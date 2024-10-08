@@ -1,29 +1,10 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
     provider = "prisma-client-js"
 }
 
 datasource db {
     provider = "mysql"
-    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-    // Further reading:
-    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
     url      = env("DATABASE_URL")
-}
-
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    @@index([name])
 }
 
 // Necessary for Next auth
@@ -34,11 +15,11 @@ model Account {
     provider                 String
     providerAccountId        String
     refresh_token            String? @db.Text
-    access_token             String? // @db.Text
+    access_token             String? @db.Text
     expires_at               Int?
     token_type               String?
     scope                    String?
-    id_token                 String? // @db.Text
+    id_token                 String? @db.Text
     session_state            String?
     user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
     refresh_token_expires_in Int?
@@ -55,14 +36,23 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
+    id                 String   @id @default(cuid())
+    username           String   @unique
+    email              String   @unique
+    createdDate        DateTime @default(now())
+    allowNotifications Boolean  @default(true)
+    verifiedEmail      Boolean  @default(false)
+    name               String?
+    image              String?
+
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    comments      Comment[]
+    notifications Notification[]
+    profile       Profile?
+
+    @@index([username, email])
 }
 
 model VerificationToken {
@@ -71,4 +61,67 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Profile {
+    id               String   @id @default(cuid())
+    userId           String   @unique
+    createdDate      DateTime @default(now())
+    lastModifiedDate DateTime @updatedAt
+    skills           Json?
+    interests        Json?
+    gradYear         Int?
+    bio              String?
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+    id               String   @id @default(cuid())
+    createdById      String
+    createdDate      DateTime @default(now())
+    lastModifiedDate DateTime @updatedAt
+    title            String
+    description      String
+    postType         PostType
+    technologies     Json?
+    githubRepo       String?
+    status           Status
+
+    createdBy User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
+    comments  Comment[]
+
+    @@index([title])
+}
+
+model Comment {
+    id               String   @id @default(cuid())
+    postId           String
+    createdById      String
+    createdDate      DateTime @default(now())
+    lastModifiedDate DateTime @updatedAt
+    content          String
+
+    post      Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+    createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+    id                   String  @id @default(cuid())
+    userId               String
+    message              String
+    disableNotifications Boolean @default(false)
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum PostType {
+    SEEKING_CONTRIBUTION
+    SEEKING_FEEDBACK
+    DISCUSSION
+}
+
+enum Status {
+    OPEN
+    CLOSED
 }
