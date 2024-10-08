@@ -104,10 +104,14 @@ classDiagram
    ```
    git clone https://github.com/steelesh/UCollab.git && cd UCollab
    ```
-3. Create your .env file
+2. Create your .env file
    ```
    Modify .env.example and rename to .env
    ```
+3. Install the dependencies
+   ```
+    npm install
+    ```
 4. Create the database
    ```
    sh start-database.sh
