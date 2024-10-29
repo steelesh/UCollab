@@ -1,13 +1,14 @@
 export default function Login() {
   return (
-    <div className="hero min-h-screen">
-      <div className="card w-full max-w-sm shrink-0 bg-base-200 shadow-2xl">
+    <div className="my-16 flex justify-center">
+      <div className="card w-full max-w-sm bg-base-300 shadow-2xl">
         <form className="card-body">
           <div className="form-control">
-            <label className="label">
+            <label htmlFor="email" className="label label-text">
               <span className="label-text">Email</span>
             </label>
             <input
+              id="email"
               type="email"
               placeholder=""
               className="input input-bordered"
@@ -15,10 +16,11 @@ export default function Login() {
             />
           </div>
           <div className="form-control">
-            <label className="label">
+            <label htmlFor="password" className="label label-text">
               <span className="label-text">Password</span>
             </label>
             <input
+              id="password"
               type="password"
               placeholder=""
               className="input input-bordered"
