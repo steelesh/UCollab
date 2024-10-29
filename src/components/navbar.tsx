@@ -1,15 +1,16 @@
-import Theme from "../components/theme";
+import Theme from "@components/theme";
+import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <div className="navbar bg-base-300">
+    <nav className="navbar bg-base-300 p-3">
       <div className="flex-1">
-        <a className="p-3 pl-8 text-5xl font-bold">
-          <span className="inline-block origin-center transform transition-transform duration-300 hover:scale-110">
-            <span className="text-[#E00222]">UC</span>
-            <span className="text-white">ollab</span>
+        <Link href="/" className="text-5xl font-bold">
+          <span className="inline-block origin-center transform transition-transform duration-300 hover:scale-105">
+            <span className="text-primary">UC</span>
+            <span className="text-accent">ollab</span>
           </span>
-        </a>
+        </Link>
       </div>
       <div className="flex-none gap-2">
         <div className="form-control">
@@ -22,7 +23,7 @@ export default function Navbar() {
         <div className="mx-4">
           <Theme />
         </div>
-        <div className="dropdown dropdown-end mr-4">
+        <div className="dropdown dropdown-end">
           <div
             tabIndex={0}
             role="button"
@@ -37,20 +38,20 @@ export default function Navbar() {
             className="menu dropdown-content menu-sm z-[1] mt-3 w-52 rounded-box bg-base-300 p-2 shadow"
           >
             <li>
-              <a className="justify-between">
+              <Link href="/profile" className="justify-between">
                 Profile
                 <span className="badge">New</span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a>Settings</a>
+              <Link href="/settings">Settings</Link>
             </li>
             <li>
-              <a>Logout</a>
+              <Link href="#">Logout</Link>
             </li>
           </ul>
         </div>
       </div>
-    </div>
+    </nav>
   );
 }
