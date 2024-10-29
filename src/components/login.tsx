@@ -1,7 +1,7 @@
 export default function Login() {
   return (
-    <div className="hero min-h-screen bg-base-200">
-      <div className="card w-full max-w-sm shrink-0 bg-base-100 shadow-2xl">
+    <div className="hero min-h-screen">
+      <div className="card w-full max-w-sm shrink-0 bg-base-200 shadow-2xl">
         <form className="card-body">
           <div className="form-control">
             <label className="label">
