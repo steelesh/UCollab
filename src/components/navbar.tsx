@@ -3,10 +3,10 @@ import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <div className="navbar bg-base-300">
+    <nav className="navbar bg-base-300 p-3">
       <div className="flex-1">
-        <Link href="/" className="p-3 pl-8 text-5xl font-bold">
-          <span className="inline-block origin-center transform transition-transform duration-300 hover:scale-110">
+        <Link href="/" className="text-5xl font-bold">
+          <span className="inline-block origin-center transform transition-transform duration-300 hover:scale-105">
             <span className="text-primary">UC</span>
             <span className="text-accent">ollab</span>
           </span>
@@ -23,7 +23,7 @@ export default function Navbar() {
         <div className="mx-4">
           <Theme />
         </div>
-        <div className="dropdown dropdown-end mr-4">
+        <div className="dropdown dropdown-end">
           <div
             tabIndex={0}
             role="button"
@@ -52,6 +52,6 @@ export default function Navbar() {
           </ul>
         </div>
       </div>
-    </div>
+    </nav>
   );
 }
