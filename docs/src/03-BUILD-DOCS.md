@@ -22,3 +22,19 @@ Polly Noll
 
 
 	Problem/Solution: Polly is getting farther into her degree which means that classes are getting a bit more involved. Polly has started to struggle a bit. She never found the Canvas community posts to be helpful because no one checks them. She also doesn’t like bothering Professors as she likes to have answers to her issues quickly. Polly also wishes she could meet more like-minded individuals. There are many projects coming up for her that require team cooperation. Polly would really benefit from a UC student website in which other computer science students and related majors can discuss and socialize.  
+
+
+
+Emily Carter
+
+	About: Emily is a junior majoring in Cybersecurity at the University of Cincinnati. She is passionate about ethical hacking and has completed several online courses, but she lacks hands-on experience in collaborative projects.
+
+	Problem/Solution: Emily wants to build a portfolio of projects to showcase her skills but struggles to find peers who share her interests. UCollab can connect her with fellow cybersecurity students for group projects, allowing them to work together on practical challenges, share resources, and enhance their learning experience.
+
+
+
+Kevin Lawson
+
+	About: Kevin is a graduate student specializing in Game Development and Simulation. He is passionate about creating immersive gaming experiences but struggles to find other developers to collaborate with on projects.
+
+	Problem/Solution: Kevin has an idea for a game but needs artists and programmers to bring it to life. UCollab can help him connect with students across IT and Computer Science disciplines, enabling him to form a diverse team with complementary skills and work collaboratively on his project.
