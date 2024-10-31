@@ -3,11 +3,11 @@ import { useTheme } from "next-themes";
 export default function Theme() {
   const { theme, setTheme } = useTheme();
   return (
-    <div>
-      {theme === "dim" ? (
+    <div className="cursor-pointer">
+      {theme === "ucollabDark" ? (
         <div
           className="flex-1 lg:flex-none"
-          onClick={() => setTheme("business")}
+          onClick={() => setTheme("ucollab")}
         >
           <svg
             className="h-10 w-10 fill-current"
@@ -18,7 +18,10 @@ export default function Theme() {
           </svg>
         </div>
       ) : (
-        <div className="flex-1 lg:flex-none" onClick={() => setTheme("dim")}>
+        <div
+          className="flex-1 lg:flex-none"
+          onClick={() => setTheme("ucollabDark")}
+        >
           <svg
             className="h-10 w-10 fill-current"
             xmlns="http://www.w3.org/2000/svg"
