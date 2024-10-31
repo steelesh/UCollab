@@ -97,8 +97,10 @@ classDiagram
     Comment --> Post : belongs to
     Notification --> User : notifies
 ```
-
 ## Build Instructions
+
+> [!Important]  
+> Building this project from source requires installing [Git](https://git-scm.com/), [NodeJS](https://nodejs.org/en), and [Docker](https://www.docker.com/products/docker-desktop/).
 
 1. Clone the repository and change into the directory
    ```
@@ -106,7 +108,7 @@ classDiagram
    ```
 2. Create your .env file
    ```
-   Modify .env.example and rename to .env
+   Copy .env.example and rename it to .env
    ```
 3. Install the dependencies
    ```
