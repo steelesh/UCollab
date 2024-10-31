@@ -3,11 +3,10 @@ import Link from "next/link";
 export default function Footer() {
   const navigation = {
     main: [
-      { name: "Home", href: "/" },
-      { name: "Profile", href: "/profile" },
-      { name: "Settings", href: "/settings" },
       { name: "Accessibility", href: "/accessibility" },
       { name: "Privacy", href: "/privacy" },
+      { name: "License", href: "/license" },
+      { name: "About Us", href: "/about-us" },
     ],
   };
 
@@ -28,9 +27,6 @@ export default function Footer() {
             </Link>
           ))}
         </nav>
-        <p className="mt-10 text-center text-accent">
-          UCollab — IT SR Capstone project
-        </p>
       </div>
     </footer>
   );
