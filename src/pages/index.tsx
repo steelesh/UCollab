@@ -1,5 +1,4 @@
 import Head from "next/head";
-import Login from "@components/login";
 
 export default function Home() {
   return (
@@ -7,7 +6,11 @@ export default function Home() {
       <Head>
         <title>UCollab — Home</title>
       </Head>
-      <Login />
+      <h1>Home</h1>
+      <a href="/protected" className="btn btn-primary mt-6">
+        Protected Page
+      </a>
+      <p>^to test auth</p>
     </>
   );
 }
