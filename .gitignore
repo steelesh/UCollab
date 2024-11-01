@@ -44,6 +44,14 @@ yarn-error.log*
 
 # idea files
 .idea
+dev-alfardous
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
 
 # mdbooks
 /docs/book/
+main
