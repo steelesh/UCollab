@@ -10,6 +10,7 @@ import {
 import AzureADProvider from "next-auth/providers/azure-ad";
 import { type JWT } from "next-auth/jwt";
 import { db } from "~/server/db";
+import { env } from "~/env";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -25,9 +26,9 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
   providers: [
     AzureADProvider({
-      clientId: process.env.AZURE_AD_CLIENT_ID!,
-      clientSecret: process.env.AZURE_AD_CLIENT_SECRET!,
-      tenantId: process.env.AZURE_AD_TENANT_ID!,
+      clientId: env.AZURE_AD_CLIENT_ID!,
+      clientSecret: env.AZURE_AD_CLIENT_SECRET!,
+      tenantId: env.AZURE_AD_TENANT_ID!,
       authorization: {
         params: {
           scope: "openid profile email User.Read User.ReadBasic.All",
