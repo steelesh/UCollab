@@ -91,8 +91,8 @@ export default function Privacy() {
               <strong>Legal Obligations:</strong> We may disclose information if
               required to do so by law, or in response to valid requests by
               public authorities (e.g., a court or government agency), to
-              protect the safety, rights, or property of [Your Company Name],
-              our users, or others.
+              protect the safety, rights, or property of UCollab, our users, or
+              others.
             </li>
           </ul>
 
