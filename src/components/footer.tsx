@@ -6,12 +6,12 @@ export default function Footer() {
       { name: "Accessibility", href: "/accessibility" },
       { name: "Privacy", href: "/privacy" },
       { name: "License", href: "/license" },
-      { name: "About Us", href: "/about-us" },
+      { name: "About Us", href: "/about" },
     ],
   };
 
   return (
-    <footer className="bg-base-200 py-6">
+    <footer className="bg-base-200 py-6 ">
       <div className="mx-auto overflow-hidden">
         <nav
           aria-label="Footer"
