@@ -9,9 +9,11 @@ export default function BasicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${GeistSans.className} flex min-h-[100svh] flex-col`}>
+    <div className={`${GeistSans.className} flex min-h-screen flex-col`}>
       <Navbar />
-      <main className="flex-grow">{children}</main>
+      <main className="relative flex h-0 flex-grow overflow-hidden">
+        {children}
+      </main>
       <Footer />
     </div>
   );

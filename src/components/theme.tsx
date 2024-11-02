@@ -1,13 +1,30 @@
+"use client";
+import * as React from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
 export default function Theme() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  const toggleTheme = () => {
+    setTheme(theme === "ucollab" ? "ucollabDark" : "ucollab");
+  };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <div className="cursor-pointer">
       {theme === "ucollabDark" ? (
         <div
           className="flex-1 lg:flex-none"
-          onClick={() => setTheme("ucollab")}
+          onClick={toggleTheme}
         >
           <svg
             className="h-10 w-10 fill-current"
@@ -20,7 +37,7 @@ export default function Theme() {
       ) : (
         <div
           className="flex-1 lg:flex-none"
-          onClick={() => setTheme("ucollabDark")}
+          onClick={toggleTheme}
         >
           <svg
             className="h-10 w-10 fill-current"

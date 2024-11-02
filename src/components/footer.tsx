@@ -6,7 +6,7 @@ export default function Footer() {
       { name: "Accessibility", href: "/accessibility" },
       { name: "Privacy", href: "/privacy" },
       { name: "License", href: "/license" },
-      { name: "About Us", href: "/about-us" },
+      { name: "About Us", href: "/about" },
     ],
   };
 

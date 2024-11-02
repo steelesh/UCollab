@@ -21,8 +21,8 @@ export default function Navbar() {
           </span>
         </Link>
       </div>
-      {session ? (
-        <div className="flex-grow justify-end md:hidden">
+      <div className="flex-grow justify-end md:hidden">
+        {session ? (
           <button onClick={toggleDrawer} className="btn btn-circle btn-ghost">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -39,8 +39,8 @@ export default function Navbar() {
               />
             </svg>
           </button>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
       <div className="hidden flex-1 justify-evenly md:flex">
         <Link className="group pt-1.5 text-xl text-accent" href="/explore">
           Explore
@@ -56,13 +56,15 @@ export default function Navbar() {
         </Link>
       </div>
       <div className="flex-shrink justify-end md:flex-none">
-        <div className="form-control hidden md:flex">
-          <input
-            type="text"
-            placeholder="Search"
-            className="input input-bordered w-48 lg:w-auto"
-          />
-        </div>
+        {session ? (
+          <div className="form-control hidden md:flex">
+            <input
+              type="text"
+              placeholder="Search"
+              className="input input-bordered w-48 lg:w-auto"
+            />
+          </div>
+        ) : null}
         <div className="mx-4 md:mx-6">
           <Theme />
         </div>
