@@ -13,6 +13,7 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate",
+    "db:seed": "prisma db seed",
     "test:unit": "jest",
     "test:unit:watch": "jest --watch",
     "test:unit:coverage": "jest --coverage",
@@ -20,6 +21,9 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report"
+  },
+  "prisma": {
+    "seed": "tsx --tsconfig tsconfig.json prisma/seed.ts"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
@@ -37,7 +41,6 @@
     "@playwright/test": "^1.48.2",
     "@types/eslint": "^8.56.12",
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.7.5",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^8.8.1",
@@ -50,9 +53,10 @@
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.8",
     "prisma": "^5.20.0",
-    "tailwindcss": "^3.4.13",
+    "tailwindcss": "^3.4.14",
     "ts-jest": "^29.2.5",
-    "typescript": "^5.6.2"
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
   },
   "ct3aMetadata": {
     "initVersion": "7.37.0"
