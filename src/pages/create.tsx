@@ -1,6 +1,6 @@
 import Head from "next/head";
 
-export default function Accessibility() {
+export default function Create() {
   return (
     <>
       <Head>
