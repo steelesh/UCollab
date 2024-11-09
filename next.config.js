@@ -17,6 +17,16 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "avatar.iran.liara.run",
+        port: "",
+        pathname: "/public/**",
+      },
+    ],
+  },
   transpilePackages: ["geist"],
 };
 

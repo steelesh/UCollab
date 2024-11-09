@@ -31,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   return {
     props: {
-      users: users.map(user => ({
+      users: users.map((user) => ({
         ...user,
         createdDate: user.createdDate.toISOString().split("T")[0],
         lastLogin: user.lastLogin.toISOString().split("T")[0],
@@ -50,20 +50,23 @@ export default function Community({ users }: CommunityProps) {
         {users.map((user, index) => (
           <div
             key={index}
-            className="flex items-center p-4 border-b w-full max-w-3xl"
+            className="flex w-full max-w-3xl items-center border-b p-4"
           >
             <Image
-              src={user.image ?? "https://avatar.iran.liara.run/public"} // Path to default avatar
+              src={user.image ?? "https://avatar.iran.liara.run/public"}
               alt={user.username}
               width={50}
               height={50}
               className="rounded-full"
             />
             <div className="ml-4">
-              <Link href={`/@${user.username}`} className="font-bold hover:underline">
+              <Link
+                href={`/${user.username}`}
+                className="font-bold hover:underline"
+              >
                 {user.username}
               </Link>
-              <p className="text-gray-500 text-sm">{user.email}</p>
+              <p className="text-sm text-gray-500">{user.email}</p>
             </div>
             <div className="ml-auto text-right">
               <p className="text-sm">Created: {user.createdDate}</p>
