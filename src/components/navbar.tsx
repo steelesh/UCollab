@@ -4,11 +4,9 @@ export default function Navbar() {
   return (
     <div className="navbar bg-base-300">
       <div className="flex-1">
-        <a className="p-3 pl-8 text-5xl font-bold">
-          <span className="inline-block origin-center transform transition-transform duration-300 hover:scale-110">
-            <span className="text-[#E00222]">UC</span>
-            <span className="text-white">ollab</span>
-          </span>
+        <a href="/" className="p-3 pl-8">
+          {/* Replace text with the actual logo image */}
+          <img src="/UCollablogo.png" alt="UCollab Logo" className="h-10 inline-block origin-center transform transition-transform duration-300 hover:scale-110" />
         </a>
       </div>
       <div className="flex-none gap-2">
