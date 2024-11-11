@@ -14,12 +14,14 @@ export default function Navbar() {
   return (
     <nav className="navbar bg-base-300 p-3">
       <div className="flex-shrink">
-        <Link href="/" className="text-5xl font-bold">
-          <span className="inline-block origin-center transform transition-transform duration-300 hover:scale-105">
-            <span className="text-primary">UC</span>
-            <span className="text-accent">ollab</span>
-          </span>
-        </Link>
+        <Link href="/" className="p-3 pl-8">
+  <img
+    src="/UCollablogo.png"
+    alt="UCollab Logo"
+    className="h-10 inline-block origin-center transform transition-transform duration-300 hover:scale-110"
+  />
+</Link>
+
       </div>
       <div className="flex-grow justify-end md:hidden">
         {session ? (
