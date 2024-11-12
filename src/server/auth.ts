@@ -1,5 +1,5 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import type { GetServerSidePropsContext } from "next";
+import { type GetServerSidePropsContext } from "next";
 import {
   type DefaultSession,
   type DefaultUser,
@@ -8,7 +8,7 @@ import {
   type Session,
 } from "next-auth";
 import AzureADProvider from "next-auth/providers/azure-ad";
-import type { JWT } from "next-auth/jwt";
+import { type JWT } from "next-auth/jwt";
 import { db } from "~/server/db";
 import { env } from "~/env";
 
@@ -20,11 +20,6 @@ declare module "next-auth" {
   interface User extends DefaultUser {
     username: string;
   }
-}
-
-// Check that necessary environment variables are defined at runtime
-if (!env.AZURE_AD_CLIENT_ID || !env.AZURE_AD_CLIENT_SECRET || !env.AZURE_AD_TENANT_ID) {
-  throw new Error("Azure AD environment variables are not defined");
 }
 
 export const authOptions: NextAuthOptions = {
@@ -62,12 +57,12 @@ export const authOptions: NextAuthOptions = {
                   type: account.type,
                   provider: account.provider,
                   providerAccountId: account.providerAccountId,
-                  access_token: account.access_token!,
+                  access_token: account.access_token,
                   expires_at: account.expires_at,
-                  token_type: account.token_type!,
-                  scope: account.scope!,
-                  id_token: account.id_token!,
-                  session_state: account.session_state!,
+                  token_type: account.token_type,
+                  scope: account.scope,
+                  id_token: account.id_token,
+                  session_state: account.session_state,
                 },
               });
             }
@@ -78,7 +73,7 @@ export const authOptions: NextAuthOptions = {
                 image: user.image,
                 lastLogin: new Date(),
                 username,
-                azureAdId: profile.sub!,
+                azureAdId: profile.sub,
               },
             });
           } else {
@@ -88,7 +83,7 @@ export const authOptions: NextAuthOptions = {
                 name: user.name!,
                 image: user.image!,
                 username,
-                azureAdId: profile.sub!,
+                azureAdId: profile.sub,
                 allowNotifications: true,
                 verifiedEmail: false,
                 profile: {
@@ -103,12 +98,12 @@ export const authOptions: NextAuthOptions = {
                     type: account.type,
                     provider: account.provider,
                     providerAccountId: account.providerAccountId,
-                    access_token: account.access_token!,
+                    access_token: account.access_token,
                     expires_at: account.expires_at,
-                    token_type: account.token_type!,
-                    scope: account.scope!,
-                    id_token: account.id_token!,
-                    session_state: account.session_state!,
+                    token_type: account.token_type,
+                    scope: account.scope,
+                    id_token: account.id_token,
+                    session_state: account.session_state,
                   },
                 },
               },
