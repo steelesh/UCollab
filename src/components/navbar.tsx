@@ -12,35 +12,35 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="navbar bg-base-300 p-3">
-      <div className="flex-shrink">
-        <Link href="/" className="text-5xl font-bold">
-          <span className="inline-block origin-center transform transition-transform duration-300 hover:scale-105">
-            <span className="text-primary">UC</span>
-            <span className="text-accent">ollab</span>
-          </span>
-        </Link>
-      </div>
-      <div className="flex-grow justify-end md:hidden">
-        {session ? (
-          <button onClick={toggleDrawer} className="btn btn-circle btn-ghost">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16m-7 6h7"
-              />
-            </svg>
-          </button>
-        ) : null}
-      </div>
+<div className="navbar bg-base-300">
+  <div className="flex-1">
+    <a href="/" className="p-3 pl-8">
+      {/* Replace text with the actual logo image */}
+      <img src="/UCollablogo.png" alt="UCollab Logo" className="h-20 w-auto" />
+    </a>
+  </div>
+
+  <div className="flex-grow justify-end md:hidden">
+    {session ? (
+      <button onClick={toggleDrawer} className="btn btn-circle btn-ghost">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M4 6h16M4 12h16m-7 6h7"
+          />
+        </svg>
+      </button>
+    ) : null}
+  </div>
+
       <div className="hidden flex-1 justify-evenly md:flex">
         <Link className="group pt-1.5 text-xl text-accent" href="/explore">
           Explore
@@ -159,6 +159,6 @@ export default function Navbar() {
           </div>
         </div>
       )}
-    </nav>
+    </div>
   );
 }

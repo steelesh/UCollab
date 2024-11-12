@@ -26,9 +26,9 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
   providers: [
     AzureADProvider({
-      clientId: env.AZURE_AD_CLIENT_ID!,
-      clientSecret: env.AZURE_AD_CLIENT_SECRET!,
-      tenantId: env.AZURE_AD_TENANT_ID!,
+      clientId: env.AZURE_AD_CLIENT_ID,
+      clientSecret: env.AZURE_AD_CLIENT_SECRET,
+      tenantId: env.AZURE_AD_TENANT_ID,
       authorization: {
         params: {
           scope: "openid profile email User.Read User.ReadBasic.All",
@@ -40,7 +40,7 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account, profile }) {
       if (account?.provider === "azure-ad" && profile) {
         try {
-          const username = user.email?.split("@")[0] || "";
+          const username = user.email?.split("@")[0] ?? "";
           const existingUser = await db.user.findUnique({
             where: { email: user.email! },
             include: {
