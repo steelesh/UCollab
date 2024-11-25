@@ -1,6 +1,6 @@
 import { signIn } from "next-auth/react";
 import Head from "next/head";
-import { GetServerSideProps } from "next";
+import { type GetServerSideProps } from "next";
 import { getServerAuthSession } from "~/server/auth";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -22,8 +22,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 export default function Signin() {
   const handleSignIn = () => {
     const callbackUrl =
-      new URLSearchParams(window.location.search).get("callbackUrl") || "/";
-    signIn("azure-ad", { callbackUrl });
+      new URLSearchParams(window.location.search).get("callbackUrl") ?? "/";
+    void signIn("azure-ad", { callbackUrl });
   };
 
   return (
