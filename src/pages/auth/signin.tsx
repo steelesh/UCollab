@@ -35,7 +35,7 @@ export default function Signin() {
       <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-24">
         <section className="flex w-full flex-col items-center justify-center px-4 py-32">
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 0 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.0 }}
             viewport={{ once: true }}
@@ -99,7 +99,7 @@ export default function Signin() {
               className="md:w-1/2"
             >
               <img
-                src="/ideas2.svg"
+                src="/ideas.svg"
                 alt="Discover Projects"
                 className="w-full px-12"
               />
