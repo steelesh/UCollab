@@ -104,9 +104,7 @@ export default function Navbar() {
             </ul>
           </div>
         ) : (
-          <Link href="/auth/signin" className="btn btn-primary">
-            Sign In
-          </Link>
+          <div></div>
         )}
       </div>
       {session && (
