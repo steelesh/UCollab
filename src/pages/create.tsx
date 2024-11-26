@@ -8,7 +8,7 @@ const CreateProjectPage = () => {
   const [description, setDescription] = useState("");
   const [technologies, setTechnologies] = useState<string[]>([]);
   const [githubRepo, setGithubRepo] = useState("");
-  const [postType, setPostType] = useState<string[]>([]);
+  const [postType, setPostType] = useState<string>("");
   const router = useRouter();
 
   const handleTechnologyInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -31,24 +31,32 @@ const CreateProjectPage = () => {
     const newPost = {
       title,
       description,
+      postType: postType.toUpperCase().replace(" ", "_"),
+      status: "OPEN",
       technologies,
       githubRepo,
-      postType,
-      status: "open",
     };
 
-    // placeholder
     try {
-      void router.push("/projects");
-    } catch (error) {}
+      const response = await fetch("/api/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newPost),
+      });
+      if (response.ok) {
+        void router.push("/explore");
+      } else {
+        console.error("Failed to create project");
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
   };
 
   const handlePostTypeToggle = (type: string) => {
-    if (postType.includes(type)) {
-      setPostType(postType.filter((t) => t !== type));
-    } else {
-      setPostType([...postType, type]);
-    }
+    setPostType((prev) => (prev === type ? "" : type));
   };
 
   return (
@@ -129,7 +137,7 @@ const CreateProjectPage = () => {
               {["Contributions", "Feedback", "Discussion"].map((type) => (
                 <motion.button
                   key={type}
-                  className={`btn btn-outline btn-xs ${postType.includes(type) ? "btn-success" : "btn-accent"} rounded-lg`}
+                  className={`btn btn-outline btn-xs ${postType === type ? "btn-success" : "btn-accent"} rounded-lg`}
                   onClick={() => handlePostTypeToggle(type)}
                   whileHover={{ scale: 1.15 }}
                   whileTap={{ scale: 1.0 }}
