@@ -1,4 +1,4 @@
-import { PostType, Status, User } from "@prisma/client";
+import { PostType, Status, type User } from "@prisma/client";
 import { db } from "~/server/db";
 
 async function main() {
@@ -29,7 +29,7 @@ async function main() {
         title: "looking for contributors on a Next.js project",
         description:
           "building a developer collaboration platform and need help with API development.",
-        postType: PostType.SEEKING_CONTRIBUTION,
+        postType: PostType.CONTRIBUTION,
         status: Status.OPEN,
         technologies: ["Next.js", "Prisma", "TypeScript"],
         githubRepo: "https://github.com/example/project",
@@ -50,7 +50,7 @@ async function main() {
         title: "Feedback needed on database schema",
         description:
           "Working on a new project and would appreciate feedback on the current database design.",
-        postType: PostType.SEEKING_FEEDBACK,
+        postType: PostType.FEEDBACK,
         status: Status.OPEN,
         technologies: ["MySQL", "Prisma"],
         createdById: user.id,

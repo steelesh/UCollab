@@ -1,13 +1,16 @@
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 interface Project {
+  user?: {
+    username: string;
+  };
   title: string;
   createdDate: string;
   createdById: string;
   description: string;
-  postType: "SEEKING_CONTRIBUTION" | "SEEKING_FEEDBACK" | "DISCUSSION";
+  postType: "CONTRIBUTION" | "FEEDBACK" | "DISCUSSION";
   status: string;
   technologies: string[];
   githubRepo?: string;
@@ -27,7 +30,25 @@ export default function Explore() {
         const jsonResponse: { data: Project[]; error: string | null } =
           (await response.json()) as { data: Project[]; error: string | null };
         if (jsonResponse.error) throw new Error(jsonResponse.error);
-        setProjects(jsonResponse.data);
+
+        const projectsWithUser = await Promise.all(
+          jsonResponse.data.map(async (project) => {
+            try {
+              const userResponse = await fetch(
+                `/api/users/from-id/${project.createdById}`,
+              );
+              if (userResponse.ok) {
+                const userData = (await userResponse.json()) as {
+                  username: string;
+                };
+                return { ...project, user: { username: userData.username } };
+              }
+            } catch {}
+            return project;
+          }),
+        );
+
+        setProjects(projectsWithUser);
       } catch (error: unknown) {
         console.error("Error fetching posts:", error);
       }
@@ -67,8 +88,17 @@ export default function Explore() {
                       {project.title}
                     </h2>
                     <span className="text-sm text-accent">
-                      {new Date(project.createdDate).toLocaleDateString()}{" "}
-                      <br /> {project.createdById}
+                      {new Date(project.createdDate).toLocaleDateString(
+                        "en-US",
+                        { month: "short", day: "numeric", year: "numeric" },
+                      )}
+                      <br />
+                      <a
+                        href={`/${project.user?.username ?? ""}`}
+                        className="link link-primary"
+                      >
+                        {project.user?.username ?? "Unknown User"}
+                      </a>
                     </span>
                   </div>
                 </div>
