@@ -95,7 +95,7 @@ export default function Explore() {
                       <br />
                       <a
                         href={`/${project.user?.username ?? ""}`}
-                        className="link link-primary"
+                        className="link link-accent font-bold tracking-wider no-underline"
                       >
                         {project.user?.username ?? "Unknown User"}
                       </a>
@@ -103,7 +103,7 @@ export default function Explore() {
                   </div>
                 </div>
                 <div className="mb-4 flex items-center justify-between">
-                  <span className="badge badge-neutral badge-md">
+                  <span className="badge badge-primary badge-outline badge-md">
                     {project.postType}
                   </span>
                 </div>
@@ -117,7 +117,7 @@ export default function Explore() {
                     {project.technologies.map((tech, i) => (
                       <span
                         key={i}
-                        className="badge badge-primary badge-outline badge-sm mb-2 mr-2 font-normal tracking-wider"
+                        className="badge badge-accent badge-outline badge-sm mb-2 mr-2 font-normal tracking-wider"
                       >
                         {tech}
                       </span>
