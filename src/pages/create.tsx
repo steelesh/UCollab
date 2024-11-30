@@ -64,7 +64,7 @@ const CreateProjectPage = () => {
       <Head>
         <title>UCollab — Create</title>
       </Head>
-      <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-24">
+      <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto pt-8">
         <div className="mx-auto w-full max-w-5xl rounded-lg bg-base-300 p-4 shadow-lg">
           <h2 className="mb-6 text-center text-3xl font-bold">
             Create Your Project
@@ -134,7 +134,7 @@ const CreateProjectPage = () => {
               />
             </div>
             <div className="flex gap-4">
-              {["Contributions", "Feedback", "Discussion"].map((type) => (
+              {["Contribution", "Feedback", "Discussion"].map((type) => (
                 <motion.button
                   key={type}
                   className={`btn btn-outline btn-xs ${postType === type ? "btn-success" : "btn-accent"} rounded-lg`}

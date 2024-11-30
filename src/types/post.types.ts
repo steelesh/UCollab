@@ -46,7 +46,7 @@ export type PostWithCommentsResponse = Prisma.PostGetPayload<{
 export type CreatePostInput = {
   title: string;
   description: string;
-  postType: "SEEKING_CONTRIBUTION" | "SEEKING_FEEDBACK" | "DISCUSSION";
+  postType: "CONTRIBUTION" | "FEEDBACK" | "DISCUSSION";
   technologies?: string[];
   githubRepo?: string;
   status: "OPEN" | "CLOSED";
