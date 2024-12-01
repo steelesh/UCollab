@@ -8,7 +8,7 @@ const CreateProjectPage = () => {
   const [description, setDescription] = useState("");
   const [technologies, setTechnologies] = useState<string[]>([]);
   const [githubRepo, setGithubRepo] = useState("");
-  const [postType, setPostType] = useState<string[]>([]);
+  const [postType, setPostType] = useState<string>("");
   const router = useRouter();
 
   const handleTechnologyInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -31,24 +31,32 @@ const CreateProjectPage = () => {
     const newPost = {
       title,
       description,
+      postType: postType.toUpperCase().replace(" ", "_"),
+      status: "OPEN",
       technologies,
       githubRepo,
-      postType,
-      status: "open",
     };
 
-    // placeholder
     try {
-      void router.push("/projects");
-    } catch (error) {}
+      const response = await fetch("/api/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newPost),
+      });
+      if (response.ok) {
+        void router.push("/explore");
+      } else {
+        console.error("Failed to create project");
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
   };
 
   const handlePostTypeToggle = (type: string) => {
-    if (postType.includes(type)) {
-      setPostType(postType.filter((t) => t !== type));
-    } else {
-      setPostType([...postType, type]);
-    }
+    setPostType((prev) => (prev === type ? "" : type));
   };
 
   return (
@@ -56,7 +64,7 @@ const CreateProjectPage = () => {
       <Head>
         <title>UCollab — Create</title>
       </Head>
-      <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-24">
+      <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto pt-8">
         <div className="mx-auto w-full max-w-5xl rounded-lg bg-base-300 p-4 shadow-lg">
           <h2 className="mb-6 text-center text-3xl font-bold">
             Create Your Project
@@ -126,10 +134,10 @@ const CreateProjectPage = () => {
               />
             </div>
             <div className="flex gap-4">
-              {["Contributions", "Feedback", "Discussion"].map((type) => (
+              {["Contribution", "Feedback", "Discussion"].map((type) => (
                 <motion.button
                   key={type}
-                  className={`btn btn-outline btn-xs ${postType.includes(type) ? "btn-success" : "btn-accent"} rounded-lg`}
+                  className={`btn btn-outline btn-xs ${postType === type ? "btn-success" : "btn-accent"} rounded-lg`}
                   onClick={() => handlePostTypeToggle(type)}
                   whileHover={{ scale: 1.15 }}
                   whileTap={{ scale: 1.0 }}

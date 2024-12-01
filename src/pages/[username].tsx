@@ -152,12 +152,8 @@ export default function UserProfile({ user }: UserProfileProps) {
           </div>
         </div>
         <div className="mt-2 w-full max-w-3xl px-4">
-          <p className="">
-            <span className="font-semibold">Biography:</span>
-            <div className="mt-2">
-              {user.profile?.bio ?? "No bio available"}
-            </div>
-          </p>
+          <span className="font-semibold">Biography:</span>
+          <div className="mt-2">{user.profile?.bio ?? "No bio available"}</div>
           <div className="mt-2">
             <span className="font-semibold">Skills:</span>
             <ul className="list-inside list-disc">

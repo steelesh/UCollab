@@ -125,8 +125,8 @@ model Notification {
 }
 
 enum PostType {
-  SEEKING_CONTRIBUTION
-  SEEKING_FEEDBACK
+  CONTRIBUTION
+  FEEDBACK
   DISCUSSION
 }
 
