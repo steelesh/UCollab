@@ -1,5 +1,5 @@
-import { db } from "~/server/db";
 import { type UpdatePostInput, type CreatePostInput } from "~/types/post.types";
+import { db } from "~/lib/db";
 
 const postInclude = {
   createdBy: {

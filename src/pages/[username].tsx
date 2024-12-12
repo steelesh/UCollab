@@ -1,7 +1,7 @@
 import { type GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { db } from "~/server/db";
+import { db } from "~/lib/db";
 
 interface UserProfileProps {
   user: {

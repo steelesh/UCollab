@@ -1,7 +1,7 @@
 import { signIn } from "next-auth/react";
 import Head from "next/head";
 import { type GetServerSideProps } from "next";
-import { getServerAuthSession } from "~/server/auth";
+import { getServerAuthSession } from "~/lib/auth";
 import { motion } from "framer-motion";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {

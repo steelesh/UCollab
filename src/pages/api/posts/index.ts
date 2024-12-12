@@ -1,5 +1,5 @@
 import { type NextApiRequest, type NextApiResponse } from "next";
-import { getServerAuthSession } from "~/server/auth";
+import { getServerAuthSession } from "~/lib/auth";
 import { PostService } from "~/services/post.service";
 import { postSchema } from "~/schemas/post.schema";
 import { z } from "zod";

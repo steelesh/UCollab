@@ -1,5 +1,5 @@
 import { type NextApiResponse, type NextApiRequest } from "next";
-import { getServerAuthSession } from "~/server/auth";
+import { getServerAuthSession } from "~/lib/auth";
 import { ProfileService } from "~/services/profile.service";
 import { type ApiResponse } from "~/types/api.types";
 import { type PublicProfileResponse } from "~/types/profile.types";

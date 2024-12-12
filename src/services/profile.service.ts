@@ -1,6 +1,6 @@
-import { db } from "~/server/db";
 import { type Prisma } from "@prisma/client";
 import { type UpdateProfileInput } from "~/types/profile.types";
+import { db } from "~/lib/db";
 
 const privateInclude = {
   user: {

@@ -1,5 +1,5 @@
 import { type NextApiRequest, type NextApiResponse } from "next";
-import { getServerAuthSession } from "~/server/auth";
+import { getServerAuthSession } from "~/lib/auth";
 import { ProfileService } from "~/services/profile.service";
 import { profileSchema } from "~/schemas/profile.schema";
 import { z } from "zod";
@@ -27,8 +27,7 @@ export default async function handler(
           return res.status(404).json({ data: null, error: "Profile not found" });
         }
         return res.status(200).json({ data: profile, error: null });
-      } catch (error) {
-        console.error("Error fetching profile:", error);
+      } catch {
         return res.status(500).json({
           data: null,
           error: "Failed to fetch profile",
