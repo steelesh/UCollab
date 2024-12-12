@@ -2,7 +2,7 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { type GetServerSideProps } from "next";
-import { db } from "~/server/db";
+import { db } from "~/config/db";
 
 interface User {
   image: string | null;

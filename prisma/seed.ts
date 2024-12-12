@@ -1,5 +1,5 @@
 import { PostType, Status, type User } from "@prisma/client";
-import { db } from "~/server/db";
+import { db } from "~/config/db";
 
 async function main() {
   try {

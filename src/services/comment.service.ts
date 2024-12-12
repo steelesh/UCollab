@@ -1,4 +1,4 @@
-import { db } from "~/server/db";
+import { db } from "~/config/db";
 import { type CreateCommentInput, type UpdateCommentInput } from "~/types/comment.types";
 
 const includeUser = {
