@@ -1,4 +1,4 @@
-import { db } from "~/server/db";
+import { db } from "~/config/db";
 import { type UpdatePostInput, type CreatePostInput } from "~/types/post.types";
 
 const postInclude = {
