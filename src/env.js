@@ -5,7 +5,7 @@ export const env = createEnv({
   server: {
     DATABASE_URL: z.string().url(),
     NEXTAUTH_SECRET:
-      process.env.NODE_ENV === "production"
+      process.env.VERCEL_ENV === "production"
         ? z.string()
         : z.string().optional(),
     NEXTAUTH_URL: z.preprocess(
