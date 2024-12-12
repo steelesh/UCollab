@@ -5,7 +5,6 @@ import { profileSchema } from "~/schemas/profile.schema";
 import { z } from "zod";
 import { type ApiResponse } from "~/types/api.types";
 import { type PrivateProfileResponse } from "~/types/profile.types";
-import { db } from "~/config/db";
 
 export default async function handler(
   req: NextApiRequest,
@@ -28,7 +27,7 @@ export default async function handler(
           return res.status(404).json({ data: null, error: "Profile not found" });
         }
         return res.status(200).json({ data: profile, error: null });
-      } catch (error) {
+      } catch {
         return res.status(500).json({
           data: null,
           error: "Failed to fetch profile",
