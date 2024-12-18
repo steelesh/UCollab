@@ -61,7 +61,7 @@ export default function Community({ users }: CommunityProps) {
             />
             <div className="ml-4">
               <Link
-                href={`/${user.username}`}
+                href={`/users/${user.username}`}
                 className="font-bold hover:underline"
               >
                 {user.username}
