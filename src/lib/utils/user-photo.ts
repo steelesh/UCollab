@@ -1,14 +1,33 @@
-import { put } from '@vercel/blob';
+import { S3Client, PutObjectCommand, ObjectCannedACL } from '@aws-sdk/client-s3';
+import { env } from '~/env';
+
+const s3Client = new S3Client({
+  endpoint: "https://nyc3.digitaloceanspaces.com",
+  region: "us-east-1",
+  credentials: {
+    accessKeyId: env.SPACES_ACCESS_KEY_ID,
+    secretAccessKey: env.SPACES_SECRET_ACCESS_KEY
+  },
+  forcePathStyle: false
+});
 
 export async function uploadProfilePhoto(buffer: Buffer, fileName: string): Promise<string> {
-  const blob = new Blob([buffer], { type: 'image/jpeg' });
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
-  const { url } = await put(fileName, blob, {
-    access: 'public',
-    contentType: 'image/jpeg'
-  });
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return url;
+  try {
+    const params = {
+      Bucket: env.SPACES_BUCKET_NAME,
+      Key: `profile-photos/${fileName}`,
+      Body: buffer,
+      ContentType: 'image/jpeg',
+      ACL: ObjectCannedACL.public_read
+    };
+
+    await s3Client.send(new PutObjectCommand(params));
+
+    return `${env.SPACES_ENDPOINT}/profile-photos/${fileName}`;
+  } catch (error) {
+    console.error('Error uploading to blob storage:', error);
+    throw error;
+  }
 }
 
 export async function getHighResProfilePhoto(accessToken: string, userId: string): Promise<string | null> {
