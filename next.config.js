@@ -7,9 +7,9 @@ const config = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'ucollab-blob.nyc3.digitaloceanspaces.com',
-        pathname: '/**',
+        protocol: "https",
+        hostname: "*.nyc3.digitaloceanspaces.com",
+        pathname: "/**",
       },
     ],
   },
