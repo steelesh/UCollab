@@ -1,26 +1,25 @@
 name: Deploy mdBook to Github Pages
-
 on:
   push:
     branches:
       - main
   pull_request:
-
 jobs:
-  deploy:
-    runs-on: ubuntu-20.04
+  run:
+    runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Setup mdBook
-        uses: peaceiris/actions-mdbook@v1
+      - uses: actions/checkout@v4
+      - name: Setup mdBook with mermaid plugin
+        uses: jontze/action-mdbook@v3
         with:
-          mdbook-version: '0.4.40'
-
-      - run: mdbook build
-
+          token: ${{ secrets.GITHUB_TOKEN }}
+          mdbook-version: '0.4.43'
+          mermaid-version: '0.14.1'
+          use-mermaid: true
+      - name: Build mdBook
+        run: mdbook build
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/main' }}
