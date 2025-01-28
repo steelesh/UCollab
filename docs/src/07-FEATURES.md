@@ -4,6 +4,8 @@
 1.  Students can create project posts with defined types such as "Looking for Feedback," "Looking for Collaboration," "Seeking Mentorship," and "Discussion."
 2.  Each post type will include relevant details, such as the project’s technologies used, linked GitHub repository, feature list, contact methods, and build/run instructions.
 
+![image](https://github.com/user-attachments/assets/54d9a6b1-454c-4074-8bb9-ef3edfaa2e8c)
+
 ### Project Discovery
 1. Students can find projects based on filters such as skills, interests, and technologies used, making it easy to connect with others who share similar goals.
 
@@ -20,10 +22,14 @@
 
 ### Profiles
 1. Each user on UCollab will have a customizable profile, showcasing their skills, project contributions, and areas of interest.
-2. This helps users connect with others who share similar academic and professional goals. 
+2. This helps users connect with others who share similar academic and professional goals.
+
+![image](https://github.com/user-attachments/assets/202285fa-9f9c-4c1a-8054-ec7442d1e480)
 
 ### Notification System
 1. UCollab offers a real-time notification system to alert students when there is new activity on posts they follow, such as feedback received or updates made, ensuring they stay up to date on all relevant updates. 
 
 ### OAuth
-1. UCollab uses OAuth to authenticate users securely with their University of Cincinnati Microsoft credentials, ensuring a familiar login process for students within the UC tenant. 
+1. UCollab uses OAuth to authenticate users securely with their University of Cincinnati Microsoft credentials, ensuring a familiar login process for students within the UC tenant.
+
+![image](https://github.com/user-attachments/assets/1289f86b-58a6-4729-8652-9f0629763bd6)
