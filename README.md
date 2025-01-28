@@ -35,7 +35,6 @@ classDiagram
         +String email
         +Date createdDate
         +boolean allowNotifications
-        +boolean verifiedEmail
         +String? name
         +String? image
     }
@@ -97,6 +96,7 @@ classDiagram
     Comment --> Post : belongs to
     Notification --> User : notifies
 ```
+
 ## Build Instructions
 
 > [!Important]  
@@ -113,7 +113,7 @@ classDiagram
 3. Install the dependencies
    ```
     npm install
-    ```
+   ```
 4. Create the database
    ```
    sh start-database.sh
@@ -126,7 +126,6 @@ classDiagram
    ```
    npm run dev
    ```
-
 
 ### Created by
 

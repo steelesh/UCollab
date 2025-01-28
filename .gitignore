@@ -55,3 +55,18 @@ node_modules/
 # mdbooks
 /docs/book/
 main
+
+# Development
+node_modules/
+.env
+.env.*
+!.env.example
+
+# Docker volumes
+mysql-data/
+minio-data/
+
+# VS Code
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
