@@ -15,7 +15,7 @@ jobs:
         uses: jontze/action-mdbook@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          mdbook-version: '0.4.43'
+          mdbook-version: '0.4.36'
           mermaid-version: '0.14.1'
           use-mermaid: true
       - name: Build mdBook
