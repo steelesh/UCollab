@@ -1,6 +1,6 @@
 import Head from "next/head";
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import useSWR from "swr";
+import { fetcher } from "../utils/fetcher"; // Import fetcher
 
 interface Project {
   user?: {
@@ -132,3 +132,4 @@ export default function Explore() {
     </>
   );
 }
+
