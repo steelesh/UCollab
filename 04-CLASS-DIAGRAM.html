@@ -8,7 +8,7 @@
 
         <!-- Custom HTML head -->
         
-        <meta name="description" content="This site provides all of the documentation currently available for UCollab.">
+        <meta name="description" content="This site provides all of the documentation for UCollab!">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
@@ -174,7 +174,98 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="class-diagram"><a class="header" href="#class-diagram">Class Diagram</a></h1>
-<p><img src="https://github.com/user-attachments/assets/0bd9c2cd-0b08-4304-a37b-a25459558d53" alt="image" /></p>
+<pre><code class="language-mermaid">classDiagram
+    class Account {
+        +UUID id
+        +UUID userId
+        +String type
+        +String provider
+        +String providerAccountId
+        +String? refreshToken
+        +String? accessToken
+        +Int? expiresAt
+        +String? tokenType
+        +String? scope
+        +String? idToken
+        +String? sessionState
+        +Int? refreshTokenExpiresIn
+    }
+ 
+    class Session {
+        +UUID id
+        +String sessionToken
+        +UUID userId
+        +Date expires
+    }
+ 
+    class User {
+        +UUID id
+        +String username
+        +String email
+        +Date createdDate
+        +boolean allowNotifications
+        +boolean verifiedEmail
+        +String? name
+        +String? image
+    }
+ 
+    class VerificationToken {
+        +String identifier
+        +String token
+        +Date expires
+    }
+ 
+    class Profile {
+        +UUID id
+        +UUID userId
+        +Date createdDate
+        +Date lastModifiedDate
+        +Json? skills
+        +Json? interests
+        +Int? gradYear
+        +String? bio
+    }
+ 
+    class Post {
+        +UUID id
+        +UUID createdById
+        +Date createdDate
+        +Date lastModifiedDate
+        +String title
+        +String description
+        +PostType postType
+        +Json? technologies
+        +String? githubRepo
+        +Status status
+    }
+ 
+    class Comment {
+        +UUID id
+        +UUID postId
+        +UUID createdById
+        +Date createdDate
+        +Date lastModifiedDate
+        +String content
+    }
+ 
+    class Notification {
+        +UUID id
+        +UUID userId
+        +String message
+        +boolean disableNotifications
+    }
+ 
+    User --&gt; Post : creates
+    User --&gt; Comment : leaves
+    User --&gt; Profile : has
+    User --&gt; Notification : receives
+    User --&gt; Account : owns
+    User --&gt; Session : has
+    User --&gt; VerificationToken : is sent
+    Post --&gt; Comment : has many
+    Comment --&gt; Post : belongs to
+    Notification --&gt; User : notifies
+</code></pre>
 
                     </main>
 
