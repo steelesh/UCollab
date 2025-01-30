@@ -25,13 +25,11 @@ export const env = createEnv({
   },
   client: {
     NEXT_PUBLIC_DEPLOY_ENV: z.enum(["local", "dev", "test", "prod"]),
-    NEXT_PUBLIC_APP_URL: z.string().url().optional(),
     NEXT_PUBLIC_POSTHOG_KEY: z.string().min(1),
     NEXT_PUBLIC_POSTHOG_HOST: z.string().url(),
   },
   runtimeEnv: {
     NEXT_PUBLIC_DEPLOY_ENV: process.env.NEXT_PUBLIC_DEPLOY_ENV,
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     AUTH_SECRET: process.env.AUTH_SECRET,
     MYSQL_HOST: process.env.MYSQL_HOST,
     MYSQL_PORT: process.env.MYSQL_PORT,

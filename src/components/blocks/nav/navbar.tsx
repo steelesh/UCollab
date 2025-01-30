@@ -1,5 +1,6 @@
 import { AuthSection } from "./auth-section";
 import { DesktopNav } from "./desktop-nav";
+import { FloatingNavWrapper } from "./floating-nav-wrapper";
 import { MobileNav } from "./mobile-nav";
 import { NavLinkProps } from "./nav-link";
 import { NavLogo } from "./nav-logo";
@@ -73,24 +74,31 @@ const routes: NavSection[] = [
         href: "/code-of-conduct",
         description: "Our community values and expectations",
       },
+      {
+        title: "User Directory",
+        href: "/u",
+        description: "Our user base",
+      },
     ],
   },
 ];
 
 export default function Navbar() {
   return (
-    <div className="w-full px-4 pt-8 pb-2 sm:px-6 lg:px-8">
-      <nav className="bg-background mx-auto flex h-16 max-w-2xl items-center justify-between rounded-full border px-5">
-        <div className="flex items-center gap-4">
-          <MobileNav items={routes} />
-          <NavLogo />
-        </div>
-        <div className="flex items-center gap-4">
-          <DesktopNav items={routes} />
-          <div className="mx-2 hidden h-6 border-l md:block" />
-          <AuthSection />
-        </div>
-      </nav>
-    </div>
+    <FloatingNavWrapper>
+      <div className="bg-background w-full border-b backdrop-blur-sm">
+        <nav className="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-4">
+            <MobileNav items={routes} />
+            <NavLogo />
+          </div>
+          <div className="flex items-center gap-4">
+            <DesktopNav items={routes} />
+            <div className="mx-2 hidden h-6 border-l md:block" />
+            <AuthSection />
+          </div>
+        </nav>
+      </div>
+    </FloatingNavWrapper>
   );
 }

@@ -1,9 +1,10 @@
+import { User } from "@prisma/client";
 import { Queue, Worker } from "bullmq";
 import IORedis from "ioredis";
 import { env } from "../lib/env";
 import {
-  CreateBatchNotificationInput,
-  CreateNotificationInput,
+  CreateBatchNotificationData,
+  CreateNotificationData,
 } from "../schemas/notification.schema";
 import { NotificationService } from "../services/notification.service";
 
@@ -48,13 +49,13 @@ notificationWorker.on("failed", (job, error) => {
 });
 
 export const mq = {
-  async addNotification(data: CreateNotificationInput) {
+  async addNotification(data: CreateNotificationData) {
     const jobId = `notification:${data.userId}:${Date.now()}`;
     return notificationQueue.add(jobId, data);
   },
 
-  async addBatchNotifications(data: CreateBatchNotificationInput) {
-    const jobs = data.userIds.map((userId) => ({
+  async addBatchNotifications(data: CreateBatchNotificationData) {
+    const jobs = data.userIds.map((userId: User["id"]) => ({
       name: `notification:${userId}:${Date.now()}`,
       data: {
         ...data,

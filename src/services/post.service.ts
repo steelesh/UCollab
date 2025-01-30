@@ -1,553 +1,182 @@
-import { Post, Technology, Prisma } from "@prisma/client";
+import { Post, Prisma, Technology } from "@prisma/client";
+import { notFound } from "next/navigation";
 import { db } from "../data/mysql";
+import { withServiceAuth } from "../lib/auth/protected-service";
+import { ErrorMessage } from "../lib/constants";
+import { AppError, AuthorizationError } from "../lib/errors/app-error";
+import { Permission } from "../lib/permissions";
 import {
   CreatePostInput,
   UpdatePostInput,
-  UpdatePostPayload,
+  postSelect,
   updatePostSchema,
 } from "../schemas/post.schema";
-import { notFound } from "next/navigation";
 import { UserService } from "./user.service";
-import { Permission } from "../lib/permissions";
 
 export const PostService = {
-  async getAllPosts(requestUserId?: string) {
-    try {
-      if (
-        requestUserId &&
-        !(await UserService.hasPermission(requestUserId, Permission.VIEW_POSTS))
-      ) {
-        throw new Error("Unauthorized: Cannot view posts");
+  // Read Operations
+  async getAllPosts(requestUserId: string) {
+    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+      try {
+        return await db.post.findMany({
+          select: postSelect,
+          orderBy: { createdDate: "desc" },
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
       }
-      return await db.post.findMany({
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          createdDate: true,
-          lastModifiedDate: true,
-          postType: true,
-          status: true,
-          githubRepo: true,
-          technologies: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          createdBy: {
-            select: {
-              id: true,
-              username: true,
-              avatar: true,
-            },
-          },
-          _count: {
-            select: {
-              comments: true,
-            },
-          },
-        },
-        orderBy: { createdDate: "desc" },
-      });
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? `Failed to fetch posts: ${error.message}`
-          : "Failed to fetch posts",
-      );
-    }
+    });
   },
 
-  async getPostById(id: Post["id"], requestUserId?: string) {
-    try {
-      if (
-        requestUserId &&
-        !(await UserService.hasPermission(requestUserId, Permission.VIEW_POSTS))
-      ) {
-        throw new Error("Unauthorized: Cannot view post");
-      }
-      const post = await db.post.findUnique({
-        where: { id },
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          createdDate: true,
-          lastModifiedDate: true,
-          postType: true,
-          status: true,
-          githubRepo: true,
-          createdById: true,
-          technologies: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          createdBy: {
-            select: {
-              id: true,
-              username: true,
-              avatar: true,
-            },
-          },
-          comments: {
-            select: {
-              id: true,
-              content: true,
-              createdDate: true,
-              createdBy: {
-                select: {
-                  id: true,
-                  username: true,
-                  avatar: true,
+  async getPostById(id: Post["id"], requestUserId: string) {
+    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+      try {
+        const post = await db.post.findUnique({
+          where: { id },
+          select: {
+            ...postSelect,
+            createdById: true,
+            comments: {
+              select: {
+                id: true,
+                content: true,
+                createdDate: true,
+                createdBy: {
+                  select: {
+                    id: true,
+                    username: true,
+                    avatar: true,
+                  },
                 },
               },
+              orderBy: { createdDate: "desc" },
             },
-            orderBy: { createdDate: "desc" },
           },
-        },
-      });
+        });
 
-      if (!post) {
-        notFound();
+        if (!post) notFound();
+        return post;
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
       }
-
-      return post;
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? `Failed to fetch post: ${error.message}`
-          : "Failed to fetch post",
-      );
-    }
+    });
   },
 
+  // Create Operations
   async createPost(data: CreatePostInput, requestUserId: string) {
-    try {
-      if (
-        !(await UserService.canAccessContent(
-          requestUserId,
-          data.userId,
-          Permission.CREATE_POST,
-        ))
-      ) {
-        throw new Error("Unauthorized: Cannot create post");
-      }
-      return await db.$transaction(async (tx) => {
-        const { technologies: techNames, ...postData } = data;
+    return withServiceAuth(requestUserId, Permission.CREATE_POST, async () => {
+      try {
+        if (
+          !(await UserService.canAccessContent(
+            requestUserId,
+            data.userId,
+            Permission.CREATE_POST,
+          ))
+        ) {
+          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
+        }
 
-        // Only use verified technologies
-        const verifiedTechs = techNames?.length
-          ? await tx.technology.findMany({
-              where: {
-                AND: [
-                  { verified: true },
-                  {
-                    name: { in: techNames.map((t) => t.toLowerCase().trim()) },
-                  },
-                ],
-              },
-              select: { name: true },
-            })
-          : [];
+        return await db.$transaction(async (tx) => {
+          const { technologies: techNames, ...postData } = data;
 
-        return tx.post.create({
-          data: {
-            ...postData,
-            createdById: data.userId,
-            technologies: verifiedTechs.length
-              ? {
-                  connect: verifiedTechs.map(({ name }) => ({ name })),
-                }
-              : undefined,
-          },
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            createdDate: true,
-            postType: true,
-            status: true,
-            githubRepo: true,
-            technologies: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        });
-      });
-    } catch (error) {
-      if (error instanceof Error && error.name === "ZodError") {
-        throw error;
-      }
-      throw new Error(
-        error instanceof Error
-          ? `Failed to create post: ${error.message}`
-          : "Failed to create post",
-      );
-    }
-  },
-
-  async updatePost(data: UpdatePostInput, requestUserId: string) {
-    try {
-      const post = await this.getPostById(data.id);
-      if (
-        !(await UserService.canAccessContent(
-          requestUserId,
-          post.createdById,
-          Permission.UPDATE_ANY_POST,
-        ))
-      ) {
-        throw new Error("Unauthorized: Cannot update post");
-      }
-      return await db.$transaction(async (tx) => {
-        // Only use verified technologies
-        const verifiedTechs = data.technologies?.length
-          ? await tx.technology.findMany({
-              where: {
-                AND: [
-                  { verified: true },
-                  {
-                    name: {
-                      in: data.technologies.map((t) => t.toLowerCase().trim()),
+          const verifiedTechs = techNames?.length
+            ? await tx.technology.findMany({
+                where: {
+                  AND: [
+                    { verified: true },
+                    {
+                      name: {
+                        in: techNames.map((t) => t.toLowerCase().trim()),
+                      },
                     },
+                  ],
+                },
+                select: { name: true },
+              })
+            : [];
+
+          return tx.post.create({
+            data: {
+              ...postData,
+              createdById: data.userId,
+              technologies: verifiedTechs.length
+                ? { connect: verifiedTechs.map(({ name }) => ({ name })) }
+                : undefined,
+            },
+            select: postSelect,
+          });
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          throw new AppError(ErrorMessage.INVALID_INPUT);
+        }
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  // Update Operations
+  async updatePost(data: UpdatePostInput, requestUserId: string) {
+    return withServiceAuth(
+      requestUserId,
+      Permission.UPDATE_ANY_POST,
+      async () => {
+        try {
+          const post = await this.getPostById(data.id, requestUserId);
+
+          if (
+            !(await UserService.canAccessContent(
+              requestUserId,
+              post.createdById,
+              Permission.UPDATE_ANY_POST,
+            ))
+          ) {
+            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
+          }
+
+          return await db.$transaction(async (tx) => {
+            const verifiedTechs = data.technologies?.length
+              ? await tx.technology.findMany({
+                  where: {
+                    AND: [
+                      { verified: true },
+                      {
+                        name: {
+                          in: data.technologies.map((t) =>
+                            t.toLowerCase().trim(),
+                          ),
+                        },
+                      },
+                    ],
                   },
-                ],
-              },
-              select: { name: true },
-            })
-          : [];
+                  select: { name: true },
+                })
+              : [];
 
-        const validatedData: UpdatePostPayload = updatePostSchema.parse({
-          ...data,
-          technologies: verifiedTechs.map((t) => t.name),
-        });
+            const validatedData = updatePostSchema.parse({
+              ...data,
+              technologies: verifiedTechs.map((t) => t.name),
+            });
 
-        return tx.post.update({
-          where: { id: data.id },
-          data: validatedData,
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            lastModifiedDate: true,
-            postType: true,
-            status: true,
-            githubRepo: true,
-            technologies: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        });
-      });
-    } catch (error) {
-      if (error instanceof Error && error.name === "ZodError") {
-        throw error;
-      }
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === "P2025") {
-          notFound();
+            return tx.post.update({
+              where: { id: data.id },
+              data: validatedData,
+              select: postSelect,
+            });
+          });
+        } catch (error) {
+          if (error instanceof AppError) throw error;
+          if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2025") notFound();
+            throw new AppError(ErrorMessage.INVALID_INPUT);
+          }
+          throw new AppError(ErrorMessage.OPERATION_FAILED);
         }
-      }
-      throw new Error(
-        error instanceof Error
-          ? `Failed to update post: ${error.message}`
-          : "Failed to update post",
-      );
-    }
-  },
-
-  async deletePost(id: Post["id"], requestUserId: string) {
-    try {
-      const post = await this.getPostById(id);
-      if (
-        !(await UserService.canAccessContent(
-          requestUserId,
-          post.createdById,
-          Permission.DELETE_ANY_POST,
-        ))
-      ) {
-        throw new Error("Unauthorized: Cannot delete post");
-      }
-      await db.post.delete({
-        where: { id },
-      });
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === "P2025") {
-          notFound();
-        }
-      }
-      throw new Error(
-        error instanceof Error
-          ? `Failed to delete post: ${error.message}`
-          : "Failed to delete post",
-      );
-    }
-  },
-
-  async getPaginatedPosts(
-    page: number = 1,
-    limit: number = 20,
-    requestUserId?: string,
-  ) {
-    try {
-      if (
-        requestUserId &&
-        !(await UserService.hasPermission(requestUserId, Permission.VIEW_POSTS))
-      ) {
-        throw new Error("Unauthorized: Cannot view posts");
-      }
-      return await db.post.findMany({
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          createdDate: true,
-          lastModifiedDate: true,
-          postType: true,
-          status: true,
-          githubRepo: true,
-          technologies: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          createdBy: {
-            select: {
-              id: true,
-              username: true,
-              avatar: true,
-            },
-          },
-          _count: {
-            select: {
-              comments: true,
-            },
-          },
-        },
-        skip: (page - 1) * limit,
-        take: limit,
-        orderBy: { createdDate: "desc" },
-      });
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? `Failed to fetch paginated posts: ${error.message}`
-          : "Failed to fetch paginated posts",
-      );
-    }
-  },
-
-  async searchPosts(
-    query: string,
-    requestUserId?: string,
-    page = 1,
-    limit = 20,
-  ) {
-    try {
-      if (
-        requestUserId &&
-        !(await UserService.hasPermission(requestUserId, Permission.VIEW_POSTS))
-      ) {
-        throw new Error("Unauthorized: Cannot search posts");
-      }
-      return await db.post.findMany({
-        where: {
-          OR: [
-            { title: { contains: query } },
-            { description: { contains: query } },
-          ],
-        },
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          createdDate: true,
-          postType: true,
-          status: true,
-          technologies: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          createdBy: {
-            select: {
-              id: true,
-              username: true,
-              avatar: true,
-            },
-          },
-        },
-        skip: (page - 1) * limit,
-        take: limit,
-      });
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? `Failed to search posts: ${error.message}`
-          : "Failed to search posts",
-      );
-    }
-  },
-
-  async getPostsByUser(userId: string, requestUserId?: string) {
-    try {
-      if (
-        requestUserId &&
-        !(await UserService.hasPermission(requestUserId, Permission.VIEW_POSTS))
-      ) {
-        throw new Error("Unauthorized: Cannot view user posts");
-      }
-      return await db.post.findMany({
-        where: { createdById: userId },
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          createdDate: true,
-          postType: true,
-          status: true,
-          technologies: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          _count: {
-            select: {
-              comments: true,
-            },
-          },
-        },
-        orderBy: { createdDate: "desc" },
-      });
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? `Failed to fetch user posts: ${error.message}`
-          : "Failed to fetch user posts",
-      );
-    }
-  },
-
-  async getPostsByTechnology(techName: string, requestUserId?: string) {
-    try {
-      if (
-        requestUserId &&
-        !(await UserService.hasPermission(requestUserId, Permission.VIEW_POSTS))
-      ) {
-        throw new Error("Unauthorized: Cannot view posts");
-      }
-      return db.post.findMany({
-        where: {
-          technologies: {
-            some: {
-              name: techName,
-            },
-          },
-        },
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          createdDate: true,
-          postType: true,
-          status: true,
-          technologies: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          createdBy: {
-            select: {
-              id: true,
-              username: true,
-              avatar: true,
-            },
-          },
-        },
-      });
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? `Failed to fetch posts by technology: ${error.message}`
-          : "Failed to fetch posts by technology",
-      );
-    }
-  },
-
-  async getPostsByTechnologies(
-    techNames: Technology["name"][],
-    matchAll: boolean = false,
-    requestUserId?: string,
-  ) {
-    try {
-      if (
-        requestUserId &&
-        !(await UserService.hasPermission(requestUserId, Permission.VIEW_POSTS))
-      ) {
-        throw new Error("Unauthorized: Cannot view posts");
-      }
-      return db.post.findMany({
-        where: {
-          technologies: matchAll
-            ? {
-                every: {
-                  name: { in: techNames },
-                },
-              }
-            : {
-                some: {
-                  name: { in: techNames },
-                },
-              },
-        },
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          createdDate: true,
-          postType: true,
-          status: true,
-          technologies: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          createdBy: {
-            select: {
-              id: true,
-              username: true,
-              avatar: true,
-            },
-          },
-          _count: {
-            select: {
-              comments: true,
-            },
-          },
-        },
-        orderBy: { createdDate: "desc" },
-      });
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? `Failed to fetch posts by technologies: ${error.message}`
-          : "Failed to fetch posts by technologies",
-      );
-    }
+      },
+    );
   },
 
   async updatePostStatus(
@@ -555,92 +184,183 @@ export const PostService = {
     status: Post["status"],
     requestUserId: string,
   ) {
-    try {
-      const post = await this.getPostById(id);
-      if (
-        !(await UserService.canAccessContent(
-          requestUserId,
-          post.createdById,
-          Permission.UPDATE_ANY_POST,
-        ))
-      ) {
-        throw new Error("Unauthorized: Cannot update post status");
-      }
-      return await db.post.update({
-        where: { id },
-        data: { status },
-        select: {
-          id: true,
-          status: true,
-          lastModifiedDate: true,
-        },
-      });
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? `Failed to update post status: ${error.message}`
-          : "Failed to update post status",
-      );
-    }
+    return withServiceAuth(
+      requestUserId,
+      Permission.UPDATE_ANY_POST,
+      async () => {
+        try {
+          const post = await this.getPostById(id, requestUserId);
+
+          if (
+            !(await UserService.canAccessContent(
+              requestUserId,
+              post.createdById,
+              Permission.UPDATE_ANY_POST,
+            ))
+          ) {
+            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
+          }
+
+          return await db.post.update({
+            where: { id },
+            data: { status },
+            select: {
+              id: true,
+              status: true,
+              lastModifiedDate: true,
+            },
+          });
+        } catch (error) {
+          if (error instanceof AppError) throw error;
+          if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2025") notFound();
+          }
+          throw new AppError(ErrorMessage.OPERATION_FAILED);
+        }
+      },
+    );
   },
 
-  async getTrendingPosts(limit: number = 10, requestUserId?: string) {
-    try {
-      if (
-        requestUserId &&
-        !(await UserService.hasPermission(requestUserId, Permission.VIEW_POSTS))
-      ) {
-        throw new Error("Unauthorized: Cannot view trending posts");
-      }
-      // Get posts with most comments in last 7 days
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  // Delete Operations
+  async deletePost(id: Post["id"], requestUserId: string) {
+    return withServiceAuth(
+      requestUserId,
+      Permission.DELETE_ANY_POST,
+      async () => {
+        try {
+          const post = await this.getPostById(id, requestUserId);
 
-      return db.post.findMany({
-        where: {
-          createdDate: {
-            gte: sevenDaysAgo,
+          if (
+            !(await UserService.canAccessContent(
+              requestUserId,
+              post.createdById,
+              Permission.DELETE_ANY_POST,
+            ))
+          ) {
+            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
+          }
+
+          await db.post.delete({ where: { id } });
+        } catch (error) {
+          if (error instanceof AppError) throw error;
+          if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2025") notFound();
+          }
+          throw new AppError(ErrorMessage.OPERATION_FAILED);
+        }
+      },
+    );
+  },
+
+  // Search & Filter Operations
+  async searchPosts(
+    query: string,
+    requestUserId: string,
+    page = 1,
+    limit = 20,
+  ) {
+    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+      try {
+        return await db.post.findMany({
+          where: {
+            OR: [
+              { title: { contains: query } },
+              { description: { contains: query } },
+            ],
           },
-        },
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          createdDate: true,
-          postType: true,
-          status: true,
-          technologies: {
-            select: {
-              id: true,
-              name: true,
+          select: postSelect,
+          skip: (page - 1) * limit,
+          take: limit,
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  async getPostsByUser(userId: string, requestUserId: string) {
+    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+      try {
+        return await db.post.findMany({
+          where: { createdById: userId },
+          select: postSelect,
+          orderBy: { createdDate: "desc" },
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  async getPostsByTechnology(techName: string, requestUserId: string) {
+    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+      try {
+        return await db.post.findMany({
+          where: {
+            technologies: {
+              some: { name: techName.toLowerCase().trim() },
             },
           },
-          createdBy: {
-            select: {
-              id: true,
-              username: true,
-              avatar: true,
-            },
+          select: postSelect,
+          orderBy: { createdDate: "desc" },
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  async getPostsByTechnologies(
+    techNames: Technology["name"][],
+    matchAll: boolean = false,
+    requestUserId: string,
+  ) {
+    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+      try {
+        return await db.post.findMany({
+          where: {
+            technologies: matchAll
+              ? {
+                  every: {
+                    name: { in: techNames.map((t) => t.toLowerCase().trim()) },
+                  },
+                }
+              : {
+                  some: {
+                    name: { in: techNames.map((t) => t.toLowerCase().trim()) },
+                  },
+                },
           },
-          _count: {
-            select: {
-              comments: true,
-            },
-          },
-        },
-        orderBy: {
-          comments: {
-            _count: "desc",
-          },
-        },
-        take: limit,
-      });
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? `Failed to fetch trending posts: ${error.message}`
-          : "Failed to fetch trending posts",
-      );
-    }
+          select: postSelect,
+          orderBy: { createdDate: "desc" },
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  async getPaginatedPosts(
+    page: number = 1,
+    limit: number = 20,
+    requestUserId: string,
+  ) {
+    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+      try {
+        return await db.post.findMany({
+          select: postSelect,
+          skip: (page - 1) * limit,
+          take: limit,
+          orderBy: { createdDate: "desc" },
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 };

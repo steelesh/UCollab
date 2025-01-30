@@ -1,19 +1,18 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { AvatarSource, OnboardingStep, Role } from "@prisma/client";
+import { AvatarSource, Role } from "@prisma/client";
 import { type NextAuthConfig } from "next-auth";
 import { encode } from "next-auth/jwt";
 import credentials from "next-auth/providers/credentials";
 import microsoftEntraId from "next-auth/providers/microsoft-entra-id";
 import { db } from "./src/data/mysql";
-import { getRequiredPermission } from "./src/lib/permissions";
-import { isDevelopment } from "./src/lib/utils";
+import { isLocalEnv } from "./src/lib/utils";
 import { UserService } from "./src/services/user.service";
 
 export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(db),
   session: { strategy: "database" },
   providers: [
-    ...(isDevelopment()
+    ...(isLocalEnv()
       ? [
           credentials({
             credentials: { userId: {} },
@@ -33,33 +32,32 @@ export const authConfig: NextAuthConfig = {
           scope: "openid profile email User.Read User.ReadBasic.All",
         },
       },
-      allowDangerousEmailAccountLinking: isDevelopment(),
+      allowDangerousEmailAccountLinking: isLocalEnv(),
     }),
   ],
 
   callbacks: {
     async jwt({ token, account }) {
-      if (isDevelopment() && account?.provider === "credentials") {
+      if (isLocalEnv() && account?.provider === "credentials") {
         token.credentials = true;
       }
       return token;
     },
     async signIn({ user, profile, account }) {
-      if (isDevelopment() && account?.provider === "credentials") {
-        return true;
-      }
+      if (isLocalEnv() && account?.provider === "credentials") return true;
 
-      if (!profile?.email || !user?.id) return false;
+      if (!profile?.email || !user?.id || !profile.sub) return false;
 
       try {
+        await db.session.deleteMany({});
+
         const existingUser = await db.user.findFirst({
-          where: {
-            OR: [
-              { azureAdId: profile.sub ?? "" },
-              { email: profile.email.toLowerCase() },
-            ],
-          },
+          where: { azureAdId: profile.sub },
         });
+
+        if (existingUser) {
+          user.id = existingUser.id;
+        }
 
         const nameMatch = profile.name?.match(
           /([^,]+),\s*([^\s(]+)\s*\(([^)]+)\)/,
@@ -69,15 +67,13 @@ export const authConfig: NextAuthConfig = {
         const username = nameMatch?.[3]?.trim() ?? "";
         const fullName = `${firstName} ${lastName}`.trim();
 
-        let avatar = await UserService.generateDefaultAvatar(
-          existingUser?.id ?? user.id,
-        );
+        let avatar = await UserService.generateDefaultAvatar(user.id);
         let avatarSource: AvatarSource = AvatarSource.DEFAULT;
 
         if (account?.access_token) {
           const msAvatar = await UserService.fetchMicrosoftAvatar(
             account.access_token,
-            existingUser?.id ?? user.id,
+            user.id,
           );
           if (msAvatar) {
             avatar = msAvatar;
@@ -89,7 +85,7 @@ export const authConfig: NextAuthConfig = {
           await db.user.create({
             data: {
               id: user.id,
-              email: profile.email.toLowerCase(),
+              email: profile.email,
               azureAdId: profile.sub ?? "",
               username,
               fullName,
@@ -107,44 +103,20 @@ export const authConfig: NextAuthConfig = {
             where: { id: existingUser.id },
             data: {
               lastLogin: new Date(),
-              azureAdId: profile.sub ?? existingUser.azureAdId,
               avatar,
               avatarSource,
             },
           });
-
-          user.id = existingUser.id;
         }
+
         return true;
       } catch (error) {
         console.error("Sign in error:", error);
         throw new Error("Failed to sign in");
       }
     },
-    authorized: async ({ auth, request: { nextUrl } }) => {
-      if (!auth?.user) return true;
-
-      const isOnboardingComplete =
-        auth.user.onboardingStep === OnboardingStep.COMPLETE;
-      const isOnboardingPage = nextUrl.pathname === "/onboarding";
-      const isHomePage = nextUrl.pathname === "/";
-
-      if (isHomePage && !isOnboardingComplete) {
-        return Response.redirect(new URL("/onboarding", nextUrl));
-      }
-
-      const requiredPermission = getRequiredPermission(nextUrl.pathname);
-      if (requiredPermission && !isOnboardingComplete) {
-        return Response.redirect(new URL("/onboarding", nextUrl));
-      }
-
-      if (isOnboardingPage && isOnboardingComplete) {
-        return Response.redirect(new URL("/", nextUrl));
-      }
-
-      return true;
-    },
   },
+
   jwt: {
     encode: async function (params) {
       if (params.token?.credentials) {
@@ -181,6 +153,6 @@ export const authConfig: NextAuthConfig = {
   },
 
   pages: {
-    signIn: "/",
+    signIn: isLocalEnv() ? "/u" : "/",
   },
 };

@@ -19,7 +19,10 @@ export default async function Page() {
   }
 
   // since there is a session, get user
-  const user = await UserService.getHomePageUser(session.user.id);
+  const user = await UserService.getHomePageUser(
+    session.user.id,
+    session.user.id,
+  );
 
   // if no user, show public home page
   if (!user) {

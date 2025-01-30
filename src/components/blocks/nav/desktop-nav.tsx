@@ -14,9 +14,11 @@ export function DesktopNav({ items }: { items: NavSection[] }) {
       <NavigationMenuList>
         {items.map((section) => (
           <NavigationMenuItem key={section.title}>
-            <NavigationMenuTrigger>{section.title}</NavigationMenuTrigger>
+            <NavigationMenuTrigger className="h-9">
+              {section.title}
+            </NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
+              <ul className="w-[300px] p-4">
                 {section.items.map((item: NavLinkProps) => (
                   <li key={item.href}>
                     <NavLink {...item} />

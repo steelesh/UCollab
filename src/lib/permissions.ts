@@ -1,5 +1,5 @@
 import { Role } from "@prisma/client";
-import { isDevelopment } from "./utils";
+import { isDevEnv, isLocalEnv, isProdEnv, isTestEnv } from "./utils";
 
 /**
  * permission enum used throughout the app to define access controls
@@ -115,13 +115,65 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
 /**
  * routes that require specific permissions
  */
-export const PROTECTED_ROUTES: Record<string, Permission | Permission[]> = {};
+export const PROTECTED_ROUTES: Record<string, Permission | Permission[]> = {
+  "/onboarding": Permission.UPDATE_OWN_USER,
+  "/admin": Permission.ACCESS_ADMIN,
+  "/posts": Permission.VIEW_POSTS,
+  "/collaborations": Permission.VIEW_POSTS,
+  "/discussions": Permission.VIEW_POSTS,
+  "/feedback": Permission.VIEW_POSTS,
+  "/mentorship": Permission.VIEW_POSTS,
+  "/post/create": Permission.CREATE_POST,
+  "/questions": Permission.VIEW_POSTS,
+  "/tags": Permission.VIEW_POSTS,
+  "/trending": Permission.VIEW_POSTS,
+};
 
 /**
- * routes only available in development environment
+ * routes available per environment
  */
-type DevelopmentRoute = (typeof DEVELOPMENT_ROUTES)[number];
-export const DEVELOPMENT_ROUTES = [] as const;
+export const ENVIRONMENT_ROUTES = {
+  LOCAL_ROUTES: [] as const,
+
+  DEV_ROUTES: [] as const,
+
+  TEST_ROUTES: [] as const,
+
+  PROD_ROUTES: [] as const,
+} as const;
+
+/**
+ * checks if a route is available in the current environment
+ * @param path - the route path to check
+ * @returns boolean
+ */
+export const isEnvironmentRoute = (path: string): boolean => {
+  if (isLocalEnv()) {
+    return ENVIRONMENT_ROUTES.LOCAL_ROUTES.some((route) =>
+      path.startsWith(route),
+    );
+  }
+
+  if (isDevEnv()) {
+    return ENVIRONMENT_ROUTES.DEV_ROUTES.some((route) =>
+      path.startsWith(route),
+    );
+  }
+
+  if (isTestEnv()) {
+    return ENVIRONMENT_ROUTES.TEST_ROUTES.some((route) =>
+      path.startsWith(route),
+    );
+  }
+
+  if (isProdEnv()) {
+    return ENVIRONMENT_ROUTES.PROD_ROUTES.some((route) =>
+      path.startsWith(route),
+    );
+  }
+
+  return false;
+};
 
 /**
  * routes accessible without authentication (public routes)
@@ -157,20 +209,6 @@ export const isPublicRoute = (path: string): boolean => {
 };
 
 /**
- * checks if a route is only available in development environment
- * @param path - the route path to check
- * @returns boolean
- * @example
- * isDevRoute('/debug') // returns true in development, false in production
- */
-export const isDevRoute = (path: string): boolean => {
-  if (!isDevelopment()) return false;
-  return DEVELOPMENT_ROUTES.some((route: DevelopmentRoute) =>
-    path.startsWith(route),
-  );
-};
-
-/**
  * gets required permissions for a given route path
  * @param path - the route path to check
  * @returns Permission | Permission[] | null
@@ -180,7 +218,9 @@ export const isDevRoute = (path: string): boolean => {
 export const getRequiredPermission = (
   path: string,
 ): Permission | Permission[] | null => {
-  if (path === "/" || isDevRoute(path)) return null;
+  if (isPublicRoute(path) || isEnvironmentRoute(path)) {
+    return null;
+  }
 
   const route = Object.entries(PROTECTED_ROUTES).find(([route]) =>
     path.startsWith(route),

@@ -175,13 +175,13 @@
     --chart-3: 30 85% 60%;
     --chart-4: 280 70% 65%;
     --chart-5: 340 80% 60%;
-    --sidebar-background: 240 5.9% 12%;
+    --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 17%;
+    --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 17%;
+    --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
     --inverse-background: 0 0% 100%;
     --inverse-foreground: 0 0% 3.9%;
@@ -200,10 +200,12 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--color-border);
   }
   body {
-    @apply bg-background text-foreground font-body;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-body);
   }
   h1,
   h2,
@@ -211,11 +213,11 @@
   h4,
   h5,
   h6 {
-    @apply font-heading;
+    font-family: var(--font-heading);
   }
   code,
   pre {
-    @apply font-mono;
+    font-family: var(--font-mono);
   }
 }
 

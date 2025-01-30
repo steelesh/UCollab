@@ -14,7 +14,7 @@ datasource db {
 
 model Account {
   id                String  @id @default(cuid())
-  userId            String  @unique
+  userId            String
   type              String
   provider          String
   providerAccountId String
@@ -55,7 +55,7 @@ model User {
   notifications           Notification[]           @relation("NotificationReceiver")
   posts                   Post[]
   profile                 Profile?                 @relation("UserProfile")
-  account                 Account?
+  accounts                Account[]
   NotificationPreferences NotificationPreferences?
   triggeredNotifications  Notification[]           @relation("NotificationTrigger")
   sessions                Session[]

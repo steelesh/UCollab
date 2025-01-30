@@ -34,7 +34,7 @@ export async function seedDatabase() {
         azureAdId: adminAzureId,
         role: "ADMIN",
         profile: { create: {} },
-        account: { create: fakeAccount() },
+        accounts: { create: fakeAccount() },
         NotificationPreferences: { create: {} },
       },
     });
@@ -79,13 +79,13 @@ async function createTestUsers(allSkills: Skill[]) {
       avatarSource: AvatarSource.DEFAULT,
       azureAdId: azureId,
       profile: { create: {} },
-      account: { create: fakeAccount() },
+      accounts: { create: fakeAccount() },
       NotificationPreferences: { create: {} },
     },
   });
 
   // create 50 completed users
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 250; i++) {
     const azureId = faker.string.uuid();
     await db.user.create({
       data: {
@@ -106,7 +106,7 @@ async function createTestUsers(allSkills: Skill[]) {
             },
           },
         },
-        account: { create: fakeAccount() },
+        accounts: { create: fakeAccount() },
         NotificationPreferences: { create: {} },
       },
     });

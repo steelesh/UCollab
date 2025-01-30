@@ -1,226 +1,183 @@
 import { Post, Prisma } from "@prisma/client";
+import { notFound } from "next/navigation";
 import { db } from "../data/mysql";
+import { withServiceAuth } from "../lib/auth/protected-service";
+import { ErrorMessage } from "../lib/constants";
+import { AppError } from "../lib/errors/app-error";
+import { Permission } from "../lib/permissions";
 import {
   CreateTechnologyInput,
   SuggestTechnologyInput,
+  technologySelect,
 } from "../schemas/technology.schema";
-import { notFound } from "next/navigation";
-import { Permission } from "../lib/permissions";
-import { UserService } from "./user.service";
 
 export const TechnologyService = {
-  async getTechnologies() {
-    try {
-      return await db.technology.findMany({
-        select: {
-          id: true,
-          name: true,
-        },
-        orderBy: { name: "asc" },
-      });
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? `Failed to fetch technologies: ${error.message}`
-          : "Failed to fetch technologies",
-      );
-    }
-  },
-
-  async searchTechnologies(query: string) {
-    try {
-      return await db.technology.findMany({
-        where: {
-          name: {
-            contains: query,
-          },
-        },
-        select: {
-          id: true,
-          name: true,
-        },
-        orderBy: { name: "asc" },
-        take: 10,
-      });
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? `Failed to search technologies: ${error.message}`
-          : "Failed to search technologies",
-      );
-    }
-  },
-
-  async createTechnology(data: CreateTechnologyInput, requestUserId: string) {
-    try {
-      if (
-        !(await UserService.hasPermission(
-          requestUserId,
-          Permission.CREATE_TECHNOLOGY,
-        ))
-      ) {
-        throw new Error("Unauthorized: Cannot create verified technologies");
-      }
-
-      const normalizedName = data.name.toLowerCase().trim();
-
-      const existingTechnology = await db.technology.findUnique({
-        where: { name: normalizedName },
-      });
-
-      if (existingTechnology) {
-        return existingTechnology;
-      }
-
-      return await db.technology.create({
-        data: {
-          name: normalizedName,
-          verified: true,
-          createdBy: {
-            connect: {
-              id: requestUserId,
-            },
-          },
-        },
-        select: {
-          id: true,
-          name: true,
-          verified: true,
-        },
-      });
-    } catch {
-      throw new Error("Failed to create technology");
-    }
-  },
-
-  // PUBLIC ENDPOINTS
+  // Public methods - no auth needed
   async getVerifiedTechnologies() {
     try {
       return await db.technology.findMany({
         where: { verified: true },
-        select: {
-          id: true,
-          name: true,
-        },
+        select: { id: true, name: true },
         orderBy: { name: "asc" },
       });
     } catch {
-      throw new Error("Failed to fetch technologies");
+      throw new AppError(ErrorMessage.OPERATION_FAILED);
     }
   },
 
-  async searchVerifiedTechnologies(query: string) {
+  async searchVerifiedTechnologies(query: string, limit = 10) {
     try {
       return await db.technology.findMany({
         where: {
           AND: [
             { verified: true },
-            { name: { contains: query.toLowerCase() } },
+            { name: { contains: query.toLowerCase().trim() } },
           ],
         },
-        select: {
-          id: true,
-          name: true,
-        },
-        take: 10,
+        select: { id: true, name: true },
+        take: limit,
         orderBy: { name: "asc" },
       });
     } catch {
-      throw new Error("Failed to search technologies");
+      throw new AppError(ErrorMessage.OPERATION_FAILED);
     }
   },
 
-  // USER ENDPOINTS
-  async suggestTechnology(data: SuggestTechnologyInput, userId: string) {
+  async getPopularTechnologies(limit = 20) {
     try {
-      const normalizedName = data.name.toLowerCase().trim();
-
-      const existing = await db.technology.findUnique({
-        where: { name: normalizedName },
-      });
-
-      if (existing) {
-        if (existing.verified) {
-          return existing;
-        }
-        throw new Error("Technology already suggested and pending review");
-      }
-
-      return await db.technology.create({
-        data: {
-          name: normalizedName,
-          verified: false,
-          createdById: userId,
-        },
+      const technologies = await db.technology.findMany({
+        where: { verified: true },
         select: {
           id: true,
           name: true,
-          verified: true,
+          _count: { select: { posts: true } },
         },
+        orderBy: { posts: { _count: "desc" } },
+        take: limit,
       });
+
+      return technologies.map((tech) => ({
+        id: tech.id,
+        name: tech.name,
+        postCount: tech._count.posts,
+      }));
     } catch {
-      throw new Error("Failed to suggest technology");
+      throw new AppError(ErrorMessage.OPERATION_FAILED);
     }
   },
 
-  // ADMIN ENDPOINTS
-  async verifyTechnology(id: string, requestUserId: string) {
-    try {
-      if (
-        !(await UserService.hasPermission(
-          requestUserId,
-          Permission.UPDATE_TECHNOLOGY,
-        ))
-      ) {
-        throw new Error("Unauthorized: Cannot verify technologies");
-      }
+  // Protected methods - require authentication
+  async createTechnology(data: CreateTechnologyInput, requestUserId: string) {
+    return withServiceAuth(
+      requestUserId,
+      Permission.CREATE_TECHNOLOGY,
+      async () => {
+        try {
+          const normalizedName = data.name.toLowerCase().trim();
+          const existingTechnology = await db.technology.findUnique({
+            where: { name: normalizedName },
+            select: technologySelect,
+          });
 
-      return await db.technology.update({
-        where: { id },
-        data: { verified: true },
-        select: {
-          id: true,
-          name: true,
-          verified: true,
-        },
-      });
-    } catch {
-      throw new Error("Failed to verify technology");
-    }
-  },
+          if (existingTechnology) return existingTechnology;
 
-  async getPendingTechnologies(requestUserId: string) {
-    try {
-      if (
-        !(await UserService.hasPermission(
-          requestUserId,
-          Permission.VIEW_TECHNOLOGIES,
-        ))
-      ) {
-        throw new Error("Unauthorized: Cannot view pending technologies");
-      }
-
-      return await db.technology.findMany({
-        where: { verified: false },
-        select: {
-          id: true,
-          name: true,
-          createdDate: true,
-          createdBy: {
-            select: {
-              id: true,
-              username: true,
+          return await db.technology.create({
+            data: {
+              name: normalizedName,
+              verified: true,
+              createdById: requestUserId,
             },
-          },
-        },
-        orderBy: { createdDate: "desc" },
-      });
-    } catch {
-      throw new Error("Failed to fetch pending technologies");
-    }
+            select: technologySelect,
+          });
+        } catch (error) {
+          if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2002") {
+              throw new AppError(`Technology "${data.name}" already exists`);
+            }
+          }
+          throw new AppError(ErrorMessage.OPERATION_FAILED);
+        }
+      },
+    );
   },
 
-  // Used by PostService
+  async suggestTechnology(data: SuggestTechnologyInput, requestUserId: string) {
+    return withServiceAuth(
+      requestUserId,
+      Permission.SUGGEST_TECHNOLOGY,
+      async () => {
+        try {
+          const normalizedName = data.name.toLowerCase().trim();
+          const existing = await db.technology.findUnique({
+            where: { name: normalizedName },
+            select: technologySelect,
+          });
+
+          if (existing) {
+            if (existing.verified) return existing;
+            throw new AppError(
+              "Technology already suggested and pending review",
+            );
+          }
+
+          return await db.technology.create({
+            data: {
+              name: normalizedName,
+              verified: false,
+              createdById: requestUserId,
+            },
+            select: technologySelect,
+          });
+        } catch (error) {
+          if (error instanceof AppError) throw error;
+          throw new AppError(ErrorMessage.OPERATION_FAILED);
+        }
+      },
+    );
+  },
+
+  async verifyTechnology(id: string, requestUserId: string) {
+    return withServiceAuth(
+      requestUserId,
+      Permission.UPDATE_TECHNOLOGY,
+      async () => {
+        try {
+          return await db.technology.update({
+            where: { id },
+            data: { verified: true },
+            select: technologySelect,
+          });
+        } catch (error) {
+          if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2025") notFound();
+          }
+          throw new AppError(ErrorMessage.OPERATION_FAILED);
+        }
+      },
+    );
+  },
+
+  async getPendingTechnologies(requestUserId: string, page = 1, limit = 20) {
+    return withServiceAuth(
+      requestUserId,
+      Permission.VIEW_TECHNOLOGIES,
+      async () => {
+        try {
+          return await db.technology.findMany({
+            where: { verified: false },
+            select: technologySelect,
+            orderBy: { createdDate: "desc" },
+            skip: (page - 1) * limit,
+            take: limit,
+          });
+        } catch {
+          throw new AppError(ErrorMessage.OPERATION_FAILED);
+        }
+      },
+    );
+  },
+
+  // Internal methods - used by other services
   async updatePostTechnologies(postId: Post["id"], technologies: string[]) {
     try {
       return await db.$transaction(async (tx) => {
@@ -229,11 +186,8 @@ export const TechnologyService = {
           select: { id: true },
         });
 
-        if (!post) {
-          notFound();
-        }
+        if (!post) notFound();
 
-        // Only use verified technologies
         const verifiedTechs = await tx.technology.findMany({
           where: {
             AND: [
@@ -264,49 +218,12 @@ export const TechnologyService = {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === "P2025") {
-          notFound();
-        }
+        if (error.code === "P2025") notFound();
       }
-      throw new Error(
-        error instanceof Error
-          ? `Failed to update post technologies: ${error.message}`
-          : "Failed to update post technologies",
-      );
+      throw new AppError(ErrorMessage.OPERATION_FAILED);
     }
   },
 
-  // For populating the technology checkboxes/dropdown
-  async getPopularTechnologies(limit: number = 20) {
-    try {
-      const technologies = await db.technology.findMany({
-        where: { verified: true },
-        select: {
-          id: true,
-          name: true,
-          _count: {
-            select: { posts: true },
-          },
-        },
-        orderBy: {
-          posts: {
-            _count: "desc",
-          },
-        },
-        take: limit,
-      });
-
-      return technologies.map((tech) => ({
-        id: tech.id,
-        name: tech.name,
-        postCount: tech._count.posts,
-      }));
-    } catch {
-      throw new Error("Failed to fetch popular technologies");
-    }
-  },
-
-  // For getting technologies of a specific post (to pre-check boxes)
   async getPostTechnologies(postId: string) {
     try {
       const post = await db.post.findUnique({
@@ -323,7 +240,7 @@ export const TechnologyService = {
 
       return post?.technologies ?? [];
     } catch {
-      throw new Error("Failed to fetch post technologies");
+      throw new AppError(ErrorMessage.OPERATION_FAILED);
     }
   },
 };

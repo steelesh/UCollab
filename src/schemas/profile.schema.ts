@@ -1,6 +1,30 @@
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
+// Add common select object for reuse
+export const profileSelect = {
+  id: true,
+  lastModifiedDate: true,
+  gradYear: true,
+  bio: true,
+  skills: {
+    where: { verified: true },
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  user: {
+    select: {
+      id: true,
+      username: true,
+      fullName: true,
+      avatar: true,
+      email: true,
+    },
+  },
+} as const;
+
 export const profileSchema = z.object({
   bio: z
     .string()
@@ -13,18 +37,17 @@ export const profileSchema = z.object({
     .max(2100, "Graduation year must be before 2100")
     .nullable()
     .optional(),
-  skills: z.array(z.string()).optional(),
+  skills: z
+    .array(z.string())
+    .transform((skills) => skills.map((s) => s.toLowerCase().trim()))
+    .optional(),
 }) satisfies z.ZodType<Partial<Omit<Prisma.ProfileCreateInput, "skills">>>;
 
 export const updateProfileSchema = profileSchema.partial().transform((data) => {
   const transformed: Partial<Prisma.ProfileUpdateInput> = {
     ...data,
     skills: data.skills
-      ? {
-          connect: data.skills.map((name) => ({
-            name: name.toLowerCase().trim(),
-          })),
-        }
+      ? { connect: data.skills.map((name) => ({ name })) }
       : undefined,
   };
   return transformed;

@@ -7,16 +7,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { SignOutButton } from "../auth/sign-out-button";
 
-type DirectoryUser = Awaited<
-  ReturnType<typeof UserService.getDirectoryUsers>
->[number];
+type User = Awaited<ReturnType<typeof UserService.getUsers>>[number];
 
 interface UserCardProps {
-  user: DirectoryUser;
+  user: User;
   isCurrentUser: boolean;
+  showImpersonateButton?: boolean;
 }
 
-export function UserCard({ user, isCurrentUser }: UserCardProps) {
+export function UserCard({
+  user,
+  isCurrentUser,
+  showImpersonateButton,
+}: UserCardProps) {
   return (
     <div className="group relative">
       <Card className="bg-card relative transition-transform duration-200 hover:scale-[1.02]">
@@ -43,11 +46,12 @@ export function UserCard({ user, isCurrentUser }: UserCardProps) {
               <p className="text-muted-foreground text-sm">@{user.username}</p>
             </div>
           </div>
-          {!isCurrentUser ? (
-            <ImpersonateButton userId={user.id} />
-          ) : (
-            <SignOutButton />
-          )}
+          {showImpersonateButton &&
+            (isCurrentUser ? (
+              <SignOutButton />
+            ) : (
+              <ImpersonateButton userId={user.id} />
+            ))}
         </CardContent>
       </Card>
     </div>

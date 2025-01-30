@@ -1,25 +1,26 @@
-import { Comment, Post } from "@prisma/client";
+import { Comment, Post, Prisma, User } from "@prisma/client";
+import { z } from "zod";
 import { db } from "../data/mysql";
+import { withServiceAuth } from "../lib/auth/protected-service";
+import { ErrorMessage } from "../lib/constants";
 import {
-  CreateCommentInput,
-  UpdateCommentInput,
+  AppError,
+  AuthorizationError,
+  ValidationError,
+} from "../lib/errors/app-error";
+import { Permission } from "../lib/permissions";
+import {
+  commentFormSchema,
+  type CreateCommentData,
+  type UpdateCommentData,
 } from "../schemas/comment.schema";
 import { NotificationService } from "./notification.service";
-import { Prisma } from "@prisma/client";
-import { notFound } from "next/navigation";
 import { UserService } from "./user.service";
-import { Permission } from "../lib/permissions";
 
 export const CommentService = {
-  async getComments(postId: Post["id"], requestUserId?: string) {
-    try {
-      if (
-        requestUserId &&
-        !(await UserService.hasPermission(requestUserId, Permission.VIEW_POSTS))
-      ) {
-        throw new Error("Unauthorized: Cannot view comments");
-      }
-      return await db.comment.findMany({
+  async getComments(postId: Post["id"], requestUserId: User["id"]) {
+    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+      return db.comment.findMany({
         where: { postId },
         select: {
           id: true,
@@ -36,17 +37,11 @@ export const CommentService = {
         },
         orderBy: { createdDate: "desc" },
       });
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? `Failed to fetch comments: ${error.message}`
-          : "Failed to fetch comments",
-      );
-    }
+    });
   },
 
-  async getComment(id: Comment["id"]) {
-    try {
+  async getComment(id: Comment["id"], requestUserId: User["id"]) {
+    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
       const comment = await db.comment.findUnique({
         where: { id },
         select: {
@@ -73,135 +68,135 @@ export const CommentService = {
       });
 
       if (!comment) {
-        notFound();
+        throw new AppError(ErrorMessage.NOT_FOUND("Comment"));
       }
 
       return comment;
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? `Failed to fetch comment: ${error.message}`
-          : "Failed to fetch comment",
-      );
-    }
+    });
   },
 
-  async createComment(data: CreateCommentInput, requestUserId: string) {
-    try {
-      if (
-        !(await UserService.hasPermission(
-          requestUserId,
-          Permission.CREATE_COMMENT,
-        ))
-      ) {
-        throw new Error("Unauthorized: Cannot create comment");
-      }
-      return await db.$transaction(async (tx) => {
-        const comment = await tx.comment.create({
-          data: {
-            content: data.content,
-            postId: data.postId,
-            createdById: data.userId,
-          },
+  async createComment(
+    { content, postId }: CreateCommentData,
+    requestUserId: User["id"],
+  ) {
+    return withServiceAuth(
+      requestUserId,
+      Permission.CREATE_COMMENT,
+      async () => {
+        try {
+          const validatedData = commentFormSchema.parse({ content });
+
+          return await db.$transaction(async (tx) => {
+            const comment = await tx.comment.create({
+              data: {
+                content: validatedData.content,
+                postId,
+                createdById: requestUserId,
+              },
+              select: {
+                id: true,
+                content: true,
+                postId: true,
+                createdById: true,
+                post: {
+                  select: {
+                    title: true,
+                    createdById: true,
+                  },
+                },
+                createdBy: {
+                  select: {
+                    username: true,
+                  },
+                },
+              },
+            });
+
+            await NotificationService.sendCommentNotifications({
+              postId: comment.postId,
+              postTitle: comment.post.title,
+              commentId: comment.id,
+              postAuthorId: comment.post.createdById,
+              commentAuthorId: comment.createdById,
+              commentAuthorName: comment.createdBy.username,
+              content: comment.content,
+            });
+
+            return comment;
+          });
+        } catch (error) {
+          if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            throw new AppError(ErrorMessage.OPERATION_FAILED);
+          }
+          if (error instanceof z.ZodError) {
+            throw new ValidationError(ErrorMessage.VALIDATION_FAILED, error);
+          }
+          throw error;
+        }
+      },
+    );
+  },
+
+  async updateComment(
+    { id, content }: UpdateCommentData,
+    requestUserId: User["id"],
+  ) {
+    return withServiceAuth(requestUserId, null, async () => {
+      try {
+        const validatedData = commentFormSchema.parse({ content });
+
+        const comment = await db.comment.findUnique({
+          where: { id },
+          select: { id: true, createdById: true },
+        });
+
+        if (!comment) {
+          throw new AppError(ErrorMessage.NOT_FOUND("Comment"));
+        }
+
+        if (
+          !(await UserService.canAccessContent(
+            requestUserId,
+            comment.createdById,
+            Permission.UPDATE_ANY_COMMENT,
+          ))
+        ) {
+          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
+        }
+
+        return await db.comment.update({
+          where: { id },
           select: {
             id: true,
             content: true,
-            postId: true,
-            createdById: true,
-            post: {
-              select: {
-                title: true,
-                createdById: true,
-              },
-            },
-            createdBy: {
-              select: {
-                username: true,
-              },
-            },
+            lastModifiedDate: true,
           },
+          data: { content: validatedData.content },
         });
-
-        await NotificationService.sendCommentNotifications({
-          postId: comment.postId,
-          postTitle: comment.post.title,
-          commentId: comment.id,
-          postAuthorId: comment.post.createdById,
-          commentAuthorId: comment.createdById,
-          commentAuthorName: comment.createdBy.username,
-          content: comment.content,
-        });
-
-        return comment;
-      });
-    } catch (error) {
-      if (error instanceof Error && error.name === "ZodError") {
-        throw error;
-      }
-      throw new Error(
-        error instanceof Error
-          ? `Failed to create comment: ${error.message}`
-          : "Failed to create comment",
-      );
-    }
-  },
-
-  async updateComment(data: UpdateCommentInput, requestUserId: string) {
-    try {
-      const comment = await db.comment.findUnique({
-        where: { id: data.id },
-        select: { id: true, createdById: true },
-      });
-
-      if (!comment) {
-        notFound();
-      }
-
-      if (
-        !(await UserService.canAccessContent(
-          requestUserId,
-          comment.createdById,
-          Permission.UPDATE_ANY_COMMENT,
-        ))
-      ) {
-        throw new Error("Unauthorized: Cannot update comment");
-      }
-
-      return await db.comment.update({
-        where: { id: data.id },
-        select: {
-          id: true,
-          content: true,
-          lastModifiedDate: true,
-        },
-        data,
-      });
-    } catch (error) {
-      if (error instanceof Error && error.name === "ZodError") {
-        throw error;
-      }
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === "P2025") {
-          notFound();
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          if (error.code === "P2025") {
+            throw new AppError(ErrorMessage.NOT_FOUND("Comment"));
+          }
+          throw new AppError(ErrorMessage.OPERATION_FAILED);
         }
+        if (error instanceof z.ZodError) {
+          throw new ValidationError(ErrorMessage.VALIDATION_FAILED, error);
+        }
+        throw error;
       }
-      throw new Error(
-        error instanceof Error
-          ? `Failed to update comment: ${error.message}`
-          : "Failed to update comment",
-      );
-    }
+    });
   },
 
-  async deleteComment(id: Comment["id"], requestUserId: string) {
-    try {
+  async deleteComment(id: Comment["id"], requestUserId: User["id"]) {
+    return withServiceAuth(requestUserId, null, async () => {
       const comment = await db.comment.findUnique({
         where: { id },
         select: { id: true, createdById: true },
       });
 
       if (!comment) {
-        notFound();
+        throw new AppError(ErrorMessage.NOT_FOUND("Comment"));
       }
 
       if (
@@ -211,27 +206,25 @@ export const CommentService = {
           Permission.DELETE_ANY_COMMENT,
         ))
       ) {
-        throw new Error("Unauthorized: Cannot delete comment");
+        throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
       }
 
-      await db.comment.delete({
-        where: { id },
-      });
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === "P2025") {
-          notFound();
+      try {
+        await db.comment.delete({ where: { id } });
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          if (error.code === "P2025") {
+            throw new AppError(ErrorMessage.NOT_FOUND("Comment"));
+          }
+          throw new AppError(ErrorMessage.OPERATION_FAILED);
         }
+        throw error;
       }
-      throw new Error(
-        error instanceof Error
-          ? `Failed to delete comment: ${error.message}`
-          : "Failed to delete comment",
-      );
-    }
+    });
   },
 
-  async extractMentionedUserIds(content: string) {
+  // This is a utility method that doesn't need auth
+  async extractMentionedUserIds(content: Comment["content"]) {
     try {
       const mentionRegex = /@(\w+)/g;
       const mentions = content.match(mentionRegex) || [];
@@ -252,22 +245,19 @@ export const CommentService = {
       });
 
       return users.map((user) => user.id);
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? `Failed to extract mentioned users: ${error.message}`
-          : "Failed to extract mentioned users",
-      );
+    } catch {
+      throw new AppError("Failed to extract mentioned users");
     }
   },
 
   async getPaginatedComments(
     postId: Post["id"],
+    requestUserId: User["id"],
     page: number = 1,
     limit: number = 20,
   ) {
-    try {
-      return await db.comment.findMany({
+    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+      return db.comment.findMany({
         where: { postId },
         select: {
           id: true,
@@ -286,12 +276,6 @@ export const CommentService = {
         take: limit,
         orderBy: { createdDate: "desc" },
       });
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? `Failed to fetch paginated comments: ${error.message}`
-          : "Failed to fetch paginated comments",
-      );
-    }
+    });
   },
 };

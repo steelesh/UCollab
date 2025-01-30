@@ -1,11 +1,26 @@
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
+// Add common select object for reuse
+export const technologySelect = {
+  id: true,
+  name: true,
+  verified: true,
+  createdDate: true,
+  createdBy: {
+    select: {
+      id: true,
+      username: true,
+    },
+  },
+} as const;
+
 export const technologySchema = z.object({
   name: z
     .string()
     .min(1, "Technology name is required")
-    .transform((val) => val.toLowerCase().trim()),
+    .max(50, "Technology name must be less than 50 characters")
+    .transform((name) => name.toLowerCase().trim()),
   verified: z.boolean().default(false),
 }) satisfies z.ZodType<Partial<Prisma.TechnologyCreateInput>>;
 

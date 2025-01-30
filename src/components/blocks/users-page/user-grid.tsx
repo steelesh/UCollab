@@ -1,23 +1,25 @@
-import { UserService } from "@/src/services/user.service";
+import { User } from "@prisma/client";
 import { UserCard } from "./user-card";
 
-type DirectoryUser = Awaited<
-  ReturnType<typeof UserService.getDirectoryUsers>
->[number];
-
 interface UserGridProps {
-  users: DirectoryUser[];
+  users: User[];
   currentUserId?: string;
+  showImpersonateButton?: boolean;
 }
 
-export function UserGrid({ users, currentUserId }: UserGridProps) {
+export function UserGrid({
+  users,
+  currentUserId,
+  showImpersonateButton,
+}: UserGridProps) {
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {users.map((user) => (
         <UserCard
           key={user.id}
           user={user}
           isCurrentUser={user.id === currentUserId}
+          showImpersonateButton={showImpersonateButton}
         />
       ))}
     </div>

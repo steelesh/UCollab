@@ -1,5 +1,5 @@
+import { Post, PostStatus, PostType, Prisma, User } from "@prisma/client";
 import { z } from "zod";
-import { PostType, PostStatus, Prisma, User, Post } from "@prisma/client";
 
 export const postSchema = z.object({
   title: z
@@ -41,3 +41,32 @@ export type UpdatePostInput = z.input<typeof updatePostSchema> & {
   id: Post["id"];
 };
 export type UpdatePostPayload = z.output<typeof updatePostSchema>;
+
+// Add these common select objects that are reused in post.service.ts
+export const postSelect = {
+  id: true,
+  title: true,
+  description: true,
+  createdDate: true,
+  postType: true,
+  status: true,
+  githubRepo: true,
+  technologies: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  createdBy: {
+    select: {
+      id: true,
+      username: true,
+      avatar: true,
+    },
+  },
+  _count: {
+    select: {
+      comments: true,
+    },
+  },
+} as const;

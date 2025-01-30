@@ -1,5 +1,6 @@
 import { Route } from "next";
 import Link from "next/link";
+import { ModeToggle } from "../../ui/color-mode-toggle";
 import { Container } from "../../ui/container";
 import { H3 } from "../../ui/h3";
 import { List } from "../../ui/list";
@@ -67,9 +68,12 @@ export default function Footer() {
             ))}
           </div>
         </div>
-        <P className="text-inverse-muted-foreground py-6 text-xs">
-          © {new Date().getFullYear()} UCollab. All rights reserved.
-        </P>
+        <div className="flex items-center justify-between py-6">
+          <P className="text-inverse-muted-foreground text-xs">
+            © {new Date().getFullYear()} UCollab. All rights reserved.
+          </P>
+          <ModeToggle />
+        </div>
       </Container>
     </footer>
   );

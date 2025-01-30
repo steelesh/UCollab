@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { env } from "./env";
 
 /**
  * merges class names
@@ -9,17 +10,31 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * checks if the current environment is development
+ * checks if the current environment is local
  */
-export function isDevelopment() {
-  return process.env.NODE_ENV === "development";
+export function isLocalEnv() {
+  return env.NEXT_PUBLIC_DEPLOY_ENV === "local";
 }
 
 /**
- * checks if the current environment is production
+ * checks if the current environment is dev
  */
-export function isProduction() {
-  return process.env.NODE_ENV === "production";
+export function isDevEnv() {
+  return env.NEXT_PUBLIC_DEPLOY_ENV === "dev";
+}
+
+/**
+ * checks if the current environment is test
+ */
+export function isTestEnv() {
+  return env.NEXT_PUBLIC_DEPLOY_ENV === "test";
+}
+
+/**
+ * checks if the current environment is prod
+ */
+export function isProdEnv() {
+  return env.NEXT_PUBLIC_DEPLOY_ENV === "prod";
 }
 
 /**

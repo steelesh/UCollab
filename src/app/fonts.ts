@@ -5,12 +5,14 @@ export const hurricane = Hurricane({
   display: "swap",
   variable: "--font-hurricane",
   weight: "400",
+  preload: false,
 });
 
 export const robotoSlab = Roboto_Slab({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-roboto-slab",
+  preload: false,
 });
 
 export const roboto = Roboto({
@@ -18,10 +20,12 @@ export const roboto = Roboto({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-roboto",
+  preload: false,
 });
 
 export const robotoMono = Roboto_Mono({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-roboto-mono",
+  preload: false,
 });

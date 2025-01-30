@@ -11,7 +11,7 @@ export function SignOutButton() {
   const handleSignOut = async () => {
     setIsPending(true);
     try {
-      await signOut({ callbackUrl: "/" });
+      await signOut();
     } finally {
       setIsPending(false);
     }
