@@ -1,17 +1,20 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { type GetServerSidePropsContext } from "next";
 import {
-  type DefaultSession, type DefaultUser,
+  type DefaultSession,
+  type DefaultUser,
   getServerSession,
-  type NextAuthOptions
+  type NextAuthOptions,
+  type Session,
 } from "next-auth";
 import AzureADProvider from "next-auth/providers/azure-ad";
-import { env } from "~/env";
-import { getHighResProfilePhoto } from "~/lib/utils/user-photo";
+import { type JWT } from "next-auth/jwt";
 import { db } from "~/lib/db";
+import { env } from "~/env";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
+    accessToken?: string;
     user: {
       id: string;
       username: string;
@@ -48,15 +51,9 @@ export const authOptions: NextAuthOptions = {
               accounts: true,
             },
           });
-          const profilePhotoUrl = account.access_token
-            ? await getHighResProfilePhoto(
-              account.access_token,
-              existingUser?.id ?? "temp"
-            )
-            : user.image;
           if (existingUser) {
             if (
-              !existingUser.accounts.some((acc) => acc.provider === "azure-ad")
+                !existingUser.accounts.some((acc) => acc.provider === "azure-ad")
             ) {
               await db.account.create({
                 data: {
@@ -77,7 +74,7 @@ export const authOptions: NextAuthOptions = {
               where: { id: existingUser.id },
               data: {
                 name: user.name,
-                image: profilePhotoUrl ?? user.image,
+                image: user.image,
                 lastLogin: new Date(),
                 username,
                 azureAdId: profile.sub,
@@ -87,8 +84,8 @@ export const authOptions: NextAuthOptions = {
             await db.user.create({
               data: {
                 email: user.email!,
-                name: user.name,
-                image: profilePhotoUrl ?? user.image,
+                name: user.name!,
+                image: user.image!,
                 username,
                 azureAdId: profile.sub,
                 allowNotifications: true,
@@ -124,33 +121,33 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async jwt({ token, user }) {
-      if (user) {
+
+    async jwt({ token, user, account }) {
+      if (account && user) {
         return {
+          ...token,
+          accessToken: account.access_token,
           id: user.id,
-          email: user.email,
-          username: user.email?.split("@")[0] ?? "",
-          image: user.image,
+          username: user.username,
         };
       }
       return token;
     },
-    async session({ session, token }) {
+
+    async session({ session, token }: { session: Session; token: JWT }) {
       return {
         ...session,
+        accessToken: token.accessToken,
         user: {
           ...session.user,
           id: token.id,
           username: token.username,
-          email: token.email,
-          image: token.image as string,
         },
       };
     },
   },
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60,
   },
   pages: {
     signIn: "/auth/signin",
