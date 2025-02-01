@@ -91,7 +91,6 @@
     "@vitejs/plugin-react": "^4.3.4",
     "@vitest/ui": "^3.0.2",
     "eslint-config-prettier": "^10.0.1",
-    "husky": "^9.1.7",
     "jsdom": "^26.0.0",
     "postcss": "^8.5.1",
     "prettier": "3.4.2",
