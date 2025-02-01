@@ -1,6 +1,7 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { AvatarSource, Role } from "@prisma/client";
 import { type NextAuthConfig } from "next-auth";
+import { type Adapter } from "next-auth/adapters";
 import { encode } from "next-auth/jwt";
 import credentials from "next-auth/providers/credentials";
 import microsoftEntraId from "next-auth/providers/microsoft-entra-id";
@@ -9,7 +10,7 @@ import { isLocalEnv } from "~/lib/utils";
 import { UserService } from "~/services/user.service";
 
 export const authConfig: NextAuthConfig = {
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma) as Adapter,
   session: { strategy: "database" },
   providers: [
     ...(isLocalEnv()

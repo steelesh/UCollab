@@ -1,7 +1,7 @@
 import { type NextApiRequest, type NextApiResponse } from "next";
 import { auth } from "~/lib/auth";
 import { CommentService } from "~/services/comment.service";
-import {commentFormSchema, CreateCommentData} from "~/schemas/comment.schema";
+import {commentFormSchema, type CreateCommentData} from "~/schemas/comment.schema";
 import { z } from "zod";
 import { type ApiResponse } from "~/types/api.types";
 import { type CommentResponse } from "~/types/comment.types";

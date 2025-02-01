@@ -1,4 +1,4 @@
-import { type Role } from "@prisma/client"; // adjust according to your Role type
+import { type Role } from "@prisma/client";
 
 declare module "next-auth" {
     interface Session {
@@ -7,7 +7,7 @@ declare module "next-auth" {
             email?: string | null;
             name?: string | null;
             image?: string | null;
-            role: Role; // use your Role type or string if simpler
+            role: Role;
             username: string;
             profile: {
                 skills?: string;
@@ -26,7 +26,7 @@ declare module "next-auth" {
         username: string;
         profile: {
             skills?: string;
-            gradYear?: number;
+            gradYear?: number;s
             bio?: string;
         };
     }
