@@ -1,6 +1,6 @@
 import { type Comment, type Post, Prisma, type User } from "@prisma/client";
 import { z } from "zod";
-import { db } from "~/data/db";
+import { prisma } from "~/lib/prisma";
 import { withServiceAuth } from "~/lib/auth/protected-service";
 import { ErrorMessage } from "~/lib/constants";
 import {
@@ -20,7 +20,7 @@ import { UserService } from "./user.service";
 export const CommentService = {
   async getComments(postId: Post["id"], requestUserId: User["id"]) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
-      return db.comment.findMany({
+      return prisma.comment.findMany({
         where: { postId },
         select: {
           id: true,
@@ -42,7 +42,7 @@ export const CommentService = {
 
   async getComment(id: Comment["id"], requestUserId: User["id"]) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
-      const comment = await db.comment.findUnique({
+      const comment = await prisma.comment.findUnique({
         where: { id },
         select: {
           id: true,
@@ -86,7 +86,7 @@ export const CommentService = {
         try {
           const validatedData = commentFormSchema.parse({ content });
 
-          return await db.$transaction(async (tx) => {
+          return await prisma.$transaction(async (tx) => {
             const comment = await tx.comment.create({
               data: {
                 content: validatedData.content,
@@ -145,7 +145,7 @@ export const CommentService = {
       try {
         const validatedData = commentFormSchema.parse({ content });
 
-        const comment = await db.comment.findUnique({
+        const comment = await prisma.comment.findUnique({
           where: { id },
           select: { id: true, createdById: true },
         });
@@ -164,7 +164,7 @@ export const CommentService = {
           throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
         }
 
-        return await db.comment.update({
+        return await prisma.comment.update({
           where: { id },
           select: {
             id: true,
@@ -190,7 +190,7 @@ export const CommentService = {
 
   async deleteComment(id: Comment["id"], requestUserId: User["id"]) {
     return withServiceAuth(requestUserId, null, async () => {
-      const comment = await db.comment.findUnique({
+      const comment = await prisma.comment.findUnique({
         where: { id },
         select: { id: true, createdById: true },
       });
@@ -210,7 +210,7 @@ export const CommentService = {
       }
 
       try {
-        await db.comment.delete({ where: { id } });
+        await prisma.comment.delete({ where: { id } });
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === "P2025") {
@@ -233,7 +233,7 @@ export const CommentService = {
 
       const usernames = mentions.map((mention) => mention.substring(1));
 
-      const users = await db.user.findMany({
+      const users = await prisma.user.findMany({
         where: {
           username: {
             in: usernames,
@@ -251,7 +251,7 @@ export const CommentService = {
   },
 
   async verifyCommentOwner(commentId: string, userId: string) {
-    const comment = await db.comment.findUnique({
+    const comment = await prisma.comment.findUnique({
       where: { id: commentId },
       select: { createdById: true },
     });
@@ -265,7 +265,7 @@ export const CommentService = {
     limit = 20,
   ) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
-      return db.comment.findMany({
+      return prisma.comment.findMany({
         where: { postId },
         select: {
           id: true,

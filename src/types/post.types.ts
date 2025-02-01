@@ -41,6 +41,7 @@ export type PostWithCommentsResponse = Prisma.PostGetPayload<{
 }>;
 
 export type CreatePostInput = {
+  id: string;
   title: string;
   description: string;
   postType: "CONTRIBUTION" | "FEEDBACK" | "DISCUSSION";

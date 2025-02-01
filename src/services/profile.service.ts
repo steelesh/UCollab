@@ -1,6 +1,6 @@
 import { Prisma, type User } from "@prisma/client";
 import { notFound } from "next/navigation";
-import { db } from "~/data/db";
+import { prisma } from "~/lib/prisma";
 import { withServiceAuth } from "~/lib/auth/protected-service";
 import { ErrorMessage } from "~/lib/constants";
 import { AppError, AuthorizationError } from "~/lib/errors/app-error";
@@ -30,7 +30,7 @@ export const ProfileService = {
             throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
           }
 
-          const profile = await db.profile.findUnique({
+          const profile = await prisma.profile.findUnique({
             where: { userId },
             select: profileSelect,
           });
@@ -66,7 +66,7 @@ export const ProfileService = {
             throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
           }
 
-          return await db.$transaction(async (tx) => {
+          return await prisma.$transaction(async (tx) => {
             const profile = await tx.profile.findUnique({
               where: { userId },
               select: { id: true },
@@ -122,7 +122,7 @@ export const ProfileService = {
       Permission.VIEW_ANY_PROFILE,
       async () => {
         try {
-          return await db.profile.findMany({
+          return await prisma.profile.findMany({
             skip: (page - 1) * limit,
             take: limit,
             select: profileSelect,
@@ -147,7 +147,7 @@ export const ProfileService = {
       Permission.VIEW_ANY_PROFILE,
       async () => {
         try {
-          return await db.profile.findMany({
+          return await prisma.profile.findMany({
             where: {
               OR: [
                 { user: { username: { contains: query } } },
@@ -171,7 +171,7 @@ export const ProfileService = {
   // Public Operations
   async getPublicProfile(username: string) {
     try {
-      const profile = await db.profile.findFirst({
+      const profile = await prisma.profile.findFirst({
         where: { user: { username } },
         select: {
           ...profileSelect,

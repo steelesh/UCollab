@@ -1,6 +1,6 @@
 import { type Post, Prisma, type Technology } from "@prisma/client";
 import { notFound } from "next/navigation";
-import { db } from "~/data/db";
+import { prisma } from "~/lib/prisma";
 import { withServiceAuth } from "~/lib/auth/protected-service";
 import { ErrorMessage } from "~/lib/constants";
 import { AppError, AuthorizationError } from "~/lib/errors/app-error";
@@ -18,7 +18,7 @@ export const PostService = {
   async getAllPosts(requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
       try {
-        return await db.post.findMany({
+        return await prisma.post.findMany({
           select: postSelect,
           orderBy: { createdDate: "desc" },
         });
@@ -32,7 +32,7 @@ export const PostService = {
   async getPostById(id: Post["id"], requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
       try {
-        const post = await db.post.findUnique({
+        const post = await prisma.post.findUnique({
           where: { id },
           select: {
             ...postSelect,
@@ -95,7 +95,7 @@ export const PostService = {
           throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
         }
 
-        return await db.$transaction(async (tx) => {
+        return await prisma.$transaction(async (tx) => {
           const { technologies: techNames, ...postData } = data;
 
           const verifiedTechs = techNames?.length
@@ -154,7 +154,7 @@ export const PostService = {
             throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
           }
 
-          return await db.$transaction(async (tx) => {
+          return await prisma.$transaction(async (tx) => {
             const verifiedTechs = data.technologies?.length
               ? await tx.technology.findMany({
                   where: {
@@ -218,7 +218,7 @@ export const PostService = {
             throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
           }
 
-          return await db.post.update({
+          return await prisma.post.update({
             where: { id },
             data: { status },
             select: {
@@ -257,7 +257,7 @@ export const PostService = {
             throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
           }
 
-          await db.post.delete({ where: { id } });
+          await prisma.post.delete({ where: { id } });
         } catch (error) {
           if (error instanceof AppError) throw error;
           if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -278,7 +278,7 @@ export const PostService = {
   ) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
       try {
-        return await db.post.findMany({
+        return await prisma.post.findMany({
           where: {
             OR: [
               { title: { contains: query } },
@@ -299,7 +299,7 @@ export const PostService = {
   async getPostsByUser(userId: string, requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
       try {
-        return await db.post.findMany({
+        return await prisma.post.findMany({
           where: { createdById: userId },
           select: postSelect,
           orderBy: { createdDate: "desc" },
@@ -314,7 +314,7 @@ export const PostService = {
   async getPostsByTechnology(techName: string, requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
       try {
-        return await db.post.findMany({
+        return await prisma.post.findMany({
           where: {
             technologies: {
               some: { name: techName.toLowerCase().trim() },
@@ -337,7 +337,7 @@ export const PostService = {
   ) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
       try {
-        return await db.post.findMany({
+        return await prisma.post.findMany({
           where: {
             technologies: matchAll
               ? {
@@ -362,7 +362,7 @@ export const PostService = {
   },
 
   async verifyPostOwner(postId: string, userId: string) {
-    const post = await db.post.findUnique({
+    const post = await prisma.post.findUnique({
       where: { id: postId },
       select: { createdById: true },
     });
@@ -381,7 +381,7 @@ export const PostService = {
   ) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
       try {
-        return await db.post.findMany({
+        return await prisma.post.findMany({
           select: postSelect,
           skip: (page - 1) * limit,
           take: limit,

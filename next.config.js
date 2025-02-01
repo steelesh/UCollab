@@ -13,7 +13,7 @@ const config = {
       },
     ],
   },
-  transpilePackages: ["geist"],
+  transpilePackages: ['next-auth'],
 };
 
 export default config;

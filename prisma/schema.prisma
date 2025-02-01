@@ -7,7 +7,7 @@ generator fake_data {
   output   = "../src/data/fake-data.ts"
 }
 
-datasource db {
+datasource prisma {
   provider = "mysql"
   url      = env("MYSQL_URL")
 }
@@ -18,12 +18,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String? @prisma.Text
+  access_token      String? @prisma.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String? @prisma.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -46,7 +46,7 @@ model User {
   ///FAKE:faker.person.lastName()
   lastName                String
   ///FAKE:faker.image.avatarGitHub()
-  avatar                  String                   @db.Text
+  avatar                  String                   @prisma.Text
   avatarSource            AvatarSource             @default(DEFAULT)
   ///FAKE:faker.string.uuid()
   azureAdId               String                   @unique
@@ -77,7 +77,7 @@ model Profile {
   ///FAKE:faker.number.int({ min: 2023, max: 2030 })
   gradYear         Int?
   ///FAKE:faker.person.bio()
-  bio              String?  @db.Text
+  bio              String?  @prisma.Text
   user             User     @relation("UserProfile", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -90,8 +90,8 @@ model Post {
   createdDate      DateTime       @default(now())
   ///FAKE:faker.date.recent()
   lastModifiedDate DateTime       @updatedAt
-  title            String         @db.Text
-  description      String         @db.Text
+  title            String         @prisma.Text
+  description      String         @prisma.Text
   postType         PostType
   technologies     Technology[]
   githubRepo       String?
@@ -139,7 +139,7 @@ model Comment {
   createdDate      DateTime       @default(now())
   ///FAKE:faker.date.recent()
   lastModifiedDate DateTime       @updatedAt
-  content          String         @db.Text
+  content          String         @prisma.Text
   createdBy        User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
   post             Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
   notifications    Notification[] @relation("CommentNotifications")
@@ -169,7 +169,7 @@ model NotificationPreferences {
 model Notification {
   id          String           @id @default(cuid())
   userId      String
-  message     String           @db.Text
+  message     String           @prisma.Text
   createdDate DateTime         @default(now())
   isRead      Boolean          @default(false)
   type        NotificationType

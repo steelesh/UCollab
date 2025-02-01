@@ -2,7 +2,7 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { type GetServerSideProps } from "next";
-import { db } from "~/data/db";
+import { prisma } from "~/lib/prisma";
 
 interface User {
   avatar: string | null;
@@ -18,7 +18,7 @@ interface CommunityProps {
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const users = await db.user.findMany({
+  const users = await prisma.user.findMany({
     select: {
       avatar: true,
       username: true,

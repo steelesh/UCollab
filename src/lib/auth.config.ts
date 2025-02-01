@@ -4,12 +4,12 @@ import { type NextAuthConfig } from "next-auth";
 import { encode } from "next-auth/jwt";
 import credentials from "next-auth/providers/credentials";
 import microsoftEntraId from "next-auth/providers/microsoft-entra-id";
-import { db } from "~/data/db";
+import { prisma } from "~/lib/prisma";
 import { isLocalEnv } from "~/lib/utils";
 import { UserService } from "~/services/user.service";
 
 export const authConfig: NextAuthConfig = {
-  adapter: PrismaAdapter(db),
+  adapter: PrismaAdapter(prisma),
   session: { strategy: "database" },
   providers: [
     ...(isLocalEnv()
@@ -18,7 +18,7 @@ export const authConfig: NextAuthConfig = {
             credentials: { userId: {} },
             async authorize(credentials) {
               if (!credentials?.userId) return null;
-              return db.user.findUnique({
+              return prisma.user.findUnique({
                 where: {id: credentials.userId as string},
               });
             },
@@ -43,15 +43,23 @@ export const authConfig: NextAuthConfig = {
       }
       return token;
     },
+    async session({ session, token, user }) {
+      if (session.user && user) {
+        session.user.role = user.role;
+        session.user.username = user.username;
+        session.user.profile = user.profile;
+      }
+      return session;
+    },
     async signIn({ user, profile, account }) {
       if (isLocalEnv() && account?.provider === "credentials") return true;
 
       if (!profile?.email || !user?.id || !profile.sub) return false;
 
       try {
-        await db.session.deleteMany({});
+        await prisma.session.deleteMany({});
 
-        const existingUser = await db.user.findFirst({
+        const existingUser = await prisma.user.findFirst({
           where: { azureAdId: profile.sub },
         });
 
@@ -82,7 +90,7 @@ export const authConfig: NextAuthConfig = {
         }
 
         if (!existingUser) {
-          await db.user.create({
+          await prisma.user.create({
             data: {
               id: user.id,
               email: profile.email,
@@ -99,7 +107,7 @@ export const authConfig: NextAuthConfig = {
             },
           });
         } else {
-          await db.user.update({
+          await prisma.user.update({
             where: { id: existingUser.id },
             data: {
               lastLogin: new Date(),
@@ -119,14 +127,18 @@ export const authConfig: NextAuthConfig = {
 
   jwt: {
     encode: async function (params) {
-      if (params.token?.credentials) {
+      if (!params.token) {
+        params.token = {};
+      }
+
+      if (params.token.credentials) {
         const sessionToken = crypto.randomUUID();
 
         if (!params.token.sub) {
           throw new Error("No user ID found in token");
         }
 
-        const existingSession = await db.session.findFirst({
+        const existingSession = await prisma.session.findFirst({
           where: { userId: params.token.sub },
         });
 
@@ -134,7 +146,7 @@ export const authConfig: NextAuthConfig = {
           return existingSession.sessionToken;
         }
 
-        const createdSession = await db.session.create({
+        const createdSession = await prisma.session.create({
           data: {
             sessionToken: sessionToken,
             userId: params.token.sub,
@@ -148,6 +160,7 @@ export const authConfig: NextAuthConfig = {
 
         return sessionToken;
       }
+
       return encode(params);
     },
   },

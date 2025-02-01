@@ -8,7 +8,7 @@ const createPrismaClient = () =>
                 ? ["query", "error", "warn"]
                 : ["error"],
         datasources: {
-            db: {
+            prisma: {
                 url: env.MYSQL_URL,
             },
         },
@@ -18,6 +18,6 @@ const globalForPrisma = globalThis as unknown as {
     prisma: ReturnType<typeof createPrismaClient> | undefined;
 };
 
-export const db = globalForPrisma.prisma ?? createPrismaClient();
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
-if (process.env.NODE_ENV === "development") globalForPrisma.prisma = db;
+if (process.env.NODE_ENV === "development") globalForPrisma.prisma = prisma;

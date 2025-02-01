@@ -22,12 +22,12 @@ export async function withApiAuth<T>(
 
     if (permission) {
       const hasPermission = await UserService.hasPermission(
-        session.user.id,
-        permission,
+          session.user.id,
+          permission,
       );
       if (!hasPermission) {
         throw new AuthorizationError(
-          ErrorMessage.MISSING_PERMISSION(permission),
+            ErrorMessage.MISSING_PERMISSION(permission),
         );
       }
     }
@@ -42,24 +42,24 @@ export async function withApiAuth<T>(
 
     if (error instanceof AppError) {
       return Response.json(
-        {
-          data: null,
-          error: error.message,
-        },
-        {
-          status: error.statusCode,
-        },
+          {
+            data: null,
+            error: error.message,
+          },
+          {
+            status: error.statusCode,
+          },
       );
     }
 
     return Response.json(
-      {
-        data: null,
-        error: ErrorMessage.SERVER_ERROR,
-      },
-      {
-        status: ErrorCode.SERVER_ERROR,
-      },
+        {
+          data: null,
+          error: ErrorMessage.SERVER_ERROR,
+        },
+        {
+          status: ErrorCode.SERVER_ERROR,
+        },
     );
   }
 }

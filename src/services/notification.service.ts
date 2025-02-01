@@ -8,7 +8,7 @@ import {
   type User,
 } from "@prisma/client";
 import { mq } from "~/data/mq";
-import { db } from "~/data/db";
+import { prisma } from "~/lib/prisma";
 import { withServiceAuth } from "~/lib/auth/protected-service";
 import { ErrorMessage } from "~/lib/constants";
 import { AppError, AuthorizationError } from "~/lib/errors/app-error";
@@ -55,7 +55,7 @@ export const NotificationService = {
             throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
           }
 
-          return await db.notification.findMany({
+          return await prisma.notification.findMany({
             where: { userId },
             select: notificationSelect,
             orderBy: { createdDate: "desc" },
@@ -88,7 +88,7 @@ export const NotificationService = {
             throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
           }
 
-          return await db.notification.findMany({
+          return await prisma.notification.findMany({
             where: { userId, isRead },
             select: notificationSelect,
             orderBy: { createdDate: "desc" },
@@ -122,7 +122,7 @@ export const NotificationService = {
             throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
           }
 
-          return await db.notification.findMany({
+          return await prisma.notification.findMany({
             where: { userId },
             select: notificationSelect,
             skip: (page - 1) * limit,
@@ -154,7 +154,7 @@ export const NotificationService = {
             throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
           }
 
-          return await db.notification.count({
+          return await prisma.notification.count({
             where: { userId },
           });
         } catch (error) {
@@ -181,7 +181,7 @@ export const NotificationService = {
             throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
           }
 
-          return await db.notification.count({
+          return await prisma.notification.count({
             where: { userId, isRead: false },
           });
         } catch (error) {
@@ -199,7 +199,7 @@ export const NotificationService = {
       Permission.UPDATE_ANY_NOTIFICATION,
       async () => {
         try {
-          const notification = await db.notification.findUnique({
+          const notification = await prisma.notification.findUnique({
             where: { id },
             select: { id: true, userId: true },
           });
@@ -218,7 +218,7 @@ export const NotificationService = {
             throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
           }
 
-          return await db.notification.update({
+          return await prisma.notification.update({
             where: { id },
             data: { isRead: true },
             select: notificationSelect,
@@ -253,7 +253,7 @@ export const NotificationService = {
             throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
           }
 
-          return await db.notification.updateMany({
+          return await prisma.notification.updateMany({
             where: { userId, isRead: false },
             data: { isRead: true },
           });
@@ -274,7 +274,7 @@ export const NotificationService = {
       Permission.UPDATE_OWN_NOTIFICATION,
       async () => {
         try {
-          const notifications = await db.notification.findMany({
+          const notifications = await prisma.notification.findMany({
             where: { id: { in: notificationIds } },
             select: { id: true, userId: true },
           });
@@ -293,7 +293,7 @@ export const NotificationService = {
             }
           }
 
-          return await db.notification.updateMany({
+          return await prisma.notification.updateMany({
             where: { id: { in: notificationIds } },
             data: { isRead: true },
           });
@@ -326,13 +326,13 @@ export const NotificationService = {
   },
 
   // Cleanup Operations
-  async cleanupOldNotifications(daysToKeep: number = 30): Promise<void> {
+  async cleanupOldNotifications(daysToKeep = 30): Promise<void> {
     return withServiceAuth(undefined, Permission.ACCESS_ADMIN, async () => {
       try {
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-        await db.notification.deleteMany({
+        await prisma.notification.deleteMany({
           where: {
             createdDate: {
               lt: cutoffDate,
@@ -367,7 +367,7 @@ export const NotificationService = {
         .filter((id) => id !== data.commentAuthorId)
         .filter((id, index, self) => self.indexOf(id) === index);
 
-      if (uniqueMentionedUsers.length > 0) {
+      if (uniqueMentionedUsers.length > 0 && uniqueMentionedUsers[0]) {
         const preferences = await this.getNotificationPreferences(
           uniqueMentionedUsers[0],
         );
@@ -422,7 +422,7 @@ export const NotificationService = {
     userId: User["id"],
   ): Promise<NotificationPreferences | null> {
     try {
-      return await db.notificationPreferences.findUnique({
+      return await prisma.notificationPreferences.findUnique({
         where: { userId },
       });
     } catch {
@@ -449,7 +449,7 @@ export const NotificationService = {
   // Add this method to NotificationService
   async createNotification(data: CreateNotificationData) {
     try {
-      return await db.notification.create({
+      return await prisma.notification.create({
         data: {
           message: data.message,
           type: data.type,

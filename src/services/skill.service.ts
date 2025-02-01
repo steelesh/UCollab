@@ -1,6 +1,6 @@
 import { Prisma, type Skill } from "@prisma/client";
 import { notFound } from "next/navigation";
-import { db } from "~/data/db";
+import { prisma } from "~/lib/prisma";
 import { withServiceAuth } from "~/lib/auth/protected-service";
 import { ErrorMessage } from "~/lib/constants";
 import { AppError } from "~/lib/errors/app-error";
@@ -15,7 +15,7 @@ export const SkillService = {
   // Public Operations
   async getAllSkills() {
     try {
-      return await db.skill.findMany({
+      return await prisma.skill.findMany({
         where: { verified: true },
         select: { id: true, name: true },
         orderBy: { name: "asc" },
@@ -27,7 +27,7 @@ export const SkillService = {
 
   async searchSkills(query: string, limit = 10) {
     try {
-      return await db.skill.findMany({
+      return await prisma.skill.findMany({
         where: {
           AND: [
             { verified: true },
@@ -47,14 +47,14 @@ export const SkillService = {
   async createSkill(data: CreateSkillInput, requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.CREATE_SKILL, async () => {
       try {
-        const existingSkill = await db.skill.findUnique({
+        const existingSkill = await prisma.skill.findUnique({
           where: { name: data.name.toLowerCase().trim() },
           select: { id: true, name: true },
         });
 
         if (existingSkill) return existingSkill;
 
-        return await db.skill.create({
+        return await prisma.skill.create({
           data: {
             ...data,
             verified: true,
@@ -79,7 +79,7 @@ export const SkillService = {
       Permission.SUGGEST_SKILL,
       async () => {
         try {
-          return await db.skill.create({
+          return await prisma.skill.create({
             data: {
               ...data,
               verified: false,
@@ -106,7 +106,7 @@ export const SkillService = {
   ) {
     return withServiceAuth(requestUserId, Permission.UPDATE_SKILL, async () => {
       try {
-        return await db.skill.update({
+        return await prisma.skill.update({
           where: { id: skillId },
           data: {
             ...data,
@@ -129,7 +129,7 @@ export const SkillService = {
   async deleteSkill(skillId: Skill["id"], requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.DELETE_SKILL, async () => {
       try {
-        await db.skill.delete({ where: { id: skillId } });
+        await prisma.skill.delete({ where: { id: skillId } });
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === "P2025") notFound();
@@ -142,7 +142,7 @@ export const SkillService = {
   async getPendingSkills(requestUserId: string, page = 1, limit = 20) {
     return withServiceAuth(requestUserId, Permission.VIEW_SKILLS, async () => {
       try {
-        return await db.skill.findMany({
+        return await prisma.skill.findMany({
           where: { verified: false },
           select: skillSelect,
           orderBy: { createdDate: "desc" },

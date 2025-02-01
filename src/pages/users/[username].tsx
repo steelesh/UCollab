@@ -1,7 +1,7 @@
 import { type GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { db } from "~/data/db";
+import { prisma } from "~/lib/prisma";
 
 interface UserProfileProps {
   user: {
@@ -24,14 +24,14 @@ interface UserProfileProps {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.params as { username: string };
 
-  const user = await db.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { username },
     select: {
       username: true,
       email: true,
       createdDate: true,
       lastLogin: true,
-      image: true,
+      avatar: true,
       profile: {
         select: {
           skills: true,

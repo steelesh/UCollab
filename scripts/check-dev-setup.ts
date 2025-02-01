@@ -17,22 +17,6 @@ const services = {
     },
 };
 
-const askQuestion = (query: string): Promise<string> => {
-    return new Promise((resolve) => {
-        readline.question(query, (answer) => {
-            resolve(answer.toLowerCase());
-        });
-    });
-};
-
-async function checkDatabaseData() {
-    try {
-        return (await prisma.user.count()) > 0;
-    } catch {
-        return false;
-    }
-}
-
 async function main() {
     console.log("🔍 Checking dev setup...");
 
@@ -55,30 +39,7 @@ async function main() {
             await new Promise((resolve) => setTimeout(resolve, 10000));
         }
 
-        console.log("🔍 Checking for existing seed data...");
-        const hasData = await checkDatabaseData();
-        console.log(hasData ? "✓ Seed data detected\n" : "✗ No seed data found\n");
-
-        if (hasData) {
-            const answer = await askQuestion(
-                "Would you like to reseed the database? (y/n): ",
-            );
-            if (answer !== "y") {
-                readline.close();
-                return;
-            }
-        } else {
-            const answer = await askQuestion(
-                "Would you like to seed the database? (y/n): ",
-            );
-            if (answer !== "y") {
-                readline.close();
-                return;
-            }
-        }
-
         execSync("npm run db:push", { stdio: "inherit" });
-        execSync("npm run db:seed", { stdio: "inherit" });
         console.log("✓ setup complete");
     } catch (error) {
         console.error("✗ setup check failed:", error);

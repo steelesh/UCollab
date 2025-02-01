@@ -1,8 +1,8 @@
 import { lorelei } from "@dicebear/collection";
 import { createAvatar } from "@dicebear/core";
-import { Account, AvatarSource, Prisma, Role, User } from "@prisma/client";
+import { type Account, AvatarSource, Prisma, Role, type User } from "@prisma/client";
 import { notFound } from "next/navigation";
-import { db } from "~/data/db";
+import { prisma } from "~/lib/prisma";
 import { s3 } from "~/data/s3";
 import { withServiceAuth } from "~/lib/auth/protected-service";
 import { ErrorMessage } from "~/lib/constants";
@@ -17,7 +17,7 @@ import {
 export const UserService = {
   async getUser(username: User["username"]) {
     try {
-      const user = await db.user.findUnique({
+      const user = await prisma.user.findUnique({
         where: { username },
         select: publicUserSelect,
       });
@@ -45,7 +45,7 @@ export const UserService = {
             throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
           }
 
-          const user = await db.user.findUnique({
+          const user = await prisma.user.findUnique({
             where: { id: userId },
             select: userSelect,
           });
@@ -62,7 +62,7 @@ export const UserService = {
 
   async getUsers(userId?: string, isLocalDev = false): Promise<User[]> {
     if (isLocalDev) {
-      return db.user.findMany({
+      return prisma.user.findMany({
           orderBy: {createdDate: "desc"},
       });
     }
@@ -72,7 +72,7 @@ export const UserService = {
     }
 
     return withServiceAuth(userId, Permission.VIEW_USERS_LIST, async () => {
-      return db.user.findMany({
+      return prisma.user.findMany({
           orderBy: {createdDate: "desc"},
       });
     });
@@ -85,7 +85,7 @@ export const UserService = {
       Permission.VIEW_USERS_LIST,
       async () => {
         try {
-          return await db.user.findMany({
+          return await prisma.user.findMany({
             where: { username: { startsWith: query.toLowerCase().trim() } },
             select: publicUserSelect,
             take: limit,
@@ -102,7 +102,7 @@ export const UserService = {
   async getAdminUserDetails(userId: User["id"], requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.VIEW_USERS, async () => {
       try {
-        const user = await db.user.findUnique({
+        const user = await prisma.user.findUnique({
           where: { id: userId },
           select: {
             ...userSelect,
@@ -126,7 +126,7 @@ export const UserService = {
   ) {
     return withServiceAuth(requestUserId, Permission.MANAGE_ROLES, async () => {
       try {
-        return await db.user.update({
+        return await prisma.user.update({
           where: { id: userId },
           data: { role: newRole },
           select: {
@@ -147,7 +147,7 @@ export const UserService = {
       Permission.DELETE_ANY_USER,
       async () => {
         try {
-          await db.$transaction(async (tx) => {
+          await prisma.$transaction(async (tx) => {
             return tx.user.delete({ where: { id: userId } });
           });
         } catch (error) {
@@ -191,7 +191,7 @@ export const UserService = {
               : AvatarSource.DEFAULT;
           }
 
-          return await db.user.update({
+          return await prisma.user.update({
             where: { id: userId },
             data: updates,
             select: userSelect,
@@ -210,7 +210,7 @@ export const UserService = {
   // Internal Helper Methods
   async getUserRole(userId: User["id"]) {
     try {
-      const user = await db.user.findUnique({
+      const user = await prisma.user.findUnique({
         where: { id: userId },
         select: { role: true },
       });

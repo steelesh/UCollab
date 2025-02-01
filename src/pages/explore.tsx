@@ -26,26 +26,32 @@ export default function Explore() {
     const fetchProjects: () => Promise<void> = async () => {
       try {
         const response: Response = await fetch("/api/posts");
-        if (!response.ok) throw new Error("Failed to fetch posts");
+        if (!response.ok) {
+          console.error(`Failed to fetch posts: ${response.status} ${response.statusText}`);
+          return;
+        }
         const jsonResponse: { data: Project[]; error: string | null } =
           (await response.json()) as { data: Project[]; error: string | null };
-        if (jsonResponse.error) throw new Error(jsonResponse.error);
-
+        if (jsonResponse.error) {
+          console.error("API Error:", jsonResponse.error);
+          return;
+        }
         const projectsWithUser = await Promise.all(
-          jsonResponse.data.map(async (project) => {
-            try {
-              const userResponse = await fetch(
-                `/api/users/from-id/${project.createdById}`,
-              );
-              if (userResponse.ok) {
-                const userData = (await userResponse.json()) as {
-                  username: string;
-                };
+            jsonResponse.data.map(async (project) => {
+              try {
+                const userResponse = await fetch(`/api/users/from-id/${project.createdById}`);
+                if (!userResponse.ok) {
+                  console.warn(`Failed to fetch user for project ${project.title}`);
+                  return project;
+                }
+
+                const userData = await userResponse.json() as { username: string };
                 return { ...project, user: { username: userData.username } };
+              } catch (error) {
+                console.error(`Error fetching user for project ${project.title}:`, error);
+                return project;
               }
-            } catch {}
-            return project;
-          }),
+            }),
         );
 
         setProjects(projectsWithUser);

@@ -26,10 +26,8 @@
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "db:init": "prisma db push && prisma db seed",
     "db:clean": "prisma db push --force-reset",
     "postinstall": "prisma generate",
-    "db:seed": "prisma db seed",
     "prepare": "husky"
   },
   "prisma": {

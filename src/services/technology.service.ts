@@ -1,6 +1,6 @@
 import { type Post, Prisma } from "@prisma/client";
 import { notFound } from "next/navigation";
-import { db } from "~/data/db";
+import { prisma } from "~/lib/prisma";
 import { withServiceAuth } from "~/lib/auth/protected-service";
 import { ErrorMessage } from "~/lib/constants";
 import { AppError } from "~/lib/errors/app-error";
@@ -15,7 +15,7 @@ export const TechnologyService = {
   // Public methods - no auth needed
   async getVerifiedTechnologies() {
     try {
-      return await db.technology.findMany({
+      return await prisma.technology.findMany({
         where: { verified: true },
         select: { id: true, name: true },
         orderBy: { name: "asc" },
@@ -27,7 +27,7 @@ export const TechnologyService = {
 
   async searchVerifiedTechnologies(query: string, limit = 10) {
     try {
-      return await db.technology.findMany({
+      return await prisma.technology.findMany({
         where: {
           AND: [
             { verified: true },
@@ -45,7 +45,7 @@ export const TechnologyService = {
 
   async getPopularTechnologies(limit = 20) {
     try {
-      const technologies = await db.technology.findMany({
+      const technologies = await prisma.technology.findMany({
         where: { verified: true },
         select: {
           id: true,
@@ -74,14 +74,14 @@ export const TechnologyService = {
       async () => {
         try {
           const normalizedName = data.name.toLowerCase().trim();
-          const existingTechnology = await db.technology.findUnique({
+          const existingTechnology = await prisma.technology.findUnique({
             where: { name: normalizedName },
             select: technologySelect,
           });
 
           if (existingTechnology) return existingTechnology;
 
-          return await db.technology.create({
+          return await prisma.technology.create({
             data: {
               name: normalizedName,
               verified: true,
@@ -108,7 +108,7 @@ export const TechnologyService = {
       async () => {
         try {
           const normalizedName = data.name.toLowerCase().trim();
-          const existing = await db.technology.findUnique({
+          const existing = await prisma.technology.findUnique({
             where: { name: normalizedName },
             select: technologySelect,
           });
@@ -120,7 +120,7 @@ export const TechnologyService = {
             );
           }
 
-          return await db.technology.create({
+          return await prisma.technology.create({
             data: {
               name: normalizedName,
               verified: false,
@@ -142,7 +142,7 @@ export const TechnologyService = {
       Permission.UPDATE_TECHNOLOGY,
       async () => {
         try {
-          return await db.technology.update({
+          return await prisma.technology.update({
             where: { id },
             data: { verified: true },
             select: technologySelect,
@@ -163,7 +163,7 @@ export const TechnologyService = {
       Permission.VIEW_TECHNOLOGIES,
       async () => {
         try {
-          return await db.technology.findMany({
+          return await prisma.technology.findMany({
             where: { verified: false },
             select: technologySelect,
             orderBy: { createdDate: "desc" },
@@ -180,7 +180,7 @@ export const TechnologyService = {
   // Internal methods - used by other services
   async updatePostTechnologies(postId: Post["id"], technologies: string[]) {
     try {
-      return await db.$transaction(async (tx) => {
+      return await prisma.$transaction(async (tx) => {
         const post = await tx.post.findUnique({
           where: { id: postId },
           select: { id: true },
@@ -226,7 +226,7 @@ export const TechnologyService = {
 
   async getPostTechnologies(postId: string) {
     try {
-      const post = await db.post.findUnique({
+      const post = await prisma.post.findUnique({
         where: { id: postId },
         select: {
           technologies: {
