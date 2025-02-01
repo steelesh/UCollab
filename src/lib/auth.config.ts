@@ -3,7 +3,6 @@ import { AvatarSource, Role } from "@prisma/client";
 import { type NextAuthConfig } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
 import { encode } from "next-auth/jwt";
-import credentials from "next-auth/providers/credentials";
 import microsoftEntraId from "next-auth/providers/microsoft-entra-id";
 import { prisma } from "~/lib/prisma";
 import { isLocalEnv } from "~/lib/utils";
@@ -13,19 +12,6 @@ export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma) as Adapter,
   session: { strategy: "database" },
   providers: [
-    ...(isLocalEnv()
-        ? [
-          credentials({
-            credentials: { userId: {} },
-            async authorize(credentials) {
-              if (!credentials?.userId) return null;
-              return prisma.user.findUnique({
-                where: {id: credentials.userId as string},
-              });
-            },
-          }),
-        ]
-        : []),
     microsoftEntraId({
       issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
       authorization: {
