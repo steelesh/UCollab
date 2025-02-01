@@ -1,49 +1,30 @@
-"use server";
-
 import { auth } from "@/auth";
+import { ErrorMessage } from "@/src/lib/constants";
 import {
   CreateTechnologyInput,
   SuggestTechnologyInput,
 } from "@/src/schemas/technology.schema";
 import { TechnologyService } from "@/src/services/technology.service";
-import { revalidatePath } from "next/cache";
 
 export async function createTechnology(data: CreateTechnologyInput) {
   const session = await auth();
-  if (!session?.user?.id) throw new Error("Not authenticated");
+  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
 
-  const technology = await TechnologyService.createTechnology(
-    data,
-    session.user.id,
-  );
-  revalidatePath("/admin/technologies");
-  revalidatePath("/technologies");
-  return technology;
+  return TechnologyService.createTechnology(data, session.user.id);
 }
 
 export async function suggestTechnology(data: SuggestTechnologyInput) {
   const session = await auth();
-  if (!session?.user?.id) throw new Error("Not authenticated");
+  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
 
-  const technology = await TechnologyService.suggestTechnology(
-    data,
-    session.user.id,
-  );
-  revalidatePath("/technologies");
-  return technology;
+  return TechnologyService.suggestTechnology(data, session.user.id);
 }
 
 export async function verifyTechnology(technologyId: string) {
   const session = await auth();
-  if (!session?.user?.id) throw new Error("Not authenticated");
+  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
 
-  const technology = await TechnologyService.verifyTechnology(
-    technologyId,
-    session.user.id,
-  );
-  revalidatePath("/admin/technologies");
-  revalidatePath("/technologies");
-  return technology;
+  return TechnologyService.verifyTechnology(technologyId, session.user.id);
 }
 
 export async function updatePostTechnologies(
@@ -51,12 +32,7 @@ export async function updatePostTechnologies(
   technologies: string[],
 ) {
   const session = await auth();
-  if (!session?.user?.id) throw new Error("Not authenticated");
+  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
 
-  const result = await TechnologyService.updatePostTechnologies(
-    postId,
-    technologies,
-  );
-  revalidatePath(`/posts/${postId}`);
-  return result;
+  return TechnologyService.updatePostTechnologies(postId, technologies);
 }
