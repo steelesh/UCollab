@@ -1,7 +1,7 @@
 import { type NextApiRequest, type NextApiResponse } from "next";
-import { getServerAuthSession } from "~/lib/auth";
+import { auth } from "~/lib/auth";
 import { CommentService } from "~/services/comment.service";
-import { commentSchema } from "~/schemas/comment.schema";
+import {commentFormSchema, CreateCommentData} from "~/schemas/comment.schema";
 import { z } from "zod";
 import { type ApiResponse } from "~/types/api.types";
 import { type CommentResponse } from "~/types/comment.types";
@@ -12,7 +12,7 @@ export default async function handler(
 ) {
 
   // auth check
-  const session = await getServerAuthSession({ req, res });
+  const session = await auth();
   const userId = session?.user?.id;
   if (!userId) {
     return res.status(401).json({ data: null, error: "Unauthorized" });
@@ -28,7 +28,7 @@ export default async function handler(
   switch (req.method) {
     case "GET":
       try {
-        const comments = await CommentService.getComments(postId);
+        const comments = await CommentService.getComments(postId, userId);
         return res.status(200).json({ data: comments, error: null });
       } catch (error) {
         console.error("Error fetching comments:", error);
@@ -41,11 +41,10 @@ export default async function handler(
     // handle POST req
     case "POST":
       try {
-        const validatedData = commentSchema.parse(req.body);
+        const validatedData = commentFormSchema.parse(req.body);
         const comment = await CommentService.createComment(
-          validatedData,
+          (validatedData as CreateCommentData),
           postId,
-          userId
         );
         return res.status(201).json({ data: comment, error: null });
       } catch (error) {

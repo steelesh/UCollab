@@ -5,9 +5,8 @@ export type PrivateProfileResponse = Prisma.ProfileGetPayload<{
     user: {
       select: {
         id: true;
-        name: true;
         username: true;
-        image: true;
+        avatar: true;
         email: true;
         allowNotifications: true;
       };
@@ -18,8 +17,8 @@ export type PrivateProfileResponse = Prisma.ProfileGetPayload<{
 export type PublicProfileResponse = Prisma.UserGetPayload<{
   select: {
     username: true;
-    name: true;
-    image: true;
+    avatar: true;
+    allowNotifications: true;
     profile: {
       select: {
         bio: true;

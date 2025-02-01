@@ -2,10 +2,10 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { type GetServerSideProps } from "next";
-import { db } from "~/lib/db";
+import { db } from "~/data/db";
 
 interface User {
-  image: string | null;
+  avatar: string | null;
   username: string;
   email: string;
   createdDate: string;
@@ -20,12 +20,11 @@ interface CommunityProps {
 export const getServerSideProps: GetServerSideProps = async () => {
   const users = await db.user.findMany({
     select: {
-      image: true,
+      avatar: true,
       username: true,
       email: true,
       createdDate: true,
       lastLogin: true,
-      verifiedEmail: true,
     },
   });
 
@@ -53,7 +52,7 @@ export default function Community({ users }: CommunityProps) {
             className="flex w-full max-w-3xl items-center border-b p-4"
           >
             <Image
-              src={user.image ?? "https://avatar.iran.liara.run/public"}
+              src={user.avatar ?? "https://avatar.iran.liara.run/public"}
               alt={user.username}
               width={50}
               height={50}

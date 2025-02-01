@@ -12,12 +12,12 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="navbar bg-base-300 p-3">
+    <nav className="navbar bg-base-300 p-3 select-none">
       <div className="flex-shrink">
         <Link href="/" className="text-5xl font-bold">
           <span className="inline-block origin-center transform transition-transform duration-300 hover:scale-105">
-            <span className="text-primary">UC</span>
-            <span className="text-accent">ollab</span>
+            <span className="text-primary-content">UC</span>
+            <span className="text-accent-content">ollab</span>
           </span>
         </Link>
       </div>
@@ -42,17 +42,17 @@ export default function Navbar() {
         ) : null}
       </div>
       <div className="hidden flex-1 justify-evenly md:flex">
-        <Link className="group pt-1.5 text-xl text-accent" href="/explore">
+        <Link className="group pt-1.5 text-xl text-accent-content" href="/explore">
           Explore
-          <span className="block h-0.5 max-w-0 bg-primary transition-all duration-500 group-hover:max-w-full"></span>
+          <span className="block h-0.5 max-w-0 bg-primary-content transition-all duration-500 group-hover:max-w-full"></span>
         </Link>
-        <Link className="group pt-1.5 text-xl text-accent" href="/create">
+        <Link className="group pt-1.5 text-xl text-accent-content" href="/create">
           Create
-          <span className="block h-0.5 max-w-0 bg-primary transition-all duration-500 group-hover:max-w-full"></span>
+          <span className="block h-0.5 max-w-0 bg-primary-content transition-all duration-500 group-hover:max-w-full"></span>
         </Link>
-        <Link className="group pt-1.5 text-xl text-accent" href="/community">
+        <Link className="group pt-1.5 text-xl text-accent-content" href="/community">
           Community
-          <span className="block h-0.5 max-w-0 bg-primary transition-all duration-500 group-hover:max-w-full"></span>
+          <span className="block h-0.5 max-w-0 bg-primary-content transition-all duration-500 group-hover:max-w-full"></span>
         </Link>
       </div>
       <div className="flex-shrink justify-end md:flex-none">

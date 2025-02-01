@@ -1,5 +1,5 @@
 import { type NextApiRequest, type NextApiResponse } from "next";
-import { getServerAuthSession } from "~/lib/auth";
+import { auth } from "~/lib/auth";
 import { ProfileService } from "~/services/profile.service";
 import { profileSchema } from "~/schemas/profile.schema";
 import { z } from "zod";
@@ -12,7 +12,7 @@ export default async function handler(
 ) {
 
   // auth check
-  const session = await getServerAuthSession({ req, res });
+  const session = await auth();
   const userId = session?.user?.id;
   if (!userId) {
     return res.status(401).json({ data: null, error: "Unauthorized" });
@@ -22,7 +22,7 @@ export default async function handler(
   switch (req.method) {
     case "GET":
       try {
-        const profile = await ProfileService.getPrivateProfile(userId);
+        const profile = await ProfileService.getProfile(userId, userId);
         if (!profile) {
           return res.status(404).json({ data: null, error: "Profile not found" });
         }
@@ -38,7 +38,7 @@ export default async function handler(
     case "PUT":
       try {
         const validatedData = profileSchema.parse(req.body);
-        const profile = await ProfileService.updateProfile(userId, validatedData);
+        const profile = await ProfileService.updateProfile(userId, validatedData, userId);
         return res.status(200).json({ data: profile, error: null });
       } catch (error) {
         if (error instanceof z.ZodError) {

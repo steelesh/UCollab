@@ -5,9 +5,8 @@ export type PostResponse = Prisma.PostGetPayload<{
     createdBy: {
       select: {
         id: true;
-        name: true;
         username: true;
-        image: true;
+        avatar: true;
       };
     };
     _count: {
@@ -23,9 +22,8 @@ export type PostWithCommentsResponse = Prisma.PostGetPayload<{
     createdBy: {
       select: {
         id: true;
-        name: true;
         username: true;
-        image: true;
+        avatar: true;
       };
     };
     comments: {
@@ -33,9 +31,8 @@ export type PostWithCommentsResponse = Prisma.PostGetPayload<{
         createdBy: {
           select: {
             id: true;
-            name: true;
             username: true;
-            image: true;
+            avatar: true;
           };
         };
       };

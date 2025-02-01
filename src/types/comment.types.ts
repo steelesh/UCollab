@@ -5,9 +5,8 @@ export type CommentResponse = Prisma.CommentGetPayload<{
     createdBy: {
       select: {
         id: true;
-        name: true;
         username: true;
-        image: true;
+        avatar: true;
       };
     };
   };

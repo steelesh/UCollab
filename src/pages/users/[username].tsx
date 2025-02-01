@@ -1,7 +1,7 @@
 import { type GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { db } from "~/lib/db";
+import { db } from "~/data/db";
 
 interface UserProfileProps {
   user: {
@@ -31,13 +31,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       email: true,
       createdDate: true,
       lastLogin: true,
-      verifiedEmail: true,
       image: true,
-      name: true,
       profile: {
         select: {
           skills: true,
-          interests: true,
           gradYear: true,
           bio: true,
         },
@@ -58,7 +55,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         profile: user.profile
           ? {
               skills: user.profile.skills ?? [],
-              interests: user.profile.interests ?? [],
               gradYear: user.profile.gradYear,
               bio: user.profile.bio,
             }
@@ -163,18 +159,6 @@ export default function UserProfile({ user }: UserProfileProps) {
                 ))
               ) : (
                 <li>No skills listed</li>
-              )}
-            </ul>
-          </div>
-          <div className="mt-2">
-            <span className="font-semibold">Interests:</span>
-            <ul className="list-inside list-disc">
-              {user.profile?.interests.length ? (
-                user.profile.interests.map((interest, index) => (
-                  <li key={index}>{interest}</li>
-                ))
-              ) : (
-                <li>No interests listed</li>
               )}
             </ul>
           </div>

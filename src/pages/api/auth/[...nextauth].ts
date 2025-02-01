@@ -1,5 +1,2 @@
-import NextAuth from "next-auth";
-
-import { authOptions } from "~/lib/auth";
-
-export default NextAuth(authOptions);
+import { handlers } from "~/lib/auth";
+export const { GET, POST } = handlers;

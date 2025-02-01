@@ -1,5 +1,5 @@
 import { type NextApiResponse, type NextApiRequest } from "next";
-import { getServerAuthSession } from "~/lib/auth";
+import { auth } from "~/lib/auth";
 import { ProfileService } from "~/services/profile.service";
 import { type ApiResponse } from "~/types/api.types";
 import { type PublicProfileResponse } from "~/types/profile.types";
@@ -10,7 +10,7 @@ export default async function handler(
 ) {
 
   // auth check
-  const session = await getServerAuthSession({ req, res });
+  const session = await auth();
   if (!session?.user?.id) {
     return res.status(401).json({ data: null, error: "Unauthorized" });
   }

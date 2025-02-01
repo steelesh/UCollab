@@ -16,10 +16,10 @@ export default function Home() {
             viewport={{ once: true }}
             className="max-w-3xl text-center"
           >
-            <h1 className="mb-6 text-6xl font-extrabold">
+            <h1 className="mb-6 text-6xl font-extrabold select-none">
               Collaborate. Innovate. Succeed.
             </h1>
-            <p className="mb-12 text-2xl">
+            <p className="mb-12 text-2xl select-none">
               UCollab connects students to work together on exciting projects.
             </p>
           </motion.div>

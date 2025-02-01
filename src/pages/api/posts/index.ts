@@ -1,67 +1,59 @@
-import { type NextApiRequest, type NextApiResponse } from "next";
-import { getServerAuthSession } from "~/lib/auth";
+"use server";
+
+import { auth } from "~/lib/auth";
+import { type CreatePostInput, type UpdatePostInput } from "~/schemas/post.schema";
 import { PostService } from "~/services/post.service";
-import { postSchema } from "~/schemas/post.schema";
-import { z } from "zod";
-import { type ApiResponse } from "~/types/api.types";
-import { type PostResponse } from "~/types/post.types";
+import { type Post } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
-// api route that can return a single post or all posts
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<PostResponse | PostResponse[]>>
-) {
+export async function createPost(data: CreatePostInput) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Not authenticated");
 
-  // auth check
-  const session = await getServerAuthSession({ req, res });
-  const userId = session?.user?.id;
-  if (!userId) {
-    return res.status(401).json({ data: null, error: "Unauthorized" });
-  }
+  const post = await PostService.createPost(
+      { ...data, userId: session.user.id },
+      session.user.id,
+  );
 
-  // handle GET req
-  switch (req.method) {
-    case "GET":
-      try {
-        const posts = await PostService.getAllPosts();
-        return res.status(200).json({ data: posts, error: null });
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-        return res.status(500).json({
-          data: null,
-          error: "Failed to fetch posts"
-        });
-      }
+  revalidatePath("/posts");
+  revalidatePath(`/profile/${session.user.username}`);
+  return post;
+}
 
-    // handle POST req
-    case "POST":
-      try {
-        const validatedData = postSchema.parse(req.body);
-        const post = await PostService.createPost(validatedData, userId);
-        const postWithCount = {
-          ...post,
-          _count: {
-            comments: 0,
-          },
-        };
-        return res.status(201).json({ data: postWithCount, error: null });
-      } catch (error) {
-        if (error instanceof z.ZodError) {
-          return res.status(400).json({ data: null, error: error });
-        }
-        console.error("Error creating post:", error);
-        return res.status(500).json({
-          data: null,
-          error: "Failed to create post"
-        });
-      }
+export async function updatePost(data: UpdatePostInput) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Not authenticated");
 
-    // only allow GET and POST requests
-    default:
-      res.setHeader("Allow", ["GET", "POST"]);
-      return res.status(405).json({
-        data: null,
-        error: `Method ${req.method} Not Allowed`
-      });
-  }
+  const post = await PostService.updatePost(data, session.user.id);
+
+  revalidatePath("/posts");
+  revalidatePath(`/posts/${data.id}`);
+  revalidatePath(`/profile/${session.user.username}`);
+  return post;
+}
+
+export async function deletePost(postId: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Not authenticated");
+
+  await PostService.deletePost(postId, session.user.id);
+
+  revalidatePath("/posts");
+  revalidatePath(`/profile/${session.user.username}`);
+}
+
+export async function updatePostStatus(postId: string, status: Post["status"]) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Not authenticated");
+
+  const post = await PostService.updatePostStatus(
+      postId,
+      status,
+      session.user.id,
+  );
+
+  revalidatePath("/posts");
+  revalidatePath(`/posts/${postId}`);
+  revalidatePath(`/profile/${session.user.username}`);
+  return post;
 }

@@ -1,68 +1,195 @@
-import { type Prisma } from "@prisma/client";
-import { type UpdateProfileInput } from "~/types/profile.types";
-import { db } from "~/lib/db";
-
-const privateInclude = {
-  user: {
-    select: {
-      id: true,
-      name: true,
-      username: true,
-      image: true,
-      email: true,
-      allowNotifications: true,
-    },
-  },
-};
+import { Prisma, type User } from "@prisma/client";
+import { notFound } from "next/navigation";
+import { db } from "~/data/db";
+import { withServiceAuth } from "~/lib/auth/protected-service";
+import { ErrorMessage } from "~/lib/constants";
+import { AppError, AuthorizationError } from "~/lib/errors/app-error";
+import { Permission } from "~/lib/permissions";
+import {
+  type UpdateProfileInput,
+  profileSelect,
+  updateProfileSchema,
+} from "~/schemas/profile.schema";
+import { UserService } from "./user.service";
 
 export const ProfileService = {
-  async getPrivateProfile(userId: string) {
-    return db.profile.findUnique({
-      where: { userId },
-      include: privateInclude,
-    });
+  // Read Operations
+  async getProfile(userId: User["id"], requestUserId: string) {
+    return withServiceAuth(
+      requestUserId,
+      Permission.VIEW_ANY_PROFILE,
+      async () => {
+        try {
+          if (
+            !(await UserService.canAccessContent(
+              requestUserId,
+              userId,
+              Permission.VIEW_ANY_PROFILE,
+            ))
+          ) {
+            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
+          }
+
+          const profile = await db.profile.findUnique({
+            where: { userId },
+            select: profileSelect,
+          });
+
+          if (!profile) notFound();
+          return profile;
+        } catch (error) {
+          if (error instanceof AppError) throw error;
+          throw new AppError(ErrorMessage.OPERATION_FAILED);
+        }
+      },
+    );
   },
 
+  // Update Operations
+  async updateProfile(
+    userId: User["id"],
+    data: UpdateProfileInput,
+    requestUserId: string,
+  ) {
+    return withServiceAuth(
+      requestUserId,
+      Permission.UPDATE_ANY_PROFILE,
+      async () => {
+        try {
+          if (
+            !(await UserService.canAccessContent(
+              requestUserId,
+              userId,
+              Permission.UPDATE_ANY_PROFILE,
+            ))
+          ) {
+            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
+          }
+
+          return await db.$transaction(async (tx) => {
+            const profile = await tx.profile.findUnique({
+              where: { userId },
+              select: { id: true },
+            });
+
+            if (!profile) notFound();
+
+            const verifiedSkills = data.skills?.length
+              ? await tx.skill.findMany({
+                  where: {
+                    AND: [
+                      { verified: true },
+                      {
+                        name: {
+                          in: data.skills.map((name) =>
+                            name.toLowerCase().trim(),
+                          ),
+                        },
+                      },
+                    ],
+                  },
+                  select: { name: true },
+                })
+              : [];
+
+            const validatedData = updateProfileSchema.parse({
+              ...data,
+              skills: verifiedSkills.map((s) => s.name),
+            });
+
+            return tx.profile.update({
+              where: { userId },
+              data: validatedData,
+              select: profileSelect,
+            });
+          });
+        } catch (error) {
+          if (error instanceof AppError) throw error;
+          if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2025") notFound();
+            throw new AppError(ErrorMessage.INVALID_INPUT);
+          }
+          throw new AppError(ErrorMessage.OPERATION_FAILED);
+        }
+      },
+    );
+  },
+
+  // List & Search Operations
+  async getAllProfiles(requestUserId: string, page = 1, limit = 10) {
+    return withServiceAuth(
+      requestUserId,
+      Permission.VIEW_ANY_PROFILE,
+      async () => {
+        try {
+          return await db.profile.findMany({
+            skip: (page - 1) * limit,
+            take: limit,
+            select: profileSelect,
+            orderBy: { lastModifiedDate: "desc" },
+          });
+        } catch (error) {
+          if (error instanceof AppError) throw error;
+          throw new AppError(ErrorMessage.OPERATION_FAILED);
+        }
+      },
+    );
+  },
+
+  async searchProfiles(
+    query: string,
+    requestUserId: string,
+    page = 1,
+    limit = 10,
+  ) {
+    return withServiceAuth(
+      requestUserId,
+      Permission.VIEW_ANY_PROFILE,
+      async () => {
+        try {
+          return await db.profile.findMany({
+            where: {
+              OR: [
+                { user: { username: { contains: query } } },
+                { user: { fullName: { contains: query } } },
+                { skills: { some: { name: { contains: query } } } },
+              ],
+            },
+            skip: (page - 1) * limit,
+            take: limit,
+            select: profileSelect,
+            orderBy: { lastModifiedDate: "desc" },
+          });
+        } catch (error) {
+          if (error instanceof AppError) throw error;
+          throw new AppError(ErrorMessage.OPERATION_FAILED);
+        }
+      },
+    );
+  },
+
+  // Public Operations
   async getPublicProfile(username: string) {
-    return db.user.findUnique({
-      where: { username },
-      select: {
-        username: true,
-        name: true,
-        image: true,
-        profile: {
-          select: {
-            bio: true,
-            skills: true,
-            interests: true,
-            gradYear: true,
-          },
-        },
-        posts: {
-          include: {
-            _count: {
-              select: {
-                comments: true,
-              },
+    try {
+      const profile = await db.profile.findFirst({
+        where: { user: { username } },
+        select: {
+          ...profileSelect,
+          user: {
+            select: {
+              id: true,
+              username: true,
+              fullName: true,
+              avatar: true,
             },
           },
-          orderBy: {
-            createdDate: "desc",
-          },
         },
-      },
-    });
-  },
+      });
 
-  async updateProfile(userId: string, data: UpdateProfileInput) {
-    return db.profile.update({
-      where: { userId },
-      data: {
-        ...data,
-        skills: data.skills ? (data.skills as Prisma.JsonArray) : undefined,
-        interests: data.interests ? (data.interests as Prisma.JsonArray) : undefined,
-      },
-      include: privateInclude,
-    });
+      if (!profile) notFound();
+      return profile;
+    } catch {
+      throw new AppError(ErrorMessage.OPERATION_FAILED);
+    }
   },
 };

@@ -1,5 +1,5 @@
 import { type NextApiRequest, type NextApiResponse } from "next";
-import { getServerAuthSession } from "~/lib/auth";
+import { auth } from "~/lib/auth";
 import { PostService } from "~/services/post.service";
 import { postSchema } from "~/schemas/post.schema";
 import { z } from "zod";
@@ -13,7 +13,7 @@ export default async function handler(
 ) {
 
   // auth check
-  const session = await getServerAuthSession({ req, res });
+  const session = await auth();
   const userId = session?.user?.id;
   if (!userId) {
     return res.status(401).json({ data: null, error: "Unauthorized" });
@@ -29,7 +29,7 @@ export default async function handler(
   switch (req.method) {
     case "GET":
       try {
-        const post = await PostService.getPostById(id);
+        const post = await PostService.getPostById(id, userId);
 
         if (!post) {
           return res.status(404).json({ data: null, error: "Post not found" });
@@ -54,7 +54,7 @@ export default async function handler(
         }
 
         const validatedData = postSchema.parse(req.body);
-        const updatedPost = await PostService.updatePost(id, validatedData);
+        const updatedPost = await PostService.updatePost(validatedData, { id });
 
         return res.status(200).json({ data: updatedPost, error: null });
       } catch (error) {
@@ -77,7 +77,7 @@ export default async function handler(
           return res.status(403).json({ data: null, error: "Forbidden" });
         }
 
-        await PostService.deletePost(id);
+        await PostService.deletePost(id, userId);
         return res.status(204).end();
       } catch (error) {
         console.error("Error deleting post:", error);

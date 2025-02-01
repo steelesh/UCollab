@@ -1,30 +1,20 @@
+"use client";
+
 import { signIn } from "next-auth/react";
+import { useState } from "react";
 import Head from "next/head";
-import { type GetServerSideProps } from "next";
-import { getServerAuthSession } from "~/lib/auth";
 import { motion } from "framer-motion";
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getServerAuthSession(context);
-
-  if (session) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
-  return {
-    props: {},
-  };
-};
 
 export default function Signin() {
-  const handleSignIn = () => {
-    const callbackUrl =
-      new URLSearchParams(window.location.search).get("callbackUrl") ?? "/";
-    void signIn("azure-ad", { callbackUrl });
+  const [isPending, setIsPending] = useState(false);
+  const handleSignIn = async () => {
+    setIsPending(true);
+    try {
+      await signIn("microsoft-entra-id");
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -52,7 +42,15 @@ export default function Signin() {
                 className="btn btn-primary select-none"
                 onClick={handleSignIn}
               >
-                Sign in with UC Credentials
+                {isPending ? (
+                    <>
+                      <span className="loading loading-spinner loading-md"></span>
+                    </>
+                    ) : (
+                        <>
+                          Sign in with UC Credentials
+                        </>
+                )}
               </button>
             </div>
           </motion.div>

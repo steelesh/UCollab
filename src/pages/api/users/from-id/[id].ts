@@ -3,13 +3,13 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient({ log: ["query", "info", "warn", "error"] });
 
-import { getSession } from "next-auth/react";
+import {auth} from "~/lib/auth";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const session = await getSession({ req });
+  const session = await auth();
 
   if (!session) {
     return res.status(401).json({ error: "Unauthorized" });

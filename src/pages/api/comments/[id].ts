@@ -1,7 +1,7 @@
 import { type NextApiRequest, type NextApiResponse } from "next";
-import { getServerAuthSession } from "~/lib/auth";
+import { auth } from "~/lib/auth";
 import { CommentService } from "~/services/comment.service";
-import { commentSchema } from "~/schemas/comment.schema";
+import { commentFormSchema } from "~/schemas/comment.schema";
 import { z } from "zod";
 import { type ApiResponse } from "~/types/api.types";
 import { type CommentResponse } from "~/types/comment.types";
@@ -12,7 +12,7 @@ export default async function handler(
 ) {
 
   // auth check
-  const session = await getServerAuthSession({ req, res });
+  const session = await auth();
   const userId = session?.user?.id;
   if (!userId) {
     return res.status(401).json({ data: null, error: "Unauthorized" });
@@ -33,7 +33,7 @@ export default async function handler(
           return res.status(403).json({ data: null, error: "Forbidden" });
         }
 
-        const validatedData = commentSchema.parse(req.body);
+        const validatedData = commentFormSchema.parse(req.body);
         const comment = await CommentService.updateComment(id, validatedData);
         return res.status(200).json({ data: comment, error: null });
       } catch (error) {
@@ -55,7 +55,7 @@ export default async function handler(
           return res.status(403).json({ data: null, error: "Forbidden" });
         }
 
-        await CommentService.deleteComment(id);
+        await CommentService.deleteComment(id, userId);
         return res.status(204).end();
       } catch (error) {
         console.error("Error deleting comment:", error);
