@@ -1,12 +1,12 @@
 import { PrismaClient } from "@prisma/client";
-import { env } from "~/env";
+import { env } from "~/lib/env";
 
 const createPrismaClient = () =>
   new PrismaClient({
     log: process.env.VERCEL_ENV === "development" ? ["query", "error", "warn"] : ["error"],
     datasources: {
       db: {
-        url: env.DATABASE_URL,
+        url: env.MYSQL_URL,
       }
     },
   });
