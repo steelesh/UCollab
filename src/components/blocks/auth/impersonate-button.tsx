@@ -1,7 +1,7 @@
 "use client";
 
 import { User } from "@prisma/client";
-import { signIn } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { useState } from "react";
 import { Button } from "../../ui/button";
 import { Spinner } from "../../ui/spinner";
@@ -12,6 +12,7 @@ export function ImpersonateButton({ userId }: { userId: User["id"] }) {
   const handleClick = async () => {
     setIsPending(true);
     try {
+      await signOut({ redirect: false });
       await signIn("credentials", { userId });
     } finally {
       setIsPending(false);

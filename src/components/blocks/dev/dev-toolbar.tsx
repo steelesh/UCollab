@@ -1,13 +1,13 @@
 "use client";
 
 import { Button } from "@/src/components/ui/button";
-import { isLocalEnv } from "@/src/lib/utils";
+import { isDevelopment } from "@/src/lib/utils";
 import { motion } from "framer-motion";
 import { Settings } from "lucide-react";
 import Link from "next/link";
 
 export function DevToolbar() {
-  if (!isLocalEnv()) {
+  if (!isDevelopment()) {
     return null;
   }
 

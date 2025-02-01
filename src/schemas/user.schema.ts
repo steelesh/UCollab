@@ -1,28 +1,6 @@
 import { z } from "zod";
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from "../lib/constants";
 
-// Add common select object for reuse
-export const userSelect = {
-  id: true,
-  username: true,
-  email: true,
-  fullName: true,
-  firstName: true,
-  lastName: true,
-  avatar: true,
-  avatarSource: true,
-  role: true,
-  onboardingStep: true,
-  createdDate: true,
-} as const;
-
-export const publicUserSelect = {
-  id: true,
-  username: true,
-  fullName: true,
-  avatar: true,
-} as const;
-
 export const userSchema = z.object({
   username: z
     .string()
@@ -59,3 +37,24 @@ export const updateUserSchema = z.object({
 
 export type CreateUserInput = z.infer<typeof userSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+
+export const userSelect = {
+  id: true,
+  username: true,
+  email: true,
+  fullName: true,
+  firstName: true,
+  lastName: true,
+  avatar: true,
+  avatarSource: true,
+  role: true,
+  onboardingStep: true,
+  createdDate: true,
+} as const;
+
+export const publicUserSelect = {
+  id: true,
+  username: true,
+  fullName: true,
+  avatar: true,
+} as const;

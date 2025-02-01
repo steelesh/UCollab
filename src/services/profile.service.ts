@@ -13,7 +13,6 @@ import {
 import { UserService } from "./user.service";
 
 export const ProfileService = {
-  // Read Operations
   async getProfile(userId: User["id"], requestUserId: string) {
     return withServiceAuth(
       requestUserId,
@@ -45,7 +44,6 @@ export const ProfileService = {
     );
   },
 
-  // Update Operations
   async updateProfile(
     userId: User["id"],
     data: UpdateProfileInput,
@@ -115,7 +113,6 @@ export const ProfileService = {
     );
   },
 
-  // List & Search Operations
   async getAllProfiles(requestUserId: string, page = 1, limit = 10) {
     return withServiceAuth(
       requestUserId,
@@ -168,7 +165,6 @@ export const ProfileService = {
     );
   },
 
-  // Public Operations
   async getPublicProfile(username: string) {
     try {
       const profile = await db.profile.findFirst({

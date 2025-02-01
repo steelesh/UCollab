@@ -8,6 +8,7 @@ import { withServiceAuth } from "../lib/auth/protected-service";
 import { ErrorMessage } from "../lib/constants";
 import { AppError, AuthorizationError } from "../lib/errors/app-error";
 import { hasPermission, Permission } from "../lib/permissions";
+import { isDevelopment } from "../lib/utils";
 import {
   publicUserSelect,
   UpdateUserInput,
@@ -60,8 +61,8 @@ export const UserService = {
     );
   },
 
-  async getUsers(userId?: string, isLocalDev = false): Promise<User[]> {
-    if (isLocalDev) {
+  async getUsers(userId?: string): Promise<User[]> {
+    if (isDevelopment()) {
       return await db.user.findMany({
         orderBy: { createdDate: "desc" },
       });
@@ -78,7 +79,6 @@ export const UserService = {
     });
   },
 
-  // Search Operations
   async searchUsers(query: string, requestUserId: string, limit = 5) {
     return withServiceAuth(
       requestUserId,
@@ -98,7 +98,6 @@ export const UserService = {
     );
   },
 
-  // Admin Operations
   async getAdminUserDetails(userId: User["id"], requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.VIEW_USERS, async () => {
       try {
@@ -160,7 +159,6 @@ export const UserService = {
     );
   },
 
-  // User Management Operations
   async updateUser(
     userId: User["id"],
     data: UpdateUserInput,
@@ -207,7 +205,6 @@ export const UserService = {
     );
   },
 
-  // Internal Helper Methods
   async getUserRole(userId: User["id"]) {
     try {
       const user = await db.user.findUnique({
@@ -253,7 +250,6 @@ export const UserService = {
     }
   },
 
-  // Avatar Methods
   async processUserAvatar(avatar: File | null, userId: User["id"]) {
     try {
       if (avatar === null) {

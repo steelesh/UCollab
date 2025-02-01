@@ -8,11 +8,6 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "**.digitaloceanspaces.com",
-        pathname: "/**",
-      },
-      {
         protocol: "http",
         hostname: "localhost",
         port: "9000",

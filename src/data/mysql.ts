@@ -1,12 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 import { env } from "../lib/env";
+import { isDevelopment } from "../lib/utils";
 
 const createPrismaClient = () =>
   new PrismaClient({
-    log:
-      process.env.NODE_ENV === "development"
-        ? ["query", "error", "warn"]
-        : ["error"],
+    log: isDevelopment() ? ["query", "error", "warn"] : ["error"],
     datasources: {
       db: {
         url: env.MYSQL_URL,
@@ -20,4 +18,4 @@ const globalForPrisma = globalThis as unknown as {
 
 export const db = globalForPrisma.prisma ?? createPrismaClient();
 
-if (process.env.NODE_ENV === "development") globalForPrisma.prisma = db;
+if (isDevelopment()) globalForPrisma.prisma = db;

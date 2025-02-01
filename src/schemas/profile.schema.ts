@@ -1,30 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
-// Add common select object for reuse
-export const profileSelect = {
-  id: true,
-  lastModifiedDate: true,
-  gradYear: true,
-  bio: true,
-  skills: {
-    where: { verified: true },
-    select: {
-      id: true,
-      name: true,
-    },
-  },
-  user: {
-    select: {
-      id: true,
-      username: true,
-      fullName: true,
-      avatar: true,
-      email: true,
-    },
-  },
-} as const;
-
 export const profileSchema = z.object({
   bio: z
     .string()
@@ -56,3 +32,26 @@ export const updateProfileSchema = profileSchema.partial().transform((data) => {
 export type CreateProfileInput = z.infer<typeof profileSchema>;
 export type UpdateProfileInput = z.input<typeof updateProfileSchema>;
 export type UpdateProfilePayload = z.output<typeof updateProfileSchema>;
+
+export const profileSelect = {
+  id: true,
+  lastModifiedDate: true,
+  gradYear: true,
+  bio: true,
+  skills: {
+    where: { verified: true },
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  user: {
+    select: {
+      id: true,
+      username: true,
+      fullName: true,
+      avatar: true,
+      email: true,
+    },
+  },
+} as const;

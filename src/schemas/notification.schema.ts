@@ -1,7 +1,6 @@
 import { NotificationType, User } from "@prisma/client";
 import { z } from "zod";
 
-// Form validation schema (what users input)
 export const notificationPreferencesFormSchema = z.object({
   enabled: z.boolean().default(true),
   allowComments: z.boolean().default(true),
@@ -10,7 +9,6 @@ export const notificationPreferencesFormSchema = z.object({
   allowSystem: z.boolean().default(true),
 });
 
-// Service input types (internal use)
 export type CreateNotificationData = {
   userId: User["id"];
   type: NotificationType;
@@ -36,7 +34,6 @@ export type UpdateNotificationPreferencesData = {
   allowSystem?: boolean;
 };
 
-// Pagination params
 export const paginationSchema = z.object({
   page: z.number().int().positive().default(1),
   limit: z.number().int().positive().max(100).default(20),
@@ -44,7 +41,6 @@ export const paginationSchema = z.object({
 
 export type PaginationParams = z.infer<typeof paginationSchema>;
 
-// Add admin notification schemas
 export const createSystemNotificationSchema = z.object({
   message: z
     .string()
@@ -54,7 +50,23 @@ export const createSystemNotificationSchema = z.object({
   type: z.nativeEnum(NotificationType).default(NotificationType.SYSTEM),
 });
 
-// Export types
 export type CreateSystemNotificationInput = z.infer<
   typeof createSystemNotificationSchema
 >;
+
+export const notificationSelect = {
+  id: true,
+  message: true,
+  createdDate: true,
+  isRead: true,
+  type: true,
+  postId: true,
+  commentId: true,
+  triggeredBy: {
+    select: {
+      id: true,
+      username: true,
+      avatar: true,
+    },
+  },
+} as const;

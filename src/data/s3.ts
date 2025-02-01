@@ -4,6 +4,7 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { env } from "../lib/env";
+import { isDevelopment } from "../lib/utils";
 
 type S3UploadParams = {
   buffer: Buffer;
@@ -21,11 +22,11 @@ export const s3Client = new S3Client({
     accessKeyId: env.S3_ACCESS_KEY_ID,
     secretAccessKey: env.S3_SECRET_ACCESS_KEY,
   },
-  forcePathStyle: process.env.NODE_ENV === "development",
+  forcePathStyle: isDevelopment(),
 });
 
 function getFileUrl(key: string): string {
-  return process.env.NODE_ENV === "development"
+  return isDevelopment()
     ? `${env.S3_ENDPOINT}/${env.S3_BUCKET_NAME}/${key}`
     : `https://${env.S3_BUCKET_NAME}.${env.S3_ENDPOINT}/${key}`;
 }
@@ -94,7 +95,7 @@ export const s3 = {
   },
 
   async initializeBucket(): Promise<void> {
-    if (process.env.NODE_ENV === "development") {
+    if (isDevelopment()) {
       try {
         await s3Client.send(
           new PutBucketPolicyCommand({

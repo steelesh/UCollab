@@ -12,7 +12,6 @@ import {
 } from "../schemas/skill.schema";
 
 export const SkillService = {
-  // Public Operations
   async getAllSkills() {
     try {
       return await db.skill.findMany({
@@ -43,7 +42,6 @@ export const SkillService = {
     }
   },
 
-  // Protected Operations
   async createSkill(data: CreateSkillInput, requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.CREATE_SKILL, async () => {
       try {

@@ -3,7 +3,7 @@ services:
     container_name: ucollab-mysql
     image: mysql
     environment:
-      MYSQL_ROOT_HOST: ${MYSQL_HOST}
+      MYSQL_ROOT_HOST: "%"
       MYSQL_ROOT_USER: ${MYSQL_USER}
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}

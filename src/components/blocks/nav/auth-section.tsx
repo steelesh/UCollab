@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { isDevelopment } from "@/src/lib/utils";
 import Image from "next/image";
 import { Avatar } from "../../ui/avatar";
 import {
@@ -37,6 +38,11 @@ export async function AuthSection() {
     );
   }
 
-  // if user is not authenticated, show sign in button
-  return <NavLink href="/u" title="Sign in" className="hover:bg-transparent" />;
+  return (
+    <NavLink
+      href={isDevelopment() ? "/u" : "/signin"}
+      title="Sign in"
+      className="hover:bg-transparent"
+    />
+  );
 }

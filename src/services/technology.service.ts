@@ -12,7 +12,6 @@ import {
 } from "../schemas/technology.schema";
 
 export const TechnologyService = {
-  // Public methods - no auth needed
   async getVerifiedTechnologies() {
     try {
       return await db.technology.findMany({
@@ -66,7 +65,6 @@ export const TechnologyService = {
     }
   },
 
-  // Protected methods - require authentication
   async createTechnology(data: CreateTechnologyInput, requestUserId: string) {
     return withServiceAuth(
       requestUserId,
@@ -177,7 +175,6 @@ export const TechnologyService = {
     );
   },
 
-  // Internal methods - used by other services
   async updatePostTechnologies(postId: Post["id"], technologies: string[]) {
     try {
       return await db.$transaction(async (tx) => {

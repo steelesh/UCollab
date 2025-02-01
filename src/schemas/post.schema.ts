@@ -42,7 +42,6 @@ export type UpdatePostInput = z.input<typeof updatePostSchema> & {
 };
 export type UpdatePostPayload = z.output<typeof updatePostSchema>;
 
-// Add these common select objects that are reused in post.service.ts
 export const postSelect = {
   id: true,
   title: true,

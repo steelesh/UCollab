@@ -223,7 +223,6 @@ export const CommentService = {
     });
   },
 
-  // This is a utility method that doesn't need auth
   async extractMentionedUserIds(content: Comment["content"]) {
     try {
       const mentionRegex = /@(\w+)/g;

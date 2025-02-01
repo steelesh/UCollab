@@ -16,29 +16,12 @@ import { Permission } from "../lib/permissions";
 import {
   CreateBatchNotificationData,
   CreateNotificationData,
+  notificationSelect,
 } from "../schemas/notification.schema";
 import { CommentService } from "./comment.service";
 import { UserService } from "./user.service";
 
-const notificationSelect = {
-  id: true,
-  message: true,
-  createdDate: true,
-  isRead: true,
-  type: true,
-  postId: true,
-  commentId: true,
-  triggeredBy: {
-    select: {
-      id: true,
-      username: true,
-      avatar: true,
-    },
-  },
-} as const;
-
 export const NotificationService = {
-  // Read Operations
   async getUserNotifications(userId: User["id"], requestUserId: string) {
     return withServiceAuth(
       requestUserId,
@@ -137,7 +120,6 @@ export const NotificationService = {
     );
   },
 
-  // Count Operations
   async getNotificationsCount(userId: User["id"], requestUserId: string) {
     return withServiceAuth(
       requestUserId,
@@ -192,7 +174,6 @@ export const NotificationService = {
     );
   },
 
-  // Update Operations
   async markNotificationAsRead(id: Notification["id"], requestUserId: string) {
     return withServiceAuth(
       requestUserId,
@@ -305,8 +286,6 @@ export const NotificationService = {
     );
   },
 
-  // Notification Creation and Queue Operations
-  // Private Queue Methods
   async queueNotification(data: CreateNotificationData): Promise<void> {
     try {
       await mq.addNotification(data);
@@ -325,7 +304,6 @@ export const NotificationService = {
     }
   },
 
-  // Cleanup Operations
   async cleanupOldNotifications(daysToKeep: number = 30): Promise<void> {
     return withServiceAuth(undefined, Permission.ACCESS_ADMIN, async () => {
       try {
@@ -346,7 +324,6 @@ export const NotificationService = {
     });
   },
 
-  // Notification Sending
   async sendCommentNotifications(data: {
     postId: Post["id"];
     postTitle: Post["title"];
@@ -362,7 +339,6 @@ export const NotificationService = {
         data.content,
       );
 
-      // Handle mentions notifications
       const uniqueMentionedUsers = mentionedUserIds
         .filter((id) => id !== data.commentAuthorId)
         .filter((id, index, self) => self.indexOf(id) === index);
@@ -385,7 +361,6 @@ export const NotificationService = {
         }
       }
 
-      // Handle post author notification
       const shouldNotifyPostAuthor =
         data.postAuthorId !== data.commentAuthorId &&
         !mentionedUserIds.includes(data.postAuthorId);
@@ -446,7 +421,6 @@ export const NotificationService = {
     return preferencesMap[type] ?? false;
   },
 
-  // Add this method to NotificationService
   async createNotification(data: CreateNotificationData) {
     try {
       return await db.notification.create({

@@ -1,4 +1,4 @@
-import { isLocalEnv } from "@/src/lib/utils";
+import { isDevelopment } from "@/src/lib/utils";
 import { execSync } from "child_process";
 
 function getPortFromDocker(containerName: string): number | null {
@@ -36,7 +36,7 @@ function getPrismaStudioPort(): number | null {
 }
 
 export async function GET() {
-  if (!isLocalEnv()) {
+  if (!isDevelopment()) {
     return Response.json(
       { error: "Only available in local development" },
       { status: 403 },

@@ -14,7 +14,6 @@ import {
 import { UserService } from "./user.service";
 
 export const PostService = {
-  // Read Operations
   async getAllPosts(requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
       try {
@@ -64,7 +63,6 @@ export const PostService = {
     });
   },
 
-  // Create Operations
   async createPost(data: CreatePostInput, requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.CREATE_POST, async () => {
       try {
@@ -118,7 +116,6 @@ export const PostService = {
     });
   },
 
-  // Update Operations
   async updatePost(data: UpdatePostInput, requestUserId: string) {
     return withServiceAuth(
       requestUserId,
@@ -221,7 +218,6 @@ export const PostService = {
     );
   },
 
-  // Delete Operations
   async deletePost(id: Post["id"], requestUserId: string) {
     return withServiceAuth(
       requestUserId,
@@ -252,7 +248,6 @@ export const PostService = {
     );
   },
 
-  // Search & Filter Operations
   async searchPosts(
     query: string,
     requestUserId: string,

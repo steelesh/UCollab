@@ -13,7 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/src/components/ui/sheet";
-import { cn } from "@/src/lib/utils";
+import { cn, isDevelopment } from "@/src/lib/utils";
 import { ChevronDown, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -97,7 +97,7 @@ export function MobileNav({ items }: { items: NavSection[] }) {
           </div>
         </div>
         <div className="border-t p-6">
-          <Link href="/u">
+          <Link href={isDevelopment() ? "/localdev" : "/signin"}>
             <Button onClick={() => setOpen(false)} className="w-full">
               Sign in
             </Button>

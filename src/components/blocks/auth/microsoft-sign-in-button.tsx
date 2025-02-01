@@ -19,7 +19,11 @@ export function MicrosoftSignInButton() {
   };
 
   return (
-    <Button onClick={handleClick} variant="outline" className="cursor-pointer">
+    <Button
+      onClick={handleClick}
+      variant="outline"
+      className="w-full cursor-pointer sm:w-auto"
+    >
       {isPending ? (
         <>
           <Spinner />
@@ -28,7 +32,7 @@ export function MicrosoftSignInButton() {
       ) : (
         <>
           <LogosMicrosoftIcon className="mr-2 h-4 w-4" />
-          Sign in with Microsoft Entra ID
+          Sign in with Microsoft
         </>
       )}
     </Button>
