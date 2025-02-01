@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { motion } from "framer-motion";
+import SignInButton from "~/components/signin-button";
 
 export default function Home() {
   return (
@@ -22,6 +23,7 @@ export default function Home() {
             <p className="mb-12 text-2xl select-none">
               UCollab connects students to work together on exciting projects.
             </p>
+            <SignInButton />
           </motion.div>
         </section>
 
