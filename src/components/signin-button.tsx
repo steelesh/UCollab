@@ -17,7 +17,7 @@ export default function SignInButton() {
 
   return (
     <button
-      className="btn btn-primary select-none"
+      className="btn btn-primary-content select-none"
       onClick={handleSignIn}
       disabled={isPending}
     >
