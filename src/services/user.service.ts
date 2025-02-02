@@ -1,21 +1,27 @@
-import { lorelei } from "@dicebear/collection";
-import { createAvatar } from "@dicebear/core";
-import { type Account, AvatarSource, Prisma, Role, type User } from "@prisma/client";
-import { notFound } from "next/navigation";
-import { prisma } from "~/lib/prisma";
-import { s3 } from "~/data/s3";
-import { withServiceAuth } from "~/lib/auth/protected-service";
-import { ErrorMessage } from "~/lib/constants";
-import { AppError, AuthorizationError } from "~/lib/errors/app-error";
-import { hasPermission, Permission } from "~/lib/permissions";
+import { lorelei } from '@dicebear/collection';
+import { createAvatar } from '@dicebear/core';
+import {
+  type Account,
+  AvatarSource,
+  Prisma,
+  Role,
+  type User,
+} from '@prisma/client';
+import { notFound } from 'next/navigation';
+import { prisma } from '~/lib/prisma';
+import { s3 } from '~/data/s3';
+import { withServiceAuth } from '~/lib/auth/protected-service';
+import { ErrorMessage } from '~/lib/constants';
+import { AppError, AuthorizationError } from '~/lib/errors/app-error';
+import { hasPermission, Permission } from '~/lib/permissions';
 import {
   publicUserSelect,
   type UpdateUserInput,
   userSelect,
-} from "~/schemas/user.schema";
+} from '~/schemas/user.schema';
 
 export const UserService = {
-  async getUser(username: User["username"]) {
+  async getUser(username: User['username']) {
     try {
       const user = await prisma.user.findUnique({
         where: { username },
@@ -63,7 +69,7 @@ export const UserService = {
   async getUsers(userId?: string, isLocalDev = false): Promise<User[]> {
     if (isLocalDev) {
       return prisma.user.findMany({
-          orderBy: {createdDate: "desc"},
+        orderBy: { createdDate: 'desc' },
       });
     }
 
@@ -73,7 +79,7 @@ export const UserService = {
 
     return withServiceAuth(userId, Permission.VIEW_USERS_LIST, async () => {
       return prisma.user.findMany({
-          orderBy: {createdDate: "desc"},
+        orderBy: { createdDate: 'desc' },
       });
     });
   },
@@ -89,7 +95,7 @@ export const UserService = {
             where: { username: { startsWith: query.toLowerCase().trim() } },
             select: publicUserSelect,
             take: limit,
-            orderBy: { username: "asc" },
+            orderBy: { username: 'asc' },
           });
         } catch {
           throw new AppError(ErrorMessage.OPERATION_FAILED);
@@ -99,7 +105,7 @@ export const UserService = {
   },
 
   // Admin Operations
-  async getAdminUserDetails(userId: User["id"], requestUserId: string) {
+  async getAdminUserDetails(userId: User['id'], requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.VIEW_USERS, async () => {
       try {
         const user = await prisma.user.findUnique({
@@ -120,7 +126,7 @@ export const UserService = {
   },
 
   async updateUserRole(
-    userId: User["id"],
+    userId: User['id'],
     newRole: Role,
     requestUserId: string,
   ) {
@@ -141,7 +147,7 @@ export const UserService = {
     });
   },
 
-  async deleteUser(userId: User["id"], requestUserId: string) {
+  async deleteUser(userId: User['id'], requestUserId: string) {
     return withServiceAuth(
       requestUserId,
       Permission.DELETE_ANY_USER,
@@ -152,7 +158,7 @@ export const UserService = {
           });
         } catch (error) {
           if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2025") notFound();
+            if (error.code === 'P2025') notFound();
           }
           throw new AppError(ErrorMessage.OPERATION_FAILED);
         }
@@ -162,7 +168,7 @@ export const UserService = {
 
   // User Management Operations
   async updateUser(
-    userId: User["id"],
+    userId: User['id'],
     data: UpdateUserInput,
     requestUserId: string,
   ) {
@@ -199,7 +205,7 @@ export const UserService = {
         } catch (error) {
           if (error instanceof AppError) throw error;
           if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2025") notFound();
+            if (error.code === 'P2025') notFound();
           }
           throw new AppError(ErrorMessage.OPERATION_FAILED);
         }
@@ -208,7 +214,7 @@ export const UserService = {
   },
 
   // Internal Helper Methods
-  async getUserRole(userId: User["id"]) {
+  async getUserRole(userId: User['id']) {
     try {
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -222,7 +228,7 @@ export const UserService = {
     }
   },
 
-  async hasPermission(userId: User["id"], permission: Permission) {
+  async hasPermission(userId: User['id'], permission: Permission) {
     try {
       const userRole = await this.getUserRole(userId);
       return hasPermission(userRole, permission);
@@ -232,8 +238,8 @@ export const UserService = {
   },
 
   async canAccessContent(
-    userId: User["id"],
-    ownerId: User["id"],
+    userId: User['id'],
+    ownerId: User['id'],
     permission: Permission,
   ) {
     try {
@@ -243,7 +249,7 @@ export const UserService = {
       if (hasPermission(userRole, permission)) return true;
 
       if (userId === ownerId) {
-        const ownPermission = permission.replace("ANY", "OWN") as Permission;
+        const ownPermission = permission.replace('ANY', 'OWN') as Permission;
         return hasPermission(userRole, ownPermission);
       }
 
@@ -254,7 +260,7 @@ export const UserService = {
   },
 
   // Avatar Methods
-  async processUserAvatar(avatar: File | null, userId: User["id"]) {
+  async processUserAvatar(avatar: File | null, userId: User['id']) {
     try {
       if (avatar === null) {
         return this.generateDefaultAvatar(userId);
@@ -268,7 +274,7 @@ export const UserService = {
     }
   },
 
-  async uploadUserAvatar(file: File, userId: User["id"]) {
+  async uploadUserAvatar(file: File, userId: User['id']) {
     try {
       const buffer = Buffer.from(await file.arrayBuffer());
       const fileName = await this.getAvatarFileName(userId, file.name);
@@ -278,14 +284,14 @@ export const UserService = {
     }
   },
 
-  async getAvatarFileName(userId: User["id"], originalName?: string) {
+  async getAvatarFileName(userId: User['id'], originalName?: string) {
     const extension = originalName
-      ? (originalName.split(".").pop() ?? "jpg")
-      : "jpg";
+      ? (originalName.split('.').pop() ?? 'jpg')
+      : 'jpg';
     return `${userId}.${extension}`;
   },
 
-  async generateDefaultAvatar(userId: User["id"]) {
+  async generateDefaultAvatar(userId: User['id']) {
     try {
       return createAvatar(lorelei, {
         seed: userId,
@@ -297,12 +303,12 @@ export const UserService = {
   },
 
   async fetchMicrosoftAvatar(
-    accessToken: Account["access_token"],
-    userId: User["id"],
+    accessToken: Account['access_token'],
+    userId: User['id'],
   ) {
     try {
       const response = await fetch(
-        "https://graph.microsoft.com/v1.0/me/photo/$value",
+        'https://graph.microsoft.com/v1.0/me/photo/$value',
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         },

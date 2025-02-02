@@ -1,8 +1,13 @@
-import { AvatarSource, PostType, PostStatus, NotificationType, OnboardingStep, Role } from '@prisma/client';
+import {
+  AvatarSource,
+  PostType,
+  PostStatus,
+  NotificationType,
+  OnboardingStep,
+  Role,
+} from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import Decimal from 'decimal.js';
-
-
 
 export function fakeAccount() {
   return {
@@ -83,7 +88,11 @@ export function fakePost() {
     lastModifiedDate: faker.date.recent(),
     title: faker.lorem.words(5),
     description: faker.lorem.words(5),
-    postType: faker.helpers.arrayElement([PostType.CONTRIBUTION, PostType.FEEDBACK, PostType.DISCUSSION] as const),
+    postType: faker.helpers.arrayElement([
+      PostType.CONTRIBUTION,
+      PostType.FEEDBACK,
+      PostType.DISCUSSION,
+    ] as const),
     githubRepo: undefined,
     status: faker.helpers.arrayElement(Object.values(PostStatus)),
   };
@@ -96,7 +105,11 @@ export function fakePostComplete() {
     lastModifiedDate: faker.date.recent(),
     title: faker.lorem.words(5),
     description: faker.lorem.words(5),
-    postType: faker.helpers.arrayElement([PostType.CONTRIBUTION, PostType.FEEDBACK, PostType.DISCUSSION] as const),
+    postType: faker.helpers.arrayElement([
+      PostType.CONTRIBUTION,
+      PostType.FEEDBACK,
+      PostType.DISCUSSION,
+    ] as const),
     githubRepo: undefined,
     status: faker.helpers.arrayElement(Object.values(PostStatus)),
   };
@@ -159,7 +172,12 @@ export function fakeNotificationPreferencesComplete() {
 export function fakeNotification() {
   return {
     message: faker.lorem.words(5),
-    type: faker.helpers.arrayElement([NotificationType.COMMENT, NotificationType.MENTION, NotificationType.POST_UPDATE, NotificationType.SYSTEM] as const),
+    type: faker.helpers.arrayElement([
+      NotificationType.COMMENT,
+      NotificationType.MENTION,
+      NotificationType.POST_UPDATE,
+      NotificationType.SYSTEM,
+    ] as const),
   };
 }
 export function fakeNotificationComplete() {
@@ -169,7 +187,12 @@ export function fakeNotificationComplete() {
     message: faker.lorem.words(5),
     createdDate: new Date(),
     isRead: false,
-    type: faker.helpers.arrayElement([NotificationType.COMMENT, NotificationType.MENTION, NotificationType.POST_UPDATE, NotificationType.SYSTEM] as const),
+    type: faker.helpers.arrayElement([
+      NotificationType.COMMENT,
+      NotificationType.MENTION,
+      NotificationType.POST_UPDATE,
+      NotificationType.SYSTEM,
+    ] as const),
     postId: undefined,
     commentId: undefined,
     triggeredById: undefined,

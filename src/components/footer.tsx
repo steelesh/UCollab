@@ -1,12 +1,12 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 export default function Footer() {
   const navigation = {
     main: [
-      { name: "Accessibility", href: "/accessibility" },
-      { name: "Privacy", href: "/privacy" },
-      { name: "License", href: "/license" },
-      { name: "About Us", href: "/about" },
+      { name: 'Accessibility', href: '/accessibility' },
+      { name: 'Privacy', href: '/privacy' },
+      { name: 'License', href: '/license' },
+      { name: 'About Us', href: '/about' },
     ],
   };
 
@@ -15,14 +15,12 @@ export default function Footer() {
       <div className="mx-auto overflow-hidden">
         <nav
           aria-label="Footer"
-          className="flex flex-wrap justify-center gap-8 text-sm"
-        >
+          className="flex flex-wrap justify-center gap-8 text-sm">
           {navigation.main.map((item) => (
             <Link
               key={item.name}
               href={item.href}
-              className="text-accent hover:text-base-content hover:underline"
-            >
+              className="text-accent hover:text-base-content hover:underline">
               {item.name}
             </Link>
           ))}

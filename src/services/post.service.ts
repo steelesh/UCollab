@@ -1,17 +1,23 @@
-import { type Post, Prisma, type Technology } from "@prisma/client";
-import { notFound } from "next/navigation";
-import { prisma } from "~/lib/prisma";
-import { withServiceAuth } from "~/lib/auth/protected-service";
-import { ErrorMessage } from "~/lib/constants";
-import { AppError, AuthorizationError } from "~/lib/errors/app-error";
-import { Permission } from "~/lib/permissions";
+import { type Post, Prisma, type Technology } from '@prisma/client';
+import { notFound } from 'next/navigation';
+import { prisma } from '~/lib/prisma';
+import { withServiceAuth } from '~/lib/auth/protected-service';
+import { ErrorMessage } from '~/lib/constants';
+import { AppError, AuthorizationError } from '~/lib/errors/app-error';
+import { Permission } from '~/lib/permissions';
 import {
   type UpdatePostInput,
   postSelect,
   updatePostSchema,
-} from "~/schemas/post.schema";
-import { UserService } from "./user.service";
-import {type ZodArray, type ZodEffects, type ZodNativeEnum, type ZodOptional, type ZodString} from "zod";
+} from '~/schemas/post.schema';
+import { UserService } from './user.service';
+import {
+  type ZodArray,
+  type ZodEffects,
+  type ZodNativeEnum,
+  type ZodOptional,
+  type ZodString,
+} from 'zod';
 
 export const PostService = {
   // Read Operations
@@ -20,7 +26,7 @@ export const PostService = {
       try {
         return await prisma.post.findMany({
           select: postSelect,
-          orderBy: { createdDate: "desc" },
+          orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
         if (error instanceof AppError) throw error;
@@ -29,7 +35,7 @@ export const PostService = {
     });
   },
 
-  async getPostById(id: Post["id"], requestUserId: string) {
+  async getPostById(id: Post['id'], requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
       try {
         const post = await prisma.post.findUnique({
@@ -50,7 +56,7 @@ export const PostService = {
                   },
                 },
               },
-              orderBy: { createdDate: "desc" },
+              orderBy: { createdDate: 'desc' },
             },
           },
         });
@@ -67,18 +73,18 @@ export const PostService = {
   // Create Operations
   async createPost(
     data: {
-      title: ZodString["_output"];
-      description: ZodString["_output"];
+      title: ZodString['_output'];
+      description: ZodString['_output'];
       postType: ZodNativeEnum<{
-        CONTRIBUTION: "CONTRIBUTION";
-        FEEDBACK: "FEEDBACK";
-        DISCUSSION: "DISCUSSION";
-      }>["_output"];
-      status: ZodNativeEnum<{ OPEN: "OPEN"; CLOSED: "CLOSED" }>["_output"];
+        CONTRIBUTION: 'CONTRIBUTION';
+        FEEDBACK: 'FEEDBACK';
+        DISCUSSION: 'DISCUSSION';
+      }>['_output'];
+      status: ZodNativeEnum<{ OPEN: 'OPEN'; CLOSED: 'CLOSED' }>['_output'];
       technologies?: ZodOptional<
         ZodEffects<ZodArray<ZodString>, string[]>
-      >["_output"];
-      githubRepo?: ZodOptional<ZodString>["_output"];
+      >['_output'];
+      githubRepo?: ZodOptional<ZodString>['_output'];
       userId: string;
     },
     requestUserId: string,
@@ -187,7 +193,7 @@ export const PostService = {
         } catch (error) {
           if (error instanceof AppError) throw error;
           if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2025") notFound();
+            if (error.code === 'P2025') notFound();
             throw new AppError(ErrorMessage.INVALID_INPUT);
           }
           throw new AppError(ErrorMessage.OPERATION_FAILED);
@@ -197,8 +203,8 @@ export const PostService = {
   },
 
   async updatePostStatus(
-    id: Post["id"],
-    status: Post["status"],
+    id: Post['id'],
+    status: Post['status'],
     requestUserId: string,
   ) {
     return withServiceAuth(
@@ -230,7 +236,7 @@ export const PostService = {
         } catch (error) {
           if (error instanceof AppError) throw error;
           if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2025") notFound();
+            if (error.code === 'P2025') notFound();
           }
           throw new AppError(ErrorMessage.OPERATION_FAILED);
         }
@@ -239,7 +245,7 @@ export const PostService = {
   },
 
   // Delete Operations
-  async deletePost(id: Post["id"], requestUserId: string) {
+  async deletePost(id: Post['id'], requestUserId: string) {
     return withServiceAuth(
       requestUserId,
       Permission.DELETE_ANY_POST,
@@ -261,7 +267,7 @@ export const PostService = {
         } catch (error) {
           if (error instanceof AppError) throw error;
           if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2025") notFound();
+            if (error.code === 'P2025') notFound();
           }
           throw new AppError(ErrorMessage.OPERATION_FAILED);
         }
@@ -302,7 +308,7 @@ export const PostService = {
         return await prisma.post.findMany({
           where: { createdById: userId },
           select: postSelect,
-          orderBy: { createdDate: "desc" },
+          orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
         if (error instanceof AppError) throw error;
@@ -321,7 +327,7 @@ export const PostService = {
             },
           },
           select: postSelect,
-          orderBy: { createdDate: "desc" },
+          orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
         if (error instanceof AppError) throw error;
@@ -331,7 +337,7 @@ export const PostService = {
   },
 
   async getPostsByTechnologies(
-    techNames: Technology["name"][],
+    techNames: Technology['name'][],
     matchAll = false,
     requestUserId: string,
   ) {
@@ -352,7 +358,7 @@ export const PostService = {
                 },
           },
           select: postSelect,
-          orderBy: { createdDate: "desc" },
+          orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
         if (error instanceof AppError) throw error;
@@ -374,18 +380,14 @@ export const PostService = {
     return post.createdById === userId;
   },
 
-  async getPaginatedPosts(
-    page = 1,
-    limit = 20,
-    requestUserId: string,
-  ) {
+  async getPaginatedPosts(page = 1, limit = 20, requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
       try {
         return await prisma.post.findMany({
           select: postSelect,
           skip: (page - 1) * limit,
           take: limit,
-          orderBy: { createdDate: "desc" },
+          orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
         if (error instanceof AppError) throw error;

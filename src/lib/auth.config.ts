@@ -1,22 +1,22 @@
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { AvatarSource, Role } from "@prisma/client";
-import { type NextAuthConfig } from "next-auth";
-import { type Adapter } from "next-auth/adapters";
-import { encode } from "next-auth/jwt";
-import microsoftEntraId from "next-auth/providers/microsoft-entra-id";
-import { prisma } from "~/lib/prisma";
-import { isLocalEnv } from "~/lib/utils";
-import { UserService } from "~/services/user.service";
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import { AvatarSource, Role } from '@prisma/client';
+import { type NextAuthConfig } from 'next-auth';
+import { type Adapter } from 'next-auth/adapters';
+import { encode } from 'next-auth/jwt';
+import microsoftEntraId from 'next-auth/providers/microsoft-entra-id';
+import { prisma } from '~/lib/prisma';
+import { isLocalEnv } from '~/lib/utils';
+import { UserService } from '~/services/user.service';
 
 export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma) as Adapter,
-  session: { strategy: "database" },
+  session: { strategy: 'database' },
   providers: [
     microsoftEntraId({
       issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
       authorization: {
         params: {
-          scope: "openid profile email User.Read User.ReadBasic.All",
+          scope: 'openid profile email User.Read User.ReadBasic.All',
         },
       },
       allowDangerousEmailAccountLinking: isLocalEnv(),
@@ -25,7 +25,7 @@ export const authConfig: NextAuthConfig = {
 
   callbacks: {
     async jwt({ token, account }) {
-      if (isLocalEnv() && account?.provider === "credentials") {
+      if (isLocalEnv() && account?.provider === 'credentials') {
         token.credentials = true;
       }
       return token;
@@ -39,7 +39,7 @@ export const authConfig: NextAuthConfig = {
       return session;
     },
     async signIn({ user, profile, account }) {
-      if (isLocalEnv() && account?.provider === "credentials") return true;
+      if (isLocalEnv() && account?.provider === 'credentials') return true;
 
       if (!profile?.email || !user?.id || !profile.sub) return false;
 
@@ -57,9 +57,9 @@ export const authConfig: NextAuthConfig = {
         const nameMatch = profile.name?.match(
           /([^,]+),\s*([^\s(]+)\s*\(([^)]+)\)/,
         );
-        const lastName = nameMatch?.[1]?.trim() ?? "";
-        const firstName = nameMatch?.[2]?.trim() ?? "";
-        const username = nameMatch?.[3]?.trim() ?? "";
+        const lastName = nameMatch?.[1]?.trim() ?? '';
+        const firstName = nameMatch?.[2]?.trim() ?? '';
+        const username = nameMatch?.[3]?.trim() ?? '';
         const fullName = `${firstName} ${lastName}`.trim();
 
         let avatar = await UserService.generateDefaultAvatar(user.id);
@@ -81,7 +81,7 @@ export const authConfig: NextAuthConfig = {
             data: {
               id: user.id,
               email: profile.email,
-              azureAdId: profile.sub ?? "",
+              azureAdId: profile.sub ?? '',
               username,
               fullName,
               firstName,
@@ -106,8 +106,8 @@ export const authConfig: NextAuthConfig = {
 
         return true;
       } catch (error) {
-        console.error("Sign in error:", error);
-        throw new Error("Failed to sign in");
+        console.error('Sign in error:', error);
+        throw new Error('Failed to sign in');
       }
     },
   },
@@ -122,7 +122,7 @@ export const authConfig: NextAuthConfig = {
         const sessionToken = crypto.randomUUID();
 
         if (!params.token.sub) {
-          throw new Error("No user ID found in token");
+          throw new Error('No user ID found in token');
         }
 
         const existingSession = await prisma.session.findFirst({
@@ -142,7 +142,7 @@ export const authConfig: NextAuthConfig = {
         });
 
         if (!createdSession) {
-          throw new Error("Failed to create session");
+          throw new Error('Failed to create session');
         }
 
         return sessionToken;
@@ -153,6 +153,6 @@ export const authConfig: NextAuthConfig = {
   },
 
   pages: {
-    signIn: isLocalEnv() ? "/u" : "/",
+    signIn: isLocalEnv() ? '/u' : '/',
   },
 };

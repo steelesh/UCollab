@@ -1,4 +1,4 @@
-import { type Prisma } from "@prisma/client";
+import { type Prisma } from '@prisma/client';
 
 export type PostResponse = Prisma.PostGetPayload<{
   include: {
@@ -40,14 +40,14 @@ export type PostWithCommentsResponse = Prisma.PostGetPayload<{
   };
 }>;
 
-export type CreatePostInput = {
+export interface CreatePostInput {
   id: string;
   title: string;
   description: string;
-  postType: "CONTRIBUTION" | "FEEDBACK" | "DISCUSSION";
+  postType: 'CONTRIBUTION' | 'FEEDBACK' | 'DISCUSSION';
   technologies?: string[];
   githubRepo?: string;
-  status: "OPEN" | "CLOSED";
-};
+  status: 'OPEN' | 'CLOSED';
+}
 
 export type UpdatePostInput = Partial<CreatePostInput>;

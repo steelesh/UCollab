@@ -1,16 +1,16 @@
-import { UserService } from "~/services/user.service";
-import { ErrorMessage } from "../constants";
+import { UserService } from '~/services/user.service';
+import { ErrorMessage } from '../constants';
 import {
   AppError,
   AuthenticationError,
   AuthorizationError,
-} from "../errors/app-error";
-import { type Permission, hasPermission } from "../permissions";
+} from '../errors/app-error';
+import { type Permission, hasPermission } from '../permissions';
 
 export async function withServiceAuth<T>(
-    requestUserId: string | undefined,
-    permission: Permission | null,
-    action: () => Promise<T>,
+  requestUserId: string | undefined,
+  permission: Permission | null,
+  action: () => Promise<T>,
 ): Promise<T> {
   if (!requestUserId) {
     throw new AuthenticationError();

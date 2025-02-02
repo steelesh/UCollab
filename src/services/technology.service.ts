@@ -1,15 +1,15 @@
-import { type Post, Prisma } from "@prisma/client";
-import { notFound } from "next/navigation";
-import { prisma } from "~/lib/prisma";
-import { withServiceAuth } from "~/lib/auth/protected-service";
-import { ErrorMessage } from "~/lib/constants";
-import { AppError } from "~/lib/errors/app-error";
-import { Permission } from "~/lib/permissions";
+import { type Post, Prisma } from '@prisma/client';
+import { notFound } from 'next/navigation';
+import { prisma } from '~/lib/prisma';
+import { withServiceAuth } from '~/lib/auth/protected-service';
+import { ErrorMessage } from '~/lib/constants';
+import { AppError } from '~/lib/errors/app-error';
+import { Permission } from '~/lib/permissions';
 import {
   type CreateTechnologyInput,
   type SuggestTechnologyInput,
   technologySelect,
-} from "~/schemas/technology.schema";
+} from '~/schemas/technology.schema';
 
 export const TechnologyService = {
   // Public methods - no auth needed
@@ -18,7 +18,7 @@ export const TechnologyService = {
       return await prisma.technology.findMany({
         where: { verified: true },
         select: { id: true, name: true },
-        orderBy: { name: "asc" },
+        orderBy: { name: 'asc' },
       });
     } catch {
       throw new AppError(ErrorMessage.OPERATION_FAILED);
@@ -36,7 +36,7 @@ export const TechnologyService = {
         },
         select: { id: true, name: true },
         take: limit,
-        orderBy: { name: "asc" },
+        orderBy: { name: 'asc' },
       });
     } catch {
       throw new AppError(ErrorMessage.OPERATION_FAILED);
@@ -52,7 +52,7 @@ export const TechnologyService = {
           name: true,
           _count: { select: { posts: true } },
         },
-        orderBy: { posts: { _count: "desc" } },
+        orderBy: { posts: { _count: 'desc' } },
         take: limit,
       });
 
@@ -91,7 +91,7 @@ export const TechnologyService = {
           });
         } catch (error) {
           if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2002") {
+            if (error.code === 'P2002') {
               throw new AppError(`Technology "${data.name}" already exists`);
             }
           }
@@ -116,7 +116,7 @@ export const TechnologyService = {
           if (existing) {
             if (existing.verified) return existing;
             throw new AppError(
-              "Technology already suggested and pending review",
+              'Technology already suggested and pending review',
             );
           }
 
@@ -149,7 +149,7 @@ export const TechnologyService = {
           });
         } catch (error) {
           if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2025") notFound();
+            if (error.code === 'P2025') notFound();
           }
           throw new AppError(ErrorMessage.OPERATION_FAILED);
         }
@@ -166,7 +166,7 @@ export const TechnologyService = {
           return await prisma.technology.findMany({
             where: { verified: false },
             select: technologySelect,
-            orderBy: { createdDate: "desc" },
+            orderBy: { createdDate: 'desc' },
             skip: (page - 1) * limit,
             take: limit,
           });
@@ -178,7 +178,7 @@ export const TechnologyService = {
   },
 
   // Internal methods - used by other services
-  async updatePostTechnologies(postId: Post["id"], technologies: string[]) {
+  async updatePostTechnologies(postId: Post['id'], technologies: string[]) {
     try {
       return await prisma.$transaction(async (tx) => {
         const post = await tx.post.findUnique({
@@ -218,7 +218,7 @@ export const TechnologyService = {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === "P2025") notFound();
+        if (error.code === 'P2025') notFound();
       }
       throw new AppError(ErrorMessage.OPERATION_FAILED);
     }

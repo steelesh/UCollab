@@ -1,4 +1,4 @@
-import { type Prisma } from "@prisma/client";
+import { type Prisma } from '@prisma/client';
 
 export type PrivateProfileResponse = Prisma.ProfileGetPayload<{
   include: {
@@ -36,9 +36,9 @@ export type PublicProfileResponse = Prisma.ProfileGetPayload<{
   };
 }>;
 
-export type UpdateProfileInput = {
+export interface UpdateProfileInput {
   bio?: string;
   skills?: string[];
   interests?: string[];
   gradYear?: number;
-};
+}

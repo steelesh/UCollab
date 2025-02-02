@@ -1,24 +1,24 @@
-import { type Comment, type Post, Prisma, type User } from "@prisma/client";
-import { z } from "zod";
-import { prisma } from "~/lib/prisma";
-import { withServiceAuth } from "~/lib/auth/protected-service";
-import { ErrorMessage } from "~/lib/constants";
+import { type Comment, type Post, Prisma, type User } from '@prisma/client';
+import { z } from 'zod';
+import { prisma } from '~/lib/prisma';
+import { withServiceAuth } from '~/lib/auth/protected-service';
+import { ErrorMessage } from '~/lib/constants';
 import {
   AppError,
   AuthorizationError,
   ValidationError,
-} from "~/lib/errors/app-error";
-import { Permission } from "~/lib/permissions";
+} from '~/lib/errors/app-error';
+import { Permission } from '~/lib/permissions';
 import {
   commentFormSchema,
   type CreateCommentData,
   type UpdateCommentData,
-} from "~/schemas/comment.schema";
-import { NotificationService } from "./notification.service";
-import { UserService } from "./user.service";
+} from '~/schemas/comment.schema';
+import { NotificationService } from './notification.service';
+import { UserService } from './user.service';
 
 export const CommentService = {
-  async getComments(postId: Post["id"], requestUserId: User["id"]) {
+  async getComments(postId: Post['id'], requestUserId: User['id']) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
       return prisma.comment.findMany({
         where: { postId },
@@ -35,12 +35,12 @@ export const CommentService = {
             },
           },
         },
-        orderBy: { createdDate: "desc" },
+        orderBy: { createdDate: 'desc' },
       });
     });
   },
 
-  async getComment(id: Comment["id"], requestUserId: User["id"]) {
+  async getComment(id: Comment['id'], requestUserId: User['id']) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
       const comment = await prisma.comment.findUnique({
         where: { id },
@@ -68,7 +68,7 @@ export const CommentService = {
       });
 
       if (!comment) {
-        throw new AppError(ErrorMessage.NOT_FOUND("Comment"));
+        throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
       }
 
       return comment;
@@ -77,7 +77,7 @@ export const CommentService = {
 
   async createComment(
     { content, postId }: CreateCommentData,
-    requestUserId: User["id"],
+    requestUserId: User['id'],
   ) {
     return withServiceAuth(
       requestUserId,
@@ -139,7 +139,7 @@ export const CommentService = {
 
   async updateComment(
     { id, content }: UpdateCommentData,
-    requestUserId: User["id"],
+    requestUserId: User['id'],
   ) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
@@ -151,7 +151,7 @@ export const CommentService = {
         });
 
         if (!comment) {
-          throw new AppError(ErrorMessage.NOT_FOUND("Comment"));
+          throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
         }
 
         if (
@@ -175,8 +175,8 @@ export const CommentService = {
         });
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === "P2025") {
-            throw new AppError(ErrorMessage.NOT_FOUND("Comment"));
+          if (error.code === 'P2025') {
+            throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
           }
           throw new AppError(ErrorMessage.OPERATION_FAILED);
         }
@@ -188,7 +188,7 @@ export const CommentService = {
     });
   },
 
-  async deleteComment(id: Comment["id"], requestUserId: User["id"]) {
+  async deleteComment(id: Comment['id'], requestUserId: User['id']) {
     return withServiceAuth(requestUserId, null, async () => {
       const comment = await prisma.comment.findUnique({
         where: { id },
@@ -196,7 +196,7 @@ export const CommentService = {
       });
 
       if (!comment) {
-        throw new AppError(ErrorMessage.NOT_FOUND("Comment"));
+        throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
       }
 
       if (
@@ -213,8 +213,8 @@ export const CommentService = {
         await prisma.comment.delete({ where: { id } });
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === "P2025") {
-            throw new AppError(ErrorMessage.NOT_FOUND("Comment"));
+          if (error.code === 'P2025') {
+            throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
           }
           throw new AppError(ErrorMessage.OPERATION_FAILED);
         }
@@ -224,7 +224,7 @@ export const CommentService = {
   },
 
   // This is a utility method that doesn't need auth
-  async extractMentionedUserIds(content: Comment["content"]) {
+  async extractMentionedUserIds(content: Comment['content']) {
     try {
       const mentionRegex = /@(\w+)/g;
       const mentions = content.match(mentionRegex) ?? [];
@@ -246,7 +246,7 @@ export const CommentService = {
 
       return users.map((user) => user.id);
     } catch {
-      throw new AppError("Failed to extract mentioned users");
+      throw new AppError('Failed to extract mentioned users');
     }
   },
 
@@ -259,8 +259,8 @@ export const CommentService = {
   },
 
   async getPaginatedComments(
-    postId: Post["id"],
-    requestUserId: User["id"],
+    postId: Post['id'],
+    requestUserId: User['id'],
     page = 1,
     limit = 20,
   ) {
@@ -282,7 +282,7 @@ export const CommentService = {
         },
         skip: (page - 1) * limit,
         take: limit,
-        orderBy: { createdDate: "desc" },
+        orderBy: { createdDate: 'desc' },
       });
     });
   },

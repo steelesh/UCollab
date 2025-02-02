@@ -1,6 +1,6 @@
-import Head from "next/head";
-import { motion } from "framer-motion";
-import SignInButton from "~/components/signin-button";
+import Head from 'next/head';
+import { motion } from 'framer-motion';
+import SignInButton from '~/components/signin-button';
 
 export default function Home() {
   return (
@@ -15,8 +15,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.0 }}
             viewport={{ once: true }}
-            className="max-w-3xl text-center"
-          >
+            className="max-w-3xl text-center">
             <h1 className="mb-6 text-6xl font-extrabold select-none">
               Collaborate. Innovate. Succeed.
             </h1>
@@ -34,8 +33,7 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 1.0 }}
               viewport={{ once: true }}
-              className="order-2 mt-8 md:order-1 md:mt-0 md:w-1/2"
-            >
+              className="order-2 mt-8 md:order-1 md:mt-0 md:w-1/2">
               <h2 className="mb-4 text-4xl font-bold">Connect with Peers</h2>
               <p className="mb-4 text-lg">
                 Build your network by connecting with students who share your
@@ -47,8 +45,7 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 1.0 }}
               viewport={{ once: true }}
-              className="order-1 md:order-2 md:w-1/2"
-            >
+              className="order-1 md:order-2 md:w-1/2">
               <img
                 src="/collab.svg"
                 alt="Connect with Peers"
@@ -65,8 +62,7 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 1.0 }}
               viewport={{ once: true }}
-              className="md:w-1/2"
-            >
+              className="md:w-1/2">
               <img
                 src="/ideas.svg"
                 alt="Discover Projects"
@@ -78,8 +74,7 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 1.0 }}
               viewport={{ once: true }}
-              className="mt-8 md:mt-0 md:w-1/2"
-            >
+              className="mt-8 md:mt-0 md:w-1/2">
               <h2 className="mb-4 text-4xl font-bold">Discover new Projects</h2>
               <p className="mb-4 text-lg">
                 Explore a wide range of student-led projects and find the ones

@@ -1,19 +1,19 @@
-import { User } from "@prisma/client";
-import { Queue, Worker } from "bullmq";
-import IORedis from "ioredis";
-import { env } from "../lib/env";
+import { User } from '@prisma/client';
+import { Queue, Worker } from 'bullmq';
+import IORedis from 'ioredis';
+import { env } from '~/lib/env';
 import {
   CreateBatchNotificationData,
   CreateNotificationData,
-} from "../schemas/notification.schema";
-import { NotificationService } from "../services/notification.service";
+} from '~/schemas/notification.schema';
+import { NotificationService } from '~/services/notification.service';
 
 const queueConfig = {
-  connection: new IORedis(env.REDIS_URL || "redis://localhost:6379"),
+  connection: new IORedis(env.REDIS_URL || 'redis://localhost:6379'),
   defaultJobOptions: {
     attempts: 3,
     backoff: {
-      type: "exponential",
+      type: 'exponential',
       delay: 1000,
     },
     removeOnComplete: true,
@@ -21,17 +21,17 @@ const queueConfig = {
   },
 };
 
-const notificationQueue = new Queue("notification", queueConfig);
+const notificationQueue = new Queue('notification', queueConfig);
 
 const notificationWorker = new Worker(
-  "notification",
+  'notification',
   async (job) => {
     await NotificationService.createNotification(job.data);
   },
   queueConfig,
 );
 
-notificationWorker.on("completed", (job, result) => {
+notificationWorker.on('completed', (job, result) => {
   console.log(
     `Notification job ${job.id} completed`,
     `Type: ${job.data.type}`,
@@ -40,7 +40,7 @@ notificationWorker.on("completed", (job, result) => {
   );
 });
 
-notificationWorker.on("failed", (job, error) => {
+notificationWorker.on('failed', (job, error) => {
   console.error(
     `Notification job ${job?.id} failed:`,
     `User: ${job?.data.userId}`,
@@ -55,7 +55,7 @@ export const mq = {
   },
 
   async addBatchNotifications(data: CreateBatchNotificationData) {
-    const jobs = data.userIds.map((userId: User["id"]) => ({
+    const jobs = data.userIds.map((userId: User['id']) => ({
       name: `notification:${userId}:${Date.now()}`,
       data: {
         ...data,

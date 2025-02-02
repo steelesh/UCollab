@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { signIn } from 'next-auth/react';
+import { useState } from 'react';
 
 export default function SignInButton() {
   const [isPending, setIsPending] = useState(false);
@@ -9,7 +9,7 @@ export default function SignInButton() {
   const handleSignIn = async () => {
     setIsPending(true);
     try {
-      await signIn("microsoft-entra-id");
+      await signIn('microsoft-entra-id');
     } finally {
       setIsPending(false);
     }
@@ -19,12 +19,11 @@ export default function SignInButton() {
     <button
       className="btn btn-primary-content select-none"
       onClick={handleSignIn}
-      disabled={isPending}
-    >
+      disabled={isPending}>
       {isPending ? (
         <span className="loading loading-spinner loading-md"></span>
       ) : (
-        "Sign in with UC Credentials"
+        'Sign in with UC Credentials'
       )}
     </button>
   );

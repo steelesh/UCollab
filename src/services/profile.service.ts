@@ -1,20 +1,20 @@
-import { Prisma, type User } from "@prisma/client";
-import { notFound } from "next/navigation";
-import { prisma } from "~/lib/prisma";
-import { withServiceAuth } from "~/lib/auth/protected-service";
-import { ErrorMessage } from "~/lib/constants";
-import { AppError, AuthorizationError } from "~/lib/errors/app-error";
-import { Permission } from "~/lib/permissions";
+import { Prisma, type User } from '@prisma/client';
+import { notFound } from 'next/navigation';
+import { prisma } from '~/lib/prisma';
+import { withServiceAuth } from '~/lib/auth/protected-service';
+import { ErrorMessage } from '~/lib/constants';
+import { AppError, AuthorizationError } from '~/lib/errors/app-error';
+import { Permission } from '~/lib/permissions';
 import {
   type UpdateProfileInput,
   profileSelect,
   updateProfileSchema,
-} from "~/schemas/profile.schema";
-import { UserService } from "./user.service";
+} from '~/schemas/profile.schema';
+import { UserService } from './user.service';
 
 export const ProfileService = {
   // Read Operations
-  async getProfile(userId: User["id"], requestUserId: string) {
+  async getProfile(userId: User['id'], requestUserId: string) {
     return withServiceAuth(
       requestUserId,
       Permission.VIEW_ANY_PROFILE,
@@ -47,7 +47,7 @@ export const ProfileService = {
 
   // Update Operations
   async updateProfile(
-    userId: User["id"],
+    userId: User['id'],
     data: UpdateProfileInput,
     requestUserId: string,
   ) {
@@ -106,7 +106,7 @@ export const ProfileService = {
         } catch (error) {
           if (error instanceof AppError) throw error;
           if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2025") notFound();
+            if (error.code === 'P2025') notFound();
             throw new AppError(ErrorMessage.INVALID_INPUT);
           }
           throw new AppError(ErrorMessage.OPERATION_FAILED);
@@ -126,7 +126,7 @@ export const ProfileService = {
             skip: (page - 1) * limit,
             take: limit,
             select: profileSelect,
-            orderBy: { lastModifiedDate: "desc" },
+            orderBy: { lastModifiedDate: 'desc' },
           });
         } catch (error) {
           if (error instanceof AppError) throw error;
@@ -158,7 +158,7 @@ export const ProfileService = {
             skip: (page - 1) * limit,
             take: limit,
             select: profileSelect,
-            orderBy: { lastModifiedDate: "desc" },
+            orderBy: { lastModifiedDate: 'desc' },
           });
         } catch (error) {
           if (error instanceof AppError) throw error;

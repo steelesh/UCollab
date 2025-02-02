@@ -1,4 +1,4 @@
-import Head from "next/head";
+import Head from 'next/head';
 
 export default function Privacy() {
   return (
@@ -7,11 +7,11 @@ export default function Privacy() {
         <title>UCollab — Privacy</title>
       </Head>
       <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-24">
-        <h1 className="select-none text-center text-2xl font-bold">
+        <h1 className="text-center text-2xl font-bold select-none">
           Privacy Policy
         </h1>
         <div className="mt-8 max-w-3xl space-y-6">
-          <p className="text-sm text-accent">
+          <p className="text-accent text-sm">
             <strong>Last Updated:</strong> November 11th, 2024
           </p>
 

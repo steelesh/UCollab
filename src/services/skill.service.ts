@@ -1,15 +1,15 @@
-import { Prisma, type Skill } from "@prisma/client";
-import { notFound } from "next/navigation";
-import { prisma } from "~/lib/prisma";
-import { withServiceAuth } from "~/lib/auth/protected-service";
-import { ErrorMessage } from "~/lib/constants";
-import { AppError } from "~/lib/errors/app-error";
-import { Permission } from "~/lib/permissions";
+import { Prisma, type Skill } from '@prisma/client';
+import { notFound } from 'next/navigation';
+import { prisma } from '~/lib/prisma';
+import { withServiceAuth } from '~/lib/auth/protected-service';
+import { ErrorMessage } from '~/lib/constants';
+import { AppError } from '~/lib/errors/app-error';
+import { Permission } from '~/lib/permissions';
 import {
   type CreateSkillInput,
   type UpdateSkillInput,
   skillSelect,
-} from "~/schemas/skill.schema";
+} from '~/schemas/skill.schema';
 
 export const SkillService = {
   // Public Operations
@@ -18,7 +18,7 @@ export const SkillService = {
       return await prisma.skill.findMany({
         where: { verified: true },
         select: { id: true, name: true },
-        orderBy: { name: "asc" },
+        orderBy: { name: 'asc' },
       });
     } catch {
       throw new AppError(ErrorMessage.OPERATION_FAILED);
@@ -35,7 +35,7 @@ export const SkillService = {
           ],
         },
         select: { id: true, name: true },
-        orderBy: { name: "asc" },
+        orderBy: { name: 'asc' },
         take: limit,
       });
     } catch {
@@ -64,7 +64,7 @@ export const SkillService = {
         });
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === "P2002") {
+          if (error.code === 'P2002') {
             throw new AppError(`Skill "${data.name}" already exists`);
           }
         }
@@ -89,7 +89,7 @@ export const SkillService = {
           });
         } catch (error) {
           if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2002") {
+            if (error.code === 'P2002') {
               throw new AppError(`Skill "${data.name}" already exists`);
             }
           }
@@ -100,7 +100,7 @@ export const SkillService = {
   },
 
   async updateSkill(
-    skillId: Skill["id"],
+    skillId: Skill['id'],
     data: UpdateSkillInput,
     requestUserId: string,
   ) {
@@ -116,8 +116,8 @@ export const SkillService = {
         });
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === "P2025") notFound();
-          if (error.code === "P2002") {
+          if (error.code === 'P2025') notFound();
+          if (error.code === 'P2002') {
             throw new AppError(`Skill "${data.name}" already exists`);
           }
         }
@@ -126,13 +126,13 @@ export const SkillService = {
     });
   },
 
-  async deleteSkill(skillId: Skill["id"], requestUserId: string) {
+  async deleteSkill(skillId: Skill['id'], requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.DELETE_SKILL, async () => {
       try {
         await prisma.skill.delete({ where: { id: skillId } });
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === "P2025") notFound();
+          if (error.code === 'P2025') notFound();
         }
         throw new AppError(ErrorMessage.OPERATION_FAILED);
       }
@@ -145,7 +145,7 @@ export const SkillService = {
         return await prisma.skill.findMany({
           where: { verified: false },
           select: skillSelect,
-          orderBy: { createdDate: "desc" },
+          orderBy: { createdDate: 'desc' },
           skip: (page - 1) * limit,
           take: limit,
         });

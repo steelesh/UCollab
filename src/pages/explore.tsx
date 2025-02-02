@@ -1,6 +1,6 @@
-import Head from "next/head";
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import Head from 'next/head';
+import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 
 interface Project {
   user?: {
@@ -10,7 +10,7 @@ interface Project {
   createdDate: string;
   createdById: string;
   description: string;
-  postType: "CONTRIBUTION" | "FEEDBACK" | "DISCUSSION";
+  postType: 'CONTRIBUTION' | 'FEEDBACK' | 'DISCUSSION';
   status: string;
   technologies: string[];
   githubRepo?: string;
@@ -25,38 +25,49 @@ export default function Explore() {
   useEffect(() => {
     const fetchProjects: () => Promise<void> = async () => {
       try {
-        const response: Response = await fetch("/api/posts");
+        const response: Response = await fetch('/api/posts');
         if (!response.ok) {
-          console.error(`Failed to fetch posts: ${response.status} ${response.statusText}`);
+          console.error(
+            `Failed to fetch posts: ${response.status} ${response.statusText}`,
+          );
           return;
         }
         const jsonResponse: { data: Project[]; error: string | null } =
           (await response.json()) as { data: Project[]; error: string | null };
         if (jsonResponse.error) {
-          console.error("API Error:", jsonResponse.error);
+          console.error('API Error:', jsonResponse.error);
           return;
         }
         const projectsWithUser = await Promise.all(
-            jsonResponse.data.map(async (project) => {
-              try {
-                const userResponse = await fetch(`/api/users/from-id/${project.createdById}`);
-                if (!userResponse.ok) {
-                  console.warn(`Failed to fetch user for project ${project.title}`);
-                  return project;
-                }
-
-                const userData = await userResponse.json() as { username: string };
-                return { ...project, user: { username: userData.username } };
-              } catch (error) {
-                console.error(`Error fetching user for project ${project.title}:`, error);
+          jsonResponse.data.map(async (project) => {
+            try {
+              const userResponse = await fetch(
+                `/api/users/from-id/${project.createdById}`,
+              );
+              if (!userResponse.ok) {
+                console.warn(
+                  `Failed to fetch user for project ${project.title}`,
+                );
                 return project;
               }
-            }),
+
+              const userData = (await userResponse.json()) as {
+                username: string;
+              };
+              return { ...project, user: { username: userData.username } };
+            } catch (error) {
+              console.error(
+                `Error fetching user for project ${project.title}:`,
+                error,
+              );
+              return project;
+            }
+          }),
         );
 
         setProjects(projectsWithUser);
       } catch (error: unknown) {
-        console.error("Error fetching posts:", error);
+        console.error('Error fetching posts:', error);
       }
     };
 
@@ -73,11 +84,10 @@ export default function Explore() {
           {projects.map((project, index) => (
             <motion.div
               key={index}
-              className="card card-bordered w-full bg-base-300 shadow-xl"
+              className="card card-bordered bg-base-300 w-full shadow-xl"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 1.0 }}
-              transition={{ duration: 0.3 }}
-            >
+              transition={{ duration: 0.3 }}>
               <div className="card-body">
                 <div className="mb-2 flex items-center">
                   <div className="avatar mr-4">
@@ -93,17 +103,16 @@ export default function Explore() {
                     <h2 className="card-title text-lg font-bold text-white">
                       {project.title}
                     </h2>
-                    <span className="text-sm text-accent">
+                    <span className="text-accent text-sm">
                       {new Date(project.createdDate).toLocaleDateString(
-                        "en-US",
-                        { month: "short", day: "numeric", year: "numeric" },
+                        'en-US',
+                        { month: 'short', day: 'numeric', year: 'numeric' },
                       )}
                       <br />
                       <a
-                        href={`/${project.user?.username ?? ""}`}
-                        className="link link-accent font-bold tracking-wider no-underline"
-                      >
-                        {project.user?.username ?? "Unknown User"}
+                        href={`/${project.user?.username ?? ''}`}
+                        className="link link-accent font-bold tracking-wider no-underline">
+                        {project.user?.username ?? 'Unknown User'}
                       </a>
                     </span>
                   </div>
@@ -123,8 +132,7 @@ export default function Explore() {
                     {project.technologies.map((tech, i) => (
                       <span
                         key={i}
-                        className="badge badge-accent badge-outline badge-sm mb-2 mr-2 font-normal tracking-wider"
-                      >
+                        className="badge badge-accent badge-outline badge-sm mr-2 mb-2 font-normal tracking-wider">
                         {tech}
                       </span>
                     ))}

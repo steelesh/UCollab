@@ -1,23 +1,23 @@
-import { PrismaClient } from "@prisma/client";
-import { env } from "~/lib/env";
+import { PrismaClient } from '@prisma/client';
+import { env } from '~/lib/env';
 
 const createPrismaClient = () =>
-    new PrismaClient({
-        log:
-            process.env.NODE_ENV === "development"
-                ? ["query", "error", "warn"]
-                : ["error"],
-        datasources: {
-            prisma: {
-                url: env.MYSQL_URL,
-            },
-        },
-    });
+  new PrismaClient({
+    log:
+      process.env.NODE_ENV === 'development'
+        ? ['query', 'error', 'warn']
+        : ['error'],
+    datasources: {
+      prisma: {
+        url: env.MYSQL_URL,
+      },
+    },
+  });
 
 const globalForPrisma = globalThis as unknown as {
-    prisma: ReturnType<typeof createPrismaClient> | undefined;
+  prisma: ReturnType<typeof createPrismaClient> | undefined;
 };
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
-if (process.env.NODE_ENV === "development") globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV === 'development') globalForPrisma.prisma = prisma;

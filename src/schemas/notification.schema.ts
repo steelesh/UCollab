@@ -1,5 +1,5 @@
-import { NotificationType, User } from "@prisma/client";
-import { z } from "zod";
+import { NotificationType, User } from '@prisma/client';
+import { z } from 'zod';
 
 // Form validation schema (what users input)
 export const notificationPreferencesFormSchema = z.object({
@@ -11,30 +11,30 @@ export const notificationPreferencesFormSchema = z.object({
 });
 
 // Service input types (internal use)
-export type CreateNotificationData = {
-  userId: User["id"];
+export interface CreateNotificationData {
+  userId: User['id'];
   type: NotificationType;
   message: string;
   postId?: string;
   commentId?: string;
   triggeredById?: string;
-};
+}
 
 export type CreateBatchNotificationData = Omit<
   CreateNotificationData,
-  "userId"
+  'userId'
 > & {
-  userIds: User["id"][];
+  userIds: User['id'][];
 };
 
-export type UpdateNotificationPreferencesData = {
-  userId: User["id"];
+export interface UpdateNotificationPreferencesData {
+  userId: User['id'];
   enabled?: boolean;
   allowComments?: boolean;
   allowMentions?: boolean;
   allowPostUpdates?: boolean;
   allowSystem?: boolean;
-};
+}
 
 // Pagination params
 export const paginationSchema = z.object({
@@ -48,9 +48,9 @@ export type PaginationParams = z.infer<typeof paginationSchema>;
 export const createSystemNotificationSchema = z.object({
   message: z
     .string()
-    .min(1, "Message is required")
-    .max(500, "Message must be less than 500 characters"),
-  userIds: z.array(z.string()).min(1, "At least one user must be selected"),
+    .min(1, 'Message is required')
+    .max(500, 'Message must be less than 500 characters'),
+  userIds: z.array(z.string()).min(1, 'At least one user must be selected'),
   type: z.nativeEnum(NotificationType).default(NotificationType.SYSTEM),
 });
 

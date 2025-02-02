@@ -1,31 +1,31 @@
-import { env } from "./env";
+import { env } from './env';
 
 /**
  * checks if the current environment is local
  */
 export function isLocalEnv() {
-    return env.NEXT_PUBLIC_DEPLOY_ENV === "local";
+  return env.NEXT_PUBLIC_DEPLOY_ENV === 'local';
 }
 
 /**
  * checks if the current environment is dev
  */
 export function isDevEnv() {
-    return env.NEXT_PUBLIC_DEPLOY_ENV === "dev";
+  return env.NEXT_PUBLIC_DEPLOY_ENV === 'dev';
 }
 
 /**
  * checks if the current environment is test
  */
 export function isTestEnv() {
-    return env.NEXT_PUBLIC_DEPLOY_ENV === "test";
+  return env.NEXT_PUBLIC_DEPLOY_ENV === 'test';
 }
 
 /**
  * checks if the current environment is prod
  */
 export function isProdEnv() {
-    return env.NEXT_PUBLIC_DEPLOY_ENV === "prod";
+  return env.NEXT_PUBLIC_DEPLOY_ENV === 'prod';
 }
 
 /**

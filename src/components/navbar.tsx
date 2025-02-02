@@ -1,7 +1,7 @@
-import Theme from "@components/theme";
-import Link from "next/link";
-import { useState } from "react";
-import { signOut, useSession } from "next-auth/react";
+import Theme from '@components/theme';
+import Link from 'next/link';
+import { useState } from 'react';
+import { signOut, useSession } from 'next-auth/react';
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -29,8 +29,7 @@ export default function Navbar() {
               className="h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+              stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -42,17 +41,23 @@ export default function Navbar() {
         ) : null}
       </div>
       <div className="hidden flex-1 justify-evenly md:flex">
-        <Link className="group pt-1.5 text-xl text-accent-content" href="/explore">
+        <Link
+          className="group text-accent-content pt-1.5 text-xl"
+          href="/explore">
           Explore
-          <span className="block h-0.5 max-w-0 bg-primary-content transition-all duration-500 group-hover:max-w-full"></span>
+          <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
         </Link>
-        <Link className="group pt-1.5 text-xl text-accent-content" href="/create">
+        <Link
+          className="group text-accent-content pt-1.5 text-xl"
+          href="/create">
           Create
-          <span className="block h-0.5 max-w-0 bg-primary-content transition-all duration-500 group-hover:max-w-full"></span>
+          <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
         </Link>
-        <Link className="group pt-1.5 text-xl text-accent-content" href="/community">
+        <Link
+          className="group text-accent-content pt-1.5 text-xl"
+          href="/community">
           Community
-          <span className="block h-0.5 max-w-0 bg-primary-content transition-all duration-500 group-hover:max-w-full"></span>
+          <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
         </Link>
       </div>
       <div className="flex-shrink justify-end md:flex-none">
@@ -73,22 +78,20 @@ export default function Navbar() {
             <div
               tabIndex={0}
               role="button"
-              className="avatar btn btn-circle btn-ghost"
-            >
+              className="avatar btn btn-circle btn-ghost">
               <div className="w-10 rounded-full">
                 <img
                   alt="Avatar"
                   src={
                     session.user?.image ??
-                    "https://avatar.iran.liara.run/public"
+                    'https://avatar.iran.liara.run/public'
                   }
                 />
               </div>
             </div>
             <ul
               tabIndex={0}
-              className="menu dropdown-content menu-sm z-[1] mt-3 w-52 rounded-box bg-base-300 p-2 shadow"
-            >
+              className="menu dropdown-content menu-sm rounded-box bg-base-300 z-[1] mt-3 w-52 p-2 shadow">
               <li>
                 <Link href="/profile" className="justify-between">
                   Profile
@@ -109,21 +112,18 @@ export default function Navbar() {
       </div>
       {session && (
         <div
-          className={`fixed right-0 top-0 h-full w-64 transform bg-base-200 p-5 shadow-lg ${
-            drawerOpen ? "translate-x-0" : "translate-x-full"
-          } z-[2] transition-transform duration-300 ease-in-out`}
-        >
+          className={`bg-base-200 fixed top-0 right-0 h-full w-64 transform p-5 shadow-lg ${
+            drawerOpen ? 'translate-x-0' : 'translate-x-full'
+          } z-[2] transition-transform duration-300 ease-in-out`}>
           <button
             onClick={toggleDrawer}
-            className="btn btn-circle btn-ghost absolute right-4 top-4"
-          >
+            className="btn btn-circle btn-ghost absolute top-4 right-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+              stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -134,24 +134,21 @@ export default function Navbar() {
           </button>
           <div className="mt-10 flex flex-col">
             <Link
-              className="mb-4 text-xl text-accent"
+              className="text-accent mb-4 text-xl"
               href="/explore"
-              onClick={toggleDrawer}
-            >
+              onClick={toggleDrawer}>
               Explore
             </Link>
             <Link
-              className="mb-4 text-xl text-accent"
+              className="text-accent mb-4 text-xl"
               href="/create"
-              onClick={toggleDrawer}
-            >
+              onClick={toggleDrawer}>
               Create
             </Link>
             <Link
-              className="text-xl text-accent"
+              className="text-accent text-xl"
               href="/community"
-              onClick={toggleDrawer}
-            >
+              onClick={toggleDrawer}>
               Community
             </Link>
           </div>

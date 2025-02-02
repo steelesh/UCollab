@@ -1,5 +1,5 @@
-import { Prisma } from "@prisma/client";
-import { z } from "zod";
+import { Prisma } from '@prisma/client';
+import { z } from 'zod';
 
 // Add common select object for reuse
 export const technologySelect = {
@@ -18,8 +18,8 @@ export const technologySelect = {
 export const technologySchema = z.object({
   name: z
     .string()
-    .min(1, "Technology name is required")
-    .max(50, "Technology name must be less than 50 characters")
+    .min(1, 'Technology name is required')
+    .max(50, 'Technology name must be less than 50 characters')
     .transform((name) => name.toLowerCase().trim()),
   verified: z.boolean().default(false),
 }) satisfies z.ZodType<Partial<Prisma.TechnologyCreateInput>>;

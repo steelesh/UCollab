@@ -6,19 +6,19 @@ import {
   type Post,
   Prisma,
   type User,
-} from "@prisma/client";
-import { mq } from "~/data/mq";
-import { prisma } from "~/lib/prisma";
-import { withServiceAuth } from "~/lib/auth/protected-service";
-import { ErrorMessage } from "~/lib/constants";
-import { AppError, AuthorizationError } from "~/lib/errors/app-error";
-import { Permission } from "~/lib/permissions";
+} from '@prisma/client';
+import { mq } from '~/data/mq';
+import { prisma } from '~/lib/prisma';
+import { withServiceAuth } from '~/lib/auth/protected-service';
+import { ErrorMessage } from '~/lib/constants';
+import { AppError, AuthorizationError } from '~/lib/errors/app-error';
+import { Permission } from '~/lib/permissions';
 import {
   type CreateBatchNotificationData,
   type CreateNotificationData,
-} from "~/schemas/notification.schema";
-import { CommentService } from "./comment.service";
-import { UserService } from "./user.service";
+} from '~/schemas/notification.schema';
+import { CommentService } from './comment.service';
+import { UserService } from './user.service';
 
 const notificationSelect = {
   id: true,
@@ -39,7 +39,7 @@ const notificationSelect = {
 
 export const NotificationService = {
   // Read Operations
-  async getUserNotifications(userId: User["id"], requestUserId: string) {
+  async getUserNotifications(userId: User['id'], requestUserId: string) {
     return withServiceAuth(
       requestUserId,
       Permission.VIEW_ANY_NOTIFICATION,
@@ -58,7 +58,7 @@ export const NotificationService = {
           return await prisma.notification.findMany({
             where: { userId },
             select: notificationSelect,
-            orderBy: { createdDate: "desc" },
+            orderBy: { createdDate: 'desc' },
           });
         } catch (error) {
           if (error instanceof AppError) throw error;
@@ -69,7 +69,7 @@ export const NotificationService = {
   },
 
   async getUserNotificationsByStatus(
-    userId: User["id"],
+    userId: User['id'],
     isRead: boolean,
     requestUserId: string,
   ) {
@@ -91,7 +91,7 @@ export const NotificationService = {
           return await prisma.notification.findMany({
             where: { userId, isRead },
             select: notificationSelect,
-            orderBy: { createdDate: "desc" },
+            orderBy: { createdDate: 'desc' },
           });
         } catch (error) {
           if (error instanceof AppError) throw error;
@@ -102,7 +102,7 @@ export const NotificationService = {
   },
 
   async getPaginatedNotifications(
-    userId: User["id"],
+    userId: User['id'],
     page = 1,
     limit = 20,
     requestUserId: string,
@@ -127,7 +127,7 @@ export const NotificationService = {
             select: notificationSelect,
             skip: (page - 1) * limit,
             take: limit,
-            orderBy: { createdDate: "desc" },
+            orderBy: { createdDate: 'desc' },
           });
         } catch (error) {
           if (error instanceof AppError) throw error;
@@ -138,7 +138,7 @@ export const NotificationService = {
   },
 
   // Count Operations
-  async getNotificationsCount(userId: User["id"], requestUserId: string) {
+  async getNotificationsCount(userId: User['id'], requestUserId: string) {
     return withServiceAuth(
       requestUserId,
       Permission.VIEW_ANY_NOTIFICATION,
@@ -165,7 +165,7 @@ export const NotificationService = {
     );
   },
 
-  async getUnreadNotificationsCount(userId: User["id"], requestUserId: string) {
+  async getUnreadNotificationsCount(userId: User['id'], requestUserId: string) {
     return withServiceAuth(
       requestUserId,
       Permission.VIEW_ANY_NOTIFICATION,
@@ -193,7 +193,7 @@ export const NotificationService = {
   },
 
   // Update Operations
-  async markNotificationAsRead(id: Notification["id"], requestUserId: string) {
+  async markNotificationAsRead(id: Notification['id'], requestUserId: string) {
     return withServiceAuth(
       requestUserId,
       Permission.UPDATE_ANY_NOTIFICATION,
@@ -205,7 +205,7 @@ export const NotificationService = {
           });
 
           if (!notification) {
-            throw new AppError(ErrorMessage.NOT_FOUND("Notification"));
+            throw new AppError(ErrorMessage.NOT_FOUND('Notification'));
           }
 
           if (
@@ -227,9 +227,9 @@ export const NotificationService = {
           if (error instanceof AppError) throw error;
           if (
             error instanceof Prisma.PrismaClientKnownRequestError &&
-            error.code === "P2025"
+            error.code === 'P2025'
           ) {
-            throw new AppError(ErrorMessage.NOT_FOUND("Notification"));
+            throw new AppError(ErrorMessage.NOT_FOUND('Notification'));
           }
           throw new AppError(ErrorMessage.OPERATION_FAILED);
         }
@@ -237,7 +237,7 @@ export const NotificationService = {
     );
   },
 
-  async markAllNotificationsAsRead(userId: User["id"], requestUserId: string) {
+  async markAllNotificationsAsRead(userId: User['id'], requestUserId: string) {
     return withServiceAuth(
       requestUserId,
       Permission.UPDATE_ANY_NOTIFICATION,
@@ -266,7 +266,7 @@ export const NotificationService = {
   },
 
   async markMultipleNotificationsAsRead(
-    notificationIds: Notification["id"][],
+    notificationIds: Notification['id'][],
     requestUserId: string,
   ) {
     return withServiceAuth(
@@ -348,13 +348,13 @@ export const NotificationService = {
 
   // Notification Sending
   async sendCommentNotifications(data: {
-    postId: Post["id"];
-    postTitle: Post["title"];
-    commentId: Comment["id"];
-    postAuthorId: User["id"];
-    commentAuthorId: User["id"];
-    commentAuthorName: User["username"];
-    content: Comment["content"];
+    postId: Post['id'];
+    postTitle: Post['title'];
+    commentId: Comment['id'];
+    postAuthorId: User['id'];
+    commentAuthorId: User['id'];
+    commentAuthorName: User['username'];
+    content: Comment['content'];
   }): Promise<void> {
     try {
       const notifications: Promise<void>[] = [];
@@ -419,7 +419,7 @@ export const NotificationService = {
   },
 
   async getNotificationPreferences(
-    userId: User["id"],
+    userId: User['id'],
   ): Promise<NotificationPreferences | null> {
     try {
       return await prisma.notificationPreferences.findUnique({
@@ -431,12 +431,12 @@ export const NotificationService = {
   },
 
   async shouldSend(
-    type: Notification["type"],
+    type: Notification['type'],
     preferences: NotificationPreferences | null,
   ): Promise<boolean> {
     if (!preferences?.enabled) return false;
 
-    const preferencesMap: Record<Notification["type"], boolean> = {
+    const preferencesMap: Record<Notification['type'], boolean> = {
       [NotificationType.COMMENT]: preferences.allowComments,
       [NotificationType.MENTION]: preferences.allowMentions,
       [NotificationType.POST_UPDATE]: preferences.allowPostUpdates,

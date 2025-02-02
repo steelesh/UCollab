@@ -1,13 +1,13 @@
-import { auth } from "~/lib/auth";
-import { UserService } from "~/services/user.service";
-import { type NextRequest } from "next/server";
-import { ErrorCode, ErrorMessage } from "../constants";
+import { auth } from '~/lib/auth';
+import { UserService } from '~/services/user.service';
+import { type NextRequest } from 'next/server';
+import { ErrorCode, ErrorMessage } from '../constants';
 import {
   AppError,
   AuthenticationError,
   AuthorizationError,
-} from "../errors/app-error";
-import { type Permission } from "../permissions";
+} from '../errors/app-error';
+import { type Permission } from '../permissions';
 
 export async function withApiAuth<T>(
   req: NextRequest,
@@ -22,12 +22,12 @@ export async function withApiAuth<T>(
 
     if (permission) {
       const hasPermission = await UserService.hasPermission(
-          session.user.id,
-          permission,
+        session.user.id,
+        permission,
       );
       if (!hasPermission) {
         throw new AuthorizationError(
-            ErrorMessage.MISSING_PERMISSION(permission),
+          ErrorMessage.MISSING_PERMISSION(permission),
         );
       }
     }
@@ -42,24 +42,24 @@ export async function withApiAuth<T>(
 
     if (error instanceof AppError) {
       return Response.json(
-          {
-            data: null,
-            error: error.message,
-          },
-          {
-            status: error.statusCode,
-          },
+        {
+          data: null,
+          error: error.message,
+        },
+        {
+          status: error.statusCode,
+        },
       );
     }
 
     return Response.json(
-        {
-          data: null,
-          error: ErrorMessage.SERVER_ERROR,
-        },
-        {
-          status: ErrorCode.SERVER_ERROR,
-        },
+      {
+        data: null,
+        error: ErrorMessage.SERVER_ERROR,
+      },
+      {
+        status: ErrorCode.SERVER_ERROR,
+      },
     );
   }
 }

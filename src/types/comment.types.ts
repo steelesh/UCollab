@@ -1,4 +1,4 @@
-import { type Prisma } from "@prisma/client";
+import { type Prisma } from '@prisma/client';
 
 export type CommentResponse = Prisma.CommentGetPayload<{
   include: {
@@ -12,10 +12,10 @@ export type CommentResponse = Prisma.CommentGetPayload<{
   };
 }>;
 
-export type CreateCommentInput = {
+export interface CreateCommentInput {
   content: string;
-};
+}
 
-export type UpdateCommentInput = {
+export interface UpdateCommentInput {
   content: string;
-};
+}
