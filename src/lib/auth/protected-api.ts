@@ -1,12 +1,8 @@
-import { auth } from '~/lib/auth';
+import { auth } from '~/lib/auth/auth';
 import { UserService } from '~/services/user.service';
 import { type NextRequest } from 'next/server';
 import { ErrorCode, ErrorMessage } from '../constants';
-import {
-  AppError,
-  AuthenticationError,
-  AuthorizationError,
-} from '../errors/app-error';
+import { AppError, AuthenticationError, AuthorizationError } from '../errors/app-error';
 import { type Permission } from '../permissions';
 
 export async function withApiAuth<T>(
@@ -21,14 +17,9 @@ export async function withApiAuth<T>(
     }
 
     if (permission) {
-      const hasPermission = await UserService.hasPermission(
-        session.user.id,
-        permission,
-      );
+      const hasPermission = await UserService.hasPermission(session.user.id, permission);
       if (!hasPermission) {
-        throw new AuthorizationError(
-          ErrorMessage.MISSING_PERMISSION(permission),
-        );
+        throw new AuthorizationError(ErrorMessage.MISSING_PERMISSION(permission));
       }
     }
 

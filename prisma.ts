@@ -4,7 +4,7 @@ import { isDevelopment } from '~/lib/utils';
 
 const createPrismaClient = () =>
   new PrismaClient({
-    log: isDevelopment() ? ['query', 'error', 'warn'] : ['error'],
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
     datasources: {
       prisma: {
         url: env.MYSQL_URL,
@@ -16,6 +16,6 @@ const globalForPrisma = globalThis as unknown as {
   prisma: ReturnType<typeof createPrismaClient> | undefined;
 };
 
-export const db = globalForPrisma.prisma ?? createPrismaClient();
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
-if (isDevelopment()) globalForPrisma.prisma = db;
+if (isDevelopment()) globalForPrisma.prisma = prisma;

@@ -1,19 +1,11 @@
 import { type Comment, type Post, Prisma, type User } from '@prisma/client';
 import { z } from 'zod';
-import { prisma } from '~/lib/prisma';
+import { prisma } from '../../prisma';
 import { withServiceAuth } from '~/lib/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
-import {
-  AppError,
-  AuthorizationError,
-  ValidationError,
-} from '~/lib/errors/app-error';
+import { AppError, AuthorizationError, ValidationError } from '~/lib/errors/app-error';
 import { Permission } from '~/lib/permissions';
-import {
-  commentFormSchema,
-  type CreateCommentData,
-  type UpdateCommentData,
-} from '~/schemas/comment.schema';
+import { commentFormSchema, type CreateCommentData, type UpdateCommentData } from '~/schemas/comment.schema';
 import { NotificationService } from './notification.service';
 import { UserService } from './user.service';
 
@@ -75,72 +67,62 @@ export const CommentService = {
     });
   },
 
-  async createComment(
-    { content, postId }: CreateCommentData,
-    requestUserId: User['id'],
-  ) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.CREATE_COMMENT,
-      async () => {
-        try {
-          const validatedData = commentFormSchema.parse({ content });
+  async createComment({ content, postId }: CreateCommentData, requestUserId: User['id']) {
+    return withServiceAuth(requestUserId, Permission.CREATE_COMMENT, async () => {
+      try {
+        const validatedData = commentFormSchema.parse({ content });
 
-          return await prisma.$transaction(async (tx) => {
-            const comment = await tx.comment.create({
-              data: {
-                content: validatedData.content,
-                postId,
-                createdById: requestUserId,
-              },
-              select: {
-                id: true,
-                content: true,
-                postId: true,
-                createdById: true,
-                post: {
-                  select: {
-                    title: true,
-                    createdById: true,
-                  },
-                },
-                createdBy: {
-                  select: {
-                    username: true,
-                  },
+        return await prisma.$transaction(async (tx) => {
+          const comment = await tx.comment.create({
+            data: {
+              content: validatedData.content,
+              postId,
+              createdById: requestUserId,
+            },
+            select: {
+              id: true,
+              content: true,
+              postId: true,
+              createdById: true,
+              post: {
+                select: {
+                  title: true,
+                  createdById: true,
                 },
               },
-            });
-
-            await NotificationService.sendCommentNotifications({
-              postId: comment.postId,
-              postTitle: comment.post.title,
-              commentId: comment.id,
-              postAuthorId: comment.post.createdById,
-              commentAuthorId: comment.createdById,
-              commentAuthorName: comment.createdBy.username,
-              content: comment.content,
-            });
-
-            return comment;
+              createdBy: {
+                select: {
+                  username: true,
+                },
+              },
+            },
           });
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new AppError(ErrorMessage.OPERATION_FAILED);
-          }
-          if (error instanceof z.ZodError) {
-            throw new ValidationError(ErrorMessage.VALIDATION_FAILED, error);
-          }
-          throw error;
+
+          await NotificationService.sendCommentNotifications({
+            postId: comment.postId,
+            postTitle: comment.post.title,
+            commentId: comment.id,
+            postAuthorId: comment.post.createdById,
+            commentAuthorId: comment.createdById,
+            commentAuthorName: comment.createdBy.username,
+            content: comment.content,
+          });
+
+          return comment;
+        });
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          throw new AppError(ErrorMessage.OPERATION_FAILED);
         }
-      },
-    );
+        if (error instanceof z.ZodError) {
+          throw new ValidationError(ErrorMessage.VALIDATION_FAILED, error);
+        }
+        throw error;
+      }
+    });
   },
 
-  async updateComment(
-    { id, content }: UpdateCommentData,
-    requestUserId: User['id'],
-  ) {
+  async updateComment({ id, content }: UpdateCommentData, requestUserId: User['id']) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         const validatedData = commentFormSchema.parse({ content });
@@ -154,13 +136,7 @@ export const CommentService = {
           throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
         }
 
-        if (
-          !(await UserService.canAccessContent(
-            requestUserId,
-            comment.createdById,
-            Permission.UPDATE_ANY_COMMENT,
-          ))
-        ) {
+        if (!(await UserService.canAccessContent(requestUserId, comment.createdById, Permission.UPDATE_ANY_COMMENT))) {
           throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
         }
 
@@ -199,13 +175,7 @@ export const CommentService = {
         throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
       }
 
-      if (
-        !(await UserService.canAccessContent(
-          requestUserId,
-          comment.createdById,
-          Permission.DELETE_ANY_COMMENT,
-        ))
-      ) {
+      if (!(await UserService.canAccessContent(requestUserId, comment.createdById, Permission.DELETE_ANY_COMMENT))) {
         throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
       }
 
@@ -258,12 +228,7 @@ export const CommentService = {
     return comment?.createdById === userId;
   },
 
-  async getPaginatedComments(
-    postId: Post['id'],
-    requestUserId: User['id'],
-    page = 1,
-    limit = 20,
-  ) {
+  async getPaginatedComments(postId: Post['id'], requestUserId: User['id'], page = 1, limit = 20) {
     return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
       return prisma.comment.findMany({
         where: { postId },

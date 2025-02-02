@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { type GetServerSideProps } from 'next';
-import { prisma } from '~/lib/prisma';
+import { prisma } from '../../prisma';
 
 interface User {
   avatar: string | null;
@@ -47,9 +47,7 @@ export default function Community({ users }: CommunityProps) {
       </Head>
       <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-24">
         {users.map((user, index) => (
-          <div
-            key={index}
-            className="flex w-full max-w-3xl items-center border-b p-4">
+          <div key={index} className="flex w-full max-w-3xl items-center border-b p-4">
             <Image
               src={user.avatar ?? 'https://avatar.iran.liara.run/public'}
               alt={user.username}
@@ -58,9 +56,7 @@ export default function Community({ users }: CommunityProps) {
               className="rounded-full"
             />
             <div className="ml-4">
-              <Link
-                href={`/users/${user.username}`}
-                className="font-bold hover:underline">
+              <Link href={`/users/${user.username}`} className="font-bold hover:underline">
                 {user.username}
               </Link>
               <p className="text-sm text-gray-500">{user.email}</p>
@@ -68,9 +64,7 @@ export default function Community({ users }: CommunityProps) {
             <div className="ml-auto text-right">
               <p className="text-sm">Created: {user.createdDate}</p>
               <p className="text-sm">Last Login: {user.lastLogin}</p>
-              <p className="text-sm">
-                Verified: {user.verifiedEmail ? 'Yes' : 'No'}
-              </p>
+              <p className="text-sm">Verified: {user.verifiedEmail ? 'Yes' : 'No'}</p>
             </div>
           </div>
         ))}

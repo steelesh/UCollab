@@ -3,8 +3,9 @@ import { AvatarSource, User as PrismaUser, Role } from '@prisma/client';
 import NextAuth, { DefaultSession, type NextAuthConfig } from 'next-auth';
 import { encode } from 'next-auth/jwt';
 import credentials from 'next-auth/providers/credentials';
+import { prisma } from '../../../prisma';
 import microsoftEntraId from 'next-auth/providers/microsoft-entra-id';
-import { prisma } from './prisma';
+
 import { isDevelopment } from '~/lib/utils';
 import { UserService } from '~/services/user.service';
 

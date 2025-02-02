@@ -1,15 +1,11 @@
 import { Prisma, type Skill } from '@prisma/client';
 import { notFound } from 'next/navigation';
-import { prisma } from '~/lib/prisma';
+import { prisma } from '../../prisma';
 import { withServiceAuth } from '~/lib/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
 import { AppError } from '~/lib/errors/app-error';
 import { Permission } from '~/lib/permissions';
-import {
-  type CreateSkillInput,
-  type UpdateSkillInput,
-  skillSelect,
-} from '~/schemas/skill.schema';
+import { type CreateSkillInput, type UpdateSkillInput, skillSelect } from '~/schemas/skill.schema';
 
 export const SkillService = {
   // Public Operations
@@ -29,10 +25,7 @@ export const SkillService = {
     try {
       return await prisma.skill.findMany({
         where: {
-          AND: [
-            { verified: true },
-            { name: { contains: query.toLowerCase().trim() } },
-          ],
+          AND: [{ verified: true }, { name: { contains: query.toLowerCase().trim() } }],
         },
         select: { id: true, name: true },
         orderBy: { name: 'asc' },
@@ -74,36 +67,28 @@ export const SkillService = {
   },
 
   async suggestSkill(data: CreateSkillInput, requestUserId: string) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.SUGGEST_SKILL,
-      async () => {
-        try {
-          return await prisma.skill.create({
-            data: {
-              ...data,
-              verified: false,
-              createdById: requestUserId,
-            },
-            select: skillSelect,
-          });
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === 'P2002') {
-              throw new AppError(`Skill "${data.name}" already exists`);
-            }
+    return withServiceAuth(requestUserId, Permission.SUGGEST_SKILL, async () => {
+      try {
+        return await prisma.skill.create({
+          data: {
+            ...data,
+            verified: false,
+            createdById: requestUserId,
+          },
+          select: skillSelect,
+        });
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          if (error.code === 'P2002') {
+            throw new AppError(`Skill "${data.name}" already exists`);
           }
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
         }
-      },
-    );
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
-  async updateSkill(
-    skillId: Skill['id'],
-    data: UpdateSkillInput,
-    requestUserId: string,
-  ) {
+  async updateSkill(skillId: Skill['id'], data: UpdateSkillInput, requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.UPDATE_SKILL, async () => {
       try {
         return await prisma.skill.update({

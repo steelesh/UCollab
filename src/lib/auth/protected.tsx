@@ -1,4 +1,4 @@
-import { auth } from '~/lib/auth';
+import { auth } from '~/lib/auth/auth';
 import { type Role } from '@prisma/client';
 import { redirect, unauthorized } from 'next/navigation';
 import { type Permission, hasPermission, hasRole } from '../permissions';
@@ -11,9 +11,7 @@ export function withProtected<P extends PageProps>(
   permissions: Permission[] = [],
   roles: Role[] = [],
 ) {
-  return async function ProtectedComponent(
-    props: P,
-  ): Promise<React.ReactElement> {
+  return async function ProtectedComponent(props: P): Promise<React.ReactElement> {
     try {
       const session = await auth();
       if (!session?.user?.id) {
@@ -24,10 +22,7 @@ export function withProtected<P extends PageProps>(
         unauthorized();
       }
 
-      if (
-        permissions.length &&
-        !permissions.every((p) => hasPermission(session.user.role, p))
-      ) {
+      if (permissions.length && !permissions.every((p) => hasPermission(session.user.role, p))) {
         unauthorized();
       }
       return Component({ ...props, userId: session.user.id });

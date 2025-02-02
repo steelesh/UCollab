@@ -1,3 +1,5 @@
+'use client';
+
 import Theme from '@components/theme';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -30,32 +32,21 @@ export default function Navbar() {
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16m-7 6h7"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
             </svg>
           </button>
         ) : null}
       </div>
       <div className="hidden flex-1 justify-evenly md:flex">
-        <Link
-          className="group text-accent-content pt-1.5 text-xl"
-          href="/explore">
+        <Link className="group text-accent-content pt-1.5 text-xl" href="/explore">
           Explore
           <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
         </Link>
-        <Link
-          className="group text-accent-content pt-1.5 text-xl"
-          href="/create">
+        <Link className="group text-accent-content pt-1.5 text-xl" href="/create">
           Create
           <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
         </Link>
-        <Link
-          className="group text-accent-content pt-1.5 text-xl"
-          href="/community">
+        <Link className="group text-accent-content pt-1.5 text-xl" href="/community">
           Community
           <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
         </Link>
@@ -63,11 +54,7 @@ export default function Navbar() {
       <div className="flex-shrink justify-end md:flex-none">
         {session ? (
           <div className="form-control hidden md:flex">
-            <input
-              type="text"
-              placeholder="Search"
-              className="input input-bordered w-48 lg:w-auto"
-            />
+            <input type="text" placeholder="Search" className="input input-bordered w-48 lg:w-auto" />
           </div>
         ) : null}
         <div className="mx-4 md:mx-6">
@@ -75,18 +62,9 @@ export default function Navbar() {
         </div>
         {session ? (
           <div className="dropdown dropdown-end">
-            <div
-              tabIndex={0}
-              role="button"
-              className="avatar btn btn-circle btn-ghost">
+            <div tabIndex={0} role="button" className="avatar btn btn-circle btn-ghost">
               <div className="w-10 rounded-full">
-                <img
-                  alt="Avatar"
-                  src={
-                    session.user?.image ??
-                    'https://avatar.iran.liara.run/public'
-                  }
-                />
+                <img alt="Avatar" src={session.user?.image ?? 'https://avatar.iran.liara.run/public'} />
               </div>
             </div>
             <ul
@@ -115,40 +93,24 @@ export default function Navbar() {
           className={`bg-base-200 fixed top-0 right-0 h-full w-64 transform p-5 shadow-lg ${
             drawerOpen ? 'translate-x-0' : 'translate-x-full'
           } z-[2] transition-transform duration-300 ease-in-out`}>
-          <button
-            onClick={toggleDrawer}
-            className="btn btn-circle btn-ghost absolute top-4 right-4">
+          <button onClick={toggleDrawer} className="btn btn-circle btn-ghost absolute top-4 right-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
           <div className="mt-10 flex flex-col">
-            <Link
-              className="text-accent mb-4 text-xl"
-              href="/explore"
-              onClick={toggleDrawer}>
+            <Link className="text-accent mb-4 text-xl" href="/explore" onClick={toggleDrawer}>
               Explore
             </Link>
-            <Link
-              className="text-accent mb-4 text-xl"
-              href="/create"
-              onClick={toggleDrawer}>
+            <Link className="text-accent mb-4 text-xl" href="/create" onClick={toggleDrawer}>
               Create
             </Link>
-            <Link
-              className="text-accent text-xl"
-              href="/community"
-              onClick={toggleDrawer}>
+            <Link className="text-accent text-xl" href="/community" onClick={toggleDrawer}>
               Community
             </Link>
           </div>
