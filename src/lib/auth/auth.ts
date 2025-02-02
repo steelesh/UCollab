@@ -2,10 +2,9 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import { AvatarSource, User as PrismaUser, Role } from '@prisma/client';
 import NextAuth, { DefaultSession, type NextAuthConfig } from 'next-auth';
 import { encode } from 'next-auth/jwt';
-import credentials from 'next-auth/providers/credentials';
 import { prisma } from '../../../prisma';
 import microsoftEntraId from 'next-auth/providers/microsoft-entra-id';
-
+import { Adapter } from 'next-auth/adapters';
 import { isDevelopment } from '~/lib/utils';
 import { UserService } from '~/services/user.service';
 
@@ -24,23 +23,9 @@ declare module 'next-auth' {
 }
 
 const authConfig: NextAuthConfig = {
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma) as Adapter,
   session: { strategy: 'database' },
   providers: [
-    ...(isDevelopment()
-      ? [
-          credentials({
-            credentials: { userId: {} },
-            async authorize(credentials) {
-              if (!credentials?.userId) return null;
-              await prisma.session.deleteMany({});
-              return prisma.user.findUnique({
-                where: { id: credentials.userId as string },
-              });
-            },
-          }),
-        ]
-      : []),
     microsoftEntraId({
       issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
       authorization: {
