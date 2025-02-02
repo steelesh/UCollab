@@ -1,7 +1,6 @@
 import { type Prisma } from '@prisma/client';
 import { z } from 'zod';
 
-// Add common select object for reuse
 export const profileSelect = {
   userId: true,
   id: true,
@@ -19,19 +18,15 @@ export const profileSelect = {
     select: {
       id: true,
       username: true,
-      avatar: true, // renamed from avatar
+      avatar: true,
       email: true,
-      allowNotifications: true, // added if available in your DB
+      allowNotifications: true,
     },
   },
 } as const;
 
 export const profileSchema = z.object({
-  bio: z
-    .string()
-    .max(500, 'Bio must be less than 500 characters')
-    .nullable()
-    .optional(),
+  bio: z.string().max(500, 'Bio must be less than 500 characters').nullable().optional(),
   gradYear: z
     .number()
     .min(2000, 'Graduation year must be after 2000')
@@ -47,9 +42,7 @@ export const profileSchema = z.object({
 export const updateProfileSchema = profileSchema.partial().transform((data) => {
   const transformed: Partial<Prisma.ProfileUpdateInput> = {
     ...data,
-    skills: data.skills
-      ? { connect: data.skills.map((name) => ({ name })) }
-      : undefined,
+    skills: data.skills ? { connect: data.skills.map((name) => ({ name })) } : undefined,
   };
   return transformed;
 });

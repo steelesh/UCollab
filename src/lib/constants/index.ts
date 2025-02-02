@@ -20,8 +20,7 @@ export const ErrorMessage = {
   AUTHENTICATION_REQUIRED: 'Authentication required',
   INSUFFICIENT_PERMISSIONS: 'Insufficient permissions',
   INSUFFICIENT_ROLE: 'Insufficient role',
-  MISSING_PERMISSION: (permission: string) =>
-    `Missing required permission: ${permission}`,
+  MISSING_PERMISSION: (permission: string) => `Missing required permission: ${permission}`,
 
   VALIDATION_FAILED: 'Validation failed',
   INVALID_INPUT: 'Invalid input provided',
@@ -33,6 +32,5 @@ export const ErrorMessage = {
   SERVER_ERROR: 'Internal server error',
 
   NOTIFICATION_QUEUE_FAILED: 'Failed to queue notification',
-  NOTIFICATION_PREFERENCE_UPDATE_FAILED:
-    'Failed to update notification preferences',
+  NOTIFICATION_PREFERENCE_UPDATE_FAILED: 'Failed to update notification preferences',
 } as const;

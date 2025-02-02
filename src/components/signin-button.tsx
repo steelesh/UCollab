@@ -16,15 +16,8 @@ export default function SignInButton() {
   };
 
   return (
-    <button
-      className="btn btn-primary-content select-none"
-      onClick={handleSignIn}
-      disabled={isPending}>
-      {isPending ? (
-        <span className="loading loading-spinner loading-md"></span>
-      ) : (
-        'Sign in with UC Credentials'
-      )}
+    <button className="btn btn-primary-content select-none" onClick={handleSignIn} disabled={isPending}>
+      {isPending ? <span className="loading loading-spinner loading-md"></span> : 'Sign in with UC Credentials'}
     </button>
   );
 }

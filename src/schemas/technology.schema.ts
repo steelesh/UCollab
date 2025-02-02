@@ -1,7 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
-// Add common select object for reuse
 export const technologySelect = {
   id: true,
   name: true,
@@ -28,10 +27,9 @@ export const suggestTechnologySchema = technologySchema.pick({
   name: true,
 });
 
-export const updateTechnologySchema =
-  technologySchema.partial() satisfies z.ZodType<
-    Partial<Prisma.TechnologyUpdateInput>
-  >;
+export const updateTechnologySchema = technologySchema.partial() satisfies z.ZodType<
+  Partial<Prisma.TechnologyUpdateInput>
+>;
 
 export type CreateTechnologyInput = z.infer<typeof technologySchema>;
 export type UpdateTechnologyInput = z.infer<typeof updateTechnologySchema>;

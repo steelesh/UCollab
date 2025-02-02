@@ -2,10 +2,7 @@ import { User } from '@prisma/client';
 import { Queue, Worker } from 'bullmq';
 import IORedis from 'ioredis';
 import { env } from '~/lib/env';
-import {
-  CreateBatchNotificationData,
-  CreateNotificationData,
-} from '~/schemas/notification.schema';
+import { CreateBatchNotificationData, CreateNotificationData } from '~/schemas/notification.schema';
 import { NotificationService } from '~/services/notification.service';
 
 const queueConfig = {
@@ -32,20 +29,11 @@ const notificationWorker = new Worker(
 );
 
 notificationWorker.on('completed', (job, result) => {
-  console.log(
-    `Notification job ${job.id} completed`,
-    `Type: ${job.data.type}`,
-    `User: ${job.data.userId}`,
-    result,
-  );
+  console.log(`Notification job ${job.id} completed`, `Type: ${job.data.type}`, `User: ${job.data.userId}`, result);
 });
 
 notificationWorker.on('failed', (job, error) => {
-  console.error(
-    `Notification job ${job?.id} failed:`,
-    `User: ${job?.data.userId}`,
-    error,
-  );
+  console.error(`Notification job ${job?.id} failed:`, `User: ${job?.data.userId}`, error);
 });
 
 export const mq = {

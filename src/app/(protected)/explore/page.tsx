@@ -19,15 +19,9 @@ interface Project {
 }
 
 export default async function ExplorePage() {
-  // Get the authentication cookies from the request
   const cookieHeader = cookies().toString();
 
-  // Define the absolute base URL.
-  // Make sure to set NEXT_PUBLIC_API_URL in your environment (or fallback to localhost)
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-
-  // Use the absolute URL for the fetch request
-  const postsResponse = await fetch(`${baseUrl}/api/posts`, {
+  const postsResponse = await fetch(`/api/posts`, {
     headers: { cookie: cookieHeader },
     next: { revalidate: 60 },
   });
@@ -41,11 +35,10 @@ export default async function ExplorePage() {
   }
   const projects = jsonResponse.data;
 
-  // For each project, fetch the corresponding user data using an absolute URL
   const projectsWithUser = await Promise.all(
     projects.map(async (project) => {
       try {
-        const userResponse = await fetch(`${baseUrl}/api/users/from-id/${project.createdById}`, {
+        const userResponse = await fetch(`/api/users/from-id/${project.createdById}`, {
           headers: { cookie: cookieHeader },
           next: { revalidate: 60 },
         });

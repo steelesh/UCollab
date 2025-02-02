@@ -1,7 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
-// Add common select object for reuse
 export const skillSelect = {
   id: true,
   name: true,
@@ -25,9 +24,7 @@ export const skillSchema = z.object({
   createdById: z.string().optional(),
 }) satisfies z.ZodType<Partial<Prisma.SkillCreateInput>>;
 
-export const updateSkillSchema = skillSchema.partial() satisfies z.ZodType<
-  Partial<Prisma.SkillUpdateInput>
->;
+export const updateSkillSchema = skillSchema.partial() satisfies z.ZodType<Partial<Prisma.SkillUpdateInput>>;
 
 export type CreateSkillInput = z.infer<typeof skillSchema>;
 export type UpdateSkillInput = z.infer<typeof updateSkillSchema>;

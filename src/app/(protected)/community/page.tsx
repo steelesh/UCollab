@@ -6,7 +6,7 @@ export const metadata = {
   title: 'UCollab — Community',
 };
 
-interface User {
+interface _User {
   avatar: string | null;
   username: string;
   email: string;

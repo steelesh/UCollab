@@ -9,7 +9,6 @@ import { type UpdateProfileInput, profileSelect, updateProfileSchema } from '~/s
 import { UserService } from './user.service';
 
 export const ProfileService = {
-  // Read Operations
   async getProfile(userId: User['id'], requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.VIEW_ANY_PROFILE, async () => {
       try {
@@ -31,7 +30,6 @@ export const ProfileService = {
     });
   },
 
-  // Update Operations
   async updateProfile(userId: User['id'], data: UpdateProfileInput, requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.UPDATE_ANY_PROFILE, async () => {
       try {
@@ -125,7 +123,6 @@ export const ProfileService = {
     });
   },
 
-  // Public Operations
   async getPublicProfile(username: string) {
     try {
       const profile = await prisma.profile.findFirst({

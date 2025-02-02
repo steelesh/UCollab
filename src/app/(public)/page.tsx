@@ -21,7 +21,7 @@ export default async function Page() {
           <p className="mb-4 text-lg">
             Build your network by connecting with students who share your interests and goals.
           </p>
-          <img src="../collab.svg" alt="Connect with Peers" className="w-full" />
+          <img src="/collab.svg" alt="Connect with Peers" className="w-full" />
         </div>
       </section>
 

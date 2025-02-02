@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Form validation schema (what users actually input)
 export const commentFormSchema = z.object({
   content: z
     .string()
@@ -9,7 +8,6 @@ export const commentFormSchema = z.object({
     .transform((str) => str.trim()),
 });
 
-// Service input types (internal use)
 export interface CreateCommentData {
   content: string;
   postId: string;
@@ -21,5 +19,4 @@ export interface UpdateCommentData {
   postId: string;
 }
 
-// Form data type
 export type CommentFormData = z.infer<typeof commentFormSchema>;

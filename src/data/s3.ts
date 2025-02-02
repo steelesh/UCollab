@@ -1,8 +1,4 @@
-import {
-  PutBucketPolicyCommand,
-  PutObjectCommand,
-  S3Client,
-} from '@aws-sdk/client-s3';
+import { PutBucketPolicyCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { env } from '~/lib/env';
 
 interface S3UploadParams {
@@ -31,10 +27,7 @@ function getFileUrl(key: string): string {
 }
 
 export const s3 = {
-  async uploadProfilePhoto(
-    buffer: Buffer,
-    fileName: string,
-  ): Promise<S3UploadResponse> {
+  async uploadProfilePhoto(buffer: Buffer, fileName: string): Promise<S3UploadResponse> {
     return this.uploadFile({
       buffer,
       fileName,
@@ -120,9 +113,7 @@ export const s3 = {
   },
 };
 
-export async function setBucketPublicReadAccess(
-  bucketName: string,
-): Promise<void> {
+export async function setBucketPublicReadAccess(bucketName: string): Promise<void> {
   const publicReadPolicy = {
     Version: '2012-10-17',
     Statement: [

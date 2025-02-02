@@ -1,10 +1,6 @@
 import { UserService } from '~/services/user.service';
 import { ErrorMessage } from '../constants';
-import {
-  AppError,
-  AuthenticationError,
-  AuthorizationError,
-} from '../errors/app-error';
+import { AppError, AuthenticationError, AuthorizationError } from '../errors/app-error';
 import { type Permission, hasPermission } from '../permissions';
 
 export async function withServiceAuth<T>(

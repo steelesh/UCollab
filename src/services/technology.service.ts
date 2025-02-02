@@ -8,7 +8,6 @@ import { Permission } from '~/lib/permissions';
 import { type CreateTechnologyInput, type SuggestTechnologyInput, technologySelect } from '~/schemas/technology.schema';
 
 export const TechnologyService = {
-  // Public methods - no auth needed
   async getVerifiedTechnologies() {
     try {
       return await prisma.technology.findMany({
@@ -59,7 +58,6 @@ export const TechnologyService = {
     }
   },
 
-  // Protected methods - require authentication
   async createTechnology(data: CreateTechnologyInput, requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.CREATE_TECHNOLOGY, async () => {
       try {

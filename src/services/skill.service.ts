@@ -8,7 +8,6 @@ import { Permission } from '~/lib/permissions';
 import { type CreateSkillInput, type UpdateSkillInput, skillSelect } from '~/schemas/skill.schema';
 
 export const SkillService = {
-  // Public Operations
   async getAllSkills() {
     try {
       return await prisma.skill.findMany({
@@ -36,7 +35,6 @@ export const SkillService = {
     }
   },
 
-  // Protected Operations
   async createSkill(data: CreateSkillInput, requestUserId: string) {
     return withServiceAuth(requestUserId, Permission.CREATE_SKILL, async () => {
       try {

@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorMessage } from "../constants";
+import { ErrorCode, ErrorMessage } from '../constants';
 
 export class AppError extends Error {
   constructor(

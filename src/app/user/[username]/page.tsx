@@ -1,12 +1,8 @@
-// app/user/[username]/page.tsx
-
 import { prisma } from '~/../prisma';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 
-// Optional: Use generateMetadata to set dynamic head metadata for this page.
 export async function generateMetadata({ params }: { params: { username: string } }) {
-  // Minimal query to get the username for the title.
   const user = await prisma.user.findUnique({
     where: { username: params.username },
     select: { username: true },
@@ -36,7 +32,6 @@ interface UserProfile {
 export default async function UserProfilePage({ params }: { params: { username: string } }) {
   const { username } = params;
 
-  // Fetch the user data from the database.
   const user = await prisma.user.findUnique({
     where: { username },
     select: {
@@ -56,11 +51,9 @@ export default async function UserProfilePage({ params }: { params: { username: 
   });
 
   if (!user) {
-    // When no user is found, trigger Next.js 404
     notFound();
   }
 
-  // Transform the dates and rename "avatar" to "image"
   const transformedUser: UserProfile = {
     username: user.username,
     email: user.email,
@@ -78,7 +71,6 @@ export default async function UserProfilePage({ params }: { params: { username: 
 
   return (
     <>
-      {/* (If you prefer not to use generateMetadata, you can include a <head> block here.) */}
       <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-24">
         <div className="flex w-full max-w-3xl items-center border-b p-4">
           <Image

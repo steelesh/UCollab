@@ -2,14 +2,8 @@ import { Post, PostStatus, PostType, Prisma, User } from '@prisma/client';
 import { z } from 'zod';
 
 export const postSchema = z.object({
-  title: z
-    .string()
-    .min(1, 'Title is required')
-    .max(200, 'Title must be less than 200 characters'),
-  description: z
-    .string()
-    .min(1, 'Description is required')
-    .max(5000, 'Description must be less than 5000 characters'),
+  title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
+  description: z.string().min(1, 'Description is required').max(5000, 'Description must be less than 5000 characters'),
   postType: z.nativeEnum(PostType),
   technologies: z
     .array(z.string())
@@ -42,7 +36,6 @@ export type UpdatePostInput = z.input<typeof updatePostSchema> & {
 };
 export type UpdatePostPayload = z.output<typeof updatePostSchema>;
 
-// Add these common select objects that are reused in post.service.ts
 export const postSelect = {
   id: true,
   title: true,

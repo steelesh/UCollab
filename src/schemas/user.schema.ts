@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from '~/lib/constants';
 
-// Add common select object for reuse
 export const userSelect = {
   id: true,
   username: true,
@@ -28,10 +27,7 @@ export const userSchema = z.object({
     .string()
     .min(3, 'Username must be at least 3 characters')
     .max(30, 'Username must be less than 30 characters')
-    .regex(
-      /^[a-zA-Z0-9._-]+$/,
-      'Username can only contain letters, numbers, dots, hyphens and underscores',
-    ),
+    .regex(/^[a-zA-Z0-9._-]+$/, 'Username can only contain letters, numbers, dots, hyphens and underscores'),
   email: z
     .string()
     .email('Invalid email address')
@@ -45,10 +41,7 @@ export const updateUserSchema = z.object({
   username: userSchema.shape.username.optional(),
   avatar: z
     .instanceof(File, { message: 'Avatar must be a valid file' })
-    .refine(
-      (file) => file.size <= MAX_FILE_SIZE,
-      'File size must be less than 5MB',
-    )
+    .refine((file) => file.size <= MAX_FILE_SIZE, 'File size must be less than 5MB')
     .refine(
       (file) => Object.values(ACCEPTED_IMAGE_TYPES).includes(file.type),
       'Only .jpg, .jpeg, .png and .webp formats are supported',
