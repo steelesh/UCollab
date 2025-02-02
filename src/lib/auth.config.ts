@@ -55,7 +55,7 @@ export const authConfig: NextAuthConfig = {
         }
 
         const nameMatch = profile.name?.match(
-            /([^,]+),\s*([^\s(]+)\s*\(([^)]+)\)/,
+          /([^,]+),\s*([^\s(]+)\s*\(([^)]+)\)/,
         );
         const lastName = nameMatch?.[1]?.trim() ?? "";
         const firstName = nameMatch?.[2]?.trim() ?? "";
@@ -67,8 +67,8 @@ export const authConfig: NextAuthConfig = {
 
         if (account?.access_token) {
           const msAvatar = await UserService.fetchMicrosoftAvatar(
-              account.access_token,
-              user.id,
+            account.access_token,
+            user.id,
           );
           if (msAvatar) {
             avatar = msAvatar;
