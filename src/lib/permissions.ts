@@ -1,5 +1,5 @@
 import { type Role } from '@prisma/client';
-import { isDevEnv, isLocalEnv, isProdEnv, isTestEnv } from './utils';
+import { isDevelopment, isProduction, isTest } from './utils';
 
 /**
  * permission enum used throughout the app to define access controls
@@ -148,28 +148,16 @@ export const ENVIRONMENT_ROUTES = {
  * @returns boolean
  */
 export const isEnvironmentRoute = (path: string): boolean => {
-  if (isLocalEnv()) {
-    return ENVIRONMENT_ROUTES.LOCAL_ROUTES.some((route) =>
-      path.startsWith(route),
-    );
+  if (isDevelopment()) {
+    return ENVIRONMENT_ROUTES.DEV_ROUTES.some((route) => path.startsWith(route));
   }
 
-  if (isDevEnv()) {
-    return ENVIRONMENT_ROUTES.DEV_ROUTES.some((route) =>
-      path.startsWith(route),
-    );
+  if (isTest()) {
+    return ENVIRONMENT_ROUTES.TEST_ROUTES.some((route) => path.startsWith(route));
   }
 
-  if (isTestEnv()) {
-    return ENVIRONMENT_ROUTES.TEST_ROUTES.some((route) =>
-      path.startsWith(route),
-    );
-  }
-
-  if (isProdEnv()) {
-    return ENVIRONMENT_ROUTES.PROD_ROUTES.some((route) =>
-      path.startsWith(route),
-    );
+  if (isProduction()) {
+    return ENVIRONMENT_ROUTES.PROD_ROUTES.some((route) => path.startsWith(route));
   }
 
   return false;
@@ -202,10 +190,7 @@ export const PUBLIC_ROUTES = [
  * isPublicRoute('/admin') // returns false
  */
 export const isPublicRoute = (path: string): boolean => {
-  return (
-    PUBLIC_ROUTES.includes(path as PublicRoute) ||
-    PUBLIC_ROUTES.some((route) => path.startsWith(route))
-  );
+  return PUBLIC_ROUTES.includes(path as PublicRoute) || PUBLIC_ROUTES.some((route) => path.startsWith(route));
 };
 
 /**
@@ -215,16 +200,12 @@ export const isPublicRoute = (path: string): boolean => {
  * @example
  * getRequiredPermission('/admin/users') // returns Permission.ACCESS_ADMIN
  */
-export const getRequiredPermission = (
-  path: string,
-): Permission | Permission[] | null => {
+export const getRequiredPermission = (path: string): Permission | Permission[] | null => {
   if (isPublicRoute(path) || isEnvironmentRoute(path)) {
     return null;
   }
 
-  const route = Object.entries(PROTECTED_ROUTES).find(([route]) =>
-    path.startsWith(route),
-  );
+  const route = Object.entries(PROTECTED_ROUTES).find(([route]) => path.startsWith(route));
   return route ? route[1] : null;
 };
 
@@ -237,10 +218,7 @@ export const getRequiredPermission = (
  * hasPermission('ADMIN', Permission.CREATE_POST) // returns true
  * hasPermission('USER', [Permission.DELETE_ANY_POST]) // returns false
  */
-export const hasPermission = (
-  userRole: Role | undefined,
-  permission: Permission | Permission[],
-) => {
+export const hasPermission = (userRole: Role | undefined, permission: Permission | Permission[]) => {
   if (!userRole) return false;
 
   if (Array.isArray(permission)) {
