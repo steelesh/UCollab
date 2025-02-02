@@ -27,8 +27,7 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:clean": "prisma db push --force-reset",
-    "postinstall": "prisma generate",
-    "prepare": "husky"
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "tsx src/data/seed.ts"
@@ -71,7 +70,6 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-playwright": "^2.2.0",
     "eslint-plugin-prettier": "^5.2.3",
-    "husky": "^9.1.7",
     "postcss": "^8.5.1",
     "prettier": "3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.9",
