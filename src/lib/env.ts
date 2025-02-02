@@ -24,7 +24,7 @@ export const env = createEnv({
     S3_BUCKET_NAME: z.string().min(1),
   },
   client: {
-    NEXT_PUBLIC_DEPLOY_ENV: z.enum(['local', 'dev', 'test', 'prod']),
+    NEXT_PUBLIC_DEPLOY_ENV: z.enum(['dev', 'test', 'prod']),
     NEXT_PUBLIC_POSTHOG_KEY: z.string().min(1),
     NEXT_PUBLIC_POSTHOG_HOST: z.string().url(),
   },
