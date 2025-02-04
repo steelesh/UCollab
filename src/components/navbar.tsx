@@ -52,39 +52,39 @@ export default function Navbar() {
         </Link>
       </div>
       <div className="flex-shrink justify-end md:flex-none">
-        {session ? (
-          <div className="form-control hidden md:flex">
-            <input type="text" placeholder="Search" className="input input-bordered w-48 lg:w-auto" />
-          </div>
-        ) : null}
-        <div className="mx-4 md:mx-6">
-          <Theme />
-        </div>
-        {session ? (
-          <div className="dropdown dropdown-end">
-            <div tabIndex={0} role="button" className="avatar btn btn-circle btn-ghost">
-              <div className="w-10 rounded-full">
-                <img alt="Avatar" src={session.user.avatar ?? 'https://avatar.iran.liara.run/public'} />
-              </div>
+        <div className="flex items-center gap-4">
+          {session ? (
+            <div className="form-control hidden md:flex">
+              <input type="text" placeholder="Search" className="input input-bordered w-48 lg:w-auto" />
             </div>
-            <ul className="menu dropdown-content menu-sm rounded-box bg-base-300 z-[1] mt-3 w-52 p-2 shadow">
-              <li>
-                <Link href="/profile" className="justify-between">
-                  Profile
-                  <span className="badge">New</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/settings">Settings</Link>
-              </li>
-              <li>
-                <button onClick={() => signOut()}>Sign Out</button>
-              </li>
-            </ul>
-          </div>
-        ) : (
-          <div></div>
-        )}
+          ) : null}
+          <Theme />
+          {session ? (
+            <div className="dropdown dropdown-end">
+              <div tabIndex={0} role="button" className="avatar btn btn-circle btn-ghost">
+                <div className="w-10 rounded-full">
+                  <img alt="Avatar" src={session.user.avatar ?? 'https://avatar.iran.liara.run/public'} />
+                </div>
+              </div>
+              <ul className="menu dropdown-content menu-sm rounded-box bg-base-300 z-[1] mt-3 w-52 p-2 shadow">
+                <li>
+                  <Link href="/profile" className="justify-between">
+                    Profile
+                    <span className="badge">New</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/settings">Settings</Link>
+                </li>
+                <li>
+                  <button onClick={() => signOut()}>Sign Out</button>
+                </li>
+              </ul>
+            </div>
+          ) : (
+            <div></div>
+          )}
+        </div>
       </div>
       {session && (
         <div
