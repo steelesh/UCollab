@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { withAuth } from '~/lib/auth/protected';
 
 export const metadata = {
   title: 'UCollab — Explore',
@@ -18,7 +19,7 @@ interface Project {
   githubRepo?: string;
 }
 
-export default async function ExplorePage() {
+export async function ExplorePage() {
   const cookieHeader = cookies().toString();
 
   const postsResponse = await fetch(`/api/posts`, {
@@ -108,3 +109,5 @@ export default async function ExplorePage() {
     </div>
   );
 }
+
+export default withAuth(ExplorePage);

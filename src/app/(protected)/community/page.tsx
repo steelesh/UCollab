@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { prisma } from '../../../../prisma';
+import { withAuth } from '~/lib/auth/protected';
 
 export const metadata = {
   title: 'UCollab — Community',
@@ -14,7 +15,7 @@ interface _User {
   lastLogin: string;
 }
 
-export default async function CommunityPage() {
+async function CommunityPage() {
   const users = await prisma.user.findMany({
     select: {
       avatar: true,
@@ -57,3 +58,5 @@ export default async function CommunityPage() {
     </div>
   );
 }
+
+export default withAuth(CommunityPage);

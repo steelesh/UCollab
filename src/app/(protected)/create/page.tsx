@@ -1,15 +1,16 @@
-import { redirect } from 'next/navigation';
+import { createPost } from '~/actions/post.actions';
+import { withAuth } from '~/lib/auth/protected';
 
 export const metadata = {
   title: 'UCollab — Create',
 };
 
-export default function CreateProjectPage() {
+async function CreatePage() {
   return (
     <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto pt-8">
       <div className="bg-base-300 mx-auto w-full max-w-5xl rounded-lg p-4 shadow-lg">
         <h2 className="mb-6 text-center text-3xl font-bold">Create Your Project</h2>
-        <form action={createProject}>
+        <form action={createPost}>
           <div className="form-control mb-4">
             <label className="label" htmlFor="projectTitle">
               <span className="label-text">Project Title</span>
@@ -90,40 +91,4 @@ export default function CreateProjectPage() {
   );
 }
 
-async function createProject(formData: FormData) {
-  'use server';
-
-  const title = formData.get('title') as string;
-  const description = formData.get('description') as string;
-  const technologiesString = formData.get('technologies') as string;
-  const githubRepo = formData.get('githubRepo') as string;
-  const postType = (formData.get('postType') as string).toUpperCase().replace(' ', '_');
-
-  const technologies = technologiesString
-    ? technologiesString
-        .split(',')
-        .map((tech) => tech.trim().toLowerCase())
-        .filter(Boolean)
-    : [];
-
-  const newPost = {
-    title,
-    description,
-    postType,
-    status: 'OPEN',
-    technologies,
-    githubRepo,
-  };
-
-  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/posts', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(newPost),
-  });
-
-  if (!res.ok) {
-    throw new Error('Failed to create project');
-  }
-
-  redirect('/explore');
-}
+export default withAuth(CreatePage);
