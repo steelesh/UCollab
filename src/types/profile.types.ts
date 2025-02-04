@@ -1,13 +1,12 @@
-import { type Prisma } from "@prisma/client";
+import { type Prisma } from '@prisma/client';
 
 export type PrivateProfileResponse = Prisma.ProfileGetPayload<{
   include: {
     user: {
       select: {
         id: true;
-        name: true;
         username: true;
-        image: true;
+        avatar: true;
         email: true;
         allowNotifications: true;
       };
@@ -15,37 +14,31 @@ export type PrivateProfileResponse = Prisma.ProfileGetPayload<{
   };
 }>;
 
-export type PublicProfileResponse = Prisma.UserGetPayload<{
+export type PublicProfileResponse = Prisma.ProfileGetPayload<{
   select: {
-    username: true;
-    name: true;
-    image: true;
-    profile: {
+    id: true;
+    userId: true;
+    lastModifiedDate: true;
+    gradYear: true;
+    bio: true;
+    skills: {
       select: {
-        bio: true;
-        skills: true;
-        interests: true;
-        gradYear: true;
+        id: true;
+        name: true;
       };
     };
-    posts: {
-      include: {
-        _count: {
-          select: {
-            comments: true;
-          };
-        };
-      };
-      orderBy: {
-        createdDate: "desc";
+    user: {
+      select: {
+        username: true;
+        avatar: true;
       };
     };
   };
 }>;
 
-export type UpdateProfileInput = {
+export interface UpdateProfileInput {
   bio?: string;
   skills?: string[];
   interests?: string[];
   gradYear?: number;
-};
+}

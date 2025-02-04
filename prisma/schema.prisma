@@ -2,107 +2,207 @@ generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
+generator fake_data {
+  provider = "prisma-generator-fake-data"
+  output   = "../src/data/fake-data.ts"
+}
+
+datasource prisma {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+  url      = env("MYSQL_URL")
 }
 
 model Account {
-  id                       String  @id @default(cuid())
-  userId                   String
-  type                     String
-  provider                 String
-  providerAccountId        String
-  refresh_token            String? @db.Text
-  access_token             String? @db.Text
-  expires_at               Int?
-  token_type               String?
-  scope                    String?
-  id_token                 String? @db.Text
-  session_state            String?
-  refresh_token_expires_in Int?
-  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @prisma.Text
+  access_token      String? @prisma.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @prisma.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
 }
 
 model User {
-  id                 String         @id @default(cuid())
-  username           String         @unique
-  email              String         @unique
-  createdDate        DateTime       @default(now())
-  lastLogin          DateTime       @default(now())
-  allowNotifications Boolean        @default(true)
-  verifiedEmail      Boolean        @default(false)
-  name               String?
-  image              String?        @db.Text
-  azureAdId          String?        @unique
-  emailVerified      DateTime?
-  accounts           Account[]
-  comments           Comment[]
-  notifications      Notification[]
-  posts              Post[]
-  profile            Profile?
+  id                      String                   @id @default(cuid())
+  username                String                   @unique
+  email                   String                   @unique
+  ///FAKE:faker.date.past({ years: 1 })
+  createdDate             DateTime                 @default(now())
+  ///FAKE:faker.date.recent({ days: 7 })
+  lastLogin               DateTime                 @default(now())
+  ///FAKE:faker.datatype.boolean()
+  fullName                String
+  ///FAKE:faker.person.firstName()
+  firstName               String
+  ///FAKE:faker.person.lastName()
+  lastName                String
+  ///FAKE:faker.image.avatarGitHub()
+  avatar                  String                   @prisma.Text
+  avatarSource            AvatarSource             @default(DEFAULT)
+  ///FAKE:faker.string.uuid()
+  azureAdId               String                   @unique
+  onboardingStep          OnboardingStep           @default(STEP_ONE)
+  comments                Comment[]
+  notifications           Notification[]           @relation("NotificationReceiver")
+  posts                   Post[]
+  profile                 Profile?                 @relation("UserProfile")
+  accounts                Account[]
+  NotificationPreferences NotificationPreferences?
+  triggeredNotifications  Notification[]           @relation("NotificationTrigger")
+  sessions                Session[]
+  role                    Role                     @default(USER)
+  Technology              Technology[]
+  Skill                   Skill[]
 
-  @@index([username, email])
+  @@index([username])
+  @@index([email])
   @@index([azureAdId])
 }
 
 model Profile {
   id               String   @id @default(cuid())
   userId           String   @unique
-  createdDate      DateTime @default(now())
+  ///FAKE:faker.date.recent()
   lastModifiedDate DateTime @updatedAt
-  skills           Json?
-  interests        Json?
+  skills           Skill[]
+  ///FAKE:faker.number.int({ min: 2023, max: 2030 })
   gradYear         Int?
-  bio              String?  @db.Text
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ///FAKE:faker.person.bio()
+  bio              String?  @prisma.Text
+  user             User     @relation("UserProfile", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
 model Post {
-  id               String    @id @default(cuid())
+  id               String         @id @default(cuid())
   createdById      String
-  createdDate      DateTime  @default(now())
-  lastModifiedDate DateTime  @updatedAt
-  title            String    @db.Text
-  description      String    @db.Text
+  ///FAKE:faker.date.past({ years: 1 })
+  createdDate      DateTime       @default(now())
+  ///FAKE:faker.date.recent()
+  lastModifiedDate DateTime       @updatedAt
+  title            String         @prisma.Text
+  description      String         @prisma.Text
   postType         PostType
-  technologies     Json?
+  technologies     Technology[]
   githubRepo       String?
-  status           Status
+  ///FAKE:faker.helpers.arrayElement(Object.values(PostStatus))
+  status           PostStatus
   comments         Comment[]
-  createdBy        User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdBy        User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  notifications    Notification[] @relation("PostNotifications")
 
   @@index([createdById])
   @@index([title(length: 191)])
 }
 
+model Skill {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  verified    Boolean   @default(false)
+  createdById String
+  createdDate DateTime  @default(now())
+  createdBy   User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  profiles    Profile[]
+
+  @@index([createdById])
+  @@index([name])
+}
+
+model Technology {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  verified    Boolean  @default(false)
+  createdById String
+  createdDate DateTime @default(now())
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  posts       Post[]
+
+  @@index([createdById])
+  @@index([name])
+}
+
 model Comment {
-  id               String   @id @default(cuid())
+  id               String         @id @default(cuid())
   postId           String
   createdById      String
-  createdDate      DateTime @default(now())
-  lastModifiedDate DateTime @updatedAt
-  content          String   @db.Text
-  createdBy        User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  post             Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  ///FAKE:faker.date.recent({ days: 30 })
+  createdDate      DateTime       @default(now())
+  ///FAKE:faker.date.recent()
+  lastModifiedDate DateTime       @updatedAt
+  content          String         @prisma.Text
+  createdBy        User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  post             Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  notifications    Notification[] @relation("CommentNotifications")
 
   @@index([postId])
   @@index([createdById])
 }
 
-model Notification {
-  id                   String  @id @default(cuid())
-  userId               String
-  message              String  @db.Text
-  disableNotifications Boolean @default(false)
-  user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+model NotificationPreferences {
+  id               String  @id @default(cuid())
+  userId           String  @unique
+  ///FAKE:faker.datatype.boolean()
+  enabled          Boolean @default(true)
+  ///FAKE:faker.datatype.boolean()
+  allowComments    Boolean @default(true)
+  ///FAKE:faker.datatype.boolean()
+  allowMentions    Boolean @default(true)
+  ///FAKE:faker.datatype.boolean()
+  allowPostUpdates Boolean @default(true)
+  ///FAKE:faker.datatype.boolean()
+  allowSystem      Boolean @default(true)
+  user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String
+  message     String           @prisma.Text
+  createdDate DateTime         @default(now())
+  isRead      Boolean          @default(false)
+  type        NotificationType
+
+  post      Post?    @relation("PostNotifications", fields: [postId], references: [id])
+  postId    String?
+  comment   Comment? @relation("CommentNotifications", fields: [commentId], references: [id])
+  commentId String?
+
+  triggeredBy   User?   @relation("NotificationTrigger", fields: [triggeredById], references: [id])
+  triggeredById String?
+  user          User    @relation("NotificationReceiver", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([postId])
+  @@index([commentId])
+  @@index([triggeredById])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+enum AvatarSource {
+  MICROSOFT
+  UPLOAD
+  DEFAULT
 }
 
 enum PostType {
@@ -111,7 +211,27 @@ enum PostType {
   DISCUSSION
 }
 
-enum Status {
+enum PostStatus {
   OPEN
   CLOSED
+}
+
+enum NotificationType {
+  COMMENT
+  MENTION
+  POST_UPDATE
+  SYSTEM
+}
+
+enum OnboardingStep {
+  STEP_ONE
+  STEP_TWO
+  STEP_THREE
+  STEP_FOUR
+  COMPLETE
+}
+
+enum Role {
+  ADMIN
+  USER
 }

@@ -1,13 +1,12 @@
-import { type Prisma } from "@prisma/client";
+import { type Prisma } from '@prisma/client';
 
 export type PostResponse = Prisma.PostGetPayload<{
   include: {
     createdBy: {
       select: {
         id: true;
-        name: true;
         username: true;
-        image: true;
+        avatar: true;
       };
     };
     _count: {
@@ -23,9 +22,8 @@ export type PostWithCommentsResponse = Prisma.PostGetPayload<{
     createdBy: {
       select: {
         id: true;
-        name: true;
         username: true;
-        image: true;
+        avatar: true;
       };
     };
     comments: {
@@ -33,9 +31,8 @@ export type PostWithCommentsResponse = Prisma.PostGetPayload<{
         createdBy: {
           select: {
             id: true;
-            name: true;
             username: true;
-            image: true;
+            avatar: true;
           };
         };
       };
@@ -43,13 +40,14 @@ export type PostWithCommentsResponse = Prisma.PostGetPayload<{
   };
 }>;
 
-export type CreatePostInput = {
+export interface CreatePostInput {
+  id: string;
   title: string;
   description: string;
-  postType: "CONTRIBUTION" | "FEEDBACK" | "DISCUSSION";
+  postType: 'CONTRIBUTION' | 'FEEDBACK' | 'DISCUSSION';
   technologies?: string[];
   githubRepo?: string;
-  status: "OPEN" | "CLOSED";
-};
+  status: 'OPEN' | 'CLOSED';
+}
 
 export type UpdatePostInput = Partial<CreatePostInput>;

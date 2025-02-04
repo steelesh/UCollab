@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 (() => {
     const darkThemes = ['ayu', 'navy', 'coal'];
     const lightThemes = ['light', 'rust'];
@@ -13,6 +15,7 @@
     }
 
     const theme = lastThemeWasLight ? 'default' : 'dark';
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     mermaid.initialize({ startOnLoad: true, theme });
 
     // Simplest way to make mermaid re-render the diagrams in the new theme is via refreshing the page

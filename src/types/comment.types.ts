@@ -1,22 +1,21 @@
-import { type Prisma } from "@prisma/client";
+import { type Prisma } from '@prisma/client';
 
 export type CommentResponse = Prisma.CommentGetPayload<{
   include: {
     createdBy: {
       select: {
         id: true;
-        name: true;
         username: true;
-        image: true;
+        avatar: true;
       };
     };
   };
 }>;
 
-export type CreateCommentInput = {
+export interface CreateCommentInput {
   content: string;
-};
+}
 
-export type UpdateCommentInput = {
+export interface UpdateCommentInput {
   content: string;
-};
+}

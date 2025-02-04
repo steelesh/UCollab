@@ -2,6 +2,7 @@
   "compilerOptions": {
     /* Base Options: */
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "target": "es2022",
     "allowJs": true,
@@ -32,7 +33,7 @@
     }
   },
   "include": [
-    ".eslintrc.cjs",
+    "eslint.config.mjs",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
