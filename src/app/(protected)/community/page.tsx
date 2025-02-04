@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { prisma } from '../../../../prisma';
+import { prisma } from '../../../data/prisma';
 import { withAuth } from '~/lib/auth/protected';
 
 export const metadata = {

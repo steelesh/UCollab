@@ -2,10 +2,8 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import { AvatarSource, User as PrismaUser, Role } from '@prisma/client';
 import NextAuth, { DefaultSession, type NextAuthConfig } from 'next-auth';
 import { encode } from 'next-auth/jwt';
-import { prisma } from '../../../prisma';
 import microsoftEntraId from 'next-auth/providers/microsoft-entra-id';
-import { Adapter } from 'next-auth/adapters';
-import { isDevelopment } from '~/lib/utils';
+import { prisma } from '~/data/prisma';
 import { UserService } from '~/services/user.service';
 
 declare module 'next-auth' {
@@ -23,7 +21,7 @@ declare module 'next-auth' {
 }
 
 const authConfig: NextAuthConfig = {
-  adapter: PrismaAdapter(prisma) as Adapter,
+  adapter: PrismaAdapter(prisma),
   session: { strategy: 'database' },
   providers: [
     microsoftEntraId({
@@ -33,20 +31,17 @@ const authConfig: NextAuthConfig = {
           scope: 'openid profile email User.Read User.ReadBasic.All',
         },
       },
-      allowDangerousEmailAccountLinking: isDevelopment(),
     }),
   ],
 
   callbacks: {
-    async jwt({ token, account }) {
-      if (isDevelopment() && account?.provider === 'credentials') {
-        token.credentials = true;
+    async session({ session, user }) {
+      if (session.user) {
+        session.user = { ...session.user, ...user };
       }
-      return token;
+      return session;
     },
     async signIn({ user, profile, account }) {
-      if (isDevelopment() && account?.provider === 'credentials') return true;
-
       if (!profile?.email || !user?.id || !profile.sub) return false;
 
       try {
@@ -149,7 +144,7 @@ const authConfig: NextAuthConfig = {
   },
 
   pages: {
-    signIn: isDevelopment() ? '/u' : '/signin',
+    signIn: '/',
   },
 };
 

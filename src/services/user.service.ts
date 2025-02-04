@@ -2,7 +2,7 @@ import { lorelei } from '@dicebear/collection';
 import { createAvatar } from '@dicebear/core';
 import { Account, AvatarSource, Prisma, Role, User } from '@prisma/client';
 import { notFound } from 'next/navigation';
-import { prisma } from '../../prisma';
+import { prisma } from '../data/prisma';
 import { s3 } from '~/data/s3';
 import { withServiceAuth } from '~/lib/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
