@@ -239,22 +239,4 @@ export const UserService = {
       throw new AppError(ErrorMessage.OPERATION_FAILED);
     }
   },
-
-  async getPaginatedUsers(page: number, limit: number, requestUserId?: string) {
-    if (isDevelopment()) {
-      return await db.user.findMany({
-        orderBy: { createdDate: "desc" },
-        take: limit,
-        skip: page * limit,
-      });
-    }
-
-    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
-      return await db.user.findMany({
-        orderBy: { createdDate: "desc" },
-        take: limit,
-        skip: page * limit,
-      });
-    });
-  },
 };
