@@ -1,5 +1,5 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { AvatarSource, User as PrismaUser, Role } from "@prisma/client";
+import { AvatarSource, User as PrismaUser, Role, User } from "@prisma/client";
 import NextAuth, { DefaultSession, type NextAuthConfig } from "next-auth";
 import { encode } from "next-auth/jwt";
 import credentials from "next-auth/providers/credentials";
@@ -60,7 +60,6 @@ const authConfig: NextAuthConfig = {
     },
     async signIn({ user, profile, account }) {
       if (isDevelopment() && account?.provider === "credentials") return true;
-
       if (!profile?.email || !user?.id || !profile.sub) return false;
 
       try {
@@ -72,57 +71,51 @@ const authConfig: NextAuthConfig = {
 
         if (existingUser) {
           user.id = existingUser.id;
-        }
 
-        const nameMatch = profile.name?.match(
-          /([^,]+),\s*([^\s(]+)\s*\(([^)]+)\)/,
-        );
-        const lastName = nameMatch?.[1]?.trim() ?? "";
-        const firstName = nameMatch?.[2]?.trim() ?? "";
-        const username = nameMatch?.[3]?.trim() ?? "";
-        const fullName = `${firstName} ${lastName}`.trim();
+          const updateData: Partial<PrismaUser> = {
+            lastLogin: new Date(),
+          };
 
-        let avatar = await UserService.generateDefaultAvatar(user.id);
-        let avatarSource: AvatarSource = AvatarSource.DEFAULT;
-
-        if (account?.access_token) {
-          const msAvatar = await UserService.fetchMicrosoftAvatar(
-            account.access_token,
-            user.id,
-          );
-          if (msAvatar) {
-            avatar = msAvatar;
-            avatarSource = AvatarSource.MICROSOFT;
+          if (
+            existingUser.avatarSource === AvatarSource.MICROSOFT &&
+            account?.access_token
+          ) {
+            const msAvatar = await UserService.fetchMicrosoftAvatar(
+              account.access_token,
+              existingUser.id,
+            );
+            if (msAvatar) {
+              updateData.avatar = msAvatar;
+            }
           }
-        }
 
-        if (!existingUser) {
-          await db.user.create({
-            data: {
-              id: user.id,
-              email: profile.email,
-              azureAdId: profile.sub ?? "",
-              username,
-              fullName,
-              firstName,
-              lastName,
-              avatar,
-              avatarSource,
-              role: Role.USER,
-              profile: { create: {} },
-              NotificationPreferences: { create: {} },
-            },
-          });
-        } else {
           await db.user.update({
             where: { id: existingUser.id },
-            data: {
-              lastLogin: new Date(),
-              avatar,
-              avatarSource,
-            },
+            data: updateData,
           });
+
+          return true;
         }
+
+        const { firstName, lastName, username, fullName } = parseUserProfile(
+          profile.name,
+        );
+        const { avatar, avatarSource } = await getUserAvatar(
+          user.id,
+          account?.access_token,
+        );
+
+        await createNewUser({
+          userId: user.id,
+          email: profile.email,
+          azureAdId: profile.sub,
+          firstName,
+          lastName,
+          username,
+          fullName,
+          avatar,
+          avatarSource,
+        });
 
         return true;
       } catch (error) {
@@ -171,5 +164,72 @@ const authConfig: NextAuthConfig = {
     signIn: isDevelopment() ? "/u" : "/signin",
   },
 };
+
+function parseUserProfile(profileName: string | null | undefined) {
+  const nameMatch = profileName?.match(/([^,]+),\s*([^\s(]+)\s*\(([^)]+)\)/);
+  const lastName = nameMatch?.[1]?.trim() ?? "";
+  const firstName = nameMatch?.[2]?.trim() ?? "";
+  const username = nameMatch?.[3]?.trim() ?? "";
+  const fullName = `${firstName} ${lastName}`.trim();
+
+  return { firstName, lastName, username, fullName };
+}
+
+async function getUserAvatar(userId: string, accessToken?: string) {
+  let avatar = await UserService.generateDefaultAvatar(userId);
+  let avatarSource: AvatarSource = AvatarSource.DEFAULT;
+
+  if (accessToken) {
+    const msAvatar = await UserService.fetchMicrosoftAvatar(
+      accessToken,
+      userId,
+    );
+    if (msAvatar) {
+      avatar = msAvatar;
+      avatarSource = AvatarSource.MICROSOFT;
+    }
+  }
+
+  return { avatar, avatarSource };
+}
+
+async function createNewUser({
+  userId,
+  email,
+  azureAdId,
+  firstName,
+  lastName,
+  username,
+  fullName,
+  avatar,
+  avatarSource,
+}: {
+  userId: User["id"];
+  email: User["email"];
+  azureAdId: User["azureAdId"];
+  firstName: User["firstName"];
+  lastName: User["lastName"];
+  username: User["username"];
+  fullName: User["fullName"];
+  avatar: User["avatar"];
+  avatarSource: User["avatarSource"];
+}) {
+  return db.user.create({
+    data: {
+      id: userId,
+      email,
+      azureAdId,
+      username,
+      fullName,
+      firstName,
+      lastName,
+      avatar,
+      avatarSource,
+      role: Role.USER,
+      profile: { create: {} },
+      NotificationPreferences: { create: {} },
+    },
+  });
+}
 
 export const { auth, handlers, signIn, signOut } = NextAuth(authConfig);
