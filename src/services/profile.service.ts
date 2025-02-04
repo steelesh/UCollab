@@ -3,168 +3,135 @@ import { notFound } from "next/navigation";
 import { db } from "../data/mysql";
 import { withServiceAuth } from "../lib/auth/protected-service";
 import { ErrorMessage } from "../lib/constants";
-import { AppError, AuthorizationError } from "../lib/errors/app-error";
-import { Permission } from "../lib/permissions";
+import { AppError } from "../lib/errors/app-error";
 import {
   UpdateProfileInput,
   profileSelect,
   updateProfileSchema,
 } from "../schemas/profile.schema";
-import { UserService } from "./user.service";
 
 export const ProfileService = {
+  // Owner or admin can view profile
   async getProfile(userId: User["id"], requestUserId: string) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.VIEW_ANY_PROFILE,
-      async () => {
-        try {
-          if (
-            !(await UserService.canAccessContent(
-              requestUserId,
-              userId,
-              Permission.VIEW_ANY_PROFILE,
-            ))
-          ) {
-            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-          }
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
+      try {
+        const profile = await db.profile.findUnique({
+          where: { userId },
+          select: profileSelect,
+        });
 
-          const profile = await db.profile.findUnique({
-            where: { userId },
-            select: profileSelect,
-          });
-
-          if (!profile) notFound();
-          return profile;
-        } catch (error) {
-          if (error instanceof AppError) throw error;
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
+        if (!profile) notFound();
+        return profile;
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
+  // Owner or admin can update profile
   async updateProfile(
     userId: User["id"],
     data: UpdateProfileInput,
     requestUserId: string,
   ) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.UPDATE_ANY_PROFILE,
-      async () => {
-        try {
-          if (
-            !(await UserService.canAccessContent(
-              requestUserId,
-              userId,
-              Permission.UPDATE_ANY_PROFILE,
-            ))
-          ) {
-            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-          }
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
+      try {
+        return await db.$transaction(async (tx) => {
+          const profile = await tx.profile.findUnique({
+            where: { userId },
+            select: { id: true },
+          });
 
-          return await db.$transaction(async (tx) => {
-            const profile = await tx.profile.findUnique({
-              where: { userId },
-              select: { id: true },
-            });
+          if (!profile) notFound();
 
-            if (!profile) notFound();
-
-            const verifiedSkills = data.skills?.length
-              ? await tx.skill.findMany({
-                  where: {
-                    AND: [
-                      { verified: true },
-                      {
-                        name: {
-                          in: data.skills.map((name) =>
-                            name.toLowerCase().trim(),
-                          ),
-                        },
+          const verifiedSkills = data.skills?.length
+            ? await tx.skill.findMany({
+                where: {
+                  AND: [
+                    { verified: true },
+                    {
+                      name: {
+                        in: data.skills.map((name) =>
+                          name.toLowerCase().trim(),
+                        ),
                       },
-                    ],
-                  },
-                  select: { name: true },
-                })
-              : [];
+                    },
+                  ],
+                },
+                select: { name: true },
+              })
+            : [];
 
-            const validatedData = updateProfileSchema.parse({
-              ...data,
-              skills: verifiedSkills.map((s) => s.name),
-            });
-
-            return tx.profile.update({
-              where: { userId },
-              data: validatedData,
-              select: profileSelect,
-            });
+          const validatedData = updateProfileSchema.parse({
+            ...data,
+            skills: verifiedSkills.map((s) => s.name),
           });
-        } catch (error) {
-          if (error instanceof AppError) throw error;
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2025") notFound();
-            throw new AppError(ErrorMessage.INVALID_INPUT);
-          }
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
-  },
 
-  async getAllProfiles(requestUserId: string, page = 1, limit = 10) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.VIEW_ANY_PROFILE,
-      async () => {
-        try {
-          return await db.profile.findMany({
-            skip: (page - 1) * limit,
-            take: limit,
+          return tx.profile.update({
+            where: { userId },
+            data: validatedData,
             select: profileSelect,
-            orderBy: { lastModifiedDate: "desc" },
           });
-        } catch (error) {
-          if (error instanceof AppError) throw error;
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          if (error.code === "P2025") notFound();
+          throw new AppError(ErrorMessage.INVALID_INPUT);
         }
-      },
-    );
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
+  // Admin only - view all profiles
+  async getAllProfiles(requestUserId: string, page = 1, limit = 10) {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
+      try {
+        return await db.profile.findMany({
+          skip: (page - 1) * limit,
+          take: limit,
+          select: profileSelect,
+          orderBy: { lastModifiedDate: "desc" },
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  // Admin only - search profiles
   async searchProfiles(
     query: string,
     requestUserId: string,
     page = 1,
     limit = 10,
   ) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.VIEW_ANY_PROFILE,
-      async () => {
-        try {
-          return await db.profile.findMany({
-            where: {
-              OR: [
-                { user: { username: { contains: query } } },
-                { user: { fullName: { contains: query } } },
-                { skills: { some: { name: { contains: query } } } },
-              ],
-            },
-            skip: (page - 1) * limit,
-            take: limit,
-            select: profileSelect,
-            orderBy: { lastModifiedDate: "desc" },
-          });
-        } catch (error) {
-          if (error instanceof AppError) throw error;
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
+      try {
+        return await db.profile.findMany({
+          where: {
+            OR: [
+              { user: { username: { contains: query } } },
+              { user: { fullName: { contains: query } } },
+              { skills: { some: { name: { contains: query } } } },
+            ],
+          },
+          skip: (page - 1) * limit,
+          take: limit,
+          select: profileSelect,
+          orderBy: { lastModifiedDate: "desc" },
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
+  // Public method - no auth needed
   async getPublicProfile(username: string) {
     try {
       const profile = await db.profile.findFirst({

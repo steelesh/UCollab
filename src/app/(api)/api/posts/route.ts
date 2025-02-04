@@ -1,10 +1,9 @@
 import { withApiAuth } from "@/src/lib/auth/protected-api";
-import { Permission } from "@/src/lib/permissions";
 import { PostService } from "@/src/services/post.service";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
-  return withApiAuth(req, Permission.VIEW_POSTS, async (userId) => {
+  return withApiAuth(null, async (userId) => {
     const searchParams = req.nextUrl.searchParams;
     const page = parseInt(searchParams.get("page") ?? "1");
     const limit = parseInt(searchParams.get("limit") ?? "20");

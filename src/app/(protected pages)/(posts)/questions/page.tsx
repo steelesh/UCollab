@@ -1,9 +1,12 @@
+import { withAuth } from "@/src/lib/auth/protected";
 import { type Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "questions",
 };
 
-export default function Page() {
-  return <div>questions</div>;
+async function Page({ userId }: { userId: string }) {
+  return <div>questions for user {userId}</div>;
 }
+
+export default withAuth(Page);

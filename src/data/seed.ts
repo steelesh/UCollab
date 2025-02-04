@@ -22,7 +22,7 @@ export async function seedDatabase() {
     const adminAzureId = "local-dev";
     const admin = await db.user.create({
       data: {
-        ...generateUCUser(),
+        ...generateUCUser(0),
         username: "admin",
         email: "admin@ucollab.xyz",
         firstName: "Admin",
@@ -73,7 +73,7 @@ async function createTestUsers(allSkills: Skill[]) {
   const azureId = faker.string.uuid();
   await db.user.create({
     data: {
-      ...generateUCUser(),
+      ...generateUCUser(0),
       onboardingStep: OnboardingStep.STEP_ONE,
       avatar: await UserService.generateDefaultAvatar(azureId),
       avatarSource: AvatarSource.DEFAULT,
@@ -89,7 +89,7 @@ async function createTestUsers(allSkills: Skill[]) {
     const azureId = faker.string.uuid();
     await db.user.create({
       data: {
-        ...generateUCUser(),
+        ...generateUCUser(i + 1),
         onboardingStep: OnboardingStep.COMPLETE,
         avatar: await UserService.generateDefaultAvatar(azureId),
         avatarSource: AvatarSource.DEFAULT,
@@ -213,13 +213,12 @@ async function clearDatabase() {
   ]);
 }
 
-function generateUCUser() {
+function generateUCUser(index: number) {
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
-  const randomLetter = faker.string.alpha({ length: 1, casing: "lower" });
 
   const usernameBase = lastName.toLowerCase().replace(/[^a-zA-Z0-9._-]/g, "");
-  const username = `${usernameBase}${firstName[0].toLowerCase()}${randomLetter}`;
+  const username = `${usernameBase}${firstName[0].toLowerCase()}${index}`;
   const domain = faker.helpers.arrayElement(UC_DOMAINS);
 
   return {

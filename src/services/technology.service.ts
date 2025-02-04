@@ -4,7 +4,6 @@ import { db } from "../data/mysql";
 import { withServiceAuth } from "../lib/auth/protected-service";
 import { ErrorMessage } from "../lib/constants";
 import { AppError } from "../lib/errors/app-error";
-import { Permission } from "../lib/permissions";
 import {
   CreateTechnologyInput,
   SuggestTechnologyInput,
@@ -65,162 +64,158 @@ export const TechnologyService = {
     }
   },
 
+  // Admin only - creating verified technologies
   async createTechnology(data: CreateTechnologyInput, requestUserId: string) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.CREATE_TECHNOLOGY,
-      async () => {
-        try {
-          const normalizedName = data.name.toLowerCase().trim();
-          const existingTechnology = await db.technology.findUnique({
-            where: { name: normalizedName },
-            select: technologySelect,
-          });
-
-          if (existingTechnology) return existingTechnology;
-
-          return await db.technology.create({
-            data: {
-              name: normalizedName,
-              verified: true,
-              createdById: requestUserId,
-            },
-            select: technologySelect,
-          });
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2002") {
-              throw new AppError(`Technology "${data.name}" already exists`);
-            }
-          }
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
-  },
-
-  async suggestTechnology(data: SuggestTechnologyInput, requestUserId: string) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.SUGGEST_TECHNOLOGY,
-      async () => {
-        try {
-          const normalizedName = data.name.toLowerCase().trim();
-          const existing = await db.technology.findUnique({
-            where: { name: normalizedName },
-            select: technologySelect,
-          });
-
-          if (existing) {
-            if (existing.verified) return existing;
-            throw new AppError(
-              "Technology already suggested and pending review",
-            );
-          }
-
-          return await db.technology.create({
-            data: {
-              name: normalizedName,
-              verified: false,
-              createdById: requestUserId,
-            },
-            select: technologySelect,
-          });
-        } catch (error) {
-          if (error instanceof AppError) throw error;
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
-  },
-
-  async verifyTechnology(id: string, requestUserId: string) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.UPDATE_TECHNOLOGY,
-      async () => {
-        try {
-          return await db.technology.update({
-            where: { id },
-            data: { verified: true },
-            select: technologySelect,
-          });
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2025") notFound();
-          }
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
-  },
-
-  async getPendingTechnologies(requestUserId: string, page = 1, limit = 20) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.VIEW_TECHNOLOGIES,
-      async () => {
-        try {
-          return await db.technology.findMany({
-            where: { verified: false },
-            select: technologySelect,
-            orderBy: { createdDate: "desc" },
-            skip: (page - 1) * limit,
-            take: limit,
-          });
-        } catch {
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
-  },
-
-  async updatePostTechnologies(postId: Post["id"], technologies: string[]) {
-    try {
-      return await db.$transaction(async (tx) => {
-        const post = await tx.post.findUnique({
-          where: { id: postId },
-          select: { id: true },
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
+      try {
+        const normalizedName = data.name.toLowerCase().trim();
+        const existingTechnology = await db.technology.findUnique({
+          where: { name: normalizedName },
+          select: technologySelect,
         });
 
-        if (!post) notFound();
+        if (existingTechnology) return existingTechnology;
 
-        const verifiedTechs = await tx.technology.findMany({
-          where: {
-            AND: [
-              { verified: true },
-              { name: { in: technologies.map((t) => t.toLowerCase().trim()) } },
-            ],
-          },
-          select: { name: true },
-        });
-
-        return tx.post.update({
-          where: { id: postId },
+        return await db.technology.create({
           data: {
-            technologies: {
-              set: verifiedTechs.map(({ name }) => ({ name })),
-            },
+            name: normalizedName,
+            verified: true,
+            createdById: requestUserId,
           },
-          select: {
-            id: true,
-            technologies: {
-              select: {
-                id: true,
-                name: true,
+          select: technologySelect,
+        });
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          if (error.code === "P2002") {
+            throw new AppError(`Technology "${data.name}" already exists`);
+          }
+        }
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  // Authenticated users can suggest
+  async suggestTechnology(data: SuggestTechnologyInput, requestUserId: string) {
+    return withServiceAuth(requestUserId, null, async () => {
+      try {
+        const normalizedName = data.name.toLowerCase().trim();
+        const existing = await db.technology.findUnique({
+          where: { name: normalizedName },
+          select: technologySelect,
+        });
+
+        if (existing) {
+          if (existing.verified) return existing;
+          throw new AppError("Technology already suggested and pending review");
+        }
+
+        return await db.technology.create({
+          data: {
+            name: normalizedName,
+            verified: false,
+            createdById: requestUserId,
+          },
+          select: technologySelect,
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  // Admin only - verifying technologies
+  async verifyTechnology(id: string, requestUserId: string) {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
+      try {
+        return await db.technology.update({
+          where: { id },
+          data: { verified: true },
+          select: technologySelect,
+        });
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          if (error.code === "P2025") notFound();
+        }
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  // Admin only - viewing pending technologies
+  async getPendingTechnologies(requestUserId: string, page = 1, limit = 20) {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
+      try {
+        return await db.technology.findMany({
+          where: { verified: false },
+          select: technologySelect,
+          orderBy: { createdDate: "desc" },
+          skip: (page - 1) * limit,
+          take: limit,
+        });
+      } catch {
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  // Post owner or admin can update technologies
+  async updatePostTechnologies(
+    postId: Post["id"],
+    technologies: string[],
+    requestUserId: string,
+  ) {
+    return withServiceAuth(requestUserId, { ownerId: postId }, async () => {
+      try {
+        return await db.$transaction(async (tx) => {
+          const post = await tx.post.findUnique({
+            where: { id: postId },
+            select: { id: true },
+          });
+
+          if (!post) notFound();
+
+          const verifiedTechs = await tx.technology.findMany({
+            where: {
+              AND: [
+                { verified: true },
+                {
+                  name: { in: technologies.map((t) => t.toLowerCase().trim()) },
+                },
+              ],
+            },
+            select: { name: true },
+          });
+
+          return tx.post.update({
+            where: { id: postId },
+            data: {
+              technologies: {
+                set: verifiedTechs.map(({ name }) => ({ name })),
               },
             },
-          },
+            select: {
+              id: true,
+              technologies: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          });
         });
-      });
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === "P2025") notFound();
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          if (error.code === "P2025") notFound();
+        }
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
       }
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
-    }
+    });
   },
 
+  // Public method - no auth needed
   async getPostTechnologies(postId: string) {
     try {
       const post = await db.post.findUnique({

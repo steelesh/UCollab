@@ -1,9 +1,12 @@
+import { withOnboarding } from "@/src/lib/auth/protected";
 import { type Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "onboarding",
 };
 
-export default function Page() {
-  return <div>onboarding</div>;
+async function Page({ userId }: { userId: string }) {
+  return <div>onboarding for user {userId}</div>;
 }
+
+export default withOnboarding(Page);

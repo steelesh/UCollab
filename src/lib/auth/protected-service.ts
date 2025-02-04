@@ -1,26 +1,39 @@
 import { UserService } from "@/src/services/user.service";
+import { Role } from "@prisma/client";
 import { ErrorMessage } from "../constants";
 import {
   AppError,
   AuthenticationError,
   AuthorizationError,
 } from "../errors/app-error";
-import { Permission, hasPermission } from "../permissions";
+import { canAccess } from "../permissions";
+
+type ResourceCheck = {
+  ownerId?: string;
+  adminOnly?: boolean;
+};
 
 export async function withServiceAuth<T>(
   requestUserId: string | undefined,
-  permission: Permission | null,
+  resourceCheck: ResourceCheck | null,
   action: () => Promise<T>,
 ): Promise<T> {
   if (!requestUserId) {
     throw new AuthenticationError();
   }
 
-  if (permission) {
+  if (resourceCheck) {
     const userRole = await UserService.getUserRole(requestUserId);
 
-    if (!hasPermission(userRole, permission)) {
-      throw new AuthorizationError(ErrorMessage.MISSING_PERMISSION(permission));
+    if (resourceCheck.adminOnly && userRole !== Role.ADMIN) {
+      throw new AuthorizationError(ErrorMessage.INSUFFICIENT_ROLE);
+    }
+
+    if (
+      resourceCheck.ownerId &&
+      !canAccess(requestUserId, resourceCheck.ownerId, userRole)
+    ) {
+      throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
     }
   }
 

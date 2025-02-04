@@ -3,19 +3,18 @@ import { notFound } from "next/navigation";
 import { db } from "../data/mysql";
 import { withServiceAuth } from "../lib/auth/protected-service";
 import { ErrorMessage } from "../lib/constants";
-import { AppError, AuthorizationError } from "../lib/errors/app-error";
-import { Permission } from "../lib/permissions";
+import { AppError } from "../lib/errors/app-error";
 import {
   CreatePostInput,
   UpdatePostInput,
   postSelect,
   updatePostSchema,
 } from "../schemas/post.schema";
-import { UserService } from "./user.service";
 
 export const PostService = {
+  // Authenticated users can view posts
   async getAllPosts(requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+    return withServiceAuth(requestUserId, null, async () => {
       try {
         return await db.post.findMany({
           select: postSelect,
@@ -29,7 +28,7 @@ export const PostService = {
   },
 
   async getPostById(id: Post["id"], requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+    return withServiceAuth(requestUserId, null, async () => {
       try {
         const post = await db.post.findUnique({
           where: { id },
@@ -63,77 +62,62 @@ export const PostService = {
     });
   },
 
+  // Owner only - creating posts
   async createPost(data: CreatePostInput, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.CREATE_POST, async () => {
-      try {
-        if (
-          !(await UserService.canAccessContent(
-            requestUserId,
-            data.userId,
-            Permission.CREATE_POST,
-          ))
-        ) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
-        return await db.$transaction(async (tx) => {
-          const { technologies: techNames, ...postData } = data;
-
-          const verifiedTechs = techNames?.length
-            ? await tx.technology.findMany({
-                where: {
-                  AND: [
-                    { verified: true },
-                    {
-                      name: {
-                        in: techNames.map((t) => t.toLowerCase().trim()),
-                      },
-                    },
-                  ],
-                },
-                select: { name: true },
-              })
-            : [];
-
-          return tx.post.create({
-            data: {
-              ...postData,
-              createdById: data.userId,
-              technologies: verifiedTechs.length
-                ? { connect: verifiedTechs.map(({ name }) => ({ name })) }
-                : undefined,
-            },
-            select: postSelect,
-          });
-        });
-      } catch (error) {
-        if (error instanceof AppError) throw error;
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          throw new AppError(ErrorMessage.INVALID_INPUT);
-        }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
-      }
-    });
-  },
-
-  async updatePost(data: UpdatePostInput, requestUserId: string) {
     return withServiceAuth(
       requestUserId,
-      Permission.UPDATE_ANY_POST,
+      { ownerId: data.userId },
       async () => {
         try {
-          const post = await this.getPostById(data.id, requestUserId);
+          return await db.$transaction(async (tx) => {
+            const { technologies: techNames, ...postData } = data;
 
-          if (
-            !(await UserService.canAccessContent(
-              requestUserId,
-              post.createdById,
-              Permission.UPDATE_ANY_POST,
-            ))
-          ) {
-            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
+            const verifiedTechs = techNames?.length
+              ? await tx.technology.findMany({
+                  where: {
+                    AND: [
+                      { verified: true },
+                      {
+                        name: {
+                          in: techNames.map((t) => t.toLowerCase().trim()),
+                        },
+                      },
+                    ],
+                  },
+                  select: { name: true },
+                })
+              : [];
+
+            return tx.post.create({
+              data: {
+                ...postData,
+                createdById: data.userId,
+                technologies: verifiedTechs.length
+                  ? { connect: verifiedTechs.map(({ name }) => ({ name })) }
+                  : undefined,
+              },
+              select: postSelect,
+            });
+          });
+        } catch (error) {
+          if (error instanceof AppError) throw error;
+          if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            throw new AppError(ErrorMessage.INVALID_INPUT);
           }
+          throw new AppError(ErrorMessage.OPERATION_FAILED);
+        }
+      },
+    );
+  },
 
+  // Owner or admin - updating posts
+  async updatePost(data: UpdatePostInput, requestUserId: string) {
+    const post = await this.getPostById(data.id, requestUserId);
+    return withServiceAuth(
+      requestUserId,
+      { ownerId: post.createdById },
+      async () => {
+        try {
           return await db.$transaction(async (tx) => {
             const verifiedTechs = data.technologies?.length
               ? await tx.technology.findMany({
@@ -176,28 +160,18 @@ export const PostService = {
     );
   },
 
+  // Owner or admin - updating post status
   async updatePostStatus(
     id: Post["id"],
     status: Post["status"],
     requestUserId: string,
   ) {
+    const post = await this.getPostById(id, requestUserId);
     return withServiceAuth(
       requestUserId,
-      Permission.UPDATE_ANY_POST,
+      { ownerId: post.createdById },
       async () => {
         try {
-          const post = await this.getPostById(id, requestUserId);
-
-          if (
-            !(await UserService.canAccessContent(
-              requestUserId,
-              post.createdById,
-              Permission.UPDATE_ANY_POST,
-            ))
-          ) {
-            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-          }
-
           return await db.post.update({
             where: { id },
             data: { status },
@@ -218,24 +192,14 @@ export const PostService = {
     );
   },
 
+  // Owner or admin - deleting posts
   async deletePost(id: Post["id"], requestUserId: string) {
+    const post = await this.getPostById(id, requestUserId);
     return withServiceAuth(
       requestUserId,
-      Permission.DELETE_ANY_POST,
+      { ownerId: post.createdById },
       async () => {
         try {
-          const post = await this.getPostById(id, requestUserId);
-
-          if (
-            !(await UserService.canAccessContent(
-              requestUserId,
-              post.createdById,
-              Permission.DELETE_ANY_POST,
-            ))
-          ) {
-            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-          }
-
           await db.post.delete({ where: { id } });
         } catch (error) {
           if (error instanceof AppError) throw error;
@@ -248,13 +212,14 @@ export const PostService = {
     );
   },
 
+  // Authenticated users - searching and filtering posts
   async searchPosts(
     query: string,
     requestUserId: string,
     page = 1,
     limit = 20,
   ) {
-    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+    return withServiceAuth(requestUserId, null, async () => {
       try {
         return await db.post.findMany({
           where: {
@@ -275,7 +240,7 @@ export const PostService = {
   },
 
   async getPostsByUser(userId: string, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+    return withServiceAuth(requestUserId, null, async () => {
       try {
         return await db.post.findMany({
           where: { createdById: userId },
@@ -290,7 +255,7 @@ export const PostService = {
   },
 
   async getPostsByTechnology(techName: string, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+    return withServiceAuth(requestUserId, null, async () => {
       try {
         return await db.post.findMany({
           where: {
@@ -313,7 +278,7 @@ export const PostService = {
     matchAll: boolean = false,
     requestUserId: string,
   ) {
-    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+    return withServiceAuth(requestUserId, null, async () => {
       try {
         return await db.post.findMany({
           where: {
@@ -344,7 +309,7 @@ export const PostService = {
     limit: number = 20,
     requestUserId: string,
   ) {
-    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+    return withServiceAuth(requestUserId, null, async () => {
       try {
         return await db.post.findMany({
           select: postSelect,

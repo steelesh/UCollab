@@ -11,8 +11,8 @@ import { mq } from "../data/mq";
 import { db } from "../data/mysql";
 import { withServiceAuth } from "../lib/auth/protected-service";
 import { ErrorMessage } from "../lib/constants";
-import { AppError, AuthorizationError } from "../lib/errors/app-error";
-import { Permission } from "../lib/permissions";
+import { AppError } from "../lib/errors/app-error";
+import { canAccess } from "../lib/permissions";
 import {
   CreateBatchNotificationData,
   CreateNotificationData,
@@ -23,32 +23,18 @@ import { UserService } from "./user.service";
 
 export const NotificationService = {
   async getUserNotifications(userId: User["id"], requestUserId: string) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.VIEW_ANY_NOTIFICATION,
-      async () => {
-        try {
-          if (
-            !(await UserService.canAccessContent(
-              requestUserId,
-              userId,
-              Permission.VIEW_ANY_NOTIFICATION,
-            ))
-          ) {
-            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-          }
-
-          return await db.notification.findMany({
-            where: { userId },
-            select: notificationSelect,
-            orderBy: { createdDate: "desc" },
-          });
-        } catch (error) {
-          if (error instanceof AppError) throw error;
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
+      try {
+        return await db.notification.findMany({
+          where: { userId },
+          select: notificationSelect,
+          orderBy: { createdDate: "desc" },
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
   async getUserNotificationsByStatus(
@@ -56,32 +42,18 @@ export const NotificationService = {
     isRead: boolean,
     requestUserId: string,
   ) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.VIEW_ANY_NOTIFICATION,
-      async () => {
-        try {
-          if (
-            !(await UserService.canAccessContent(
-              requestUserId,
-              userId,
-              Permission.VIEW_ANY_NOTIFICATION,
-            ))
-          ) {
-            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-          }
-
-          return await db.notification.findMany({
-            where: { userId, isRead },
-            select: notificationSelect,
-            orderBy: { createdDate: "desc" },
-          });
-        } catch (error) {
-          if (error instanceof AppError) throw error;
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
+      try {
+        return await db.notification.findMany({
+          where: { userId, isRead },
+          select: notificationSelect,
+          orderBy: { createdDate: "desc" },
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
   async getPaginatedNotifications(
@@ -90,187 +62,123 @@ export const NotificationService = {
     limit: number = 20,
     requestUserId: string,
   ) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.VIEW_ANY_NOTIFICATION,
-      async () => {
-        try {
-          if (
-            !(await UserService.canAccessContent(
-              requestUserId,
-              userId,
-              Permission.VIEW_ANY_NOTIFICATION,
-            ))
-          ) {
-            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-          }
-
-          return await db.notification.findMany({
-            where: { userId },
-            select: notificationSelect,
-            skip: (page - 1) * limit,
-            take: limit,
-            orderBy: { createdDate: "desc" },
-          });
-        } catch (error) {
-          if (error instanceof AppError) throw error;
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
+      try {
+        return await db.notification.findMany({
+          where: { userId },
+          select: notificationSelect,
+          skip: (page - 1) * limit,
+          take: limit,
+          orderBy: { createdDate: "desc" },
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
   async getNotificationsCount(userId: User["id"], requestUserId: string) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.VIEW_ANY_NOTIFICATION,
-      async () => {
-        try {
-          if (
-            !(await UserService.canAccessContent(
-              requestUserId,
-              userId,
-              Permission.VIEW_ANY_NOTIFICATION,
-            ))
-          ) {
-            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-          }
-
-          return await db.notification.count({
-            where: { userId },
-          });
-        } catch (error) {
-          if (error instanceof AppError) throw error;
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
+      try {
+        return await db.notification.count({
+          where: { userId },
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
   async getUnreadNotificationsCount(userId: User["id"], requestUserId: string) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.VIEW_ANY_NOTIFICATION,
-      async () => {
-        try {
-          if (
-            !(await UserService.canAccessContent(
-              requestUserId,
-              userId,
-              Permission.VIEW_ANY_NOTIFICATION,
-            ))
-          ) {
-            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-          }
-
-          return await db.notification.count({
-            where: { userId, isRead: false },
-          });
-        } catch (error) {
-          if (error instanceof AppError) throw error;
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
+      try {
+        return await db.notification.count({
+          where: { userId, isRead: false },
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
   async markNotificationAsRead(id: Notification["id"], requestUserId: string) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.UPDATE_ANY_NOTIFICATION,
-      async () => {
-        try {
-          const notification = await db.notification.findUnique({
-            where: { id },
-            select: { id: true, userId: true },
-          });
+    try {
+      const notification = await db.notification.findUnique({
+        where: { id },
+        select: { id: true, userId: true },
+      });
 
-          if (!notification) {
-            throw new AppError(ErrorMessage.NOT_FOUND("Notification"));
-          }
+      if (!notification) {
+        throw new AppError(ErrorMessage.NOT_FOUND("Notification"));
+      }
 
-          if (
-            !(await UserService.canAccessContent(
-              requestUserId,
-              notification.userId,
-              Permission.UPDATE_ANY_NOTIFICATION,
-            ))
-          ) {
-            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-          }
-
+      return withServiceAuth(
+        requestUserId,
+        { ownerId: notification.userId },
+        async () => {
           return await db.notification.update({
             where: { id },
             data: { isRead: true },
             select: notificationSelect,
           });
-        } catch (error) {
-          if (error instanceof AppError) throw error;
-          if (
-            error instanceof Prisma.PrismaClientKnownRequestError &&
-            error.code === "P2025"
-          ) {
-            throw new AppError(ErrorMessage.NOT_FOUND("Notification"));
-          }
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
+        },
+      );
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      ) {
+        throw new AppError(ErrorMessage.NOT_FOUND("Notification"));
+      }
+      throw new AppError(ErrorMessage.OPERATION_FAILED);
+    }
   },
 
   async markAllNotificationsAsRead(userId: User["id"], requestUserId: string) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.UPDATE_ANY_NOTIFICATION,
-      async () => {
-        try {
-          if (
-            !(await UserService.canAccessContent(
-              requestUserId,
-              userId,
-              Permission.UPDATE_ANY_NOTIFICATION,
-            ))
-          ) {
-            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-          }
-
-          return await db.notification.updateMany({
-            where: { userId, isRead: false },
-            data: { isRead: true },
-          });
-        } catch (error) {
-          if (error instanceof AppError) throw error;
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
+      try {
+        return await db.notification.updateMany({
+          where: { userId, isRead: false },
+          data: { isRead: true },
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
   async markMultipleNotificationsAsRead(
     notificationIds: Notification["id"][],
     requestUserId: string,
   ) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.UPDATE_OWN_NOTIFICATION,
-      async () => {
-        try {
-          const notifications = await db.notification.findMany({
-            where: { id: { in: notificationIds } },
-            select: { id: true, userId: true },
-          });
+    try {
+      // First get all notifications to check ownership
+      const notifications = await db.notification.findMany({
+        where: { id: { in: notificationIds } },
+        select: { id: true, userId: true },
+      });
+
+      // Get the first notification's userId for the initial auth check
+      const firstNotification = notifications[0];
+      if (!firstNotification) {
+        throw new AppError(ErrorMessage.NOT_FOUND("Notifications"));
+      }
+
+      return withServiceAuth(
+        requestUserId,
+        { ownerId: firstNotification.userId },
+        async () => {
+          // Then verify access to all notifications
+          const userRole = await UserService.getUserRole(requestUserId);
 
           for (const notification of notifications) {
-            if (
-              !(await UserService.canAccessContent(
-                requestUserId,
-                notification.userId,
-                Permission.UPDATE_OWN_NOTIFICATION,
-              ))
-            ) {
-              throw new AuthorizationError(
-                ErrorMessage.INSUFFICIENT_PERMISSIONS,
-              );
+            if (!canAccess(requestUserId, notification.userId, userRole)) {
+              throw new AppError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
             }
           }
 
@@ -278,12 +186,12 @@ export const NotificationService = {
             where: { id: { in: notificationIds } },
             data: { isRead: true },
           });
-        } catch (error) {
-          if (error instanceof AppError) throw error;
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
+        },
+      );
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      throw new AppError(ErrorMessage.OPERATION_FAILED);
+    }
   },
 
   async queueNotification(data: CreateNotificationData): Promise<void> {
@@ -305,7 +213,7 @@ export const NotificationService = {
   },
 
   async cleanupOldNotifications(daysToKeep: number = 30): Promise<void> {
-    return withServiceAuth(undefined, Permission.ACCESS_ADMIN, async () => {
+    return withServiceAuth(undefined, { adminOnly: true }, async () => {
       try {
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);

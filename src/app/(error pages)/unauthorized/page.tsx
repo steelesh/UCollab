@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/src/components/ui/card";
+import { P } from "@/src/components/ui/p";
 import { ShieldAlert } from "lucide-react";
 import Link from "next/link";
 
@@ -20,8 +21,7 @@ export default function UnauthorizedPage() {
           <CardTitle className="text-2xl">Access Denied</CardTitle>
         </CardHeader>
         <CardContent className="text-muted-foreground text-center">
-          <p>You don&apos;t have permission to access this page.</p>
-          <p>Please contact an administrator if you think this is a mistake.</p>
+          <P>You don&apos;t have permission to access this page.</P>
         </CardContent>
         <CardFooter className="flex justify-center">
           <Button asChild variant="default">

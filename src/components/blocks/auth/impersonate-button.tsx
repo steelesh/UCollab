@@ -13,7 +13,7 @@ export function ImpersonateButton({ userId }: { userId: User["id"] }) {
     setIsPending(true);
     try {
       await signOut({ redirect: false });
-      await signIn("credentials", { userId });
+      await signIn("credentials", { userId, redirectTo: "/onboarding" });
     } finally {
       setIsPending(false);
     }

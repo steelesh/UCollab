@@ -6,8 +6,7 @@ import { db } from "../data/mysql";
 import { s3 } from "../data/s3";
 import { withServiceAuth } from "../lib/auth/protected-service";
 import { ErrorMessage } from "../lib/constants";
-import { AppError, AuthorizationError } from "../lib/errors/app-error";
-import { hasPermission, Permission } from "../lib/permissions";
+import { AppError } from "../lib/errors/app-error";
 import { isDevelopment } from "../lib/utils";
 import {
   publicUserSelect,
@@ -31,48 +30,30 @@ export const UserService = {
   },
 
   async getHomePageUser(userId: string, requestUserId: string) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.VIEW_OWN_PROFILE,
-      async () => {
-        try {
-          if (
-            !(await this.canAccessContent(
-              requestUserId,
-              userId,
-              Permission.VIEW_OWN_PROFILE,
-            ))
-          ) {
-            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-          }
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
+      try {
+        const user = await db.user.findUnique({
+          where: { id: userId },
+          select: userSelect,
+        });
 
-          const user = await db.user.findUnique({
-            where: { id: userId },
-            select: userSelect,
-          });
-
-          if (!user) notFound();
-          return user;
-        } catch (error) {
-          if (error instanceof AppError) throw error;
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
+        if (!user) notFound();
+        return user;
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
-  async getUsers(userId?: string): Promise<User[]> {
+  async getUsers(requestUserId?: string) {
     if (isDevelopment()) {
       return await db.user.findMany({
         orderBy: { createdDate: "desc" },
       });
     }
 
-    if (!userId) {
-      throw new AuthorizationError(ErrorMessage.AUTHENTICATION_REQUIRED);
-    }
-
-    return withServiceAuth(userId, Permission.VIEW_USERS_LIST, async () => {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
       return await db.user.findMany({
         orderBy: { createdDate: "desc" },
       });
@@ -80,26 +61,22 @@ export const UserService = {
   },
 
   async searchUsers(query: string, requestUserId: string, limit = 5) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.VIEW_USERS_LIST,
-      async () => {
-        try {
-          return await db.user.findMany({
-            where: { username: { startsWith: query.toLowerCase().trim() } },
-            select: publicUserSelect,
-            take: limit,
-            orderBy: { username: "asc" },
-          });
-        } catch {
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
-        }
-      },
-    );
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
+      try {
+        return await db.user.findMany({
+          where: { username: { startsWith: query.toLowerCase().trim() } },
+          select: publicUserSelect,
+          take: limit,
+          orderBy: { username: "asc" },
+        });
+      } catch {
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
   async getAdminUserDetails(userId: User["id"], requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_USERS, async () => {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
       try {
         const user = await db.user.findUnique({
           where: { id: userId },
@@ -123,16 +100,12 @@ export const UserService = {
     newRole: Role,
     requestUserId: string,
   ) {
-    return withServiceAuth(requestUserId, Permission.MANAGE_ROLES, async () => {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
       try {
         return await db.user.update({
           where: { id: userId },
           data: { role: newRole },
-          select: {
-            id: true,
-            username: true,
-            role: true,
-          },
+          select: { id: true, username: true, role: true },
         });
       } catch {
         throw new AppError(ErrorMessage.OPERATION_FAILED);
@@ -141,22 +114,18 @@ export const UserService = {
   },
 
   async deleteUser(userId: User["id"], requestUserId: string) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.DELETE_ANY_USER,
-      async () => {
-        try {
-          await db.$transaction(async (tx) => {
-            return tx.user.delete({ where: { id: userId } });
-          });
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2025") notFound();
-          }
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
+      try {
+        await db.$transaction(async (tx) => {
+          return tx.user.delete({ where: { id: userId } });
+        });
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          if (error.code === "P2025") notFound();
         }
-      },
-    );
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
   async updateUser(
@@ -164,45 +133,31 @@ export const UserService = {
     data: UpdateUserInput,
     requestUserId: string,
   ) {
-    return withServiceAuth(
-      requestUserId,
-      Permission.UPDATE_ANY_USER,
-      async () => {
-        try {
-          if (
-            !(await this.canAccessContent(
-              requestUserId,
-              userId,
-              Permission.UPDATE_ANY_USER,
-            ))
-          ) {
-            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-          }
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
+      try {
+        const { avatar: avatarFile, ...updateFields } = data;
+        const updates: Prisma.UserUpdateInput = { ...updateFields };
 
-          const { avatar: avatarFile, ...updateFields } = data;
-          const updates: Prisma.UserUpdateInput = { ...updateFields };
-
-          if (avatarFile !== undefined) {
-            updates.avatar = await this.processUserAvatar(avatarFile, userId);
-            updates.avatarSource = updates.avatar
-              ? AvatarSource.UPLOAD
-              : AvatarSource.DEFAULT;
-          }
-
-          return await db.user.update({
-            where: { id: userId },
-            data: updates,
-            select: userSelect,
-          });
-        } catch (error) {
-          if (error instanceof AppError) throw error;
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2025") notFound();
-          }
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (avatarFile !== undefined) {
+          updates.avatar = await this.processUserAvatar(avatarFile, userId);
+          updates.avatarSource = updates.avatar
+            ? AvatarSource.UPLOAD
+            : AvatarSource.DEFAULT;
         }
-      },
-    );
+
+        return await db.user.update({
+          where: { id: userId },
+          data: updates,
+          select: userSelect,
+        });
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          if (error.code === "P2025") notFound();
+        }
+        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
   async getUserRole(userId: User["id"]) {
@@ -214,37 +169,6 @@ export const UserService = {
 
       if (!user) notFound();
       return user.role;
-    } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
-    }
-  },
-
-  async hasPermission(userId: User["id"], permission: Permission) {
-    try {
-      const userRole = await this.getUserRole(userId);
-      return hasPermission(userRole, permission);
-    } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
-    }
-  },
-
-  async canAccessContent(
-    userId: User["id"],
-    ownerId: User["id"],
-    permission: Permission,
-  ) {
-    try {
-      const userRole = await this.getUserRole(userId);
-
-      if (userRole === Role.ADMIN) return true;
-      if (hasPermission(userRole, permission)) return true;
-
-      if (userId === ownerId) {
-        const ownPermission = permission.replace("ANY", "OWN") as Permission;
-        return hasPermission(userRole, ownPermission);
-      }
-
-      return false;
     } catch {
       throw new AppError(ErrorMessage.OPERATION_FAILED);
     }
@@ -314,5 +238,23 @@ export const UserService = {
     } catch {
       throw new AppError(ErrorMessage.OPERATION_FAILED);
     }
+  },
+
+  async getPaginatedUsers(page: number, limit: number, requestUserId?: string) {
+    if (isDevelopment()) {
+      return await db.user.findMany({
+        orderBy: { createdDate: "desc" },
+        take: limit,
+        skip: page * limit,
+      });
+    }
+
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
+      return await db.user.findMany({
+        orderBy: { createdDate: "desc" },
+        take: limit,
+        skip: page * limit,
+      });
+    });
   },
 };

@@ -1,17 +1,20 @@
 import { auth } from "@/auth";
 import { UserService } from "@/src/services/user.service";
-import { NextRequest } from "next/server";
+import { Role } from "@prisma/client";
 import { ErrorCode, ErrorMessage } from "../constants";
 import {
   AppError,
   AuthenticationError,
   AuthorizationError,
 } from "../errors/app-error";
-import { Permission } from "../permissions";
+
+type ResourceCheck = {
+  ownerId?: string;
+  adminOnly?: boolean;
+};
 
 export async function withApiAuth<T>(
-  req: NextRequest,
-  permission: Permission | null,
+  resourceCheck: ResourceCheck | null,
   handler: (userId: string) => Promise<T>,
 ) {
   try {
@@ -20,15 +23,19 @@ export async function withApiAuth<T>(
       throw new AuthenticationError();
     }
 
-    if (permission) {
-      const hasPermission = await UserService.hasPermission(
-        session.user.id,
-        permission,
-      );
-      if (!hasPermission) {
-        throw new AuthorizationError(
-          ErrorMessage.MISSING_PERMISSION(permission),
-        );
+    if (resourceCheck) {
+      const userRole = await UserService.getUserRole(session.user.id);
+
+      if (resourceCheck.adminOnly && userRole !== Role.ADMIN) {
+        throw new AuthorizationError(ErrorMessage.INSUFFICIENT_ROLE);
+      }
+
+      if (
+        resourceCheck.ownerId &&
+        session.user.id !== resourceCheck.ownerId &&
+        userRole !== Role.ADMIN
+      ) {
+        throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
       }
     }
 

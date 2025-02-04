@@ -12,7 +12,7 @@ export function MicrosoftSignInButton() {
   const handleClick = async () => {
     setIsPending(true);
     try {
-      await signIn("microsoft-entra-id");
+      await signIn("microsoft-entra-id", { redirectTo: "/onboarding" });
     } finally {
       setIsPending(false);
     }

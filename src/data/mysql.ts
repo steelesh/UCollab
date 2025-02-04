@@ -4,7 +4,8 @@ import { isDevelopment } from "../lib/utils";
 
 const createPrismaClient = () =>
   new PrismaClient({
-    log: isDevelopment() ? ["query", "error", "warn"] : ["error"],
+    // log: isDevelopment() ? ["query", "error", "warn"] : ["error"],
+    log: ["error"],
     datasources: {
       db: {
         url: env.MYSQL_URL,

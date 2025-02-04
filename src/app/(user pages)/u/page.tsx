@@ -9,8 +9,7 @@ import {
   BreadcrumbSeparator,
 } from "@/src/components/ui/breadcrumb";
 import { H2 } from "@/src/components/ui/h2";
-import { withProtected } from "@/src/lib/auth/protected";
-import { Permission } from "@/src/lib/permissions";
+import { withDevelopment } from "@/src/lib/auth/protected";
 import { isDevelopment } from "@/src/lib/utils";
 import { UserService } from "@/src/services/user.service";
 import { UserGrid } from "../../../components/blocks/users-page/user-grid";
@@ -52,6 +51,4 @@ async function Page() {
   );
 }
 
-export default isDevelopment()
-  ? Page
-  : withProtected(Page, [Permission.VIEW_USERS_LIST]);
+export default withDevelopment(Page);

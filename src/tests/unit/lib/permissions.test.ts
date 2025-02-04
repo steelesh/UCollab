@@ -1,24 +1,28 @@
-import { isEnvironmentRoute } from "@/src/lib/permissions";
-import { isDevelopment } from "@/src/lib/utils";
-import { describe, expect, it, vi } from "vitest";
+import { canAccess, hasRole } from "@/src/lib/permissions";
+import { Role } from "@prisma/client";
+import { describe, expect, it } from "vitest";
 
-vi.mock("@/src/lib/utils", () => ({
-  isDevelopment: vi.fn(),
-}));
+describe("Permission Utils", () => {
+  describe("hasRole", () => {
+    it("should validate admin role", () => {
+      expect(hasRole(Role.ADMIN, [Role.ADMIN])).toBe(true);
+      expect(hasRole(Role.USER, [Role.ADMIN])).toBe(false);
+    });
 
-describe("Environment Routes", () => {
-  it("should block routes outside development mode", () => {
-    vi.mocked(isDevelopment).mockReturnValue(false);
-    expect(isEnvironmentRoute("/localdev")).toBe(false);
+    it("should handle multiple allowed roles", () => {
+      expect(hasRole(Role.ADMIN, [Role.ADMIN, Role.USER])).toBe(true);
+      expect(hasRole(Role.USER, [Role.ADMIN, Role.USER])).toBe(true);
+    });
   });
 
-  it("should allow development routes in development mode", () => {
-    vi.mocked(isDevelopment).mockReturnValue(true);
-    expect(isEnvironmentRoute("/localdev")).toBe(true);
-  });
+  describe("canAccess", () => {
+    it("should allow admin access regardless of ownership", () => {
+      expect(canAccess("user1", "user2", Role.ADMIN)).toBe(true);
+    });
 
-  it("should block non-development routes even in development mode", () => {
-    vi.mocked(isDevelopment).mockReturnValue(true);
-    expect(isEnvironmentRoute("/some-other-path")).toBe(false);
+    it("should restrict non-admin access to owned resources", () => {
+      expect(canAccess("user1", "user1", Role.USER)).toBe(true);
+      expect(canAccess("user1", "user2", Role.USER)).toBe(false);
+    });
   });
 });
