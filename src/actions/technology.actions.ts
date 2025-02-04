@@ -1,4 +1,4 @@
-import { auth } from '~/lib/auth/auth';
+import { auth } from 'auth';
 import { ErrorMessage } from '~/lib/constants';
 import { CreateTechnologyInput, SuggestTechnologyInput } from '~/schemas/technology.schema';
 import { TechnologyService } from '~/services/technology.service';

@@ -1,8 +1,8 @@
-import { auth } from '~/lib/auth/auth';
 import { UserService } from '~/services/user.service';
 import { Role } from '@prisma/client';
 import { ErrorCode, ErrorMessage } from '../constants';
 import { AppError, AuthenticationError, AuthorizationError } from '../errors/app-error';
+import { auth } from 'auth';
 
 interface ResourceCheck {
   ownerId?: string;

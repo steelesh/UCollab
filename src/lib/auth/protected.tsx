@@ -1,8 +1,8 @@
-import { auth } from '~/lib/auth/auth';
 import { OnboardingStep, Role, User } from '@prisma/client';
 import { redirect } from 'next/navigation';
 import { isDevelopment } from '../utils';
 import React from 'react';
+import { auth } from 'auth';
 
 type PageProps = Record<string, unknown>;
 

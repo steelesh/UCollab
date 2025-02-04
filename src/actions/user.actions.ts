@@ -1,8 +1,8 @@
-import { auth } from '~/lib/auth/auth';
 import { ErrorMessage } from '~/lib/constants';
 import { UpdateUserInput } from '~/schemas/user.schema';
 import { UserService } from '~/services/user.service';
 import { Role } from '@prisma/client';
+import { auth } from 'auth';
 
 export async function updateUser(userId: string, data: UpdateUserInput) {
   const session = await auth();

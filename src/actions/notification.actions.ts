@@ -1,4 +1,4 @@
-import { auth } from '~/lib/auth/auth';
+import { auth } from 'auth';
 import { ErrorMessage } from '~/lib/constants';
 import { CreateSystemNotificationInput } from '~/schemas/notification.schema';
 import { NotificationService } from '~/services/notification.service';
