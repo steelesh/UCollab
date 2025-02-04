@@ -1,14 +1,14 @@
 import { lorelei } from '@dicebear/collection';
 import { createAvatar } from '@dicebear/core';
-import { type Account, AvatarSource, Prisma, Role, type User } from '@prisma/client';
+import { Account, AvatarSource, Prisma, Role, User } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import { prisma } from '../../prisma';
 import { s3 } from '~/data/s3';
 import { withServiceAuth } from '~/lib/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
-import { AppError, AuthorizationError } from '~/lib/errors/app-error';
-import { hasPermission, Permission } from '~/lib/permissions';
-import { publicUserSelect, type UpdateUserInput, userSelect } from '~/schemas/user.schema';
+import { AppError } from '~/lib/errors/app-error';
+import { isDevelopment } from '~/lib/utils';
+import { publicUserSelect, UpdateUserInput, userSelect } from '~/schemas/user.schema';
 
 export const UserService = {
   async getUser(username: User['username']) {
@@ -26,12 +26,8 @@ export const UserService = {
   },
 
   async getHomePageUser(userId: string, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_OWN_PROFILE, async () => {
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
-        if (!(await this.canAccessContent(requestUserId, userId, Permission.VIEW_OWN_PROFILE))) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
         const user = await prisma.user.findUnique({
           where: { id: userId },
           select: userSelect,
@@ -46,27 +42,22 @@ export const UserService = {
     });
   },
 
-  async getUsers(userId?: string, isLocalDev = false): Promise<User[]> {
-    if (isLocalDev) {
+  async getUsers(requestUserId?: string) {
+    if (isDevelopment()) {
       return prisma.user.findMany({
         orderBy: { createdDate: 'desc' },
       });
     }
 
-    if (!userId) {
-      throw new AuthorizationError(ErrorMessage.AUTHENTICATION_REQUIRED);
-    }
-
-    return withServiceAuth(userId, Permission.VIEW_USERS_LIST, async () => {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
       return prisma.user.findMany({
         orderBy: { createdDate: 'desc' },
       });
     });
   },
 
-  // Search Operations
   async searchUsers(query: string, requestUserId: string, limit = 5) {
-    return withServiceAuth(requestUserId, Permission.VIEW_USERS_LIST, async () => {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
       try {
         return await prisma.user.findMany({
           where: { username: { startsWith: query.toLowerCase().trim() } },
@@ -80,9 +71,8 @@ export const UserService = {
     });
   },
 
-  // Admin Operations
   async getAdminUserDetails(userId: User['id'], requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_USERS, async () => {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
       try {
         const user = await prisma.user.findUnique({
           where: { id: userId },
@@ -102,16 +92,12 @@ export const UserService = {
   },
 
   async updateUserRole(userId: User['id'], newRole: Role, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.MANAGE_ROLES, async () => {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
       try {
         return await prisma.user.update({
           where: { id: userId },
           data: { role: newRole },
-          select: {
-            id: true,
-            username: true,
-            role: true,
-          },
+          select: { id: true, username: true, role: true },
         });
       } catch {
         throw new AppError(ErrorMessage.OPERATION_FAILED);
@@ -120,7 +106,7 @@ export const UserService = {
   },
 
   async deleteUser(userId: User['id'], requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.DELETE_ANY_USER, async () => {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
       try {
         await prisma.$transaction(async (tx) => {
           return tx.user.delete({ where: { id: userId } });
@@ -134,14 +120,9 @@ export const UserService = {
     });
   },
 
-  // User Management Operations
   async updateUser(userId: User['id'], data: UpdateUserInput, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.UPDATE_ANY_USER, async () => {
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
-        if (!(await this.canAccessContent(requestUserId, userId, Permission.UPDATE_ANY_USER))) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
         const { avatar: avatarFile, ...updateFields } = data;
         const updates: Prisma.UserUpdateInput = { ...updateFields };
 
@@ -165,7 +146,6 @@ export const UserService = {
     });
   },
 
-  // Internal Helper Methods
   async getUserRole(userId: User['id']) {
     try {
       const user = await prisma.user.findUnique({
@@ -180,34 +160,6 @@ export const UserService = {
     }
   },
 
-  async hasPermission(userId: User['id'], permission: Permission) {
-    try {
-      const userRole = await this.getUserRole(userId);
-      return hasPermission(userRole, permission);
-    } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
-    }
-  },
-
-  async canAccessContent(userId: User['id'], ownerId: User['id'], permission: Permission) {
-    try {
-      const userRole = await this.getUserRole(userId);
-
-      if (userRole === Role.ADMIN) return true;
-      if (hasPermission(userRole, permission)) return true;
-
-      if (userId === ownerId) {
-        const ownPermission = permission.replace('ANY', 'OWN') as Permission;
-        return hasPermission(userRole, ownPermission);
-      }
-
-      return false;
-    } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
-    }
-  },
-
-  // Avatar Methods
   async processUserAvatar(avatar: File | null, userId: User['id']) {
     try {
       if (avatar === null) {

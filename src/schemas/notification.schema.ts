@@ -45,3 +45,20 @@ export const createSystemNotificationSchema = z.object({
 });
 
 export type CreateSystemNotificationInput = z.infer<typeof createSystemNotificationSchema>;
+
+export const notificationSelect = {
+  id: true,
+  message: true,
+  createdDate: true,
+  isRead: true,
+  type: true,
+  postId: true,
+  commentId: true,
+  triggeredBy: {
+    select: {
+      id: true,
+      username: true,
+      avatar: true,
+    },
+  },
+} as const;

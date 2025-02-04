@@ -1,21 +1,16 @@
-import { Prisma, type User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import { prisma } from '../../prisma';
 import { withServiceAuth } from '~/lib/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
-import { AppError, AuthorizationError } from '~/lib/errors/app-error';
-import { Permission } from '~/lib/permissions';
-import { type UpdateProfileInput, profileSelect, updateProfileSchema } from '~/schemas/profile.schema';
-import { UserService } from './user.service';
+import { AppError } from '~/lib/errors/app-error';
+import { UpdateProfileInput, profileSelect, updateProfileSchema } from '~/schemas/profile.schema';
 
 export const ProfileService = {
+  // Owner or admin can view profile
   async getProfile(userId: User['id'], requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_ANY_PROFILE, async () => {
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
-        if (!(await UserService.canAccessContent(requestUserId, userId, Permission.VIEW_ANY_PROFILE))) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
         const profile = await prisma.profile.findUnique({
           where: { userId },
           select: profileSelect,
@@ -30,13 +25,10 @@ export const ProfileService = {
     });
   },
 
+  // Owner or admin can update profile
   async updateProfile(userId: User['id'], data: UpdateProfileInput, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.UPDATE_ANY_PROFILE, async () => {
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
-        if (!(await UserService.canAccessContent(requestUserId, userId, Permission.UPDATE_ANY_PROFILE))) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
         return await prisma.$transaction(async (tx) => {
           const profile = await tx.profile.findUnique({
             where: { userId },
@@ -83,9 +75,9 @@ export const ProfileService = {
     });
   },
 
-  // List & Search Operations
+  // Admin only - view all profiles
   async getAllProfiles(requestUserId: string, page = 1, limit = 10) {
-    return withServiceAuth(requestUserId, Permission.VIEW_ANY_PROFILE, async () => {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
       try {
         return await prisma.profile.findMany({
           skip: (page - 1) * limit,
@@ -100,8 +92,9 @@ export const ProfileService = {
     });
   },
 
+  // Admin only - search profiles
   async searchProfiles(query: string, requestUserId: string, page = 1, limit = 10) {
-    return withServiceAuth(requestUserId, Permission.VIEW_ANY_PROFILE, async () => {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
       try {
         return await prisma.profile.findMany({
           where: {
@@ -123,6 +116,7 @@ export const ProfileService = {
     });
   },
 
+  // Public method - no auth needed
   async getPublicProfile(username: string) {
     try {
       const profile = await prisma.profile.findFirst({

@@ -1,13 +1,13 @@
-import { Prisma, type Skill } from '@prisma/client';
+import { Prisma, Skill } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import { prisma } from '../../prisma';
 import { withServiceAuth } from '~/lib/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
 import { AppError } from '~/lib/errors/app-error';
-import { Permission } from '~/lib/permissions';
-import { type CreateSkillInput, type UpdateSkillInput, skillSelect } from '~/schemas/skill.schema';
+import { CreateSkillInput, UpdateSkillInput, skillSelect } from '~/schemas/skill.schema';
 
 export const SkillService = {
+  // Public methods - no auth needed
   async getAllSkills() {
     try {
       return await prisma.skill.findMany({
@@ -35,8 +35,9 @@ export const SkillService = {
     }
   },
 
+  // Admin only - creating verified skills
   async createSkill(data: CreateSkillInput, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.CREATE_SKILL, async () => {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
       try {
         const existingSkill = await prisma.skill.findUnique({
           where: { name: data.name.toLowerCase().trim() },
@@ -64,8 +65,9 @@ export const SkillService = {
     });
   },
 
+  // Authenticated users can suggest
   async suggestSkill(data: CreateSkillInput, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.SUGGEST_SKILL, async () => {
+    return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.skill.create({
           data: {
@@ -86,8 +88,9 @@ export const SkillService = {
     });
   },
 
+  // Admin only - updating skills
   async updateSkill(skillId: Skill['id'], data: UpdateSkillInput, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.UPDATE_SKILL, async () => {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
       try {
         return await prisma.skill.update({
           where: { id: skillId },
@@ -109,8 +112,9 @@ export const SkillService = {
     });
   },
 
+  // Admin only - deleting skills
   async deleteSkill(skillId: Skill['id'], requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.DELETE_SKILL, async () => {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
       try {
         await prisma.skill.delete({ where: { id: skillId } });
       } catch (error) {
@@ -122,8 +126,9 @@ export const SkillService = {
     });
   },
 
+  // Admin only - viewing pending skills
   async getPendingSkills(requestUserId: string, page = 1, limit = 20) {
-    return withServiceAuth(requestUserId, Permission.VIEW_SKILLS, async () => {
+    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
       try {
         return await prisma.skill.findMany({
           where: { verified: false },

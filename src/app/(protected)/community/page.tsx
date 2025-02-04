@@ -26,19 +26,11 @@ export default async function CommunityPage() {
   });
 
   const formattedUsers: {
-    id: string;
+    createdDate: string | undefined;
+    lastLogin: string | undefined;
     username: string;
     email: string;
-    createdDate: string;
-    lastLogin: string;
-    fullName: string;
-    firstName: string;
-    lastName: string;
     avatar: string;
-    avatarSource: $Enums.AvatarSource;
-    azureAdId: string;
-    onboardingStep: $Enums.OnboardingStep;
-    role: $Enums.Role;
   }[] = users.map((user) => ({
     ...user,
     createdDate: user.createdDate.toISOString().split('T')[0],
