@@ -1,18 +1,15 @@
-import { type Post, Prisma, type Technology } from '@prisma/client';
+import { Post, Prisma, Technology } from '@prisma/client';
 import { notFound } from 'next/navigation';
-import { prisma } from '../../prisma';
+import { prisma } from '../data/prisma';
 import { withServiceAuth } from '~/lib/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
-import { AppError, AuthorizationError } from '~/lib/errors/app-error';
-import { Permission } from '~/lib/permissions';
-import { type UpdatePostInput, postSelect, updatePostSchema } from '~/schemas/post.schema';
-import { UserService } from './user.service';
-import { type ZodArray, type ZodEffects, type ZodNativeEnum, type ZodOptional, type ZodString } from 'zod';
+import { AppError } from '~/lib/errors/app-error';
+import { CreatePostInput, UpdatePostInput, postSelect, updatePostSchema } from '~/schemas/post.schema';
 
 export const PostService = {
-  // Read Operations
+  // Authenticated users can view posts
   async getAllPosts(requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+    return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.post.findMany({
           select: postSelect,
@@ -26,7 +23,7 @@ export const PostService = {
   },
 
   async getPostById(id: Post['id'], requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+    return withServiceAuth(requestUserId, null, async () => {
       try {
         const post = await prisma.post.findUnique({
           where: { id },
@@ -60,29 +57,10 @@ export const PostService = {
     });
   },
 
-  // Create Operations
-  async createPost(
-    data: {
-      title: ZodString['_output'];
-      description: ZodString['_output'];
-      postType: ZodNativeEnum<{
-        CONTRIBUTION: 'CONTRIBUTION';
-        FEEDBACK: 'FEEDBACK';
-        DISCUSSION: 'DISCUSSION';
-      }>['_output'];
-      status: ZodNativeEnum<{ OPEN: 'OPEN'; CLOSED: 'CLOSED' }>['_output'];
-      technologies?: ZodOptional<ZodEffects<ZodArray<ZodString>, string[]>>['_output'];
-      githubRepo?: ZodOptional<ZodString>['_output'];
-      userId: string;
-    },
-    requestUserId: string,
-  ) {
-    return withServiceAuth(requestUserId, Permission.CREATE_POST, async () => {
+  // Owner only - creating posts
+  async createPost(data: CreatePostInput, requestUserId: string) {
+    return withServiceAuth(requestUserId, { ownerId: data.userId }, async () => {
       try {
-        if (!(await UserService.canAccessContent(requestUserId, data.userId, Permission.CREATE_POST))) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
         return await prisma.$transaction(async (tx) => {
           const { technologies: techNames, ...postData } = data;
 
@@ -121,16 +99,11 @@ export const PostService = {
     });
   },
 
-  // Update Operations
+  // Owner or admin - updating posts
   async updatePost(data: UpdatePostInput, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.UPDATE_ANY_POST, async () => {
+    const post = await this.getPostById(data.id, requestUserId);
+    return withServiceAuth(requestUserId, { ownerId: post.createdById }, async () => {
       try {
-        const post = await this.getPostById(data.id, requestUserId);
-
-        if (!(await UserService.canAccessContent(requestUserId, post.createdById, Permission.UPDATE_ANY_POST))) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
         return await prisma.$transaction(async (tx) => {
           const verifiedTechs = data.technologies?.length
             ? await tx.technology.findMany({
@@ -170,15 +143,11 @@ export const PostService = {
     });
   },
 
+  // Owner or admin - updating post status
   async updatePostStatus(id: Post['id'], status: Post['status'], requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.UPDATE_ANY_POST, async () => {
+    const post = await this.getPostById(id, requestUserId);
+    return withServiceAuth(requestUserId, { ownerId: post.createdById }, async () => {
       try {
-        const post = await this.getPostById(id, requestUserId);
-
-        if (!(await UserService.canAccessContent(requestUserId, post.createdById, Permission.UPDATE_ANY_POST))) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
         return await prisma.post.update({
           where: { id },
           data: { status },
@@ -198,16 +167,11 @@ export const PostService = {
     });
   },
 
-  // Delete Operations
+  // Owner or admin - deleting posts
   async deletePost(id: Post['id'], requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.DELETE_ANY_POST, async () => {
+    const post = await this.getPostById(id, requestUserId);
+    return withServiceAuth(requestUserId, { ownerId: post.createdById }, async () => {
       try {
-        const post = await this.getPostById(id, requestUserId);
-
-        if (!(await UserService.canAccessContent(requestUserId, post.createdById, Permission.DELETE_ANY_POST))) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
         await prisma.post.delete({ where: { id } });
       } catch (error) {
         if (error instanceof AppError) throw error;
@@ -219,9 +183,9 @@ export const PostService = {
     });
   },
 
-  // Search & Filter Operations
+  // Authenticated users - searching and filtering posts
   async searchPosts(query: string, requestUserId: string, page = 1, limit = 20) {
-    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+    return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.post.findMany({
           where: {
@@ -239,7 +203,7 @@ export const PostService = {
   },
 
   async getPostsByUser(userId: string, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+    return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.post.findMany({
           where: { createdById: userId },
@@ -254,7 +218,7 @@ export const PostService = {
   },
 
   async getPostsByTechnology(techName: string, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+    return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.post.findMany({
           where: {
@@ -273,7 +237,7 @@ export const PostService = {
   },
 
   async getPostsByTechnologies(techNames: Technology['name'][], matchAll = false, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+    return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.post.findMany({
           where: {
@@ -299,21 +263,8 @@ export const PostService = {
     });
   },
 
-  async verifyPostOwner(postId: string, userId: string) {
-    const post = await prisma.post.findUnique({
-      where: { id: postId },
-      select: { createdById: true },
-    });
-
-    if (!post) {
-      return false;
-    }
-
-    return post.createdById === userId;
-  },
-
   async getPaginatedPosts(page = 1, limit = 20, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_POSTS, async () => {
+    return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.post.findMany({
           select: postSelect,

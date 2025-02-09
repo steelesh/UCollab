@@ -1,4 +1,4 @@
-import { prisma } from '~/../prisma';
+import { prisma } from '~/data/prisma';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 

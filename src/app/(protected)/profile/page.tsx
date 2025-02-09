@@ -1,8 +1,10 @@
+import { withAuth } from '~/lib/auth/protected';
+
 export const metadata = {
   title: 'UCollab — Profile',
 };
 
-export default function ProfilePage() {
+async function ProfilePage() {
   return (
     <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-24">
       <div className="card bg-base-300 mt-10 p-8 shadow-2xl">
@@ -11,3 +13,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+export default withAuth(ProfilePage);

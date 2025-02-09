@@ -1,48 +1,18 @@
-import {
-  type Comment,
-  type Notification,
-  type NotificationPreferences,
-  NotificationType,
-  type Post,
-  Prisma,
-  type User,
-} from '@prisma/client';
+import { Comment, Notification, NotificationPreferences, NotificationType, Post, Prisma, User } from '@prisma/client';
 import { mq } from '~/data/mq';
-import { prisma } from '../../prisma';
+import { prisma } from '../data/prisma';
 import { withServiceAuth } from '~/lib/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
-import { AppError, AuthorizationError } from '~/lib/errors/app-error';
-import { Permission } from '~/lib/permissions';
-import { type CreateBatchNotificationData, type CreateNotificationData } from '~/schemas/notification.schema';
+import { AppError } from '~/lib/errors/app-error';
+import { canAccess } from '~/lib/permissions';
+import { CreateBatchNotificationData, CreateNotificationData, notificationSelect } from '~/schemas/notification.schema';
 import { CommentService } from './comment.service';
 import { UserService } from './user.service';
 
-const notificationSelect = {
-  id: true,
-  message: true,
-  createdDate: true,
-  isRead: true,
-  type: true,
-  postId: true,
-  commentId: true,
-  triggeredBy: {
-    select: {
-      id: true,
-      username: true,
-      avatar: true,
-    },
-  },
-} as const;
-
 export const NotificationService = {
-  // Read Operations
   async getUserNotifications(userId: User['id'], requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_ANY_NOTIFICATION, async () => {
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
-        if (!(await UserService.canAccessContent(requestUserId, userId, Permission.VIEW_ANY_NOTIFICATION))) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
         return await prisma.notification.findMany({
           where: { userId },
           select: notificationSelect,
@@ -56,12 +26,8 @@ export const NotificationService = {
   },
 
   async getUserNotificationsByStatus(userId: User['id'], isRead: boolean, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_ANY_NOTIFICATION, async () => {
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
-        if (!(await UserService.canAccessContent(requestUserId, userId, Permission.VIEW_ANY_NOTIFICATION))) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
         return await prisma.notification.findMany({
           where: { userId, isRead },
           select: notificationSelect,
@@ -75,12 +41,8 @@ export const NotificationService = {
   },
 
   async getPaginatedNotifications(userId: User['id'], page = 1, limit = 20, requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_ANY_NOTIFICATION, async () => {
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
-        if (!(await UserService.canAccessContent(requestUserId, userId, Permission.VIEW_ANY_NOTIFICATION))) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
         return await prisma.notification.findMany({
           where: { userId },
           select: notificationSelect,
@@ -95,14 +57,9 @@ export const NotificationService = {
     });
   },
 
-  // Count Operations
   async getNotificationsCount(userId: User['id'], requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_ANY_NOTIFICATION, async () => {
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
-        if (!(await UserService.canAccessContent(requestUserId, userId, Permission.VIEW_ANY_NOTIFICATION))) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
         return await prisma.notification.count({
           where: { userId },
         });
@@ -114,12 +71,8 @@ export const NotificationService = {
   },
 
   async getUnreadNotificationsCount(userId: User['id'], requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.VIEW_ANY_NOTIFICATION, async () => {
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
-        if (!(await UserService.canAccessContent(requestUserId, userId, Permission.VIEW_ANY_NOTIFICATION))) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
         return await prisma.notification.count({
           where: { userId, isRead: false },
         });
@@ -130,47 +83,36 @@ export const NotificationService = {
     });
   },
 
-  // Update Operations
   async markNotificationAsRead(id: Notification['id'], requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.UPDATE_ANY_NOTIFICATION, async () => {
-      try {
-        const notification = await prisma.notification.findUnique({
-          where: { id },
-          select: { id: true, userId: true },
-        });
+    try {
+      const notification = await prisma.notification.findUnique({
+        where: { id },
+        select: { id: true, userId: true },
+      });
 
-        if (!notification) {
-          throw new AppError(ErrorMessage.NOT_FOUND('Notification'));
-        }
+      if (!notification) {
+        throw new AppError(ErrorMessage.NOT_FOUND('Notification'));
+      }
 
-        if (
-          !(await UserService.canAccessContent(requestUserId, notification.userId, Permission.UPDATE_ANY_NOTIFICATION))
-        ) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
-        return await prisma.notification.update({
+      return withServiceAuth(requestUserId, { ownerId: notification.userId }, async () => {
+        return prisma.notification.update({
           where: { id },
           data: { isRead: true },
           select: notificationSelect,
         });
-      } catch (error) {
-        if (error instanceof AppError) throw error;
-        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-          throw new AppError(ErrorMessage.NOT_FOUND('Notification'));
-        }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+      });
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        throw new AppError(ErrorMessage.NOT_FOUND('Notification'));
       }
-    });
+      throw new AppError(ErrorMessage.OPERATION_FAILED);
+    }
   },
 
   async markAllNotificationsAsRead(userId: User['id'], requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.UPDATE_ANY_NOTIFICATION, async () => {
+    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
-        if (!(await UserService.canAccessContent(requestUserId, userId, Permission.UPDATE_ANY_NOTIFICATION))) {
-          throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
-        }
-
         return await prisma.notification.updateMany({
           where: { userId, isRead: false },
           data: { isRead: true },
@@ -183,22 +125,26 @@ export const NotificationService = {
   },
 
   async markMultipleNotificationsAsRead(notificationIds: Notification['id'][], requestUserId: string) {
-    return withServiceAuth(requestUserId, Permission.UPDATE_OWN_NOTIFICATION, async () => {
-      try {
-        const notifications = await prisma.notification.findMany({
-          where: { id: { in: notificationIds } },
-          select: { id: true, userId: true },
-        });
+    try {
+      // First get all notifications to check ownership
+      const notifications = await prisma.notification.findMany({
+        where: { id: { in: notificationIds } },
+        select: { id: true, userId: true },
+      });
+
+      // Get the first notification's userId for the initial auth check
+      const firstNotification = notifications[0];
+      if (!firstNotification) {
+        throw new AppError(ErrorMessage.NOT_FOUND('Notifications'));
+      }
+
+      return withServiceAuth(requestUserId, { ownerId: firstNotification.userId }, async () => {
+        // Then verify access to all notifications
+        const userRole = await UserService.getUserRole(requestUserId);
 
         for (const notification of notifications) {
-          if (
-            !(await UserService.canAccessContent(
-              requestUserId,
-              notification.userId,
-              Permission.UPDATE_OWN_NOTIFICATION,
-            ))
-          ) {
-            throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
+          if (!canAccess(requestUserId, notification.userId, userRole)) {
+            throw new AppError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
           }
         }
 
@@ -206,15 +152,13 @@ export const NotificationService = {
           where: { id: { in: notificationIds } },
           data: { isRead: true },
         });
-      } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
-      }
-    });
+      });
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      throw new AppError(ErrorMessage.OPERATION_FAILED);
+    }
   },
 
-  // Notification Creation and Queue Operations
-  // Private Queue Methods
   async queueNotification(data: CreateNotificationData): Promise<void> {
     try {
       await mq.addNotification(data);
@@ -231,9 +175,8 @@ export const NotificationService = {
     }
   },
 
-  // Cleanup Operations
   async cleanupOldNotifications(daysToKeep = 30): Promise<void> {
-    return withServiceAuth(undefined, Permission.ACCESS_ADMIN, async () => {
+    return withServiceAuth(undefined, { adminOnly: true }, async () => {
       try {
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
@@ -252,7 +195,6 @@ export const NotificationService = {
     });
   },
 
-  // Notification Sending
   async sendCommentNotifications(data: {
     postId: Post['id'];
     postTitle: Post['title'];
@@ -266,12 +208,13 @@ export const NotificationService = {
       const notifications: Promise<void>[] = [];
       const mentionedUserIds = await CommentService.extractMentionedUserIds(data.content);
 
-      // Handle mentions notifications
       const uniqueMentionedUsers = mentionedUserIds
         .filter((id) => id !== data.commentAuthorId)
         .filter((id, index, self) => self.indexOf(id) === index);
 
-      if (uniqueMentionedUsers.length > 0 && uniqueMentionedUsers[0]) {
+      if (uniqueMentionedUsers.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         const preferences = await this.getNotificationPreferences(uniqueMentionedUsers[0]);
         if (await this.shouldSend(NotificationType.MENTION, preferences)) {
           notifications.push(
@@ -287,7 +230,6 @@ export const NotificationService = {
         }
       }
 
-      // Handle post author notification
       const shouldNotifyPostAuthor =
         data.postAuthorId !== data.commentAuthorId && !mentionedUserIds.includes(data.postAuthorId);
 
@@ -340,7 +282,6 @@ export const NotificationService = {
     return preferencesMap[type] ?? false;
   },
 
-  // Add this method to NotificationService
   async createNotification(data: CreateNotificationData) {
     try {
       return await prisma.notification.create({

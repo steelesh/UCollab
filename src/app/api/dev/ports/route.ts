@@ -6,10 +6,9 @@ function getPortFromDocker(containerName: string): number | null {
     const command = `docker port ${containerName}`;
     const output = execSync(command).toString();
     const portMatch = output.match(/0.0.0.0:(\d+)/);
-    if (portMatch && portMatch[1] !== undefined) {
-      return parseInt(portMatch[1]);
-    }
-    return null;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    return portMatch ? parseInt(portMatch[1]) : null;
   } catch {
     return null;
   }

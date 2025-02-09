@@ -1,4 +1,4 @@
-import { auth } from '~/lib/auth/auth';
+import { auth } from 'auth';
 import { ErrorMessage } from '~/lib/constants';
 import { CreateCommentData, UpdateCommentData } from '~/schemas/comment.schema';
 import { CommentService } from '~/services/comment.service';

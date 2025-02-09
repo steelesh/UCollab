@@ -1,25 +1,30 @@
-import { auth } from '~/lib/auth/auth';
 import { UserService } from '~/services/user.service';
-import { type NextRequest } from 'next/server';
+import { Role } from '@prisma/client';
 import { ErrorCode, ErrorMessage } from '../constants';
 import { AppError, AuthenticationError, AuthorizationError } from '../errors/app-error';
-import { type Permission } from '../permissions';
+import { auth } from 'auth';
 
-export async function withApiAuth<T>(
-  req: NextRequest,
-  permission: Permission | null,
-  handler: (userId: string) => Promise<T>,
-) {
+interface ResourceCheck {
+  ownerId?: string;
+  adminOnly?: boolean;
+}
+
+export async function withApiAuth<T>(resourceCheck: ResourceCheck | null, handler: (userId: string) => Promise<T>) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       throw new AuthenticationError();
     }
 
-    if (permission) {
-      const hasPermission = await UserService.hasPermission(session.user.id, permission);
-      if (!hasPermission) {
-        throw new AuthorizationError(ErrorMessage.MISSING_PERMISSION(permission));
+    if (resourceCheck) {
+      const userRole = await UserService.getUserRole(session.user.id);
+
+      if (resourceCheck.adminOnly && userRole !== Role.ADMIN) {
+        throw new AuthorizationError(ErrorMessage.INSUFFICIENT_ROLE);
+      }
+
+      if (resourceCheck.ownerId && session.user.id !== resourceCheck.ownerId && userRole !== Role.ADMIN) {
+        throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
       }
     }
 

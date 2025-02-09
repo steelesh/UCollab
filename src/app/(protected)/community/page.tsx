@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { prisma } from '../../../../prisma';
+import { prisma } from '../../../data/prisma';
+import { withAuth } from '~/lib/auth/protected';
 
 export const metadata = {
   title: 'UCollab — Community',
@@ -14,7 +15,7 @@ interface _User {
   lastLogin: string;
 }
 
-export default async function CommunityPage() {
+async function CommunityPage() {
   const users = await prisma.user.findMany({
     select: {
       avatar: true,
@@ -26,19 +27,11 @@ export default async function CommunityPage() {
   });
 
   const formattedUsers: {
-    id: string;
+    createdDate: string | undefined;
+    lastLogin: string | undefined;
     username: string;
     email: string;
-    createdDate: string;
-    lastLogin: string;
-    fullName: string;
-    firstName: string;
-    lastName: string;
     avatar: string;
-    avatarSource: $Enums.AvatarSource;
-    azureAdId: string;
-    onboardingStep: $Enums.OnboardingStep;
-    role: $Enums.Role;
   }[] = users.map((user) => ({
     ...user,
     createdDate: user.createdDate.toISOString().split('T')[0],
@@ -65,3 +58,5 @@ export default async function CommunityPage() {
     </div>
   );
 }
+
+export default withAuth(CommunityPage);

@@ -1,8 +1,8 @@
-import { auth } from '~/lib/auth/auth';
 import { ErrorMessage } from '~/lib/constants';
 import { CreatePostInput, UpdatePostInput } from '~/schemas/post.schema';
 import { PostService } from '~/services/post.service';
 import { Post } from '@prisma/client';
+import { auth } from 'auth';
 
 export async function createPost(data: CreatePostInput) {
   const session = await auth();
