@@ -114,15 +114,11 @@ classDiagram
    ```
     npm install
     ```
-4. Create the database
+4. Start Docker Desktop
    ```
-   sh start-database.sh
+   docker desktop start
    ```
-5. Update to the current database
-   ```
-   npm run db:push
-   ```
-6. Run the development build
+5. Run the development build
    ```
    npm run dev
    ```

@@ -1,4 +1,9 @@
-# UCollab Authentication Guide
+# 🎨 UCollab Authentication Guide
+
+##  Overview
+This page provides step-by-step instructions on how a user can authenticate themselves for UCollab sign up.
+
+---
 
 ### Step 1: Log in to Your UC Account
 1. Select "Login" in the top right.
