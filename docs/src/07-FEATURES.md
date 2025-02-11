@@ -1,4 +1,9 @@
-# Features
+# 🎨 UCollab Features
+
+##  Overview
+This page outlines the current features that UCollab has to offer!
+
+---
 
 ### Project Creation
 1.  Students can create project posts with defined types such as "Looking for Feedback," "Looking for Collaboration," "Seeking Mentorship," and "Discussion."
