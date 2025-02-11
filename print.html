@@ -89,7 +89,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="01-README.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">Build Guide</li><li class="chapter-item expanded "><a href="02-BUILD.html"><strong aria-hidden="true">2.</strong> Project</a></li><li class="chapter-item expanded "><a href="03-BUILD-DOCS.html"><strong aria-hidden="true">3.</strong> Documentation</a></li><li class="chapter-item expanded affix "><li class="part-title">Design Guide</li><li class="chapter-item expanded "><a href="04-CLASS-DIAGRAM.html"><strong aria-hidden="true">4.</strong> Class Diagram</a></li><li class="chapter-item expanded "><a href="05-MOCKUPS.html"><strong aria-hidden="true">5.</strong> Mockups</a></li><li class="chapter-item expanded "><a href="06-COLOR-SCHEMES.html"><strong aria-hidden="true">6.</strong> Color Schemes</a></li><li class="chapter-item expanded affix "><li class="part-title">User Guide</li><li class="chapter-item expanded "><a href="07-FEATURES.html"><strong aria-hidden="true">7.</strong> Features</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="01-README.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">Development</li><li class="chapter-item expanded "><a href="02-BUILD.html"><strong aria-hidden="true">2.</strong> Build Guide</a></li><li class="chapter-item expanded affix "><li class="part-title">Design Process</li><li class="chapter-item expanded "><a href="03-USER-PERSONAS.html"><strong aria-hidden="true">3.</strong> User Personas</a></li><li class="chapter-item expanded "><a href="04-CLASS-DIAGRAM.html"><strong aria-hidden="true">4.</strong> Class Diagram</a></li><li class="chapter-item expanded "><a href="05-MOCKUPS.html"><strong aria-hidden="true">5.</strong> Mockups</a></li><li class="chapter-item expanded "><a href="06-COLOR-SCHEMES.html"><strong aria-hidden="true">6.</strong> Color Schemes</a></li><li class="chapter-item expanded affix "><li class="part-title">User Guide</li><li class="chapter-item expanded "><a href="07-FEATURES.html"><strong aria-hidden="true">7.</strong> Features</a></li><li class="chapter-item expanded "><a href="08-AUTHENTICATION-GUIDE.html"><strong aria-hidden="true">8.</strong> Authentication</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -208,9 +208,42 @@
 <li><strong>Expand their professional network</strong> – Connect with students and professionals in their field.</li>
 <li><strong>Work with modern technologies</strong> – Get familiar with the tools and frameworks used in industry today.</li>
 </ul>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="project"><a class="header" href="#project">Project</a></h1>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="documentation"><a class="header" href="#documentation">Documentation</a></h1>
-<h3 id="user-personas"><a class="header" href="#user-personas">User Personas</a></h3>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ucollab-build-guide"><a class="header" href="#ucollab-build-guide">UCollab Build Guide</a></h1>
+<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
+<p>These instructions outline how to build the UCollab site from source for development purposes.</p>
+<hr />
+<h2 id="build-instructions"><a class="header" href="#build-instructions">Build Instructions</a></h2>
+<blockquote>
+<p>[!Important]<br />
+Building this project from source requires installing <a href="https://git-scm.com/">Git</a>, <a href="https://nodejs.org/en">NodeJS</a>, and <a href="https://www.docker.com/products/docker-desktop/">Docker</a>.</p>
+</blockquote>
+<ol>
+<li>Clone the repository and change into the directory
+<pre><code>git clone https://github.com/steelesh/UCollab.git &amp;&amp; cd UCollab
+</code></pre>
+</li>
+<li>Create your .env file
+<pre><code>Copy .env.example and rename it to .env
+</code></pre>
+</li>
+<li>Install the dependencies
+<pre><code> npm install
+</code></pre>
+</li>
+<li>Start Docker Desktop
+<pre><code>docker desktop start
+</code></pre>
+</li>
+<li>Run the development build
+<pre><code>npm run dev
+```# Project
+</code></pre>
+</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ucollab-user-personas"><a class="header" href="#ucollab-user-personas">UCollab User Personas</a></h1>
+<h2 id="overview-1"><a class="header" href="#overview-1">Overview</a></h2>
+<p>These are the user personas we came up with as part of our pre-development process for UCollab.</p>
+<hr />
 <h3 id="justin-time"><a class="header" href="#justin-time">Justin Time</a></h3>
 <h4 id="about"><a class="header" href="#about">About:</a></h4>
 <p>Justin is a freshman at the University of Cincinnati. He moved to Cincinnati from out of state, so he does not know a lot of people coming out of high school. He’s majoring in Information Technology with no specified path yet. He lives on campus and has two roommates, but they are in completely different majors from him. None of their classes match up whatsoever. He also finds it a bit hard to communicate with people in person and tends to prefer virtual conversation. </p>
@@ -231,7 +264,10 @@
 <p>Kevin is a graduate student specializing in Game Development and Simulation. He is passionate about creating immersive gaming experiences but struggles to find other developers to collaborate with on projects.</p>
 <h4 id="problemsolution-3"><a class="header" href="#problemsolution-3">Problem/Solution:</a></h4>
 <p>Kevin has an idea for a game but needs artists and programmers to bring it to life. UCollab can help him connect with students across IT and Computer Science disciplines, enabling him to form a diverse team with complementary skills and work collaboratively on his project.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="class-diagram"><a class="header" href="#class-diagram">Class Diagram</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ucollab-class-diagram"><a class="header" href="#ucollab-class-diagram">UCollab Class Diagram</a></h1>
+<h2 id="overview-2"><a class="header" href="#overview-2">Overview</a></h2>
+<p>This class diagram describes our current database structure.</p>
+<hr />
 <pre class="mermaid">classDiagram
     class Account {
         +UUID id
@@ -326,7 +362,7 @@
 </pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="mockups"><a class="header" href="#mockups">Mockups</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-ucollab-color-schemes"><a class="header" href="#-ucollab-color-schemes">🎨 UCollab Color Schemes</a></h1>
-<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
+<h2 id="overview-3"><a class="header" href="#overview-3">Overview</a></h2>
 <p>UCollab follows a <strong>modern and accessible color scheme</strong> optimized for both <strong>light mode</strong> and <strong>dark mode</strong>. Below is a breakdown of the colors used in the platform.</p>
 <hr />
 <h2 id="-light-mode-colors"><a class="header" href="#-light-mode-colors">🌞 Light Mode Colors</a></h2>
@@ -385,7 +421,10 @@ If using CSS variables
   --accent-color: #333333;
 }
 </code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="features"><a class="header" href="#features">Features</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="-ucollab-features"><a class="header" href="#-ucollab-features">🎨 UCollab Features</a></h1>
+<h2 id="overview-4"><a class="header" href="#overview-4">Overview</a></h2>
+<p>This page outlines the current features that UCollab has to offer!</p>
+<hr />
 <h3 id="project-creation"><a class="header" href="#project-creation">Project Creation</a></h3>
 <ol>
 <li>Students can create project posts with defined types such as &quot;Looking for Feedback,&quot; &quot;Looking for Collaboration,&quot; &quot;Seeking Mentorship,&quot; and &quot;Discussion.&quot;</li>
@@ -425,6 +464,21 @@ If using CSS variables
 <li>UCollab uses OAuth to authenticate users securely with their University of Cincinnati Microsoft credentials, ensuring a familiar login process for students within the UC tenant.</li>
 </ol>
 <p><img src="https://github.com/user-attachments/assets/1289f86b-58a6-4729-8652-9f0629763bd6" alt="image" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="-ucollab-authentication-guide"><a class="header" href="#-ucollab-authentication-guide">🎨 UCollab Authentication Guide</a></h1>
+<h2 id="overview-5"><a class="header" href="#overview-5">Overview</a></h2>
+<p>This page provides step-by-step instructions on how a user can authenticate themselves for UCollab sign up.</p>
+<hr />
+<h3 id="step-1-log-in-to-your-uc-account"><a class="header" href="#step-1-log-in-to-your-uc-account">Step 1: Log in to Your UC Account</a></h3>
+<ol>
+<li>Select &quot;Login&quot; in the top right.</li>
+<li>Enter your UC email address and password and click log in.</li>
+</ol>
+<h3 id="step-2-duo-authentication"><a class="header" href="#step-2-duo-authentication">Step 2: Duo Authentication</a></h3>
+<ol>
+<li>After clicking log in, you will be sent a Duo Mobile push to your app.</li>
+<li>Go to the Duo Mobile application on your phone and select &quot;Approve&quot;.</li>
+<li>Once authentication is successful, you’ll be redirected to the UCollab website.</li>
+</ol>
 
                     </main>
 
