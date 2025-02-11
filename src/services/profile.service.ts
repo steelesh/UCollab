@@ -1,6 +1,6 @@
 import { Prisma, User } from '@prisma/client';
 import { notFound } from 'next/navigation';
-import { prisma } from '../data/prisma';
+import { prisma } from '~/data/prisma';
 import { withServiceAuth } from '~/lib/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
 import { AppError } from '~/lib/errors/app-error';

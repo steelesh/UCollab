@@ -1,4 +1,4 @@
-import { AvatarSource, PostType, PostStatus, NotificationType, OnboardingStep, Role } from '@prisma/client';
+import { AvatarSource, PostType, PostStatus, NotificationType, OnboardingStep, Role, MentorshipStatus } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import Decimal from 'decimal.js';
 
@@ -43,6 +43,8 @@ export function fakeUser() {
     lastName: faker.person.lastName(),
     avatar: faker.image.avatarGitHub(),
     azureAdId: faker.string.uuid(),
+    gradYear: undefined,
+    githubProfile: undefined,
   };
 }
 export function fakeUserComplete() {
@@ -60,6 +62,9 @@ export function fakeUserComplete() {
     azureAdId: faker.string.uuid(),
     onboardingStep: OnboardingStep.STEP_ONE,
     role: Role.USER,
+    gradYear: undefined,
+    githubProfile: undefined,
+    mentorship: MentorshipStatus.NONE,
   };
 }
 export function fakeProfile() {
@@ -67,6 +72,7 @@ export function fakeProfile() {
     lastModifiedDate: faker.date.recent(),
     gradYear: faker.number.int({ min: 2023, max: 2030 }),
     bio: faker.person.bio(),
+    githubProfile: undefined,
   };
 }
 export function fakeProfileComplete() {
@@ -76,6 +82,7 @@ export function fakeProfileComplete() {
     lastModifiedDate: faker.date.recent(),
     gradYear: faker.number.int({ min: 2023, max: 2030 }),
     bio: faker.person.bio(),
+    githubProfile: undefined,
   };
 }
 export function fakePost() {
@@ -104,6 +111,7 @@ export function fakePostComplete() {
 export function fakeSkill() {
   return {
     name: faker.person.fullName(),
+    userId: faker.lorem.words(5),
   };
 }
 export function fakeSkillComplete() {
@@ -111,8 +119,10 @@ export function fakeSkillComplete() {
     id: faker.string.uuid(),
     name: faker.person.fullName(),
     verified: false,
-    createdById: faker.string.uuid(),
     createdDate: new Date(),
+    createdById: faker.string.uuid(),
+    userId: faker.lorem.words(5),
+    profileId: undefined,
   };
 }
 export function fakeTechnology() {
