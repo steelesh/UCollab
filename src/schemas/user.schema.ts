@@ -37,6 +37,13 @@ export const userSchema = z.object({
     ),
 });
 
+export const onboardingSchema = z.object({
+  gradYear: z.string().regex(/^\d{4}$/, 'Grad year must be a 4-digit year.'),
+  skills: z.string(),
+  githubProfile: z.string().url({ message: 'Invalid URL' }),
+  postType: z.string(),
+});
+
 export const updateUserSchema = z.object({
   username: userSchema.shape.username.optional(),
   avatar: z
@@ -52,3 +59,4 @@ export const updateUserSchema = z.object({
 
 export type CreateUserInput = z.infer<typeof userSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+export type CompleteOnboardingData = z.infer<typeof onboardingSchema>;

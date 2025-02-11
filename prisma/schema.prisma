@@ -89,7 +89,6 @@ model Profile {
 
 model Post {
   id               String         @id @default(cuid())
-  createdById      String
   ///FAKE:faker.date.past({ years: 1 })
   createdDate      DateTime       @default(now())
   ///FAKE:faker.date.recent()
@@ -99,9 +98,8 @@ model Post {
   postType         PostType
   technologies     Technology[]
   githubRepo       String?
-  ///FAKE:faker.helpers.arrayElement(Object.values(PostStatus))
-  status           PostStatus
   comments         Comment[]
+  createdById      String
   createdBy        User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
   notifications    Notification[] @relation("PostNotifications")
 
@@ -114,13 +112,11 @@ model Skill {
   name        String   @unique
   verified    Boolean  @default(false)
   createdDate DateTime @default(now())
-  createdById String
-  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  userId      String
   Profile     Profile? @relation(fields: [profileId], references: [id])
   profileId   String?
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
 
-  @@index([createdById])
   @@index([name])
 }
 
@@ -128,12 +124,12 @@ model Technology {
   id          String   @id @default(cuid())
   name        String   @unique
   verified    Boolean  @default(false)
-  createdById String
   createdDate DateTime @default(now())
+  Post        Post?    @relation(fields: [postId], references: [id])
+  postId      String?
+  createdById String
   createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  posts       Post[]
 
-  @@index([createdById])
   @@index([name])
 }
 
@@ -215,11 +211,6 @@ enum PostType {
   CONTRIBUTION
   FEEDBACK
   DISCUSSION
-}
-
-enum PostStatus {
-  OPEN
-  CLOSED
 }
 
 enum NotificationType {

@@ -1,26 +1,35 @@
-import { ErrorMessage } from '~/lib/constants';
-import { UpdateUserInput } from '~/schemas/user.schema';
+'use server';
+
+import { onboardingSchema } from '~/schemas/user.schema';
 import { UserService } from '~/services/user.service';
-import { Role } from '@prisma/client';
-import { auth } from 'auth';
+import { auth } from '../../auth';
+import { ErrorMessage } from '~/lib/constants';
+import { AppError } from '~/lib/errors/app-error';
+import { Prisma } from '@prisma/client';
+import { notFound, redirect } from 'next/navigation';
 
-export async function updateUser(userId: string, data: UpdateUserInput) {
+export async function updateOnboarding(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
-
-  return UserService.updateUser(userId, data, session.user.id);
-}
-
-export async function updateUserRole(userId: string, role: Role) {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
-
-  return UserService.updateUserRole(userId, role, session.user.id);
-}
-
-export async function deleteUser(userId: string) {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
-
-  return UserService.deleteUser(userId, session.user.id);
+  const { gradYear, skills, githubProfile, postType } = onboardingSchema.parse({
+    gradYear: formData.get('gradYear'),
+    skills: formData.get('skills'),
+    githubProfile: formData.get('githubProfile'),
+    postType: formData.get('postType'),
+  });
+  try {
+    await UserService.completeOnboarding(session.user.id, session.user.id, {
+      gradYear,
+      skills,
+      githubProfile,
+      postType,
+    });
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      notFound();
+    }
+    throw new AppError(ErrorMessage.OPERATION_FAILED);
+  }
+  redirect('/');
 }

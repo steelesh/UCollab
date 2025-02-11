@@ -8,8 +8,13 @@ import { withServiceAuth } from '~/lib/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
 import { AppError } from '~/lib/errors/app-error';
 import { isDevelopment } from '~/lib/utils';
-import { publicUserSelect, UpdateUserInput, userSelect } from '~/schemas/user.schema';
-import { CompleteOnboardingData, onboardingSchema } from '~/schemas/onboarding.schema';
+import {
+  publicUserSelect,
+  UpdateUserInput,
+  userSelect,
+  CompleteOnboardingData,
+  onboardingSchema,
+} from '~/schemas/user.schema';
 
 export const UserService = {
   async getUser(username: User['username']) {
@@ -29,21 +34,14 @@ export const UserService = {
   async completeOnboarding(userId: User['id'], requestUserId: string, rawData: unknown) {
     return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
-        // 1. Parse and validate the incoming data with Zod.
         const data: CompleteOnboardingData = onboardingSchema.parse(rawData);
-
-        // 2. Map postType to mentorship status.
         let mentorship: 'MENTOR' | 'MENTEE' | 'NONE' = 'NONE';
-        if (data.postType === 'Mentorship Status') {
+        if (data.postType === 'Mentor') {
           mentorship = 'MENTOR';
-        } else if (data.postType === 'Feedback') {
+        } else if (data.postType === 'Mentee') {
           mentorship = 'MENTEE';
         }
-
-        // 3. Convert gradYear from string to number.
         const gradYearNumber = data.gradYear ? parseInt(data.gradYear, 10) : null;
-
-        // 4. Use a transaction to update the user.
         return await prisma.$transaction(async (tx) => {
           return tx.user.update({
             where: { id: userId },
@@ -54,18 +52,14 @@ export const UserService = {
               mentorship: mentorship,
               Skill: {
                 deleteMany: {},
-                create: data.skills
-                  ? data.skills
-                      .split(',')
-                      .map((s) => ({ name: s.trim(), userId: userId }))
-                      .filter(({ name }) => name.length > 0)
-                  : [],
+                create: data.skills ? data.skills.split(',').map((s) => ({ name: s.trim() })) : [],
               },
             },
             select: userSelect,
           });
         });
       } catch (error) {
+        console.log(error);
         if (error instanceof AppError) throw error;
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
           notFound();

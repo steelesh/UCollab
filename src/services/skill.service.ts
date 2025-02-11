@@ -50,7 +50,7 @@ export const SkillService = {
           data: {
             ...data,
             verified: true,
-            createdById: requestUserId,
+            userId: requestUserId,
           },
           select: skillSelect,
         });
@@ -73,7 +73,7 @@ export const SkillService = {
           data: {
             ...data,
             verified: false,
-            createdById: requestUserId,
+            userId: requestUserId,
           },
           select: skillSelect,
         });
