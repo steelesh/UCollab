@@ -28,5 +28,5 @@ export async function updatePostTechnologies(postId: string, technologies: strin
   const session = await auth();
   if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
 
-  return TechnologyService.updatePostTechnologies(postId, technologies);
+  return TechnologyService.updatePostTechnologies(postId, technologies, session.user.id);
 }

@@ -6,17 +6,17 @@ export const metadata = {
 };
 
 interface Project {
-  user?: {
-    username: string;
-  };
-  title: string;
   createdDate: string;
-  createdById: string;
   description: string;
+  githubRepo?: string;
   postType: 'CONTRIBUTION' | 'FEEDBACK' | 'DISCUSSION';
   status: string;
   technologies: string[];
-  githubRepo?: string;
+  title: string;
+  user?: {
+    username: string;
+  };
+  userId: string;
 }
 
 export async function ExplorePage() {
@@ -39,7 +39,7 @@ export async function ExplorePage() {
   const projectsWithUser = await Promise.all(
     projects.map(async (project) => {
       try {
-        const userResponse = await fetch(`/api/users/from-id/${project.createdById}`, {
+        const userResponse = await fetch(`/api/users/from-id/${project.userId}`, {
           headers: { cookie: cookieHeader },
           next: { revalidate: 60 },
         });
@@ -55,7 +55,6 @@ export async function ExplorePage() {
       }
     }),
   );
-
   return (
     <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-24">
       <div className="container mx-auto grid gap-8 px-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

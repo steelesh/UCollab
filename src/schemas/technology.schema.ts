@@ -20,12 +20,9 @@ export const technologySchema = z.object({
     .min(1, 'Technology name is required')
     .max(50, 'Technology name must be less than 50 characters')
     .transform((name) => name.toLowerCase().trim()),
-  verified: z.boolean().default(false),
+  verified: z.boolean().optional(),
+  createdById: z.string().optional(),
 }) satisfies z.ZodType<Partial<Prisma.TechnologyCreateInput>>;
-
-export const suggestTechnologySchema = technologySchema.pick({
-  name: true,
-});
 
 export const updateTechnologySchema = technologySchema.partial() satisfies z.ZodType<
   Partial<Prisma.TechnologyUpdateInput>
@@ -33,4 +30,3 @@ export const updateTechnologySchema = technologySchema.partial() satisfies z.Zod
 
 export type CreateTechnologyInput = z.infer<typeof technologySchema>;
 export type UpdateTechnologyInput = z.infer<typeof updateTechnologySchema>;
-export type SuggestTechnologyInput = z.infer<typeof suggestTechnologySchema>;

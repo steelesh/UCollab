@@ -1,15 +1,13 @@
+import Form from 'next/form';
 import { withOnboarding } from '~/lib/auth/protected';
-
-export const metadata = {
-  title: 'UCollab — Onboarding',
-};
+import { updateOnboarding } from '~/actions/user.actions';
 
 async function OnboardingPage() {
   return (
     <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto pt-8">
       <div className="bg-base-300 mx-auto w-full max-w-5xl rounded-lg p-4 shadow-lg">
         <h2 className="mb-6 text-center text-3xl font-bold">Onboarding</h2>
-        <form action="/api/onboarding" method="POST">
+        <Form action={updateOnboarding}>
           <div className="form-control mb-4">
             <label className="label" htmlFor="gradYear">
               <span className="label-text">Graduation Year</span>
@@ -47,8 +45,6 @@ async function OnboardingPage() {
               placeholder="Link to the GitHub profile"
             />
           </div>
-
-          {/* Mentorship selection using radio inputs grouped in separate containers */}
           <div className="mb-4 flex gap-4">
             <div className="flex flex-col items-center">
               <input type="radio" name="postType" id="mentor" value="Mentor" className="peer hidden" />
@@ -75,11 +71,10 @@ async function OnboardingPage() {
               </label>
             </div>
           </div>
-
           <button type="submit" className="btn btn-primary-content mx-auto mt-6 block w-auto px-8">
             Submit
           </button>
-        </form>
+        </Form>
       </div>
     </div>
   );

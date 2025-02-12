@@ -52,7 +52,7 @@ export const CommentService = {
             select: {
               id: true,
               title: true,
-              createdById: true,
+              userId: true,
             },
           },
         },
@@ -77,17 +77,17 @@ export const CommentService = {
             data: {
               content: validatedData.content,
               postId,
-              createdById: requestUserId,
+              userId: requestUserId,
             },
             select: {
               id: true,
               content: true,
               postId: true,
-              createdById: true,
+              userId: true,
               post: {
                 select: {
                   title: true,
-                  createdById: true,
+                  userId: true,
                 },
               },
               createdBy: {
@@ -102,8 +102,8 @@ export const CommentService = {
             postId: comment.postId,
             postTitle: comment.post.title,
             commentId: comment.id,
-            postAuthorId: comment.post.createdById,
-            commentAuthorId: comment.createdById,
+            postAuthorId: comment.post.userId,
+            commentAuthorId: comment.userId,
             commentAuthorName: comment.createdBy.username,
             content: comment.content,
           });
@@ -127,14 +127,14 @@ export const CommentService = {
     try {
       const comment = await prisma.comment.findUnique({
         where: { id },
-        select: { id: true, createdById: true },
+        select: { id: true, userId: true },
       });
 
       if (!comment) {
         throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
       }
 
-      return withServiceAuth(requestUserId, { ownerId: comment.createdById }, async () => {
+      return withServiceAuth(requestUserId, { ownerId: comment.userId }, async () => {
         const validatedData = commentFormSchema.parse({ content });
 
         return prisma.comment.update({
@@ -166,14 +166,14 @@ export const CommentService = {
     try {
       const comment = await prisma.comment.findUnique({
         where: { id },
-        select: { id: true, createdById: true },
+        select: { id: true, userId: true },
       });
 
       if (!comment) {
         throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
       }
 
-      return withServiceAuth(requestUserId, { ownerId: comment.createdById }, async () => {
+      return withServiceAuth(requestUserId, { ownerId: comment.userId }, async () => {
         await prisma.comment.delete({ where: { id } });
       });
     } catch (error) {

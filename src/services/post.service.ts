@@ -4,10 +4,9 @@ import { prisma } from '~/data/prisma';
 import { withServiceAuth } from '~/lib/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
 import { AppError } from '~/lib/errors/app-error';
-import { CreatePostInput, UpdatePostInput, postSelect, updatePostSchema } from '~/schemas/post.schema';
+import { postSchema, postSelect, CreatePostInput } from '~/schemas/post.schema';
 
 export const PostService = {
-  // Authenticated users can view posts
   async getAllPosts(requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
@@ -58,109 +57,42 @@ export const PostService = {
   },
 
   // Owner only - creating posts
-  async createPost(data: CreatePostInput, requestUserId: string) {
-    return withServiceAuth(requestUserId, { ownerId: data.userId }, async () => {
+  async createPost(requestUserId: string, rawData: unknown) {
+    return withServiceAuth(requestUserId, { ownerId: requestUserId }, async () => {
       try {
-        return await prisma.$transaction(async (tx) => {
-          const { technologies: techNames, ...postData } = data;
-
-          const verifiedTechs = techNames?.length
-            ? await tx.technology.findMany({
-                where: {
-                  AND: [
-                    { verified: true },
-                    {
-                      name: {
-                        in: techNames.map((t) => t.toLowerCase().trim()),
-                      },
-                    },
-                  ],
-                },
-                select: { name: true },
-              })
-            : [];
-
+        const data: CreatePostInput = postSchema.parse(rawData);
+        let postType: 'CONTRIBUTION' | 'FEEDBACK' | 'DISCUSSION' = 'DISCUSSION';
+        if (data.postType === 'CONTRIBUTION') {
+          postType = 'CONTRIBUTION';
+        } else if (data.postType === 'FEEDBACK') {
+          postType = 'FEEDBACK';
+        }
+        return prisma.$transaction(async (tx) => {
           return tx.post.create({
             data: {
-              ...postData,
-              createdById: data.userId,
-              technologies: verifiedTechs.length ? { connect: verifiedTechs.map(({ name }) => ({ name })) } : undefined,
+              title: data.title,
+              description: data.description,
+              postType: postType,
+              githubRepo: data.githubRepo,
+              // Connect the new post to the user creating it (if needed)
+              createdBy: { connect: { id: requestUserId } },
+              technologies: {
+                create: data.technologies
+                  ? data.technologies.split(',').map((s) => ({
+                      name: s.trim(),
+                      createdBy: { connect: { id: requestUserId } },
+                    }))
+                  : [],
+              },
             },
             select: postSelect,
           });
         });
       } catch (error) {
+        console.log(error);
         if (error instanceof AppError) throw error;
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          throw new AppError(ErrorMessage.INVALID_INPUT);
-        }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
-      }
-    });
-  },
-
-  // Owner or admin - updating posts
-  async updatePost(data: UpdatePostInput, requestUserId: string) {
-    const post = await this.getPostById(data.id, requestUserId);
-    return withServiceAuth(requestUserId, { ownerId: post.createdById }, async () => {
-      try {
-        return await prisma.$transaction(async (tx) => {
-          const verifiedTechs = data.technologies?.length
-            ? await tx.technology.findMany({
-                where: {
-                  AND: [
-                    { verified: true },
-                    {
-                      name: {
-                        in: data.technologies.map((t) => t.toLowerCase().trim()),
-                      },
-                    },
-                  ],
-                },
-                select: { name: true },
-              })
-            : [];
-
-          const validatedData = updatePostSchema.parse({
-            ...data,
-            technologies: verifiedTechs.map((t) => t.name),
-          });
-
-          return tx.post.update({
-            where: { id: data.id },
-            data: validatedData,
-            select: postSelect,
-          });
-        });
-      } catch (error) {
-        if (error instanceof AppError) throw error;
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === 'P2025') notFound();
-          throw new AppError(ErrorMessage.INVALID_INPUT);
-        }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
-      }
-    });
-  },
-
-  // Owner or admin - updating post status
-  async updatePostStatus(id: Post['id'], status: Post['status'], requestUserId: string) {
-    const post = await this.getPostById(id, requestUserId);
-    return withServiceAuth(requestUserId, { ownerId: post.createdById }, async () => {
-      try {
-        return await prisma.post.update({
-          where: { id },
-          data: { status },
-          select: {
-            id: true,
-            status: true,
-            lastModifiedDate: true,
-          },
-        });
-      } catch (error) {
-        if (error instanceof AppError) throw error;
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === 'P2025') notFound();
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+          notFound();
         }
         throw new AppError(ErrorMessage.OPERATION_FAILED);
       }

@@ -73,7 +73,7 @@ export const TechnologyService = {
           data: {
             name: normalizedName,
             verified: true,
-            createdById: requestUserId,
+            userId: requestUserId,
           },
           select: technologySelect,
         });
@@ -107,7 +107,7 @@ export const TechnologyService = {
           data: {
             name: normalizedName,
             verified: false,
-            createdById: requestUserId,
+            userId: requestUserId,
           },
           select: technologySelect,
         });
