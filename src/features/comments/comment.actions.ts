@@ -1,7 +1,7 @@
-import { auth } from 'auth';
+import { auth } from '../../../auth';
 import { ErrorMessage } from '~/lib/constants';
-import { CreateCommentData, UpdateCommentData } from '~/schemas/comment.schema';
-import { CommentService } from '~/services/comment.service';
+import { CreateCommentData, UpdateCommentData } from '~/features/comments/comment.schema';
+import { CommentService } from '~/features/comments/comment.service';
 
 export async function createComment(data: CreateCommentData) {
   const session = await auth();

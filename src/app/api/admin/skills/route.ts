@@ -1,5 +1,5 @@
-import { withApiAuth } from '~/lib/auth/protected-api';
-import { SkillService } from '~/services/skill.service';
+import { withApiAuth } from '~/auth/protected-api';
+import { SkillService } from '~/features/skills/skill.service';
 import { NextRequest } from 'next/server';
 
 export async function GET(req: NextRequest) {

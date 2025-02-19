@@ -1,7 +1,7 @@
-import { auth } from 'auth';
+import { auth } from '../../../auth';
 import { ErrorMessage } from '~/lib/constants';
-import { CreateSkillInput, UpdateSkillInput } from '~/schemas/skill.schema';
-import { SkillService } from '~/services/skill.service';
+import { CreateSkillInput, UpdateSkillInput } from '~/features/skills/skill.schema';
+import { SkillService } from '~/features/skills/skill.service';
 
 export async function createSkill(data: CreateSkillInput) {
   const session = await auth();

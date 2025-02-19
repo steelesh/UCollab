@@ -1,4 +1,4 @@
-import { ProfileService } from '~/services/profile.service';
+import { ProfileService } from '~/features/profiles/profile.service';
 import { NextRequest } from 'next/server';
 
 export async function GET(_req: NextRequest, { params }: { params: { username: string } }) {

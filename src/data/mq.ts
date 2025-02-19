@@ -2,8 +2,8 @@ import { User } from '@prisma/client';
 import { Queue, Worker } from 'bullmq';
 import IORedis from 'ioredis';
 import { env } from '~/lib/env';
-import { CreateBatchNotificationData, CreateNotificationData } from '~/schemas/notification.schema';
-import { NotificationService } from '~/services/notification.service';
+import { CreateBatchNotificationData, CreateNotificationData } from '~/features/notifications/notification.schema';
+import { NotificationService } from '~/features/notifications/notification.service';
 
 const queueConfig = {
   connection: new IORedis(env.REDIS_URL || 'redis://localhost:6379'),

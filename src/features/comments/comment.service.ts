@@ -1,11 +1,11 @@
 import { Comment, Post, Prisma, User } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '~/data/prisma';
-import { withServiceAuth } from '~/lib/auth/protected-service';
+import { withServiceAuth } from '~/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
 import { AppError, ValidationError } from '~/lib/errors/app-error';
-import { commentFormSchema, type CreateCommentData, type UpdateCommentData } from '~/schemas/comment.schema';
-import { NotificationService } from './notification.service';
+import { commentFormSchema, type CreateCommentData, type UpdateCommentData } from '~/features/comments/comment.schema';
+import { NotificationService } from '../notifications/notification.service';
 
 export const CommentService = {
   // Authenticated users can view comments
@@ -52,7 +52,7 @@ export const CommentService = {
             select: {
               id: true,
               title: true,
-              userId: true,
+              createdById: true,
             },
           },
         },
@@ -77,17 +77,17 @@ export const CommentService = {
             data: {
               content: validatedData.content,
               postId,
-              userId: requestUserId,
+              createdById: requestUserId,
             },
             select: {
               id: true,
               content: true,
               postId: true,
-              userId: true,
+              createdById: true,
               post: {
                 select: {
                   title: true,
-                  userId: true,
+                  createdById: true,
                 },
               },
               createdBy: {
@@ -102,8 +102,8 @@ export const CommentService = {
             postId: comment.postId,
             postTitle: comment.post.title,
             commentId: comment.id,
-            postAuthorId: comment.post.userId,
-            commentAuthorId: comment.userId,
+            postAuthorId: comment.post.createdById,
+            commentAuthorId: comment.createdById,
             commentAuthorName: comment.createdBy.username,
             content: comment.content,
           });
@@ -127,14 +127,14 @@ export const CommentService = {
     try {
       const comment = await prisma.comment.findUnique({
         where: { id },
-        select: { id: true, userId: true },
+        select: { id: true, createdById: true },
       });
 
       if (!comment) {
         throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
       }
 
-      return withServiceAuth(requestUserId, { ownerId: comment.userId }, async () => {
+      return withServiceAuth(requestUserId, { ownerId: comment.createdById }, async () => {
         const validatedData = commentFormSchema.parse({ content });
 
         return prisma.comment.update({
@@ -166,14 +166,14 @@ export const CommentService = {
     try {
       const comment = await prisma.comment.findUnique({
         where: { id },
-        select: { id: true, userId: true },
+        select: { id: true, createdById: true },
       });
 
       if (!comment) {
         throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
       }
 
-      return withServiceAuth(requestUserId, { ownerId: comment.userId }, async () => {
+      return withServiceAuth(requestUserId, { ownerId: comment.createdById }, async () => {
         await prisma.comment.delete({ where: { id } });
       });
     } catch (error) {

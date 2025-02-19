@@ -1,7 +1,7 @@
-import { auth } from 'auth';
+import { auth } from '../../../auth';
 import { ErrorMessage } from '~/lib/constants';
-import { UpdateProfileInput } from '~/schemas/profile.schema';
-import { ProfileService } from '~/services/profile.service';
+import { UpdateProfileInput } from '~/features/profiles/profile.schema';
+import { ProfileService } from '~/features/profiles/profile.service';
 
 export async function updateProfile(data: UpdateProfileInput) {
   const session = await auth();

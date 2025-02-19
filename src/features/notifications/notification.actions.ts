@@ -1,7 +1,7 @@
-import { auth } from 'auth';
+import { auth } from '../../../auth';
 import { ErrorMessage } from '~/lib/constants';
-import { CreateSystemNotificationInput } from '~/schemas/notification.schema';
-import { NotificationService } from '~/services/notification.service';
+import { CreateSystemNotificationInput } from '~/features/notifications/notification.schema';
+import { NotificationService } from '~/features/notifications/notification.service';
 
 export async function markAsRead(notificationId: string) {
   const session = await auth();

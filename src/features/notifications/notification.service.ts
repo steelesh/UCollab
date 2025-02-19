@@ -1,13 +1,17 @@
 import { Comment, Notification, NotificationPreferences, NotificationType, Post, Prisma, User } from '@prisma/client';
 import { mq } from '~/data/mq';
 import { prisma } from '~/data/prisma';
-import { withServiceAuth } from '~/lib/auth/protected-service';
+import { withServiceAuth } from '~/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
 import { AppError } from '~/lib/errors/app-error';
 import { canAccess } from '~/lib/permissions';
-import { CreateBatchNotificationData, CreateNotificationData, notificationSelect } from '~/schemas/notification.schema';
-import { CommentService } from './comment.service';
-import { UserService } from './user.service';
+import {
+  CreateBatchNotificationData,
+  CreateNotificationData,
+  notificationSelect,
+} from '~/features/notifications/notification.schema';
+import { CommentService } from '../comments/comment.service';
+import { UserService } from '../users/user.service';
 
 export const NotificationService = {
   async getUserNotifications(userId: User['id'], requestUserId: string) {

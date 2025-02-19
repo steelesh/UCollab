@@ -1,20 +1,13 @@
-import { auth } from 'auth';
+import { auth } from '../../../auth';
 import { ErrorMessage } from '~/lib/constants';
-import { CreateTechnologyInput, SuggestTechnologyInput } from '~/schemas/technology.schema';
-import { TechnologyService } from '~/services/technology.service';
+import { CreateTechnologyInput } from '~/features/technologies/technology.schema';
+import { TechnologyService } from '~/features/technologies/technology.service';
 
 export async function createTechnology(data: CreateTechnologyInput) {
   const session = await auth();
   if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
 
   return TechnologyService.createTechnology(data, session.user.id);
-}
-
-export async function suggestTechnology(data: SuggestTechnologyInput) {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
-
-  return TechnologyService.suggestTechnology(data, session.user.id);
 }
 
 export async function verifyTechnology(technologyId: string) {

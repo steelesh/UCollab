@@ -4,7 +4,7 @@ import { Account, AvatarSource, Prisma, Role, User } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import { prisma } from '~/data/prisma';
 import { s3 } from '~/data/s3';
-import { withServiceAuth } from '~/lib/auth/protected-service';
+import { withServiceAuth } from '~/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
 import { AppError } from '~/lib/errors/app-error';
 import { isDevelopment } from '~/lib/env';
@@ -14,7 +14,7 @@ import {
   userSelect,
   CompleteOnboardingData,
   onboardingSchema,
-} from '~/schemas/user.schema';
+} from '~/features/users/user.schema';
 
 export const UserService = {
   async getUser(username: User['username']) {

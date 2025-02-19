@@ -1,28 +1,30 @@
 'use server';
 
-import { onboardingSchema } from '~/schemas/user.schema';
-import { UserService } from '~/services/user.service';
-import { auth } from '../../auth';
+import { postSchema } from '~/features/posts/post.schema';
+import { PostService } from '~/features/posts/post.service';
+import { auth } from '../../../auth';
 import { ErrorMessage } from '~/lib/constants';
 import { AppError } from '~/lib/errors/app-error';
 import { Prisma } from '@prisma/client';
 import { notFound, redirect } from 'next/navigation';
 
-export async function updateOnboarding(formData: FormData) {
+export async function createPost(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
-  const { gradYear, skills, githubProfile, postType } = onboardingSchema.parse({
-    gradYear: formData.get('gradYear'),
-    skills: formData.get('skills'),
-    githubProfile: formData.get('githubProfile'),
+  const { title, postType, description, technologies, githubRepo } = postSchema.parse({
+    title: formData.get('title'),
     postType: formData.get('postType'),
+    description: formData.get('description'),
+    technologies: formData.get('technologies'),
+    githubRepo: formData.get('githubRepo'),
   });
   try {
-    await UserService.completeOnboarding(session.user.id, session.user.id, {
-      gradYear,
-      skills,
-      githubProfile,
+    await PostService.createPost(session.user.id, {
+      title,
       postType,
+      description,
+      githubRepo,
+      technologies,
     });
   } catch (error) {
     if (error instanceof AppError) throw error;

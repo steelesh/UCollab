@@ -1,10 +1,10 @@
 import { Prisma, User } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import { prisma } from '~/data/prisma';
-import { withServiceAuth } from '~/lib/auth/protected-service';
+import { withServiceAuth } from '~/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
 import { AppError } from '~/lib/errors/app-error';
-import { UpdateProfileInput, profileSelect, updateProfileSchema } from '~/schemas/profile.schema';
+import { UpdateProfileInput, profileSelect, updateProfileSchema } from '~/features/profiles/profile.schema';
 
 export const ProfileService = {
   // Owner or admin can view profile

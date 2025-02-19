@@ -1,10 +1,10 @@
 import { Prisma, Skill } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import { prisma } from '~/data/prisma';
-import { withServiceAuth } from '~/lib/auth/protected-service';
+import { withServiceAuth } from '~/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
 import { AppError } from '~/lib/errors/app-error';
-import { CreateSkillInput, UpdateSkillInput, skillSelect } from '~/schemas/skill.schema';
+import { CreateSkillInput, UpdateSkillInput, skillSelect } from '~/features/skills/skill.schema';
 
 export const SkillService = {
   // Public methods - no auth needed
@@ -50,7 +50,7 @@ export const SkillService = {
           data: {
             ...data,
             verified: true,
-            userId: requestUserId,
+            createdById: requestUserId,
           },
           select: skillSelect,
         });
@@ -73,7 +73,7 @@ export const SkillService = {
           data: {
             ...data,
             verified: false,
-            userId: requestUserId,
+            createdById: requestUserId,
           },
           select: skillSelect,
         });

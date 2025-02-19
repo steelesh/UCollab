@@ -1,10 +1,10 @@
 import { Post, Prisma } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import { prisma } from '~/data/prisma';
-import { withServiceAuth } from '~/lib/auth/protected-service';
+import { withServiceAuth } from '~/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
 import { AppError } from '~/lib/errors/app-error';
-import { CreateTechnologyInput, SuggestTechnologyInput, technologySelect } from '~/schemas/technology.schema';
+import { CreateTechnologyInput, technologySelect } from '~/features/technologies/technology.schema';
 
 export const TechnologyService = {
   async getVerifiedTechnologies() {
@@ -34,29 +34,6 @@ export const TechnologyService = {
     }
   },
 
-  async getPopularTechnologies(limit = 20) {
-    try {
-      const technologies = await prisma.technology.findMany({
-        where: { verified: true },
-        select: {
-          id: true,
-          name: true,
-          _count: { select: { posts: true } },
-        },
-        orderBy: { posts: { _count: 'desc' } },
-        take: limit,
-      });
-
-      return technologies.map((tech) => ({
-        id: tech.id,
-        name: tech.name,
-        postCount: tech._count.posts,
-      }));
-    } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
-    }
-  },
-
   // Admin only - creating verified technologies
   async createTechnology(data: CreateTechnologyInput, requestUserId: string) {
     return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
@@ -73,7 +50,7 @@ export const TechnologyService = {
           data: {
             name: normalizedName,
             verified: true,
-            userId: requestUserId,
+            createdById: requestUserId,
           },
           select: technologySelect,
         });
@@ -83,36 +60,6 @@ export const TechnologyService = {
             throw new AppError(`Technology "${data.name}" already exists`);
           }
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
-      }
-    });
-  },
-
-  // Authenticated users can suggest
-  async suggestTechnology(data: SuggestTechnologyInput, requestUserId: string) {
-    return withServiceAuth(requestUserId, null, async () => {
-      try {
-        const normalizedName = data.name.toLowerCase().trim();
-        const existing = await prisma.technology.findUnique({
-          where: { name: normalizedName },
-          select: technologySelect,
-        });
-
-        if (existing) {
-          if (existing.verified) return existing;
-          throw new AppError('Technology already suggested and pending review');
-        }
-
-        return await prisma.technology.create({
-          data: {
-            name: normalizedName,
-            verified: false,
-            userId: requestUserId,
-          },
-          select: technologySelect,
-        });
-      } catch (error) {
-        if (error instanceof AppError) throw error;
         throw new AppError(ErrorMessage.OPERATION_FAILED);
       }
     });

@@ -1,8 +1,8 @@
-import { UserService } from '~/services/user.service';
+import { UserService } from '~/features/users/user.service';
 import { Role } from '@prisma/client';
-import { ErrorMessage } from '../constants';
-import { AppError, AuthenticationError, AuthorizationError } from '../errors/app-error';
-import { canAccess } from '../permissions';
+import { ErrorMessage } from '~/lib/constants';
+import { AppError, AuthenticationError, AuthorizationError } from '~/lib/errors/app-error';
+import { canAccess } from '~/lib/permissions';
 
 interface ResourceCheck {
   ownerId?: string;

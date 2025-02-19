@@ -1,10 +1,10 @@
 import { Post, Prisma, Technology } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import { prisma } from '~/data/prisma';
-import { withServiceAuth } from '~/lib/auth/protected-service';
+import { withServiceAuth } from '~/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
 import { AppError } from '~/lib/errors/app-error';
-import { postSchema, postSelect, CreatePostInput } from '~/schemas/post.schema';
+import { postSchema, postSelect, CreatePostInput } from '~/features/posts/post.schema';
 
 export const PostService = {
   async getAllPosts(requestUserId: string) {

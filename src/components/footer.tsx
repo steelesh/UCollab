@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { Route } from 'next';
 
 export default function Footer() {
   const navigation = {
@@ -15,7 +16,10 @@ export default function Footer() {
       <div className="mx-auto overflow-hidden">
         <nav aria-label="Footer" className="flex flex-wrap justify-center gap-8 text-sm">
           {navigation.main.map((item) => (
-            <Link key={item.name} href={item.href} className="text-accent hover:text-base-content hover:underline">
+            <Link
+              key={item.name}
+              href={item.href as Route}
+              className="text-accent hover:text-base-content hover:underline">
               {item.name}
             </Link>
           ))}

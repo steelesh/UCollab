@@ -5,7 +5,7 @@ import { encode } from 'next-auth/jwt';
 import microsoftEntraId from 'next-auth/providers/microsoft-entra-id';
 import { prisma } from '~/data/prisma';
 import { isDevelopment } from '~/lib/env';
-import { UserService } from '~/services/user.service';
+import { UserService } from '~/features/users/user.service';
 
 declare module 'next-auth' {
   interface Session {

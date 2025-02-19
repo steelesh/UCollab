@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { prisma } from '../../../data/prisma';
-import { withAuth } from '~/lib/auth/protected';
+import { prisma } from '~/data/prisma';
+import { withAuth } from '~/auth/protected';
 
 export const metadata = {
   title: 'UCollab — Community',
