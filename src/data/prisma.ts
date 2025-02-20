@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { env, isDevelopment } from '~/lib/env';
+import { env, isDevelopment } from '~/data/env';
 
 const createPrismaClient = () =>
   new PrismaClient({

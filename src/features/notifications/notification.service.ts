@@ -4,7 +4,7 @@ import { prisma } from '~/data/prisma';
 import { withServiceAuth } from '~/auth/protected-service';
 import { ErrorMessage } from '~/lib/constants';
 import { AppError } from '~/lib/errors/app-error';
-import { canAccess } from '~/lib/permissions';
+import { canAccess } from '~/auth/protected-role';
 import {
   CreateBatchNotificationData,
   CreateNotificationData,

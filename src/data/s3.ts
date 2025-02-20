@@ -1,5 +1,5 @@
 import { PutBucketPolicyCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { env } from '~/lib/env';
+import { env } from '~/data/env';
 
 interface S3UploadParams {
   buffer: Buffer;

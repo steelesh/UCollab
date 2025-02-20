@@ -2,7 +2,7 @@ import { UserService } from '~/features/users/user.service';
 import { Role } from '@prisma/client';
 import { ErrorMessage } from '~/lib/constants';
 import { AppError, AuthenticationError, AuthorizationError } from '~/lib/errors/app-error';
-import { canAccess } from '~/lib/permissions';
+import { canAccess } from '~/auth/protected-role';
 
 interface ResourceCheck {
   ownerId?: string;
