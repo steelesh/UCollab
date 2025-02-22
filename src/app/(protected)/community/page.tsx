@@ -8,14 +8,6 @@ export const metadata = {
   title: 'UCollab — Community',
 };
 
-interface _User {
-  avatar: string | null;
-  username: string;
-  email: string;
-  createdDate: string;
-  lastLogin: string;
-}
-
 async function CommunityPage() {
   const users = await prisma.user.findMany({
     select: {
