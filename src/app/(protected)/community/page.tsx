@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { prisma } from '~/lib/prisma';
-import { withAuth } from '~/auth/protected';
+import { withAuth } from '~/security/protected';
 import type { Route } from 'next';
 
 export const metadata = {

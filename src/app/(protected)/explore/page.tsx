@@ -1,5 +1,5 @@
 import { prisma } from '~/lib/prisma';
-import { withAuth } from '~/auth/protected';
+import { withAuth } from '~/security/protected';
 
 export const metadata = {
   title: 'UCollab — Explore',

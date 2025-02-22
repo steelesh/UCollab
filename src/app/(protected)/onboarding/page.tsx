@@ -1,5 +1,5 @@
 import Form from 'next/form';
-import { withOnboarding } from '~/auth/protected';
+import { withOnboarding } from '~/security/protected';
 import { updateOnboarding } from '~/features/users/user.actions';
 
 async function OnboardingPage() {

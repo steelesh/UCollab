@@ -1,7 +1,7 @@
 import { UserService } from '~/features/users/user.service';
 import { Role } from '@prisma/client';
 import { ErrorMessage, Utils, AuthenticationError, AuthorizationError } from '~/lib/utils';
-import { canAccess } from '~/auth/protected-role';
+import { canAccess } from '~/security/protected-role';
 
 interface ResourceCheck {
   ownerId?: string;

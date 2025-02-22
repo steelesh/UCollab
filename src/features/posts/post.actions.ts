@@ -2,7 +2,7 @@
 
 import { postSchema } from '~/features/posts/post.schema';
 import { PostService } from '~/features/posts/post.service';
-import { auth } from '../../../auth';
+import { auth } from '~/security/auth';
 import { ErrorMessage, Utils } from '~/lib/utils';
 import { Prisma } from '@prisma/client';
 import { notFound, redirect } from 'next/navigation';

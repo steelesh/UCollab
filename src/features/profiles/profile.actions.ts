@@ -1,4 +1,4 @@
-import { auth } from '../../../auth';
+import { auth } from '~/security/auth';
 import { ErrorMessage } from '~/lib/utils';
 import { UpdateProfileInput } from '~/features/profiles/profile.schema';
 import { ProfileService } from '~/features/profiles/profile.service';

@@ -1,7 +1,7 @@
 import { Comment, Post, Prisma, User } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '~/lib/prisma';
-import { withServiceAuth } from '~/auth/protected-service';
+import { withServiceAuth } from '~/security/protected-service';
 import { ErrorMessage, Utils, ValidationError } from '~/lib/utils';
 import { commentFormSchema, type CreateCommentData, type UpdateCommentData } from '~/features/comments/comment.schema';
 import { NotificationService } from '../notifications/notification.service';

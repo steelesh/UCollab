@@ -1,7 +1,7 @@
 import { Post, Prisma, Technology } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import { prisma } from '~/lib/prisma';
-import { withServiceAuth } from '~/auth/protected-service';
+import { withServiceAuth } from '~/security/protected-service';
 import { ErrorMessage, Utils } from '~/lib/utils';
 import { postSchema, postSelect, CreatePostInput } from '~/features/posts/post.schema';
 
