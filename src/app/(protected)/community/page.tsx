@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { prisma } from '~/data/prisma';
+import { prisma } from '~/lib/prisma';
 import { withAuth } from '~/auth/protected';
 import type { Route } from 'next';
 

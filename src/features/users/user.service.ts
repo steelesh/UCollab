@@ -2,12 +2,11 @@ import { lorelei } from '@dicebear/collection';
 import { createAvatar } from '@dicebear/core';
 import { Account, AvatarSource, Prisma, Role, User } from '@prisma/client';
 import { notFound } from 'next/navigation';
-import { prisma } from '~/data/prisma';
-import { s3 } from '~/data/s3';
+import { prisma } from '~/lib/prisma';
+import { s3 } from '~/lib/s3';
 import { withServiceAuth } from '~/auth/protected-service';
-import { ErrorMessage } from '~/lib/constants';
-import { AppError } from '~/lib/errors/app-error';
-import { isDevelopment } from '~/data/env';
+import { ErrorMessage, Utils } from '~/lib/utils';
+import { isDevelopment } from '~/lib/env';
 import {
   publicUserSelect,
   UpdateUserInput,
@@ -27,7 +26,7 @@ export const UserService = {
       if (!user) notFound();
       return user;
     } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
@@ -60,11 +59,11 @@ export const UserService = {
         });
       } catch (error) {
         console.log(error);
-        if (error instanceof AppError) throw error;
+        if (error instanceof Utils) throw error;
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
           notFound();
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -80,8 +79,8 @@ export const UserService = {
         if (!user) notFound();
         return user;
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -110,7 +109,7 @@ export const UserService = {
           orderBy: { username: 'asc' },
         });
       } catch {
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -130,7 +129,7 @@ export const UserService = {
         if (!user) notFound();
         return user;
       } catch {
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -144,7 +143,7 @@ export const UserService = {
           select: { id: true, username: true, role: true },
         });
       } catch {
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -159,7 +158,7 @@ export const UserService = {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === 'P2025') notFound();
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -181,11 +180,11 @@ export const UserService = {
           select: userSelect,
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
+        if (error instanceof Utils) throw error;
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === 'P2025') notFound();
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -200,7 +199,7 @@ export const UserService = {
       if (!user) notFound();
       return user.role;
     } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
@@ -214,7 +213,7 @@ export const UserService = {
       }
       return undefined;
     } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
@@ -224,7 +223,7 @@ export const UserService = {
       const fileName = await this.getAvatarFileName(userId, file.name);
       return s3.uploadProfilePhoto(buffer, fileName);
     } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
@@ -240,7 +239,7 @@ export const UserService = {
         scale: 125,
       }).toDataUri();
     } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
@@ -258,7 +257,7 @@ export const UserService = {
 
       return s3.uploadProfilePhoto(buffer, fileName);
     } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 };

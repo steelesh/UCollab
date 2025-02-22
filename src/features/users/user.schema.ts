@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from '~/lib/constants';
+import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from '~/lib/utils';
 
 export const userSelect = {
   id: true,

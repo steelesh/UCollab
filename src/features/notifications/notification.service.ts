@@ -1,9 +1,8 @@
 import { Comment, Notification, NotificationPreferences, NotificationType, Post, Prisma, User } from '@prisma/client';
-import { mq } from '~/data/mq';
-import { prisma } from '~/data/prisma';
+import { mq } from '~/lib/mq';
+import { prisma } from '~/lib/prisma';
 import { withServiceAuth } from '~/auth/protected-service';
-import { ErrorMessage } from '~/lib/constants';
-import { AppError } from '~/lib/errors/app-error';
+import { ErrorMessage, Utils } from '~/lib/utils';
 import { canAccess } from '~/auth/protected-role';
 import {
   CreateBatchNotificationData,
@@ -23,8 +22,8 @@ export const NotificationService = {
           orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -38,8 +37,8 @@ export const NotificationService = {
           orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -55,8 +54,8 @@ export const NotificationService = {
           orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -68,8 +67,8 @@ export const NotificationService = {
           where: { userId },
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -81,8 +80,8 @@ export const NotificationService = {
           where: { userId, isRead: false },
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -95,7 +94,7 @@ export const NotificationService = {
       });
 
       if (!notification) {
-        throw new AppError(ErrorMessage.NOT_FOUND('Notification'));
+        throw new Utils(ErrorMessage.NOT_FOUND('Notification'));
       }
 
       return withServiceAuth(requestUserId, { ownerId: notification.userId }, async () => {
@@ -106,11 +105,11 @@ export const NotificationService = {
         });
       });
     } catch (error) {
-      if (error instanceof AppError) throw error;
+      if (error instanceof Utils) throw error;
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        throw new AppError(ErrorMessage.NOT_FOUND('Notification'));
+        throw new Utils(ErrorMessage.NOT_FOUND('Notification'));
       }
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
@@ -122,8 +121,8 @@ export const NotificationService = {
           data: { isRead: true },
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -139,7 +138,7 @@ export const NotificationService = {
       // Get the first notification's userId for the initial auth check
       const firstNotification = notifications[0];
       if (!firstNotification) {
-        throw new AppError(ErrorMessage.NOT_FOUND('Notifications'));
+        throw new Utils(ErrorMessage.NOT_FOUND('Notifications'));
       }
 
       return withServiceAuth(requestUserId, { ownerId: firstNotification.userId }, async () => {
@@ -148,7 +147,7 @@ export const NotificationService = {
 
         for (const notification of notifications) {
           if (!canAccess(requestUserId, notification.userId, userRole)) {
-            throw new AppError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
+            throw new Utils(ErrorMessage.INSUFFICIENT_PERMISSIONS);
           }
         }
 
@@ -158,8 +157,8 @@ export const NotificationService = {
         });
       });
     } catch (error) {
-      if (error instanceof AppError) throw error;
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      if (error instanceof Utils) throw error;
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
@@ -167,7 +166,7 @@ export const NotificationService = {
     try {
       await mq.addNotification(data);
     } catch {
-      throw new AppError(ErrorMessage.NOTIFICATION_QUEUE_FAILED);
+      throw new Utils(ErrorMessage.NOTIFICATION_QUEUE_FAILED);
     }
   },
 
@@ -175,7 +174,7 @@ export const NotificationService = {
     try {
       await mq.addBatchNotifications(data);
     } catch {
-      throw new AppError(ErrorMessage.NOTIFICATION_QUEUE_FAILED);
+      throw new Utils(ErrorMessage.NOTIFICATION_QUEUE_FAILED);
     }
   },
 
@@ -194,7 +193,7 @@ export const NotificationService = {
           },
         });
       } catch {
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -255,7 +254,7 @@ export const NotificationService = {
 
       await Promise.all(notifications);
     } catch (error) {
-      throw new AppError(
+      throw new Utils(
         error instanceof Error
           ? `${ErrorMessage.NOTIFICATION_QUEUE_FAILED}: ${error.message}`
           : ErrorMessage.NOTIFICATION_QUEUE_FAILED,
@@ -269,7 +268,7 @@ export const NotificationService = {
         where: { userId },
       });
     } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
@@ -299,7 +298,7 @@ export const NotificationService = {
         },
       });
     } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 };

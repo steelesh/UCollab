@@ -1,9 +1,8 @@
 import { Post, Prisma, Technology } from '@prisma/client';
 import { notFound } from 'next/navigation';
-import { prisma } from '~/data/prisma';
+import { prisma } from '~/lib/prisma';
 import { withServiceAuth } from '~/auth/protected-service';
-import { ErrorMessage } from '~/lib/constants';
-import { AppError } from '~/lib/errors/app-error';
+import { ErrorMessage, Utils } from '~/lib/utils';
 import { postSchema, postSelect, CreatePostInput } from '~/features/posts/post.schema';
 
 export const PostService = {
@@ -15,8 +14,8 @@ export const PostService = {
           orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -50,8 +49,8 @@ export const PostService = {
         if (!post) notFound();
         return post;
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -90,11 +89,11 @@ export const PostService = {
         });
       } catch (error) {
         console.log(error);
-        if (error instanceof AppError) throw error;
+        if (error instanceof Utils) throw error;
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
           notFound();
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -106,11 +105,11 @@ export const PostService = {
       try {
         await prisma.post.delete({ where: { id } });
       } catch (error) {
-        if (error instanceof AppError) throw error;
+        if (error instanceof Utils) throw error;
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === 'P2025') notFound();
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -128,8 +127,8 @@ export const PostService = {
           take: limit,
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -143,8 +142,8 @@ export const PostService = {
           orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -162,8 +161,8 @@ export const PostService = {
           orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -189,8 +188,8 @@ export const PostService = {
           orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -205,8 +204,8 @@ export const PostService = {
           orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },

@@ -1,5 +1,5 @@
 import { auth } from '../../../auth';
-import { ErrorMessage } from '~/lib/constants';
+import { ErrorMessage } from '~/lib/utils';
 import { UpdateProfileInput } from '~/features/profiles/profile.schema';
 import { ProfileService } from '~/features/profiles/profile.service';
 

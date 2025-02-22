@@ -1,7 +1,6 @@
 import { UserService } from '~/features/users/user.service';
 import { Role } from '@prisma/client';
-import { ErrorCode, ErrorMessage } from '~/lib/constants';
-import { AppError, AuthenticationError, AuthorizationError } from '~/lib/errors/app-error';
+import { ErrorCode, ErrorMessage, Utils, AuthenticationError, AuthorizationError } from '~/lib/utils';
 import { auth } from '../../auth';
 
 interface ResourceCheck {
@@ -36,7 +35,7 @@ export async function withApiAuth<T>(resourceCheck: ResourceCheck | null, handle
   } catch (error) {
     console.error(error);
 
-    if (error instanceof AppError) {
+    if (error instanceof Utils) {
       return Response.json(
         {
           data: null,

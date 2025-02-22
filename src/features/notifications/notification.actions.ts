@@ -1,5 +1,5 @@
 import { auth } from '../../../auth';
-import { ErrorMessage } from '~/lib/constants';
+import { ErrorMessage } from '~/lib/utils';
 import { CreateSystemNotificationInput } from '~/features/notifications/notification.schema';
 import { NotificationService } from '~/features/notifications/notification.service';
 

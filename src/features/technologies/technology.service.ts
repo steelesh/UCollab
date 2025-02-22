@@ -1,9 +1,8 @@
 import { Post, Prisma } from '@prisma/client';
 import { notFound } from 'next/navigation';
-import { prisma } from '~/data/prisma';
+import { prisma } from '~/lib/prisma';
 import { withServiceAuth } from '~/auth/protected-service';
-import { ErrorMessage } from '~/lib/constants';
-import { AppError } from '~/lib/errors/app-error';
+import { ErrorMessage, Utils } from '~/lib/utils';
 import { CreateTechnologyInput, technologySelect } from '~/features/technologies/technology.schema';
 
 export const TechnologyService = {
@@ -15,7 +14,7 @@ export const TechnologyService = {
         orderBy: { name: 'asc' },
       });
     } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
@@ -30,7 +29,7 @@ export const TechnologyService = {
         orderBy: { name: 'asc' },
       });
     } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
@@ -57,10 +56,10 @@ export const TechnologyService = {
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === 'P2002') {
-            throw new AppError(`Technology "${data.name}" already exists`);
+            throw new Utils(`Technology "${data.name}" already exists`);
           }
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -78,7 +77,7 @@ export const TechnologyService = {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === 'P2025') notFound();
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -95,7 +94,7 @@ export const TechnologyService = {
           take: limit,
         });
       } catch {
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -146,7 +145,7 @@ export const TechnologyService = {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === 'P2025') notFound();
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -168,7 +167,7 @@ export const TechnologyService = {
 
       return post?.technologies ?? [];
     } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 };

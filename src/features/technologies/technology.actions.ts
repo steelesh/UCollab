@@ -1,5 +1,5 @@
 import { auth } from '../../../auth';
-import { ErrorMessage } from '~/lib/constants';
+import { ErrorMessage } from '~/lib/utils';
 import { CreateTechnologyInput } from '~/features/technologies/technology.schema';
 import { TechnologyService } from '~/features/technologies/technology.service';
 

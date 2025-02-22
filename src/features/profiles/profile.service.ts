@@ -1,9 +1,8 @@
 import { Prisma, User } from '@prisma/client';
 import { notFound } from 'next/navigation';
-import { prisma } from '~/data/prisma';
+import { prisma } from '~/lib/prisma';
 import { withServiceAuth } from '~/auth/protected-service';
-import { ErrorMessage } from '~/lib/constants';
-import { AppError } from '~/lib/errors/app-error';
+import { ErrorMessage, Utils } from '~/lib/utils';
 import { UpdateProfileInput, profileSelect, updateProfileSchema } from '~/features/profiles/profile.schema';
 
 export const ProfileService = {
@@ -19,8 +18,8 @@ export const ProfileService = {
         if (!profile) notFound();
         return profile;
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -65,12 +64,12 @@ export const ProfileService = {
           });
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
+        if (error instanceof Utils) throw error;
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === 'P2025') notFound();
-          throw new AppError(ErrorMessage.INVALID_INPUT);
+          throw new Utils(ErrorMessage.INVALID_INPUT);
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -86,8 +85,8 @@ export const ProfileService = {
           orderBy: { lastModifiedDate: 'desc' },
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -110,8 +109,8 @@ export const ProfileService = {
           orderBy: { lastModifiedDate: 'desc' },
         });
       } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -137,7 +136,7 @@ export const ProfileService = {
       if (!profile) notFound();
       return profile;
     } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 };

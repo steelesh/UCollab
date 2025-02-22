@@ -3,8 +3,7 @@
 import { postSchema } from '~/features/posts/post.schema';
 import { PostService } from '~/features/posts/post.service';
 import { auth } from '../../../auth';
-import { ErrorMessage } from '~/lib/constants';
-import { AppError } from '~/lib/errors/app-error';
+import { ErrorMessage, Utils } from '~/lib/utils';
 import { Prisma } from '@prisma/client';
 import { notFound, redirect } from 'next/navigation';
 
@@ -27,11 +26,11 @@ export async function createPost(formData: FormData) {
       technologies,
     });
   } catch (error) {
-    if (error instanceof AppError) throw error;
+    if (error instanceof Utils) throw error;
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
       notFound();
     }
-    throw new AppError(ErrorMessage.OPERATION_FAILED);
+    throw new Utils(ErrorMessage.OPERATION_FAILED);
   }
   redirect('/');
 }

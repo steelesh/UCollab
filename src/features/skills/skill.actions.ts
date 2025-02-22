@@ -1,5 +1,5 @@
 import { auth } from '../../../auth';
-import { ErrorMessage } from '~/lib/constants';
+import { ErrorMessage } from '~/lib/utils';
 import { CreateSkillInput, UpdateSkillInput } from '~/features/skills/skill.schema';
 import { SkillService } from '~/features/skills/skill.service';
 

@@ -1,6 +1,6 @@
 import { OnboardingStep, Role, User } from '@prisma/client';
 import { redirect } from 'next/navigation';
-import { isDevelopment } from '~/data/env';
+import { isDevelopment } from '~/lib/env';
 import React from 'react';
 import { auth } from '../../auth';
 

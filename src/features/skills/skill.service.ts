@@ -1,9 +1,8 @@
 import { Prisma, Skill } from '@prisma/client';
 import { notFound } from 'next/navigation';
-import { prisma } from '~/data/prisma';
+import { prisma } from '~/lib/prisma';
 import { withServiceAuth } from '~/auth/protected-service';
-import { ErrorMessage } from '~/lib/constants';
-import { AppError } from '~/lib/errors/app-error';
+import { ErrorMessage, Utils } from '~/lib/utils';
 import { CreateSkillInput, UpdateSkillInput, skillSelect } from '~/features/skills/skill.schema';
 
 export const SkillService = {
@@ -16,7 +15,7 @@ export const SkillService = {
         orderBy: { name: 'asc' },
       });
     } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
@@ -31,7 +30,7 @@ export const SkillService = {
         take: limit,
       });
     } catch {
-      throw new AppError(ErrorMessage.OPERATION_FAILED);
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
@@ -57,10 +56,10 @@ export const SkillService = {
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === 'P2002') {
-            throw new AppError(`Skill "${data.name}" already exists`);
+            throw new Utils(`Skill "${data.name}" already exists`);
           }
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -80,10 +79,10 @@ export const SkillService = {
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === 'P2002') {
-            throw new AppError(`Skill "${data.name}" already exists`);
+            throw new Utils(`Skill "${data.name}" already exists`);
           }
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -104,10 +103,10 @@ export const SkillService = {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === 'P2025') notFound();
           if (error.code === 'P2002') {
-            throw new AppError(`Skill "${data.name}" already exists`);
+            throw new Utils(`Skill "${data.name}" already exists`);
           }
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -121,7 +120,7 @@ export const SkillService = {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === 'P2025') notFound();
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
@@ -138,7 +137,7 @@ export const SkillService = {
           take: limit,
         });
       } catch {
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },

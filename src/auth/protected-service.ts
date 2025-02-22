@@ -1,7 +1,6 @@
 import { UserService } from '~/features/users/user.service';
 import { Role } from '@prisma/client';
-import { ErrorMessage } from '~/lib/constants';
-import { AppError, AuthenticationError, AuthorizationError } from '~/lib/errors/app-error';
+import { ErrorMessage, Utils, AuthenticationError, AuthorizationError } from '~/lib/utils';
 import { canAccess } from '~/auth/protected-role';
 
 interface ResourceCheck {
@@ -33,12 +32,12 @@ export async function withServiceAuth<T>(
   try {
     return await action();
   } catch (error) {
-    if (error instanceof AppError) {
+    if (error instanceof Utils) {
       throw error;
     }
     if (error instanceof Error) {
-      throw new AppError(error.message);
+      throw new Utils(error.message);
     }
-    throw new AppError(ErrorMessage.OPERATION_FAILED);
+    throw new Utils(ErrorMessage.OPERATION_FAILED);
   }
 }

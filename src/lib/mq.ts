@@ -1,7 +1,7 @@
 import { User } from '@prisma/client';
 import { Queue, Worker } from 'bullmq';
 import IORedis from 'ioredis';
-import { env } from '~/data/env';
+import { env } from '~/lib/env';
 import { CreateBatchNotificationData, CreateNotificationData } from '~/features/notifications/notification.schema';
 import { NotificationService } from '~/features/notifications/notification.service';
 

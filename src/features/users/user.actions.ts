@@ -3,8 +3,7 @@
 import { onboardingSchema } from '~/features/users/user.schema';
 import { UserService } from '~/features/users/user.service';
 import { auth } from '../../../auth';
-import { ErrorMessage } from '~/lib/constants';
-import { AppError } from '~/lib/errors/app-error';
+import { ErrorMessage, Utils } from '~/lib/utils';
 import { Prisma } from '@prisma/client';
 import { notFound, redirect } from 'next/navigation';
 
@@ -25,11 +24,11 @@ export async function updateOnboarding(formData: FormData) {
       postType,
     });
   } catch (error) {
-    if (error instanceof AppError) throw error;
+    if (error instanceof Utils) throw error;
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
       notFound();
     }
-    throw new AppError(ErrorMessage.OPERATION_FAILED);
+    throw new Utils(ErrorMessage.OPERATION_FAILED);
   }
   redirect('/');
 }

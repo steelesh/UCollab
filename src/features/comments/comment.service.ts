@@ -1,9 +1,8 @@
 import { Comment, Post, Prisma, User } from '@prisma/client';
 import { z } from 'zod';
-import { prisma } from '~/data/prisma';
+import { prisma } from '~/lib/prisma';
 import { withServiceAuth } from '~/auth/protected-service';
-import { ErrorMessage } from '~/lib/constants';
-import { AppError, ValidationError } from '~/lib/errors/app-error';
+import { ErrorMessage, Utils, ValidationError } from '~/lib/utils';
 import { commentFormSchema, type CreateCommentData, type UpdateCommentData } from '~/features/comments/comment.schema';
 import { NotificationService } from '../notifications/notification.service';
 
@@ -59,7 +58,7 @@ export const CommentService = {
       });
 
       if (!comment) {
-        throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
+        throw new Utils(ErrorMessage.NOT_FOUND('Comment'));
       }
 
       return comment;
@@ -112,7 +111,7 @@ export const CommentService = {
         });
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          throw new AppError(ErrorMessage.OPERATION_FAILED);
+          throw new Utils(ErrorMessage.OPERATION_FAILED);
         }
         if (error instanceof z.ZodError) {
           throw new ValidationError(ErrorMessage.VALIDATION_FAILED, error);
@@ -131,7 +130,7 @@ export const CommentService = {
       });
 
       if (!comment) {
-        throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
+        throw new Utils(ErrorMessage.NOT_FOUND('Comment'));
       }
 
       return withServiceAuth(requestUserId, { ownerId: comment.createdById }, async () => {
@@ -150,9 +149,9 @@ export const CommentService = {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
+          throw new Utils(ErrorMessage.NOT_FOUND('Comment'));
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
       if (error instanceof z.ZodError) {
         throw new ValidationError(ErrorMessage.VALIDATION_FAILED, error);
@@ -170,7 +169,7 @@ export const CommentService = {
       });
 
       if (!comment) {
-        throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
+        throw new Utils(ErrorMessage.NOT_FOUND('Comment'));
       }
 
       return withServiceAuth(requestUserId, { ownerId: comment.createdById }, async () => {
@@ -179,9 +178,9 @@ export const CommentService = {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          throw new AppError(ErrorMessage.NOT_FOUND('Comment'));
+          throw new Utils(ErrorMessage.NOT_FOUND('Comment'));
         }
-        throw new AppError(ErrorMessage.OPERATION_FAILED);
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
       throw error;
     }
@@ -204,7 +203,7 @@ export const CommentService = {
 
       return users.map((user) => user.id);
     } catch {
-      throw new AppError('Failed to extract mentioned users');
+      throw new Utils('Failed to extract mentioned users');
     }
   },
 
