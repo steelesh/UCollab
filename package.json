@@ -35,6 +35,8 @@
     "@tailwindcss/postcss": "^4.0.8",
     "bullmq": "^5.41.5",
     "dotenv-cli": "^8.0.0",
+    "embla-carousel-autoplay": "^8.5.2",
+    "embla-carousel-react": "^8.5.2",
     "http-status-codes": "^2.3.0",
     "motion": "^12.4.7",
     "next": "^15.1.7",
