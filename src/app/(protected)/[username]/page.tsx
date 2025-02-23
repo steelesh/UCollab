@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { prisma } from '~/lib/prisma';
 import { withAuth } from '~/security/protected';
+import SignOutButton from '~/components/signout-button';
 
 // Define the dynamic route props
 interface ProfileRouteProps {
@@ -11,7 +12,7 @@ interface ProfileRouteProps {
 type Props = ProfileRouteProps & { userId: string };
 
 async function ProfilePage({ params, _userId }: Props) {
-  const { username } = params;
+  const { username } = await params;
 
   // Fetch the profile data based on the route username
   const user = await prisma.user.findUnique({
@@ -69,7 +70,7 @@ async function ProfilePage({ params, _userId }: Props) {
                 </g>
               </svg>
             </button>
-            <button className="btn btn-accent-content">Sign Out</button>
+            <SignOutButton />
           </div>
         </div>
         {/* Profile Details */}
