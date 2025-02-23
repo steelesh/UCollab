@@ -1,20 +1,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { prisma } from '../../../../prisma';
+import { prisma } from '~/lib/prisma';
+import { withAuth } from '~/security/protected';
+import type { Route } from 'next';
 
 export const metadata = {
   title: 'UCollab — Community',
 };
 
-interface _User {
-  avatar: string | null;
-  username: string;
-  email: string;
-  createdDate: string;
-  lastLogin: string;
-}
-
-export default async function CommunityPage() {
+async function CommunityPage() {
   const users = await prisma.user.findMany({
     select: {
       avatar: true,
@@ -26,19 +20,11 @@ export default async function CommunityPage() {
   });
 
   const formattedUsers: {
-    id: string;
+    createdDate: string | undefined;
+    lastLogin: string | undefined;
     username: string;
     email: string;
-    createdDate: string;
-    lastLogin: string;
-    fullName: string;
-    firstName: string;
-    lastName: string;
     avatar: string;
-    avatarSource: $Enums.AvatarSource;
-    azureAdId: string;
-    onboardingStep: $Enums.OnboardingStep;
-    role: $Enums.Role;
   }[] = users.map((user) => ({
     ...user,
     createdDate: user.createdDate.toISOString().split('T')[0],
@@ -51,7 +37,7 @@ export default async function CommunityPage() {
         <div key={index} className="flex w-full max-w-3xl items-center border-b p-4">
           <Image src={user.avatar} alt={user.username} width={50} height={50} className="rounded-full" />
           <div className="ml-4">
-            <Link href={`/users/${user.username}`} className="font-bold hover:underline">
+            <Link href={`/users/${user.username}` as Route} className="font-bold hover:underline">
               {user.username}
             </Link>
             <p className="text-sm text-gray-500">{user.email}</p>
@@ -65,3 +51,5 @@ export default async function CommunityPage() {
     </div>
   );
 }
+
+export default withAuth(CommunityPage);

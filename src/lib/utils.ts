@@ -1,27 +1,68 @@
-import { env } from './env';
+import { StatusCodes } from 'http-status-codes';
 
-/**
- * checks if the current environment is dev
- */
-export function isDevelopment() {
-  return env.NEXT_PUBLIC_DEPLOY_ENV === 'dev';
+export const MAX_FILE_SIZE = 5 * 1024 * 1024;
+export const ACCEPTED_IMAGE_TYPES = {
+  JPEG: 'image/jpeg',
+  JPG: 'image/jpg',
+  PNG: 'image/png',
+  WEBP: 'image/webp',
+};
+
+export const ErrorCode = {
+  AUTHENTICATION: StatusCodes.UNAUTHORIZED,
+  AUTHORIZATION: StatusCodes.FORBIDDEN,
+  VALIDATION: StatusCodes.BAD_REQUEST,
+  NOT_FOUND: StatusCodes.NOT_FOUND,
+  SERVER_ERROR: StatusCodes.INTERNAL_SERVER_ERROR,
+} as const;
+
+export const ErrorMessage = {
+  AUTHENTICATION_REQUIRED: 'Authentication required',
+  INSUFFICIENT_PERMISSIONS: 'Insufficient permissions',
+  INSUFFICIENT_ROLE: 'Insufficient role',
+  MISSING_PERMISSION: (permission: string) => `Missing required permission: ${permission}`,
+
+  VALIDATION_FAILED: 'Validation failed',
+  INVALID_INPUT: 'Invalid input provided',
+
+  NOT_FOUND: (resource: string) => `${resource} not found`,
+  ALREADY_EXISTS: (resource: string) => `${resource} already exists`,
+
+  OPERATION_FAILED: 'Operation failed',
+  SERVER_ERROR: 'Internal server error',
+
+  NOTIFICATION_QUEUE_FAILED: 'Failed to queue notification',
+  NOTIFICATION_PREFERENCE_UPDATE_FAILED: 'Failed to update notification preferences',
+} as const;
+
+export class Utils extends Error {
+  constructor(
+    message: string = ErrorMessage.SERVER_ERROR,
+    public statusCode: number = ErrorCode.SERVER_ERROR,
+  ) {
+    super(message);
+    this.name = this.constructor.name;
+    Error.captureStackTrace(this, this.constructor);
+  }
 }
 
-/**
- * checks if the current environment is test
- */
-export function isTest() {
-  return env.NEXT_PUBLIC_DEPLOY_ENV === 'test';
+export class AuthenticationError extends Utils {
+  constructor(message: string = ErrorMessage.AUTHENTICATION_REQUIRED) {
+    super(message, ErrorCode.AUTHENTICATION);
+  }
 }
 
-/**
- * checks if the current environment is prod
- */
-export function isProduction() {
-  return env.NEXT_PUBLIC_DEPLOY_ENV === 'prod';
+export class AuthorizationError extends Utils {
+  constructor(message: string = ErrorMessage.INSUFFICIENT_PERMISSIONS) {
+    super(message, ErrorCode.AUTHORIZATION);
+  }
 }
 
-/**
- * fetcher function for fetching data from api endpoints (e.g. for SWR)
- */
-export const fetcher = (url: string) => fetch(url).then((res) => res.json());
+export class ValidationError extends Utils {
+  constructor(
+    message: string = ErrorMessage.VALIDATION_FAILED,
+    public errors?: unknown,
+  ) {
+    super(message, ErrorCode.VALIDATION);
+  }
+}

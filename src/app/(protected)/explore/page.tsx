@@ -1,59 +1,20 @@
-import { cookies } from 'next/headers';
+import { prisma } from '~/lib/prisma';
+import { withAuth } from '~/security/protected';
 
 export const metadata = {
   title: 'UCollab — Explore',
 };
 
-interface Project {
-  user?: {
-    username: string;
-  };
-  title: string;
-  createdDate: string;
-  createdById: string;
-  description: string;
-  postType: 'CONTRIBUTION' | 'FEEDBACK' | 'DISCUSSION';
-  status: string;
-  technologies: string[];
-  githubRepo?: string;
-}
-
-export default async function ExplorePage() {
-  const cookieHeader = cookies().toString();
-
-  const postsResponse = await fetch(`/api/posts`, {
-    headers: { cookie: cookieHeader },
-    next: { revalidate: 60 },
+export async function ExplorePage() {
+  const projectsWithUser = await prisma.post.findMany({
+    select: {
+      title: true,
+      createdDate: true,
+      description: true,
+      githubRepo: true,
+      postType: true,
+    },
   });
-  if (!postsResponse.ok) {
-    throw new Error('Failed to fetch posts');
-  }
-  const jsonResponse: { data: Project[]; error: string | null } = await postsResponse.json();
-  if (jsonResponse.error) {
-    console.error('API Error:', jsonResponse.error);
-    return <div>Error fetching posts.</div>;
-  }
-  const projects = jsonResponse.data;
-
-  const projectsWithUser = await Promise.all(
-    projects.map(async (project) => {
-      try {
-        const userResponse = await fetch(`/api/users/from-id/${project.createdById}`, {
-          headers: { cookie: cookieHeader },
-          next: { revalidate: 60 },
-        });
-        if (!userResponse.ok) {
-          console.warn(`Failed to fetch user for project ${project.title}`);
-          return project;
-        }
-        const userData = await userResponse.json();
-        return { ...project, user: { username: userData.username } };
-      } catch (error) {
-        console.error(`Error fetching user for project ${project.title}:`, error);
-        return project;
-      }
-    }),
-  );
 
   return (
     <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-24">
@@ -77,9 +38,9 @@ export default async function ExplorePage() {
                     })}
                     <br />
                     <a
-                      href={`/${project.user?.username ?? ''}`}
+                      href={`/${project.title ?? ''}`}
                       className="link link-accent font-bold tracking-wider no-underline">
-                      {project.user?.username ?? 'Unknown User'}
+                      {project.githubRepo ?? 'No repository'}
                     </a>
                   </span>
                 </div>
@@ -89,18 +50,6 @@ export default async function ExplorePage() {
               </div>
               <p className="mb-4 text-white">{project.description}</p>
               <div className="divider mb-4"></div>
-              <div className="mb-4">
-                <span className="text-sm font-semibold text-white">Technologies:</span>
-                <div>
-                  {project.technologies.map((tech, i) => (
-                    <span
-                      key={i}
-                      className="badge badge-accent badge-outline badge-sm mr-2 mb-2 font-normal tracking-wider">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         ))}
@@ -108,3 +57,5 @@ export default async function ExplorePage() {
     </div>
   );
 }
+
+export default withAuth(ExplorePage);
