@@ -1,5 +1,5 @@
-import { withApiAuth } from '~/lib/auth/protected-api';
-import { ProfileService } from '~/services/profile.service';
+import { withApiAuth } from '~/auth/protected-api';
+import { ProfileService } from '~/features/profiles/profile.service';
 import { NextRequest } from 'next/server';
 
 export async function GET(req: NextRequest) {

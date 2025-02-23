@@ -1,5 +1,5 @@
-import { withApiAuth } from '~/lib/auth/protected-api';
-import { TechnologyService } from '~/services/technology.service';
+import { withApiAuth } from '~/auth/protected-api';
+import { TechnologyService } from '~/features/technologies/technology.service';
 import { NextRequest } from 'next/server';
 
 export async function GET(req: NextRequest) {

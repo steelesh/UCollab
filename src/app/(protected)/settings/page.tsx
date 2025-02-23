@@ -1,4 +1,4 @@
-import { withAuth } from '~/lib/auth/protected';
+import { withAuth } from '~/auth/protected';
 
 export const metadata = {
   title: 'UCollab — Settings',

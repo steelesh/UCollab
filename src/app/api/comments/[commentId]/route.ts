@@ -1,5 +1,5 @@
-import { withApiAuth } from '~/lib/auth/protected-api';
-import { CommentService } from '~/services/comment.service';
+import { withApiAuth } from '~/auth/protected-api';
+import { CommentService } from '~/features/comments/comment.service';
 import { NextRequest } from 'next/server';
 
 export async function GET(req: NextRequest, { params }: { params: { commentId: string } }) {

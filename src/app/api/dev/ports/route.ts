@@ -1,4 +1,4 @@
-import { isDevelopment } from '~/lib/utils';
+import { isDevelopment } from '~/lib/env';
 import { execSync } from 'child_process';
 
 function getPortFromDocker(containerName: string): number | null {

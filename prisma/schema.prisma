@@ -2,11 +2,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator fake_data {
-  provider = "prisma-generator-fake-data"
-  output   = "../src/data/fake-data.ts"
-}
-
 datasource prisma {
   provider = "mysql"
   url      = env("MYSQL_URL")
@@ -35,20 +30,13 @@ model User {
   id                      String                   @id @default(cuid())
   username                String                   @unique
   email                   String                   @unique
-  ///FAKE:faker.date.past({ years: 1 })
   createdDate             DateTime                 @default(now())
-  ///FAKE:faker.date.recent({ days: 7 })
   lastLogin               DateTime                 @default(now())
-  ///FAKE:faker.datatype.boolean()
   fullName                String
-  ///FAKE:faker.person.firstName()
   firstName               String
-  ///FAKE:faker.person.lastName()
   lastName                String
-  ///FAKE:faker.image.avatarGitHub()
   avatar                  String                   @prisma.Text
   avatarSource            AvatarSource             @default(DEFAULT)
-  ///FAKE:faker.string.uuid()
   azureAdId               String                   @unique
   onboardingStep          OnboardingStep           @default(STEP_ONE)
   comments                Comment[]
@@ -74,12 +62,9 @@ model User {
 model Profile {
   id               String   @id @default(cuid())
   userId           String   @unique
-  ///FAKE:faker.date.recent()
   lastModifiedDate DateTime @updatedAt
   skills           Skill[]
-  ///FAKE:faker.number.int({ min: 2023, max: 2030 })
   gradYear         Int?
-  ///FAKE:faker.person.bio()
   bio              String?  @prisma.Text
   user             User     @relation("UserProfile", fields: [userId], references: [id], onDelete: Cascade)
   githubProfile    String?
@@ -89,9 +74,7 @@ model Profile {
 
 model Post {
   id               String         @id @default(cuid())
-  ///FAKE:faker.date.past({ years: 1 })
   createdDate      DateTime       @default(now())
-  ///FAKE:faker.date.recent()
   lastModifiedDate DateTime       @updatedAt
   title            String         @prisma.Text
   description      String         @prisma.Text
@@ -137,9 +120,7 @@ model Comment {
   id               String         @id @default(cuid())
   postId           String
   createdById      String
-  ///FAKE:faker.date.recent({ days: 30 })
   createdDate      DateTime       @default(now())
-  ///FAKE:faker.date.recent()
   lastModifiedDate DateTime       @updatedAt
   content          String         @prisma.Text
   createdBy        User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
@@ -153,15 +134,10 @@ model Comment {
 model NotificationPreferences {
   id               String  @id @default(cuid())
   userId           String  @unique
-  ///FAKE:faker.datatype.boolean()
   enabled          Boolean @default(true)
-  ///FAKE:faker.datatype.boolean()
   allowComments    Boolean @default(true)
-  ///FAKE:faker.datatype.boolean()
   allowMentions    Boolean @default(true)
-  ///FAKE:faker.datatype.boolean()
   allowPostUpdates Boolean @default(true)
-  ///FAKE:faker.datatype.boolean()
   allowSystem      Boolean @default(true)
   user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 

@@ -1,5 +1,5 @@
-import { withApiAuth } from '~/lib/auth/protected-api';
-import { PostService } from '~/services/post.service';
+import { withApiAuth } from '~/auth/protected-api';
+import { PostService } from '~/features/posts/post.service';
 import { NextRequest } from 'next/server';
 
 export async function GET(req: NextRequest, { params }: { params: { postId: string } }) {

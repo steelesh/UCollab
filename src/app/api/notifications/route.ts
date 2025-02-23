@@ -1,5 +1,5 @@
-import { withApiAuth } from '~/lib/auth/protected-api';
-import { NotificationService } from '~/services/notification.service';
+import { withApiAuth } from '~/auth/protected-api';
+import { NotificationService } from '~/features/notifications/notification.service';
 import { NextRequest } from 'next/server';
 
 export async function GET(req: NextRequest) {

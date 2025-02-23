@@ -1,4 +1,4 @@
-import { SkillService } from '~/services/skill.service';
+import { SkillService } from '~/features/skills/skill.service';
 import { NextRequest } from 'next/server';
 
 export async function GET(req: NextRequest) {
