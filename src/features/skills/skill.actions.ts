@@ -1,4 +1,4 @@
-import { auth } from '../../../auth';
+import { auth } from '~/security/auth';
 import { ErrorMessage } from '~/lib/utils';
 import { CreateSkillInput, UpdateSkillInput } from '~/features/skills/skill.schema';
 import { SkillService } from '~/features/skills/skill.service';

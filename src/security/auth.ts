@@ -23,6 +23,7 @@ declare module 'next-auth' {
 
 const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
+  basePath: '/auth',
   session: { strategy: 'database' },
   providers: [
     microsoftEntraId({

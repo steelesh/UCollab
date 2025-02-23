@@ -4,6 +4,7 @@ import Theme from '@components/theme';
 import Link from 'next/link';
 import { useState } from 'react';
 import { signOut, useSession } from 'next-auth/react';
+import SignInButton from '~/components/signin-button';
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -37,27 +38,48 @@ export default function Navbar() {
           </button>
         ) : null}
       </div>
-      <div className="hidden flex-1 justify-evenly md:flex">
-        <Link className="group text-accent-content pt-1.5 text-xl" href="/explore">
-          Explore
-          <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
-        </Link>
-        <Link className="group text-accent-content pt-1.5 text-xl" href="/create">
-          Create
-          <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
-        </Link>
-        <Link className="group text-accent-content pt-1.5 text-xl" href="/community">
-          Community
-          <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
-        </Link>
-      </div>
+      {session ? (
+        <div className="hidden flex-1 justify-evenly md:flex">
+          <Link className="group text-accent-content pt-1.5 text-xl" href="/explore">
+            Explore
+            <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
+          </Link>
+          <Link className="group text-accent-content pt-1.5 text-xl" href="/create">
+            Create
+            <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
+          </Link>
+          <Link className="group text-accent-content pt-1.5 text-xl" href="/community">
+            Community
+            <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
+          </Link>
+        </div>
+      ) : (
+        <div className="hidden flex-1 justify-evenly md:flex">
+          <Link className="group text-accent-content pt-1.5 text-xl" href="/#">
+            Explore
+            <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
+          </Link>
+          <Link className="group text-accent-content pt-1.5 text-xl" href="/#">
+            Create
+            <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
+          </Link>
+          <Link className="group text-accent-content pt-1.5 text-xl" href="/#">
+            Community
+            <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
+          </Link>
+        </div>
+      )}
       <div className="flex-shrink justify-end md:flex-none">
         <div className="flex items-center gap-4">
           {session ? (
             <div className="form-control hidden md:flex">
               <input type="text" placeholder="Search" className="input input-bordered w-48 lg:w-auto" />
             </div>
-          ) : null}
+          ) : (
+            <div>
+              <SignInButton />
+            </div>
+          )}
           <Theme />
           {session ? (
             <div className="dropdown dropdown-end">
@@ -81,9 +103,7 @@ export default function Navbar() {
                 </li>
               </ul>
             </div>
-          ) : (
-            <div></div>
-          )}
+          ) : null}
         </div>
       </div>
       {session && (

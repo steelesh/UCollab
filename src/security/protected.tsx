@@ -2,7 +2,7 @@ import { OnboardingStep, Role, User } from '@prisma/client';
 import { redirect } from 'next/navigation';
 import { isDevelopment } from '~/lib/env';
 import React from 'react';
-import { auth } from '../../auth';
+import { auth } from './auth';
 
 type PageProps = Record<string, unknown>;
 

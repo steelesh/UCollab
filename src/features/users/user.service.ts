@@ -4,7 +4,7 @@ import { Account, AvatarSource, Prisma, Role, User } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import { prisma } from '~/lib/prisma';
 import { s3 } from '~/lib/s3';
-import { withServiceAuth } from '~/auth/protected-service';
+import { withServiceAuth } from '~/security/protected-service';
 import { ErrorMessage, Utils } from '~/lib/utils';
 import { isDevelopment } from '~/lib/env';
 import {

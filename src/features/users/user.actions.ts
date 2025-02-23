@@ -2,7 +2,7 @@
 
 import { onboardingSchema } from '~/features/users/user.schema';
 import { UserService } from '~/features/users/user.service';
-import { auth } from '../../../auth';
+import { auth } from '~/security/auth';
 import { ErrorMessage, Utils } from '~/lib/utils';
 import { Prisma } from '@prisma/client';
 import { notFound, redirect } from 'next/navigation';

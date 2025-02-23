@@ -1,9 +1,9 @@
 import { Comment, Notification, NotificationPreferences, NotificationType, Post, Prisma, User } from '@prisma/client';
 import { mq } from '~/lib/mq';
 import { prisma } from '~/lib/prisma';
-import { withServiceAuth } from '~/auth/protected-service';
+import { withServiceAuth } from '~/security/protected-service';
 import { ErrorMessage, Utils } from '~/lib/utils';
-import { canAccess } from '~/auth/protected-role';
+import { canAccess } from '~/security/protected-role';
 import {
   CreateBatchNotificationData,
   CreateNotificationData,

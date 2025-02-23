@@ -1,5 +1,5 @@
 import { createPost } from '~/features/posts/post.actions';
-import { withAuth } from '~/auth/protected';
+import { withAuth } from '~/security/protected';
 
 export const metadata = {
   title: 'UCollab — Create',
