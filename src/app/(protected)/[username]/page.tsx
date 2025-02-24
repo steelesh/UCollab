@@ -32,7 +32,10 @@ async function ProfilePage({ params, _userId }: Props) {
         select: { content: true },
       },
       posts: {
-        select: { title: true },
+        select: {
+          id: true,
+          title: true,
+        },
       },
     },
   });
@@ -65,14 +68,16 @@ async function ProfilePage({ params, _userId }: Props) {
             />
           </div>
           <div className="absolute right-1 -bottom-12 flex space-x-2">
-            <button className="btn btn-accent-content">
-              <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
-                <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}>
-                  <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37c1 .608 2.296.07 2.572-1.065"></path>
-                  <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0-6 0"></path>
-                </g>
-              </svg>
-            </button>
+            <Link href={`/settings` as Route} className="font-bold hover:underline">
+              <button className="btn btn-accent-content">
+                <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
+                  <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}>
+                    <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37c1 .608 2.296.07 2.572-1.065"></path>
+                    <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0-6 0"></path>
+                  </g>
+                </svg>
+              </button>
+            </Link>
             <SignOutButton />
           </div>
         </div>
@@ -140,7 +145,7 @@ async function ProfilePage({ params, _userId }: Props) {
               <ul className="list-item py-4 pl-5 text-sm">
                 {latestPosts.map((post, idx) => (
                   <li key={idx}>
-                    <Link href={`/projects/${post.title}` as Route} className="font-bold hover:underline">
+                    <Link href={`/projects/${post.id}` as Route} className="font-bold hover:underline">
                       {post.title}
                     </Link>
                   </li>

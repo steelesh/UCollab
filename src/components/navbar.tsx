@@ -3,7 +3,7 @@
 import Theme from '@components/theme';
 import Link from 'next/link';
 import { useState } from 'react';
-import { signOut, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import SignInButton from '~/components/signin-button';
 
 export default function Navbar() {

@@ -1,5 +1,7 @@
 import { prisma } from '~/lib/prisma';
 import { withAuth } from '~/security/protected';
+import Link from 'next/link';
+import type { Route } from 'next';
 
 export const metadata = {
   title: 'UCollab — Explore',
@@ -8,6 +10,7 @@ export const metadata = {
 export async function ExplorePage() {
   const projectsWithUser = await prisma.post.findMany({
     select: {
+      id: true,
       title: true,
       createdDate: true,
       description: true,
@@ -29,7 +32,9 @@ export async function ExplorePage() {
                   </div>
                 </div>
                 <div>
-                  <h2 className="card-title text-lg font-bold text-white">{project.title}</h2>
+                  <Link href={`/projects/${project.id}` as Route} className="font-bold hover:underline">
+                    <h2 className="card-title text-lg font-bold text-white">{project.title}</h2>
+                  </Link>
                   <span className="text-accent text-sm">
                     {new Date(project.createdDate).toLocaleDateString('en-US', {
                       month: 'short',
