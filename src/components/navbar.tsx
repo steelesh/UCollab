@@ -25,8 +25,8 @@ export default function Navbar() {
           <Image
             src={theme === "dark" ? "/UCollab.darkLogo.png" : "/UCollab.lightLogo.png"}
             alt="UCollab Logo"
-            width={150}
-            height={50}
+            width={220}
+            height={70}
             priority
           />
         </Link>
