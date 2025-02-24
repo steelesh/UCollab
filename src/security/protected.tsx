@@ -4,11 +4,7 @@ import { isDevelopment } from '~/lib/env';
 import React from 'react';
 import { auth } from './auth';
 
-type PageProps = Record<string, unknown>;
-
-export function withAuth<P extends PageProps>(
-  Component: (props: P & { userId: string }) => Promise<React.ReactElement>,
-) {
+export function withAuth<P>(Component: (props: P & { userId: string }) => Promise<React.ReactElement>) {
   return async function AuthComponent(props: P): Promise<React.ReactElement> {
     try {
       const session = await auth();
@@ -32,9 +28,7 @@ export function withAuth<P extends PageProps>(
   };
 }
 
-export function withAdmin<P extends PageProps>(
-  Component: (props: P & { userId: string }) => Promise<React.ReactElement>,
-) {
+export function withAdmin<P>(Component: (props: P & { userId: string }) => Promise<React.ReactElement>) {
   return async function AdminComponent(props: P): Promise<React.ReactElement> {
     try {
       const session = await auth();
@@ -53,9 +47,7 @@ export function withAdmin<P extends PageProps>(
   };
 }
 
-export function withOnboarding<P extends PageProps>(
-  Component: (props: P & { userId: string }) => Promise<React.ReactElement>,
-) {
+export function withOnboarding<P>(Component: (props: P & { userId: string }) => Promise<React.ReactElement>) {
   return async function OnboardingComponent(props: P): Promise<React.ReactElement> {
     try {
       const session = await auth();
@@ -74,9 +66,7 @@ export function withOnboarding<P extends PageProps>(
   };
 }
 
-export function withDevelopment<P extends PageProps>(
-  Component: (props: P & { userId: string }) => Promise<React.ReactElement>,
-) {
+export function withDevelopment<P>(Component: (props: P & { userId: string }) => Promise<React.ReactElement>) {
   return async function DevelopmentComponent(props: P): Promise<React.ReactElement> {
     if (!isDevelopment()) {
       redirect('/');

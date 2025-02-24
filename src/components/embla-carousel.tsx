@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { JSX, useCallback } from 'react';
 import { EmblaOptionsType, EmblaCarouselType } from 'embla-carousel';
 import { PrevButton, NextButton, usePrevNextButtons } from '@components/embla-carousel-arrows';
 import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
 
 interface PropType {
-  slides: number[];
+  slides: JSX.Element[];
   options?: EmblaOptionsType;
 }
 

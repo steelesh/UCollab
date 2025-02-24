@@ -82,27 +82,13 @@ export default function Navbar() {
           )}
           <Theme />
           {session ? (
-            <div className="dropdown dropdown-end">
-              <div tabIndex={0} role="button" className="avatar btn btn-circle btn-ghost">
+            <Link href={`/${session.user.username}`}>
+              <div className="avatar btn btn-circle btn-ghost">
                 <div className="w-10 rounded-full">
                   <img alt="Avatar" src={session.user.avatar ?? 'https://avatar.iran.liara.run/public'} />
                 </div>
               </div>
-              <ul className="menu dropdown-content menu-sm rounded-box bg-base-300 z-[1] mt-3 w-52 p-2 shadow">
-                <li>
-                  <Link href="/profile" className="justify-between">
-                    Profile
-                    <span className="badge">New</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/settings">Settings</Link>
-                </li>
-                <li>
-                  <button onClick={() => signOut()}>Sign Out</button>
-                </li>
-              </ul>
-            </div>
+            </Link>
           ) : null}
         </div>
       </div>

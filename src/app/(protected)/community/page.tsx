@@ -37,7 +37,7 @@ async function CommunityPage() {
         <div key={index} className="flex w-full max-w-3xl items-center border-b p-4">
           <Image src={user.avatar} alt={user.username} width={50} height={50} className="rounded-full" />
           <div className="ml-4">
-            <Link href={`/users/${user.username}` as Route} className="font-bold hover:underline">
+            <Link href={`/${user.username}` as Route} className="font-bold hover:underline">
               {user.username}
             </Link>
             <p className="text-sm text-gray-500">{user.email}</p>

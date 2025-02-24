@@ -38,18 +38,20 @@ export async function ExplorePage() {
                     })}
                     <br />
                     <a
-                      href={`/${project.title ?? ''}`}
-                      className="link link-accent font-bold tracking-wider no-underline">
-                      {project.githubRepo ?? 'No repository'}
+                      href={`${project.githubRepo ?? ''}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="link link-accent font-bold tracking-wider text-white no-underline">
+                      GitHub Repo
                     </a>
                   </span>
                 </div>
               </div>
               <div className="mb-4 flex items-center justify-between">
-                <span className="badge badge-primary badge-outline badge-md">{project.postType}</span>
+                <span className="badge badge-primary-content badge-outline badge-md">{project.postType}</span>
               </div>
-              <p className="mb-4 text-white">{project.description}</p>
-              <div className="divider mb-4"></div>
+              <p className="text-white">{project.description}</p>
+              <div className="divider"></div>
             </div>
           </div>
         ))}
