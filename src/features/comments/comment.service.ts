@@ -97,15 +97,15 @@ export const CommentService = {
             },
           });
 
-          await NotificationService.sendCommentNotifications({
-            postId: comment.postId,
-            postTitle: comment.post.title,
-            commentId: comment.id,
-            postAuthorId: comment.post.createdById,
-            commentAuthorId: comment.createdById,
-            commentAuthorName: comment.createdBy.username,
-            content: comment.content,
-          });
+          // await NotificationService.sendCommentNotifications({
+          //   postId: comment.postId,
+          //   postTitle: comment.post.title,
+          //   commentId: comment.id,
+          //   postAuthorId: comment.post.createdById,
+          //   commentAuthorId: comment.createdById,
+          //   commentAuthorName: comment.createdBy.username,
+          //   content: comment.content,
+          // });
 
           return comment;
         });
