@@ -51,7 +51,15 @@ export const UserService = {
               mentorship: mentorship,
               skills: {
                 deleteMany: {},
-                create: data.skills ? data.skills.split(',').map((s) => ({ name: s.trim() })) : [],
+                connectOrCreate: data.skills
+                  ? data.skills.split(',').map((s) => {
+                      const trimmed = s.trim();
+                      return {
+                        where: { name: trimmed },
+                        create: { name: trimmed, verified: false },
+                      };
+                    })
+                  : [],
               },
             },
             select: userSelect,
@@ -60,7 +68,7 @@ export const UserService = {
       } catch (error) {
         console.log(error);
         if (error instanceof Utils) throw error;
-        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2005') {
           notFound();
         }
         throw new Utils(ErrorMessage.OPERATION_FAILED);
