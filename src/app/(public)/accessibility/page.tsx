@@ -14,7 +14,6 @@ export default function AccessibilityPage() {
           version of the Web Content Accessibility Guidelines.
         </p>
         <h2 className="text-lg font-semibold">Our Accessibility Features</h2>
-        <p>
         <ul className="list-disc space-y-2 pl-5">
           <li>
             <strong>Radix Certified Contrast:</strong> Our color palette is specifically chosen to be as contrasting
@@ -31,9 +30,8 @@ export default function AccessibilityPage() {
             to them as they are visiting our site.
           </li>
         </ul>
-        </p>
-        <p>
         <h2 className="text-lg font-semibold">Contact Us.</h2>
+        <p>
           At UCollab, we want every user to have a smooth experience when visiting our website. If you or anyone you know has 
           any issues or any recommendations, please contact us. 
         </p>
