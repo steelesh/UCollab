@@ -1,4 +1,4 @@
-# UCollab User Personas
+# 🤝 UCollab User Personas
 
 ##  Overview
 These are the user personas we came up with as part of our pre-development process for UCollab.

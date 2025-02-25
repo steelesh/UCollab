@@ -1,4 +1,4 @@
-# UCollab Class Diagram
+# 🗃️ UCollab Class Diagram
 
 ##  Overview
 This class diagram describes our current database structure.

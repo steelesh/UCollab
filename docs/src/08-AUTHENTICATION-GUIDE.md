@@ -1,4 +1,4 @@
-# 🎨 UCollab Authentication Guide
+# 🔑 UCollab Authentication Guide
 
 ##  Overview
 This page provides step-by-step instructions on how a user can authenticate themselves for UCollab sign up.
