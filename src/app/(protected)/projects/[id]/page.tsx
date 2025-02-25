@@ -13,8 +13,8 @@ interface ProjectRouteProps {
 
 type Props = ProjectRouteProps & { userId: string };
 
-async function ProjectPage({ params, userId }: Props) {
-  const { id } = params;
+async function ProjectPage({ params, userId: _userId }: Props) {
+  const { id } = await params;
 
   const project = await prisma.post.findUnique({
     where: { id },
@@ -190,7 +190,7 @@ async function ProjectPage({ params, userId }: Props) {
                             {new Date(comment.createdDate).toLocaleDateString()}
                           </p>
                         </div>
-                        {comment.createdById === userId && (
+                        {comment.createdById === _userId && (
                           <DeleteCommentButton
                             commentId={comment.id}
                             onDelete={handleDeleteComment.bind(null, comment.id)}
