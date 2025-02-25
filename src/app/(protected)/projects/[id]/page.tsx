@@ -3,6 +3,9 @@ import Link from 'next/link';
 import type { Route } from 'next';
 import { prisma } from '~/lib/prisma';
 import { withAuth } from '~/security/protected';
+import { revalidatePath } from 'next/cache';
+import { createComment, deleteComment } from '~/features/comments/comment.actions';
+import DeleteCommentButton from '~/components/delete-comment-button';
 
 interface ProjectRouteProps {
   params: { id: string };
@@ -10,8 +13,8 @@ interface ProjectRouteProps {
 
 type Props = ProjectRouteProps & { userId: string };
 
-async function ProjectPage({ params, _userId }: Props) {
-  const { id } = await params;
+async function ProjectPage({ params, userId }: Props) {
+  const { id } = params;
 
   const project = await prisma.post.findUnique({
     where: { id },
@@ -27,7 +30,20 @@ async function ProjectPage({ params, _userId }: Props) {
         select: { name: true },
       },
       comments: {
-        select: { content: true },
+        select: {
+          id: true,
+          content: true,
+          createdDate: true,
+          createdById: true,
+          createdBy: {
+            select: {
+              id: true,
+              username: true,
+              avatar: true
+            }
+          }
+        },
+        orderBy: { createdDate: 'desc' },
       },
     },
   });
@@ -42,6 +58,35 @@ async function ProjectPage({ params, _userId }: Props) {
 
   const createdDate = project.createdDate.toISOString().split('T')[0];
   const lastModifiedDate = project.lastModifiedDate.toISOString().split('T')[0];
+
+  async function handleAddComment(formData: FormData) {
+    'use server';
+
+    const content = formData.get('content') as string;
+    if (!content?.trim()) return;
+
+    try {
+      await createComment({
+        content,
+        postId: id
+      });
+
+      revalidatePath(`/projects/${id}`);
+    } catch (error) {
+      console.error('Failed to add comment:', error);
+    }
+  }
+
+  async function handleDeleteComment(commentId: string) {
+    'use server';
+    
+    try {
+      await deleteComment(commentId);
+      revalidatePath(`/projects/${id}`);
+    } catch (error) {
+      console.error('Failed to delete comment:', error);
+    }
+  }
 
   return (
     <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-8">
@@ -99,19 +144,68 @@ async function ProjectPage({ params, _userId }: Props) {
               </ul>
             </div>
           )}
-          {project.comments && project.comments.length > 0 && (
-            <div className="mt-8 border-t pt-4">
-              <h2 className="text-xl font-semibold">Latest Comments</h2>
-              <ul className="list-disc pl-5 text-sm">
-                {project.comments
-                  .slice(-3)
-                  .reverse()
-                  .map((comment, idx) => (
-                    <li key={idx}>{comment.content}</li>
-                  ))}
-              </ul>
-            </div>
-          )}
+          <div className="mt-8 border-t pt-4">
+            <h2 className="text-xl font-semibold mb-4">Comments</h2>
+            <form action={handleAddComment} className="mb-6">
+              <div className="form-control mb-4">
+                <label className="label" htmlFor="content">
+                  <span className="label-text">Add a comment</span>
+                </label>
+                <textarea
+                  id="content"
+                  name="content"
+                  className="textarea textarea-bordered w-full"
+                  placeholder="Share your thoughts..."
+                  rows={3}
+                  required
+                />
+              </div>
+              <div className="text-right">
+                <button
+                  type="submit"
+                  className="btn btn-primary-content"
+                >
+                  Post Comment
+                </button>
+              </div>
+            </form>
+            {project.comments && project.comments.length > 0 ? (
+              <div className="space-y-4">
+                {project.comments.map((comment) => {
+                  return (
+                    <div key={comment.id} className="rounded border p-4">
+                      <div className="flex items-center gap-2">
+                        {comment.createdBy.avatar && (
+                          <Image
+                            src={comment.createdBy.avatar}
+                            alt={comment.createdBy.username || 'User'}
+                            width={32}
+                            height={32}
+                            className="rounded-full"
+                          />
+                        )}
+                        <div>
+                          <p className="font-medium">{comment.createdBy.username || 'Anonymous'}</p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(comment.createdDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                        {comment.createdById === userId && (
+                          <DeleteCommentButton
+                            commentId={comment.id}
+                            onDelete={handleDeleteComment.bind(null, comment.id)}
+                          />
+                        )}
+                      </div>
+                      <p className="mt-2 text-sm">{comment.content}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">No comments yet. Be the first to comment!</p>
+            )}
+          </div>
         </div>
       </div>
     </div>
