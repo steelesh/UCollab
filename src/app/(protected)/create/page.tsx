@@ -1,5 +1,5 @@
-import { createPost } from '~/actions/post.actions';
-import { withAuth } from '~/lib/auth/protected';
+import { createPost } from '~/features/posts/post.actions';
+import { withAuth } from '~/security/protected';
 
 export const metadata = {
   title: 'UCollab — Create',
@@ -12,78 +12,88 @@ async function CreatePage() {
         <h2 className="mb-6 text-center text-3xl font-bold">Create Your Project</h2>
         <form action={createPost}>
           <div className="form-control mb-4">
-            <label className="label" htmlFor="projectTitle">
+            <label className="label" htmlFor="title">
               <span className="label-text">Project Title</span>
             </label>
             <input
               type="text"
               name="title"
-              id="projectTitle"
+              id="title"
               className="input input-bordered w-full"
               placeholder="Enter the project title"
               required
             />
           </div>
           <div className="form-control mb-4">
-            <label className="label" htmlFor="projectDescription">
+            <label className="label" htmlFor="description">
               <span className="label-text">Description</span>
             </label>
             <textarea
               name="description"
-              id="projectDescription"
+              id="description"
               className="textarea textarea-bordered w-full"
               placeholder="Describe your project"
               required></textarea>
           </div>
           <div className="form-control mb-4">
-            <label className="label" htmlFor="projectTechnologies">
+            <label className="label" htmlFor="technologies">
               <span className="label-text">Technologies (comma-separated)</span>
             </label>
             <input
               type="text"
-              id="projectTechnologies"
+              id="technologies"
               name="technologies"
               className="input input-bordered w-full"
               placeholder="e.g., react, nextjs, tailwind"
             />
           </div>
           <div className="form-control mb-4">
-            <label className="label" htmlFor="projectGithub">
+            <label className="label" htmlFor="githubRepo">
               <span className="label-text">GitHub Repository</span>
             </label>
             <input
               type="text"
-              id="projectGithub"
+              id="githubRepo"
               name="githubRepo"
               className="input input-bordered w-full"
               placeholder="Link to the GitHub repo"
             />
           </div>
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              name="postType"
-              value="Contribution"
-              className="btn btn-outline btn-xs btn-accent rounded-lg">
-              Contribution
-            </button>
-            <button
-              type="submit"
-              name="postType"
-              value="Feedback"
-              className="btn btn-outline btn-xs btn-accent rounded-lg">
-              Feedback
-            </button>
-            <button
-              type="submit"
-              name="postType"
-              value="Discussion"
-              className="btn btn-outline btn-xs btn-accent rounded-lg">
-              Discussion
-            </button>
+          <div className="mb-4 flex gap-4">
+            <div className="flex flex-col items-center">
+              <input type="radio" name="postType" id="contribution" value="CONTRIBUTION" className="peer hidden" />
+              <label
+                htmlFor="contribution"
+                className="btn btn-outline btn-xs btn-accent peer-checked:bg-primary-content rounded-lg peer-checked:text-white">
+                Contribution
+              </label>
+            </div>
+            <div className="flex flex-col items-center">
+              <input type="radio" name="postType" id="feedback" value="FEEDBACK" className="peer hidden" />
+              <label
+                htmlFor="feedback"
+                className="btn btn-outline btn-xs btn-accent peer-checked:bg-primary-content rounded-lg peer-checked:text-white">
+                Feedback
+              </label>
+            </div>
+            <div className="flex flex-col items-center">
+              <input
+                type="radio"
+                name="postType"
+                id="discussion"
+                value="DISCUSSION"
+                className="peer hidden"
+                defaultChecked
+              />
+              <label
+                htmlFor="discussion"
+                className="btn btn-outline btn-xs btn-accent peer-checked:bg-primary-content rounded-lg peer-checked:text-white">
+                Discussion
+              </label>
+            </div>
           </div>
-          <button type="submit" className="btn btn-primary mx-auto mt-6 block w-auto px-8">
-            Create Project
+          <button type="submit" className="btn btn-primary-content mx-auto mt-6 block w-auto px-8">
+            Submit
           </button>
         </form>
       </div>

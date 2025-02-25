@@ -12,7 +12,6 @@
 /prisma/db.sqlite
 /prisma/db.sqlite-journal
 db.sqlite
-/data/fake-data.ts
 
 # next.js
 /.next/

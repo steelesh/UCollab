@@ -51,3 +51,15 @@ export const env = createEnv({
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,
 });
+
+export function isDevelopment() {
+  return env.NEXT_PUBLIC_DEPLOY_ENV === 'dev';
+}
+
+export function isTest() {
+  return env.NEXT_PUBLIC_DEPLOY_ENV === 'test';
+}
+
+export function isProduction() {
+  return env.NEXT_PUBLIC_DEPLOY_ENV === 'prod';
+}
