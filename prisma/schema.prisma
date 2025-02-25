@@ -39,40 +39,27 @@ model User {
   avatarSource            AvatarSource             @default(DEFAULT)
   azureAdId               String                   @unique
   onboardingStep          OnboardingStep           @default(STEP_ONE)
-  comments                Comment[]
-  notifications           Notification[]           @relation("NotificationReceiver")
-  posts                   Post[]
-  profile                 Profile?                 @relation("UserProfile")
   accounts                Account[]
-  NotificationPreferences NotificationPreferences?
+  notifications           Notification[]           @relation("NotificationReceiver")
+  notificationPreferences NotificationPreferences?
   triggeredNotifications  Notification[]           @relation("NotificationTrigger")
   sessions                Session[]
+  comments                Comment[]
+  projects                Project[]
+  bio                     String?                  @prisma.Text
   role                    Role                     @default(USER)
-  Technology              Technology[]
-  Skill                   Skill[]
+  skills                  Skill[]
   gradYear                Int?
   githubProfile           String?
   mentorship              MentorshipStatus         @default(NONE)
+  Technology              Technology[]
 
   @@index([username])
   @@index([email])
   @@index([azureAdId])
 }
 
-model Profile {
-  id               String   @id @default(cuid())
-  userId           String   @unique
-  lastModifiedDate DateTime @updatedAt
-  skills           Skill[]
-  gradYear         Int?
-  bio              String?  @prisma.Text
-  user             User     @relation("UserProfile", fields: [userId], references: [id], onDelete: Cascade)
-  githubProfile    String?
-
-  @@index([userId])
-}
-
-model Post {
+model Project {
   id               String         @id @default(cuid())
   createdDate      DateTime       @default(now())
   lastModifiedDate DateTime       @updatedAt
@@ -95,8 +82,6 @@ model Skill {
   name        String   @unique
   verified    Boolean  @default(false)
   createdDate DateTime @default(now())
-  Profile     Profile? @relation(fields: [profileId], references: [id])
-  profileId   String?
   createdById String
   createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
 
@@ -108,8 +93,8 @@ model Technology {
   name        String   @unique
   verified    Boolean  @default(false)
   createdDate DateTime @default(now())
-  Post        Post?    @relation(fields: [postId], references: [id])
-  postId      String?
+  Project     Project? @relation(fields: [projectId], references: [id])
+  projectId   String?
   createdById String
   createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
 
@@ -118,16 +103,16 @@ model Technology {
 
 model Comment {
   id               String         @id @default(cuid())
-  postId           String
+  projectId        String
   createdById      String
   createdDate      DateTime       @default(now())
   lastModifiedDate DateTime       @updatedAt
   content          String         @prisma.Text
   createdBy        User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  post             Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  project          Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
   notifications    Notification[] @relation("CommentNotifications")
 
-  @@index([postId])
+  @@index([projectId])
   @@index([createdById])
 }
 
@@ -152,8 +137,8 @@ model Notification {
   isRead      Boolean          @default(false)
   type        NotificationType
 
-  post      Post?    @relation("PostNotifications", fields: [postId], references: [id])
-  postId    String?
+  project   Project? @relation("PostNotifications", fields: [projectId], references: [id])
+  projectId String?
   comment   Comment? @relation("CommentNotifications", fields: [commentId], references: [id])
   commentId String?
 
@@ -162,7 +147,7 @@ model Notification {
   user          User    @relation("NotificationReceiver", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([postId])
+  @@index([projectId])
   @@index([commentId])
   @@index([triggeredById])
 }

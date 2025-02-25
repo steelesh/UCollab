@@ -16,7 +16,7 @@ type Props = ProjectRouteProps & { userId: string };
 async function ProjectPage({ params, userId: _userId }: Props) {
   const { id } = await params;
 
-  const project = await prisma.post.findUnique({
+  const project = await prisma.project.findUnique({
     where: { id },
     select: {
       id: true,
@@ -39,9 +39,9 @@ async function ProjectPage({ params, userId: _userId }: Props) {
             select: {
               id: true,
               username: true,
-              avatar: true
-            }
-          }
+              avatar: true,
+            },
+          },
         },
         orderBy: { createdDate: 'desc' },
       },
@@ -68,7 +68,7 @@ async function ProjectPage({ params, userId: _userId }: Props) {
     try {
       await createComment({
         content,
-        postId: id
+        projectId: id,
       });
 
       revalidatePath(`/projects/${id}`);
@@ -79,7 +79,7 @@ async function ProjectPage({ params, userId: _userId }: Props) {
 
   async function handleDeleteComment(commentId: string) {
     'use server';
-    
+
     try {
       await deleteComment(commentId);
       revalidatePath(`/projects/${id}`);
@@ -145,7 +145,7 @@ async function ProjectPage({ params, userId: _userId }: Props) {
             </div>
           )}
           <div className="mt-8 border-t pt-4">
-            <h2 className="text-xl font-semibold mb-4">Comments</h2>
+            <h2 className="mb-4 text-xl font-semibold">Comments</h2>
             <form action={handleAddComment} className="mb-6">
               <div className="form-control mb-4">
                 <label className="label" htmlFor="content">
@@ -161,10 +161,7 @@ async function ProjectPage({ params, userId: _userId }: Props) {
                 />
               </div>
               <div className="text-right">
-                <button
-                  type="submit"
-                  className="btn btn-primary-content"
-                >
+                <button type="submit" className="btn btn-primary-content">
                   Post Comment
                 </button>
               </div>
@@ -186,15 +183,10 @@ async function ProjectPage({ params, userId: _userId }: Props) {
                         )}
                         <div>
                           <p className="font-medium">{comment.createdBy.username || 'Anonymous'}</p>
-                          <p className="text-xs text-gray-500">
-                            {new Date(comment.createdDate).toLocaleDateString()}
-                          </p>
+                          <p className="text-xs text-gray-500">{new Date(comment.createdDate).toLocaleDateString()}</p>
                         </div>
                         {comment.createdById === _userId && (
-                          <DeleteCommentButton
-                            commentId={comment.id}
-                            deleteAction={handleDeleteComment}
-                          />
+                          <DeleteCommentButton commentId={comment.id} deleteAction={handleDeleteComment} />
                         )}
                       </div>
                       <p className="mt-2 text-sm">{comment.content}</p>

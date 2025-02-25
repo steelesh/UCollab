@@ -1,7 +1,7 @@
 'use server';
 
-import { postSchema } from '~/features/posts/post.schema';
-import { PostService } from '~/features/posts/post.service';
+import { projectSchema } from '~/features/projects/project.schema';
+import { projectService } from '~/features/projects/project.service';
 import { auth } from '~/security/auth';
 import { ErrorMessage, Utils } from '~/lib/utils';
 import { Prisma } from '@prisma/client';
@@ -10,7 +10,7 @@ import { notFound, redirect } from 'next/navigation';
 export async function createPost(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
-  const { title, postType, description, technologies, githubRepo } = postSchema.parse({
+  const { title, postType, description, technologies, githubRepo } = projectSchema.parse({
     title: formData.get('title'),
     postType: formData.get('postType'),
     description: formData.get('description'),
@@ -18,7 +18,7 @@ export async function createPost(formData: FormData) {
     githubRepo: formData.get('githubRepo'),
   });
   try {
-    await PostService.createPost(session.user.id, {
+    await projectService.createProject(session.user.id, {
       title,
       postType,
       description,

@@ -1,4 +1,4 @@
-import { createPost } from '~/features/posts/post.actions';
+import { createPost } from '~/features/projects/project.actions';
 import { withAuth } from '~/security/protected';
 
 export const metadata = {

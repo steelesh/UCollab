@@ -25,13 +25,13 @@ async function ProfilePage({ params, _userId }: Props) {
       lastLogin: true,
       gradYear: true,
       mentorship: true,
-      Skill: {
+      skills: {
         select: { name: true },
       },
       comments: {
         select: { content: true },
       },
-      posts: {
+      projects: {
         select: {
           id: true,
           title: true,
@@ -50,7 +50,7 @@ async function ProfilePage({ params, _userId }: Props) {
 
   const createdDate = user.createdDate.toISOString().split('T')[0];
   const gradYear = user.gradYear || 'N/A';
-  const latestPosts = user.posts && user.posts.length > 0 ? user.posts.slice(-3).reverse() : [];
+  const latestProjects = user.projects && user.projects.length > 0 ? user.projects.slice(-3).reverse() : [];
   const latestComments = user.comments && user.comments.length > 0 ? user.comments.slice(-3).reverse() : [];
 
   return (
@@ -141,12 +141,12 @@ async function ProfilePage({ params, _userId }: Props) {
           </div>
           <div className="mt-8 border-t pt-4">
             <h2 className="text-md italic">Latest posts...</h2>
-            {latestPosts.length > 0 ? (
+            {latestProjects.length > 0 ? (
               <ul className="list-item py-4 pl-5 text-sm">
-                {latestPosts.map((post, idx) => (
+                {latestProjects.map((projects, idx) => (
                   <li key={idx}>
-                    <Link href={`/projects/${post.id}` as Route} className="font-bold hover:underline">
-                      {post.title}
+                    <Link href={`/projects/${projects.id}` as Route} className="font-bold hover:underline">
+                      {projects.title}
                     </Link>
                   </li>
                 ))}

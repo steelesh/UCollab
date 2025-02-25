@@ -49,7 +49,7 @@ export const UserService = {
               githubProfile: data.githubProfile,
               gradYear: gradYearNumber,
               mentorship: mentorship,
-              Skill: {
+              skills: {
                 deleteMany: {},
                 create: data.skills ? data.skills.split(',').map((s) => ({ name: s.trim() })) : [],
               },
@@ -121,7 +121,6 @@ export const UserService = {
           where: { id: userId },
           select: {
             ...userSelect,
-            profile: true,
             lastLogin: true,
           },
         });

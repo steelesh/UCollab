@@ -18,7 +18,7 @@ async function SettingsPage({ userId }: SettingsPageProps) {
       createdDate: true,
       gradYear: true,
       mentorship: true,
-      NotificationPreferences: {
+      notificationPreferences: {
         select: {
           allowComments: true,
           allowMentions: true,
@@ -97,7 +97,7 @@ async function SettingsPage({ userId }: SettingsPageProps) {
               <label className="fieldset-label flex items-center gap-2">
                 <input
                   type="checkbox"
-                  defaultChecked={user.NotificationPreferences?.allowComments}
+                  defaultChecked={user.notificationPreferences?.allowComments}
                   className="toggle"
                 />
                 Comments
@@ -105,7 +105,7 @@ async function SettingsPage({ userId }: SettingsPageProps) {
               <label className="fieldset-label flex items-center gap-2">
                 <input
                   type="checkbox"
-                  defaultChecked={user.NotificationPreferences?.allowMentions}
+                  defaultChecked={user.notificationPreferences?.allowMentions}
                   className="toggle"
                 />
                 Mentions
@@ -113,13 +113,13 @@ async function SettingsPage({ userId }: SettingsPageProps) {
               <label className="fieldset-label flex items-center gap-2">
                 <input
                   type="checkbox"
-                  defaultChecked={user.NotificationPreferences?.allowPostUpdates}
+                  defaultChecked={user.notificationPreferences?.allowPostUpdates}
                   className="toggle"
                 />
                 Post Updates
               </label>
               <label className="fieldset-label flex items-center gap-2">
-                <input type="checkbox" defaultChecked={user.NotificationPreferences?.allowSystem} className="toggle" />
+                <input type="checkbox" defaultChecked={user.notificationPreferences?.allowSystem} className="toggle" />
                 System
               </label>
             </fieldset>

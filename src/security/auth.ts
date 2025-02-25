@@ -88,8 +88,7 @@ const authConfig: NextAuthConfig = {
               avatar,
               avatarSource,
               role: Role.USER,
-              profile: { create: {} },
-              NotificationPreferences: { create: {} },
+              notificationPreferences: { create: {} },
             },
           });
         } else {
