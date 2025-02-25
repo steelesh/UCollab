@@ -1,4 +1,4 @@
-# 🎨 UCollab Features
+# 🚀 UCollab Features
 
 ##  Overview
 This page outlines the current features that UCollab has to offer!

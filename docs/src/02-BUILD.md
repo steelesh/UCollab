@@ -1,4 +1,4 @@
-# UCollab Build Guide
+# 🏗️ UCollab Build Guide
 
 ##  Overview
 These instructions outline how to build the UCollab site from source for development purposes.
