@@ -26,11 +26,11 @@ export async function seedDatabase() {
     });
     const defaultTechProject = await prisma.project.create({
       data: {
-        title: 'Default Technology Project',
-        description: 'This project exists solely to associate default technologies.',
-        postType: PostType.CONTRIBUTION,
+        title: 'UCollab',
+        description: 'UCollab is a platform built for students to connect and collaborate!.',
+        postType: PostType.DISCUSSION,
         createdById: admin.id,
-        githubRepo: null,
+        githubRepo: 'https://github.com/steelesh/UCollab',
       },
     });
 
@@ -123,7 +123,9 @@ async function createProject(user: User, allUsers: User[]) {
       description: conversation.description,
       postType,
       createdById: user.id,
-      githubRepo: conversation.githubProject ? `github.com/${user.username}/${conversation.githubProject}.git` : null,
+      githubRepo: conversation.githubProject
+        ? `https://www.github.com/${user.username}/${conversation.githubProject}`
+        : null,
       technologies: {
         connect: selectedTechs.map((tech) => ({ id: tech.id })),
       },
