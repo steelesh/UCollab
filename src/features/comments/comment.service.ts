@@ -1,17 +1,15 @@
-import { Comment, Post, Prisma, User } from '@prisma/client';
+import { Comment, Prisma, Project, User } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '~/lib/prisma';
 import { withServiceAuth } from '~/security/protected-service';
 import { ErrorMessage, Utils, ValidationError } from '~/lib/utils';
 import { commentFormSchema, type CreateCommentData, type UpdateCommentData } from '~/features/comments/comment.schema';
-import { NotificationService } from '../notifications/notification.service';
 
 export const CommentService = {
-  // Authenticated users can view comments
-  async getComments(postId: Post['id'], requestUserId: User['id']) {
+  async getComments(projectId: Project['id'], requestUserId: User['id']) {
     return withServiceAuth(requestUserId, null, async () => {
       return prisma.comment.findMany({
-        where: { postId },
+        where: { projectId },
         select: {
           id: true,
           content: true,
@@ -37,7 +35,7 @@ export const CommentService = {
         select: {
           id: true,
           content: true,
-          postId: true,
+          projectId: true,
           createdDate: true,
           lastModifiedDate: true,
           createdBy: {
@@ -47,7 +45,7 @@ export const CommentService = {
               avatar: true,
             },
           },
-          post: {
+          project: {
             select: {
               id: true,
               title: true,
@@ -66,24 +64,34 @@ export const CommentService = {
   },
 
   // Authenticated users can create comments
-  async createComment({ content, postId }: CreateCommentData, requestUserId: User['id']) {
+  async createComment({ content, projectId }: CreateCommentData, requestUserId: User['id']) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         const validatedData = commentFormSchema.parse({ content });
 
         return await prisma.$transaction(async (tx) => {
-          const comment = await tx.comment.create({
+          // await NotificationService.sendCommentNotifications({
+          //   postId: comment.postId,
+          //   postTitle: comment.post.title,
+          //   commentId: comment.id,
+          //   postAuthorId: comment.post.createdById,
+          //   commentAuthorId: comment.createdById,
+          //   commentAuthorName: comment.createdBy.username,
+          //   content: comment.content,
+          // });
+
+          return tx.comment.create({
             data: {
               content: validatedData.content,
-              postId,
+              projectId,
               createdById: requestUserId,
             },
             select: {
               id: true,
               content: true,
-              postId: true,
+              projectId: true,
               createdById: true,
-              post: {
+              project: {
                 select: {
                   title: true,
                   createdById: true,
@@ -96,18 +104,6 @@ export const CommentService = {
               },
             },
           });
-
-          // await NotificationService.sendCommentNotifications({
-          //   postId: comment.postId,
-          //   postTitle: comment.post.title,
-          //   commentId: comment.id,
-          //   postAuthorId: comment.post.createdById,
-          //   commentAuthorId: comment.createdById,
-          //   commentAuthorName: comment.createdBy.username,
-          //   content: comment.content,
-          // });
-
-          return comment;
         });
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -208,10 +204,10 @@ export const CommentService = {
   },
 
   // Authenticated users can view paginated comments
-  async getPaginatedComments(postId: Post['id'], requestUserId: User['id'], page = 1, limit = 20) {
+  async getPaginatedComments(projectId: Project['id'], requestUserId: User['id'], page = 1, limit = 20) {
     return withServiceAuth(requestUserId, null, async () => {
       return prisma.comment.findMany({
-        where: { postId },
+        where: { projectId },
         select: {
           id: true,
           content: true,

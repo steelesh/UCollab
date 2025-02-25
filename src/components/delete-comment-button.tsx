@@ -17,11 +17,7 @@ export default function DeleteCommentButton({ commentId, deleteAction }: Props) 
   };
 
   return (
-    <button
-      onClick={handleDelete}
-      className="btn btn-ghost btn-sm"
-      disabled={isPending}
-    >
+    <button onClick={handleDelete} className="btn btn-ghost btn-sm" disabled={isPending}>
       Delete
     </button>
   );

@@ -1,16 +1,16 @@
-import { Post, Prisma, Technology } from '@prisma/client';
+import { Project, Prisma, Technology } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import { prisma } from '~/lib/prisma';
 import { withServiceAuth } from '~/security/protected-service';
 import { ErrorMessage, Utils } from '~/lib/utils';
-import { postSchema, postSelect, CreatePostInput } from '~/features/posts/post.schema';
+import { projectSchema, projectSelect, CreateProjectInput } from '~/features/projects/project.schema';
 
-export const PostService = {
-  async getAllPosts(requestUserId: string) {
+export const projectService = {
+  async getAllProjects(requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        return await prisma.post.findMany({
-          select: postSelect,
+        return await prisma.project.findMany({
+          select: projectSelect,
           orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
@@ -20,13 +20,13 @@ export const PostService = {
     });
   },
 
-  async getPostById(id: Post['id'], requestUserId: string) {
+  async getProjectById(id: Project['id'], requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        const post = await prisma.post.findUnique({
+        const project = await prisma.project.findUnique({
           where: { id },
           select: {
-            ...postSelect,
+            ...projectSelect,
             createdById: true,
             comments: {
               select: {
@@ -46,8 +46,8 @@ export const PostService = {
           },
         });
 
-        if (!post) notFound();
-        return post;
+        if (!project) notFound();
+        return project;
       } catch (error) {
         if (error instanceof Utils) throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
@@ -56,10 +56,10 @@ export const PostService = {
   },
 
   // Owner only - creating posts
-  async createPost(requestUserId: string, rawData: unknown) {
+  async createProject(requestUserId: string, rawData: unknown) {
     return withServiceAuth(requestUserId, { ownerId: requestUserId }, async () => {
       try {
-        const data: CreatePostInput = postSchema.parse(rawData);
+        const data: CreateProjectInput = projectSchema.parse(rawData);
         let postType: 'CONTRIBUTION' | 'FEEDBACK' | 'DISCUSSION' = 'DISCUSSION';
         if (data.postType === 'CONTRIBUTION') {
           postType = 'CONTRIBUTION';
@@ -67,24 +67,22 @@ export const PostService = {
           postType = 'FEEDBACK';
         }
         return prisma.$transaction(async (tx) => {
-          return tx.post.create({
+          return tx.project.create({
             data: {
               title: data.title,
               description: data.description,
               postType: postType,
               githubRepo: data.githubRepo,
-              // Connect the new post to the user creating it (if needed)
               createdBy: { connect: { id: requestUserId } },
               technologies: {
                 create: data.technologies
                   ? data.technologies.split(',').map((s) => ({
                       name: s.trim(),
-                      createdBy: { connect: { id: requestUserId } },
                     }))
                   : [],
               },
             },
-            select: postSelect,
+            select: projectSelect,
           });
         });
       } catch (error) {
@@ -99,11 +97,11 @@ export const PostService = {
   },
 
   // Owner or admin - deleting posts
-  async deletePost(id: Post['id'], requestUserId: string) {
-    const post = await this.getPostById(id, requestUserId);
-    return withServiceAuth(requestUserId, { ownerId: post.createdById }, async () => {
+  async deleteProject(id: Project['id'], requestUserId: string) {
+    const project = await this.getProjectById(id, requestUserId);
+    return withServiceAuth(requestUserId, { ownerId: project.createdById }, async () => {
       try {
-        await prisma.post.delete({ where: { id } });
+        await prisma.project.delete({ where: { id } });
       } catch (error) {
         if (error instanceof Utils) throw error;
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -115,14 +113,14 @@ export const PostService = {
   },
 
   // Authenticated users - searching and filtering posts
-  async searchPosts(query: string, requestUserId: string, page = 1, limit = 20) {
+  async searchProjects(query: string, requestUserId: string, page = 1, limit = 20) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        return await prisma.post.findMany({
+        return await prisma.project.findMany({
           where: {
             OR: [{ title: { contains: query } }, { description: { contains: query } }],
           },
-          select: postSelect,
+          select: projectSelect,
           skip: (page - 1) * limit,
           take: limit,
         });
@@ -133,12 +131,12 @@ export const PostService = {
     });
   },
 
-  async getPostsByUser(userId: string, requestUserId: string) {
+  async getProjectsByUser(userId: string, requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        return await prisma.post.findMany({
+        return await prisma.project.findMany({
           where: { createdById: userId },
-          select: postSelect,
+          select: projectSelect,
           orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
@@ -148,16 +146,16 @@ export const PostService = {
     });
   },
 
-  async getPostsByTechnology(techName: string, requestUserId: string) {
+  async getProjectsByTechnology(techName: string, requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        return await prisma.post.findMany({
+        return await prisma.project.findMany({
           where: {
             technologies: {
               some: { name: techName.toLowerCase().trim() },
             },
           },
-          select: postSelect,
+          select: projectSelect,
           orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
@@ -167,10 +165,10 @@ export const PostService = {
     });
   },
 
-  async getPostsByTechnologies(techNames: Technology['name'][], matchAll = false, requestUserId: string) {
+  async getProjectsByTechnologies(techNames: Technology['name'][], matchAll = false, requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        return await prisma.post.findMany({
+        return await prisma.project.findMany({
           where: {
             technologies: matchAll
               ? {
@@ -184,7 +182,7 @@ export const PostService = {
                   },
                 },
           },
-          select: postSelect,
+          select: projectSelect,
           orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
@@ -194,11 +192,11 @@ export const PostService = {
     });
   },
 
-  async getPaginatedPosts(page = 1, limit = 20, requestUserId: string) {
+  async getPaginatedProjects(page = 1, limit = 20, requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        return await prisma.post.findMany({
-          select: postSelect,
+        return await prisma.project.findMany({
+          select: projectSelect,
           skip: (page - 1) * limit,
           take: limit,
           orderBy: { createdDate: 'desc' },

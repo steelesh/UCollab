@@ -1,4 +1,12 @@
-import { Comment, Notification, NotificationPreferences, NotificationType, Post, Prisma, User } from '@prisma/client';
+import {
+  Comment,
+  Notification,
+  NotificationPreferences,
+  NotificationType,
+  Project,
+  Prisma,
+  User,
+} from '@prisma/client';
 import { mq } from '~/lib/mq';
 import { prisma } from '~/lib/prisma';
 import { withServiceAuth } from '~/security/protected-service';
@@ -151,7 +159,7 @@ export const NotificationService = {
           }
         }
 
-        return await prisma.notification.updateMany({
+        return prisma.notification.updateMany({
           where: { id: { in: notificationIds } },
           data: { isRead: true },
         });
@@ -199,10 +207,10 @@ export const NotificationService = {
   },
 
   async sendCommentNotifications(data: {
-    postId: Post['id'];
-    postTitle: Post['title'];
+    projectId: Project['id'];
+    projectTitle: Project['title'];
     commentId: Comment['id'];
-    postAuthorId: User['id'];
+    projectAuthorId: User['id'];
     commentAuthorId: User['id'];
     commentAuthorName: User['username'];
     content: Comment['content'];
@@ -224,8 +232,8 @@ export const NotificationService = {
             this.queueBatchNotifications({
               userIds: uniqueMentionedUsers,
               type: NotificationType.MENTION,
-              message: `${data.commentAuthorName} mentioned you in a comment on: ${data.postTitle}`,
-              postId: data.postId,
+              message: `${data.commentAuthorName} mentioned you in a comment on: ${data.projectTitle}`,
+              projectId: data.projectId,
               commentId: data.commentId,
               triggeredById: data.commentAuthorId,
             }),
@@ -234,17 +242,17 @@ export const NotificationService = {
       }
 
       const shouldNotifyPostAuthor =
-        data.postAuthorId !== data.commentAuthorId && !mentionedUserIds.includes(data.postAuthorId);
+        data.projectAuthorId !== data.commentAuthorId && !mentionedUserIds.includes(data.projectAuthorId);
 
       if (shouldNotifyPostAuthor) {
-        const preferences = await this.getNotificationPreferences(data.postAuthorId);
+        const preferences = await this.getNotificationPreferences(data.projectAuthorId);
         if (await this.shouldSend(NotificationType.COMMENT, preferences)) {
           notifications.push(
             this.queueNotification({
-              userId: data.postAuthorId,
+              userId: data.projectAuthorId,
               type: NotificationType.COMMENT,
-              message: `${data.commentAuthorName} commented on your post: ${data.postTitle}`,
-              postId: data.postId,
+              message: `${data.commentAuthorName} commented on your post: ${data.projectTitle}`,
+              projectId: data.projectId,
               commentId: data.commentId,
               triggeredById: data.commentAuthorId,
             }),
@@ -278,7 +286,7 @@ export const NotificationService = {
     const preferencesMap: Record<Notification['type'], boolean> = {
       [NotificationType.COMMENT]: preferences.allowComments,
       [NotificationType.MENTION]: preferences.allowMentions,
-      [NotificationType.POST_UPDATE]: preferences.allowPostUpdates,
+      [NotificationType.PROJECT_UPDATE]: preferences.allowProjectUpdates,
       [NotificationType.SYSTEM]: preferences.allowSystem,
     };
 
@@ -292,7 +300,7 @@ export const NotificationService = {
           message: data.message,
           type: data.type,
           userId: data.userId,
-          postId: data.postId,
+          projectId: data.projectId,
           commentId: data.commentId,
           triggeredById: data.triggeredById,
         },

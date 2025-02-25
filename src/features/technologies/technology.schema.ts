@@ -6,12 +6,7 @@ export const technologySelect = {
   name: true,
   verified: true,
   createdDate: true,
-  createdBy: {
-    select: {
-      id: true,
-      username: true,
-    },
-  },
+  createdById: true,
 } as const;
 
 export const technologySchema = z.object({

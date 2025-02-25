@@ -10,13 +10,13 @@ export const commentFormSchema = z.object({
 
 export interface CreateCommentData {
   content: string;
-  postId: string;
+  projectId: string;
 }
 
 export interface UpdateCommentData {
   id: string;
   content: string;
-  postId: string;
+  projectId: string;
 }
 
 export type CommentFormData = z.infer<typeof commentFormSchema>;

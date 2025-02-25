@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 export async function ExplorePage() {
-  const projectsWithUser = await prisma.post.findMany({
+  const projectsWithUser = await prisma.project.findMany({
     select: {
       id: true,
       title: true,

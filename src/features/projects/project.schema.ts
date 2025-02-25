@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const postSelect = {
+export const projectSelect = {
   id: true,
   title: true,
   description: true,
@@ -9,7 +9,7 @@ export const postSelect = {
   githubRepo: true,
 } as const;
 
-export const postSchema = z.object({
+export const projectSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
   description: z.string().min(1, 'Description is required').max(1000, 'Description must be less than 1000 characters'),
   postType: z.string(),
@@ -17,4 +17,4 @@ export const postSchema = z.object({
   githubRepo: z.string().url({ message: 'Invalid URL' }).optional(),
 });
 
-export type CreatePostInput = z.infer<typeof postSchema>;
+export type CreateProjectInput = z.infer<typeof projectSchema>;

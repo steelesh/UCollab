@@ -1,4 +1,4 @@
-import { createPost } from '~/features/posts/post.actions';
+import { createProject } from '~/features/projects/project.actions';
 import { withAuth } from '~/security/protected';
 
 export const metadata = {
@@ -10,7 +10,7 @@ async function CreatePage() {
     <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto pt-8">
       <div className="bg-base-300 mx-auto w-full max-w-5xl rounded-lg p-4 shadow-lg">
         <h2 className="mb-6 text-center text-3xl font-bold">Create Your Project</h2>
-        <form action={createPost}>
+        <form action={createProject}>
           <div className="form-control mb-4">
             <label className="label" htmlFor="title">
               <span className="label-text">Project Title</span>

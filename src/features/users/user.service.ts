@@ -49,9 +49,17 @@ export const UserService = {
               githubProfile: data.githubProfile,
               gradYear: gradYearNumber,
               mentorship: mentorship,
-              Skill: {
+              skills: {
                 deleteMany: {},
-                create: data.skills ? data.skills.split(',').map((s) => ({ name: s.trim() })) : [],
+                connectOrCreate: data.skills
+                  ? data.skills.split(',').map((s) => {
+                      const trimmed = s.trim();
+                      return {
+                        where: { name: trimmed },
+                        create: { name: trimmed, verified: false },
+                      };
+                    })
+                  : [],
               },
             },
             select: userSelect,
@@ -60,7 +68,7 @@ export const UserService = {
       } catch (error) {
         console.log(error);
         if (error instanceof Utils) throw error;
-        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2005') {
           notFound();
         }
         throw new Utils(ErrorMessage.OPERATION_FAILED);
@@ -121,7 +129,6 @@ export const UserService = {
           where: { id: userId },
           select: {
             ...userSelect,
-            profile: true,
             lastLogin: true,
           },
         });
@@ -166,12 +173,18 @@ export const UserService = {
   async updateUser(userId: User['id'], data: UpdateUserInput, requestUserId: string) {
     return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
-        const { avatar: avatarFile, ...updateFields } = data;
+        const { avatar: avatarFile, notificationPreferences, ...updateFields } = data;
         const updates: Prisma.UserUpdateInput = { ...updateFields };
 
         if (avatarFile !== undefined) {
           updates.avatar = await this.processUserAvatar(avatarFile, userId);
           updates.avatarSource = updates.avatar ? AvatarSource.UPLOAD : AvatarSource.DEFAULT;
+        }
+
+        if (notificationPreferences !== undefined) {
+          updates.notificationPreferences = {
+            update: notificationPreferences,
+          };
         }
 
         return await prisma.user.update({

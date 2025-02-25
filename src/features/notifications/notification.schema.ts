@@ -5,7 +5,7 @@ export const notificationPreferencesFormSchema = z.object({
   enabled: z.boolean().default(true),
   allowComments: z.boolean().default(true),
   allowMentions: z.boolean().default(true),
-  allowPostUpdates: z.boolean().default(true),
+  allowProjectUpdates: z.boolean().default(true),
   allowSystem: z.boolean().default(true),
 });
 
@@ -13,7 +13,7 @@ export interface CreateNotificationData {
   userId: User['id'];
   type: NotificationType;
   message: string;
-  postId?: string;
+  projectId?: string;
   commentId?: string;
   triggeredById?: string;
 }
@@ -27,7 +27,7 @@ export interface UpdateNotificationPreferencesData {
   enabled?: boolean;
   allowComments?: boolean;
   allowMentions?: boolean;
-  allowPostUpdates?: boolean;
+  allowProjectUpdates?: boolean;
   allowSystem?: boolean;
 }
 
@@ -52,7 +52,7 @@ export const notificationSelect = {
   createdDate: true,
   isRead: true,
   type: true,
-  postId: true,
+  projectId: true,
   commentId: true,
   triggeredBy: {
     select: {
