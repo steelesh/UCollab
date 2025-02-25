@@ -52,7 +52,6 @@ model User {
   gradYear                Int?
   githubProfile           String?
   mentorship              MentorshipStatus         @default(NONE)
-  Technology              Technology[]
 
   @@index([username])
   @@index([email])
@@ -93,10 +92,8 @@ model Technology {
   name        String   @unique
   verified    Boolean  @default(false)
   createdDate DateTime @default(now())
-  Project     Project? @relation(fields: [projectId], references: [id])
-  projectId   String?
-  createdById String
-  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  Project     Project? @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdById String?
 
   @@index([name])
 }
@@ -177,7 +174,7 @@ enum PostType {
 enum NotificationType {
   COMMENT
   MENTION
-  POST_UPDATE
+  PROJECT_UPDATE
   SYSTEM
 }
 

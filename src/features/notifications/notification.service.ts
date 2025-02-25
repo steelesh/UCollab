@@ -286,7 +286,7 @@ export const NotificationService = {
     const preferencesMap: Record<Notification['type'], boolean> = {
       [NotificationType.COMMENT]: preferences.allowComments,
       [NotificationType.MENTION]: preferences.allowMentions,
-      [NotificationType.POST_UPDATE]: preferences.allowProjectUpdates,
+      [NotificationType.PROJECT_UPDATE]: preferences.allowProjectUpdates,
       [NotificationType.SYSTEM]: preferences.allowSystem,
     };
 

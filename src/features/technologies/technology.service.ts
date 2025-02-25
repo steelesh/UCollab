@@ -1,4 +1,4 @@
-import { Post, Prisma } from '@prisma/client';
+import { Project, Prisma } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import { prisma } from '~/lib/prisma';
 import { withServiceAuth } from '~/security/protected-service';
@@ -49,7 +49,6 @@ export const TechnologyService = {
           data: {
             name: normalizedName,
             verified: true,
-            createdById: requestUserId,
           },
           select: technologySelect,
         });
@@ -100,16 +99,16 @@ export const TechnologyService = {
   },
 
   // Post owner or admin can update technologies
-  async updatePostTechnologies(postId: Post['id'], technologies: string[], requestUserId: string) {
-    return withServiceAuth(requestUserId, { ownerId: postId }, async () => {
+  async updateProjectTechnologies(projectId: Project['id'], technologies: string[], requestUserId: string) {
+    return withServiceAuth(requestUserId, { ownerId: projectId }, async () => {
       try {
         return await prisma.$transaction(async (tx) => {
-          const post = await tx.post.findUnique({
-            where: { id: postId },
+          const project = await tx.project.findUnique({
+            where: { id: projectId },
             select: { id: true },
           });
 
-          if (!post) notFound();
+          if (!project) notFound();
 
           const verifiedTechs = await tx.technology.findMany({
             where: {
@@ -123,8 +122,8 @@ export const TechnologyService = {
             select: { name: true },
           });
 
-          return tx.post.update({
-            where: { id: postId },
+          return tx.project.update({
+            where: { id: projectId },
             data: {
               technologies: {
                 set: verifiedTechs.map(({ name }) => ({ name })),
@@ -151,10 +150,10 @@ export const TechnologyService = {
   },
 
   // Public method - no auth needed
-  async getPostTechnologies(postId: string) {
+  async getProjectTechnologies(projectId: string) {
     try {
-      const post = await prisma.post.findUnique({
-        where: { id: postId },
+      const project = await prisma.project.findUnique({
+        where: { id: projectId },
         select: {
           technologies: {
             select: {
@@ -165,7 +164,7 @@ export const TechnologyService = {
         },
       });
 
-      return post?.technologies ?? [];
+      return project?.technologies ?? [];
     } catch {
       throw new Utils(ErrorMessage.OPERATION_FAILED);
     }

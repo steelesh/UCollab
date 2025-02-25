@@ -7,7 +7,7 @@ import { ErrorMessage, Utils } from '~/lib/utils';
 import { Prisma } from '@prisma/client';
 import { notFound, redirect } from 'next/navigation';
 
-export async function createPost(formData: FormData) {
+export async function createProject(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
   const { title, postType, description, technologies, githubRepo } = projectSchema.parse({

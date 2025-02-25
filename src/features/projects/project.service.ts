@@ -23,7 +23,7 @@ export const projectService = {
   async getProjectById(id: Project['id'], requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        const post = await prisma.project.findUnique({
+        const project = await prisma.project.findUnique({
           where: { id },
           select: {
             ...projectSelect,
@@ -46,8 +46,8 @@ export const projectService = {
           },
         });
 
-        if (!post) notFound();
-        return post;
+        if (!project) notFound();
+        return project;
       } catch (error) {
         if (error instanceof Utils) throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
@@ -78,7 +78,6 @@ export const projectService = {
                 create: data.technologies
                   ? data.technologies.split(',').map((s) => ({
                       name: s.trim(),
-                      createdBy: { connect: { id: requestUserId } },
                     }))
                   : [],
               },
@@ -98,9 +97,9 @@ export const projectService = {
   },
 
   // Owner or admin - deleting posts
-  async deletePost(id: Project['id'], requestUserId: string) {
-    const post = await this.getProjectById(id, requestUserId);
-    return withServiceAuth(requestUserId, { ownerId: post.createdById }, async () => {
+  async deleteProject(id: Project['id'], requestUserId: string) {
+    const project = await this.getProjectById(id, requestUserId);
+    return withServiceAuth(requestUserId, { ownerId: project.createdById }, async () => {
       try {
         await prisma.project.delete({ where: { id } });
       } catch (error) {
@@ -114,7 +113,7 @@ export const projectService = {
   },
 
   // Authenticated users - searching and filtering posts
-  async searchPosts(query: string, requestUserId: string, page = 1, limit = 20) {
+  async searchProjects(query: string, requestUserId: string, page = 1, limit = 20) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.project.findMany({
@@ -132,7 +131,7 @@ export const projectService = {
     });
   },
 
-  async getPostsByUser(userId: string, requestUserId: string) {
+  async getProjectsByUser(userId: string, requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.project.findMany({
@@ -147,7 +146,7 @@ export const projectService = {
     });
   },
 
-  async getPostsByTechnology(techName: string, requestUserId: string) {
+  async getProjectsByTechnology(techName: string, requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.project.findMany({
@@ -166,7 +165,7 @@ export const projectService = {
     });
   },
 
-  async getPostsByTechnologies(techNames: Technology['name'][], matchAll = false, requestUserId: string) {
+  async getProjectsByTechnologies(techNames: Technology['name'][], matchAll = false, requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.project.findMany({
@@ -193,7 +192,7 @@ export const projectService = {
     });
   },
 
-  async getPaginatedPosts(page = 1, limit = 20, requestUserId: string) {
+  async getPaginatedProjects(page = 1, limit = 20, requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.project.findMany({

@@ -53,7 +53,7 @@ async function ProfilePage({ params }: Props) {
   const gradYear = user.gradYear || '';
   const latestProjects = user.projects && user.projects.length > 0 ? user.projects.slice(-3).reverse() : [];
   const latestComments = user.comments && user.comments.length > 0 ? user.comments.slice(-3).reverse() : [];
-  const biography = user.bio?.toString() || 'N/A';
+  const biography = user.bio?.toString() || '';
 
   return (
     <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-8">
