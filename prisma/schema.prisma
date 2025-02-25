@@ -71,7 +71,7 @@ model Project {
   comments         Comment[]
   createdById      String
   createdBy        User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  notifications    Notification[] @relation("PostNotifications")
+  notifications    Notification[] @relation("ProjectNotifications")
 
   @@index([createdById])
   @@index([title(length: 191)])
@@ -117,14 +117,14 @@ model Comment {
 }
 
 model NotificationPreferences {
-  id               String  @id @default(cuid())
-  userId           String  @unique
-  enabled          Boolean @default(true)
-  allowComments    Boolean @default(true)
-  allowMentions    Boolean @default(true)
-  allowPostUpdates Boolean @default(true)
-  allowSystem      Boolean @default(true)
-  user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                  String  @id @default(cuid())
+  userId              String  @unique
+  enabled             Boolean @default(true)
+  allowComments       Boolean @default(true)
+  allowMentions       Boolean @default(true)
+  allowProjectUpdates Boolean @default(true)
+  allowSystem         Boolean @default(true)
+  user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -137,7 +137,7 @@ model Notification {
   isRead      Boolean          @default(false)
   type        NotificationType
 
-  project   Project? @relation("PostNotifications", fields: [projectId], references: [id])
+  project   Project? @relation("ProjectNotifications", fields: [projectId], references: [id])
   projectId String?
   comment   Comment? @relation("CommentNotifications", fields: [commentId], references: [id])
   commentId String?

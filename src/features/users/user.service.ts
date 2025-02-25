@@ -165,12 +165,18 @@ export const UserService = {
   async updateUser(userId: User['id'], data: UpdateUserInput, requestUserId: string) {
     return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
-        const { avatar: avatarFile, ...updateFields } = data;
+        const { avatar: avatarFile, notificationPreferences, ...updateFields } = data;
         const updates: Prisma.UserUpdateInput = { ...updateFields };
 
         if (avatarFile !== undefined) {
           updates.avatar = await this.processUserAvatar(avatarFile, userId);
           updates.avatarSource = updates.avatar ? AvatarSource.UPLOAD : AvatarSource.DEFAULT;
+        }
+
+        if (notificationPreferences !== undefined) {
+          updates.notificationPreferences = {
+            update: notificationPreferences,
+          };
         }
 
         return await prisma.user.update({
