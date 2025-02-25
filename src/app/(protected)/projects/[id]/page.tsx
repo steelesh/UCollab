@@ -193,7 +193,7 @@ async function ProjectPage({ params, userId: _userId }: Props) {
                         {comment.createdById === _userId && (
                           <DeleteCommentButton
                             commentId={comment.id}
-                            onDelete={handleDeleteComment.bind(null, comment.id)}
+                            deleteAction={handleDeleteComment}
                           />
                         )}
                       </div>
