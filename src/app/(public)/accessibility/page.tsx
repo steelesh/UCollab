@@ -9,7 +9,7 @@ export default function AccessibilityPage() {
         <h1 className="text-center text-2xl font-bold select-none">Accessibility</h1>
         <h2 className="text-lg font-semibold">Introduction</h2>
         <p>
-          UCollab (“we,” “our,” or “us”) committed to ensuring digital accessibility for all people. 
+          UCollab is committed to ensuring digital accessibility for all people. 
           We are continually improving the user experience for everyone by adhering to the current 
           version of the Web Content Accessibility Guidelines.
         </p>
