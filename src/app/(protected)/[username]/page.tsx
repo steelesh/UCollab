@@ -11,7 +11,7 @@ interface ProfileRouteProps {
 
 type Props = ProfileRouteProps & { userId: string };
 
-async function ProfilePage({ params, _userId }: Props) {
+async function ProfilePage({ params }: Props) {
   const { username } = await params;
 
   const user = await prisma.user.findUnique({
@@ -25,13 +25,14 @@ async function ProfilePage({ params, _userId }: Props) {
       lastLogin: true,
       gradYear: true,
       mentorship: true,
-      Skill: {
+      bio: true,
+      skills: {
         select: { name: true },
       },
       comments: {
         select: { content: true },
       },
-      posts: {
+      projects: {
         select: {
           id: true,
           title: true,
@@ -49,9 +50,10 @@ async function ProfilePage({ params, _userId }: Props) {
   }
 
   const createdDate = user.createdDate.toISOString().split('T')[0];
-  const gradYear = user.gradYear || 'N/A';
-  const latestPosts = user.posts && user.posts.length > 0 ? user.posts.slice(-3).reverse() : [];
+  const gradYear = user.gradYear || '';
+  const latestProjects = user.projects && user.projects.length > 0 ? user.projects.slice(-3).reverse() : [];
   const latestComments = user.comments && user.comments.length > 0 ? user.comments.slice(-3).reverse() : [];
+  const biography = user.bio?.toString() || '';
 
   return (
     <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-8">
@@ -81,8 +83,8 @@ async function ProfilePage({ params, _userId }: Props) {
             <SignOutButton />
           </div>
         </div>
-        <div className="px-8 pt-16 pb-8">
-          <h1 className="text-2xl font-bold">{user.fullName || user.username}</h1>
+        <div className="px-8 pt-14 pb-8">
+          <h1 className="pb-2 text-2xl font-bold">{user.fullName || user.username}</h1>
           <p className="text-accent-content flex items-center gap-1 text-sm">
             <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24">
               <g fill="currentColor">
@@ -137,16 +139,22 @@ async function ProfilePage({ params, _userId }: Props) {
                 : 'Looking for mentorship'}
           </p>
           <div className="mt-4">
-            <p className="text-sm italic">No biography available</p>
+            <div className="text-sm italic">
+              {biography.length > 0 ? (
+                <p className="text-sm">{biography}</p>
+              ) : (
+                <p className="text-accent-content text-sm">No bio available.</p>
+              )}
+            </div>
           </div>
           <div className="mt-8 border-t pt-4">
             <h2 className="text-md italic">Latest posts...</h2>
-            {latestPosts.length > 0 ? (
+            {latestProjects.length > 0 ? (
               <ul className="list-item py-4 pl-5 text-sm">
-                {latestPosts.map((post, idx) => (
+                {latestProjects.map((projects, idx) => (
                   <li key={idx}>
-                    <Link href={`/projects/${post.id}` as Route} className="font-bold hover:underline">
-                      {post.title}
+                    <Link href={`/projects/${projects.id}` as Route} className="font-bold hover:underline">
+                      {projects.title}
                     </Link>
                   </li>
                 ))}

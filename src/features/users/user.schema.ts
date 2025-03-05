@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from '~/lib/utils';
+import { MentorshipStatus } from '@prisma/client';
 
 export const userSelect = {
   id: true,
@@ -54,6 +55,17 @@ export const updateUserSchema = z.object({
       'Only .jpg, .jpeg, .png and .webp formats are supported',
     )
     .nullable()
+    .optional(),
+  gradYear: z.coerce.number().optional(),
+  mentorship: z.nativeEnum(MentorshipStatus).optional(),
+  bio: z.string().optional(),
+  notificationPreferences: z
+    .object({
+      allowComments: z.boolean().optional(),
+      allowMentions: z.boolean().optional(),
+      allowProjectUpdates: z.boolean().optional(),
+      allowSystem: z.boolean().optional(),
+    })
     .optional(),
 });
 
