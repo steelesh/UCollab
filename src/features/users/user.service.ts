@@ -61,7 +61,7 @@ export const UserService = {
         },
       });
       if (!user) notFound();
-      return user;
+      return user as UserProfile;
     } catch {
       throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
