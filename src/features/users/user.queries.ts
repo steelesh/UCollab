@@ -2,7 +2,6 @@ import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
 import { UserService } from './user.service';
 import type { UserProfile } from './user.types';
-import 'server-only';
 
 const getCachedUserProfile = unstable_cache(
   async (username: string) => {
@@ -18,7 +17,3 @@ const getCachedUserProfile = unstable_cache(
 export const getUserProfile = cache(async (username: string): Promise<UserProfile> => {
   return getCachedUserProfile(username);
 });
-
-export const preloadUserProfile = (username: string) => {
-  void getUserProfile(username);
-};
