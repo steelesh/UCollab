@@ -5,7 +5,6 @@ import { ProfileHeader } from './components/profile-header';
 import { ProfileProjectsList } from './components/profile-projects-list';
 import { ProfileCommentsList } from './components/profile-comments-list';
 import { getUserProfile } from '~/features/users/user.queries';
-import { preloadUserProfile } from '~/features/users/user.queries';
 import { Metadata } from 'next';
 
 interface PageProps {
@@ -32,7 +31,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 async function Page({ params, userId }: PageProps) {
   const { username } = await params;
-  preloadUserProfile(username);
   const userProfile = await getUserProfile(username);
 
   return (
