@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import SignInButton from '~/components/signin-button';
+import { Route } from 'next';
+import { preloadUserProfile } from '~/features/users/user.queries';
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -82,7 +84,9 @@ export default function Navbar() {
           )}
           <Theme />
           {session ? (
-            <Link href={`/${session.user.username}`}>
+            <Link
+              href={`/u/${session.user.username}` as Route}
+              onMouseEnter={() => preloadUserProfile(session.user.username)}>
               <div className="avatar btn btn-circle btn-ghost">
                 <div className="w-10 rounded-full">
                   <img alt="Avatar" src={session.user.avatar ?? 'https://avatar.iran.liara.run/public'} />

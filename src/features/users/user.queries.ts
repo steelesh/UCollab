@@ -18,3 +18,7 @@ const getCachedUserProfile = unstable_cache(
 export const getUserProfile = cache(async (username: string): Promise<UserProfile> => {
   return getCachedUserProfile(username);
 });
+
+export const preloadUserProfile = (username: string) => {
+  void getUserProfile(username);
+};
