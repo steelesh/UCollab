@@ -30,7 +30,8 @@
       "~/*": ["./src/*"],
       "@components/*": ["./src/components/*"],
       "@styles/*": ["./src/styles/*"]
-    }
+    },
+    "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
   "include": [
     "eslint.config.mjs",
