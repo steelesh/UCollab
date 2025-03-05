@@ -76,5 +76,5 @@ export async function updateUser(formData: FormData) {
     }
     throw new Utils(ErrorMessage.OPERATION_FAILED);
   }
-  redirect(`/${session.user.username}`);
+  redirect(`/u/${session.user.username}`);
 }
