@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { prisma } from '~/lib/prisma';
 import { withAuth } from '~/security/protected';
 import { updateUser } from '~/features/users/user.actions';
+import { Route } from 'next';
 
 interface SettingsPageProps {
   userId: string;
@@ -57,7 +58,7 @@ async function SettingsPage({ userId }: SettingsPageProps) {
             />
           </div>
           <div className="absolute right-1 -bottom-12 flex space-x-2">
-            <Link href={`/${user.username}`}>
+            <Link href={`/u/${user.username}` as Route}>
               <button type="button" className="btn btn-primary-content">
                 Back
               </button>

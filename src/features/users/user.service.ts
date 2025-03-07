@@ -14,17 +14,54 @@ import {
   CompleteOnboardingData,
   onboardingSchema,
 } from '~/features/users/user.schema';
+import { UserProfile } from './user.types';
 
 export const UserService = {
-  async getUser(username: User['username']) {
+  async getUserProfile(username: User['username']): Promise<UserProfile> {
     try {
       const user = await prisma.user.findUnique({
         where: { username },
-        select: publicUserSelect,
+        select: {
+          id: true,
+          avatar: true,
+          username: true,
+          email: true,
+          fullName: true,
+          createdDate: true,
+          lastLogin: true,
+          gradYear: true,
+          bio: true,
+          mentorship: true,
+          skills: {
+            select: { name: true },
+          },
+          projects: {
+            take: 3,
+            orderBy: { createdDate: 'desc' },
+            select: {
+              id: true,
+              title: true,
+              createdDate: true,
+              lastModifiedDate: true,
+              createdById: true,
+            },
+          },
+          comments: {
+            take: 3,
+            orderBy: { createdDate: 'desc' },
+            select: {
+              id: true,
+              content: true,
+              createdDate: true,
+              projectId: true,
+              createdById: true,
+              lastModifiedDate: true,
+            },
+          },
+        },
       });
-
       if (!user) notFound();
-      return user;
+      return user as UserProfile;
     } catch {
       throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
