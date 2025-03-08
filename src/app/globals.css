@@ -1,170 +1,292 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "daisyui" {
-    exclude: rootscrollgutter;
+  exclude: rootscrollgutter;
 }
 @plugin "daisyui/theme" {
-    name: "light";
-    default: false;
-    prefersdark: false;
-    color-scheme: "light";
-    /* Primary Colors */
-    --color-primary: oklch(57.12% 0.2315 25.54);
-    --color-primary-focus: oklch(67.3% 0.2146 25.04);
-    --color-primary-content: oklch(57.12% 0.2315 25.54);
+  name: 'light';
+  default: false;
+  prefersdark: false;
+  color-scheme: 'light';
+  /* Primary Colors */
+  --color-primary: oklch(57.12% 0.2315 25.54);
+  --color-primary-focus: oklch(67.3% 0.2146 25.04);
+  --color-primary-content: oklch(57.12% 0.2315 25.54);
 
-    /* Secondary Colors */
-    --color-secondary: oklch(100.75% 0.1467 254.24);
-    --color-secondary-focus: oklch(41.59% 0.1321 253.93);
-    --color-secondary-content: oklch(100.75% 0.1467 254.24);
+  /* Secondary Colors */
+  --color-secondary: oklch(100.75% 0.1467 254.24);
+  --color-secondary-focus: oklch(41.59% 0.1321 253.93);
+  --color-secondary-content: oklch(100.75% 0.1467 254.24);
 
-    /* Accent Colors */
-    --color-accent: oklch(32.11% 0 0);
-    --color-accent-focus: oklch(21.78% 0 0);
-    --color-accent-content: oklch(32.11% 0 0);
+  /* Accent Colors */
+  --color-accent: oklch(32.11% 0 0);
+  --color-accent-focus: oklch(21.78% 0 0);
+  --color-accent-content: oklch(32.11% 0 0);
 
-    /* Neutral Colors */
-    --color-neutral: oklch(51.03% 0 0);
-    --color-neutral-focus: oklch(42.02% 0 0);
-    --color-neutral-content: oklch(51.03% 0 0);
+  /* Neutral Colors */
+  --color-neutral: oklch(51.03% 0 0);
+  --color-neutral-focus: oklch(42.02% 0 0);
+  --color-neutral-content: oklch(51.03% 0 0);
 
-    /* Base Colors */
-    --color-base-100: oklch(100% 0 0);
-    --color-base-200: oklch(98.51% 0 0);
-    --color-base-300: oklch(97.02% 0 0);
-    --color-base-content: oklch(0% 0 0);
+  /* Base Colors */
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(98.51% 0 0);
+  --color-base-300: oklch(97.02% 0 0);
+  --color-base-content: oklch(0% 0 0);
 
-    /* Additional Colors */
-    --color-info: oklch(72.06% 0.191 231.6);
-    --color-info-content: oklch(0% 0 0);
+  /* Additional Colors */
+  --color-info: oklch(72.06% 0.191 231.6);
+  --color-info-content: oklch(0% 0 0);
 
-    --color-success: oklch(64.8% 0.15 160);
-    --color-success-content: oklch(0% 0 0);
+  --color-success: oklch(64.8% 0.15 160);
+  --color-success-content: oklch(0% 0 0);
 
-    --color-warning: oklch(84.71% 0.199 83.87);
-    --color-warning-content: oklch(0% 0 0);
+  --color-warning: oklch(84.71% 0.199 83.87);
+  --color-warning-content: oklch(0% 0 0);
 
-    --color-error: oklch(71.76% 0.221 22.18);
-    --color-error-content: oklch(0% 0 0);
+  --color-error: oklch(71.76% 0.221 22.18);
+  --color-error-content: oklch(0% 0 0);
 }
 @plugin "daisyui/theme" {
-    name: "dark";
-    default: false;
-    prefersdark: false;
-    color-scheme: "dark";
-    /* Primary Colors */
-    --color-primary: oklch(57.12% 0.2315 25.54);
-    --color-primary-focus: oklch(67.3% 0.2146 25.04);
-    --color-primary-content: oklch(57.12% 0.2315 25.54);
+  name: 'dark';
+  default: false;
+  prefersdark: false;
+  color-scheme: 'dark';
+  /* Primary Colors */
+  --color-primary: oklch(57.12% 0.2315 25.54);
+  --color-primary-focus: oklch(67.3% 0.2146 25.04);
+  --color-primary-content: oklch(57.12% 0.2315 25.54);
 
-    /* Secondary Colors */
-    --color-secondary: oklch(100.75% 0.1467 254.24);
-    --color-secondary-focus: oklch(41.59% 0.1321 253.93);
-    --color-secondary-content: oklch(100.75% 0.1467 254.24);
+  /* Secondary Colors */
+  --color-secondary: oklch(100.75% 0.1467 254.24);
+  --color-secondary-focus: oklch(41.59% 0.1321 253.93);
+  --color-secondary-content: oklch(100.75% 0.1467 254.24);
 
-    /* Accent Colors */
-    --color-accent: oklch(84.52% 0 0);
-    --color-accent-focus: oklch(92.19% 0 0);
-    --color-accent-content: oklch(84.52% 0 0);
+  /* Accent Colors */
+  --color-accent: oklch(84.52% 0 0);
+  --color-accent-focus: oklch(92.19% 0 0);
+  --color-accent-content: oklch(84.52% 0 0);
 
-    /* Neutral Colors */
-    --color-neutral: oklch(68.3% 0 0);
-    --color-neutral-focus: oklch(76.68% 0 0);
-    --color-neutral-content: oklch(68.3% 0 0);
+  /* Neutral Colors */
+  --color-neutral: oklch(68.3% 0 0);
+  --color-neutral-focus: oklch(76.68% 0 0);
+  --color-neutral-content: oklch(68.3% 0 0);
 
-    /* Base Colors */
-    --color-base-100: oklch(21.78% 0 0);
-    --color-base-200: oklch(28.5% 0 0);
-    --color-base-300: oklch(32.11% 0 0);
-    --color-base-content: oklch(100% 0 0);
+  /* Base Colors */
+  --color-base-100: oklch(21.78% 0 0);
+  --color-base-200: oklch(28.5% 0 0);
+  --color-base-300: oklch(32.11% 0 0);
+  --color-base-content: oklch(100% 0 0);
 
-    /* Additional Colors */
-    --color-info: oklch(72.06% 0.191 231.6);
-    --color-info-content: oklch(0% 0 0);
+  /* Additional Colors */
+  --color-info: oklch(72.06% 0.191 231.6);
+  --color-info-content: oklch(0% 0 0);
 
-    --color-success: oklch(64.8% 0.15 160);
-    --color-success-content: oklch(0% 0 0);
+  --color-success: oklch(64.8% 0.15 160);
+  --color-success-content: oklch(0% 0 0);
 
-    --color-warning: oklch(84.71% 0.199 83.87);
-    --color-warning-content: oklch(0% 0 0);
+  --color-warning: oklch(84.71% 0.199 83.87);
+  --color-warning-content: oklch(0% 0 0);
 
-    --color-error: oklch(71.76% 0.221 22.18);
-    --color-error-content: oklch(0% 0 0);
+  --color-error: oklch(71.76% 0.221 22.18);
+  --color-error-content: oklch(0% 0 0);
 }
 
 body {
-    cursor: default;
+  cursor: default;
 }
 .embla {
-    max-width: 48rem;
-    margin: auto;
-    --slide-height: 19rem;
-    --slide-spacing: 1rem;
-    --slide-size: 100%;
+  max-width: 48rem;
+  margin: auto;
+  --slide-height: 19rem;
+  --slide-spacing: 1rem;
+  --slide-size: 100%;
 }
 .embla__viewport {
-    overflow: hidden;
+  overflow: hidden;
 }
 .embla__container {
-    display: flex;
-    touch-action: pan-y pinch-zoom;
-    margin-left: calc(var(--slide-spacing) * -1);
+  display: flex;
+  touch-action: pan-y pinch-zoom;
+  margin-left: calc(var(--slide-spacing) * -1);
 }
 .embla__slide {
-    transform: translate3d(0, 0, 0);
-    flex: 0 0 var(--slide-size);
-    min-width: 0;
-    padding-left: var(--slide-spacing);
+  transform: translate3d(0, 0, 0);
+  flex: 0 0 var(--slide-size);
+  min-width: 0;
+  padding-left: var(--slide-spacing);
 }
 .embla__slide__number {
-    box-shadow: inset 0 0 0 0.2rem var(--detail-medium-contrast);
-    border-radius: 1.8rem;
-    font-size: 4rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: var(--slide-height);
-    user-select: none;
+  box-shadow: inset 0 0 0 0.2rem var(--detail-medium-contrast);
+  border-radius: 1.8rem;
+  font-size: 4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--slide-height);
+  user-select: none;
 }
 .embla__controls {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    justify-content: space-between;
-    gap: 1.2rem;
-    margin-top: 1.8rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  justify-content: space-between;
+  gap: 1.2rem;
+  margin-top: 1.8rem;
 }
 .embla__buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.6rem;
-    align-items: center;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  align-items: center;
 }
 .embla__button {
-    -webkit-tap-highlight-color: rgba(var(--text-high-contrast-rgb-value), 0.5);
-    -webkit-appearance: none;
-    appearance: none;
-    background-color: transparent;
-    touch-action: manipulation;
-    display: inline-flex;
-    text-decoration: none;
-    cursor: pointer;
-    border: 0;
-    padding: 0;
-    margin: 0;
-    box-shadow: inset 0 0 0 0.2rem var(--detail-medium-contrast);
-    width: 3.6rem;
-    height: 3.6rem;
-    z-index: 1;
-    border-radius: 50%;
-    color: var(--text-body);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  -webkit-tap-highlight-color: rgba(var(--text-high-contrast-rgb-value), 0.5);
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  touch-action: manipulation;
+  display: inline-flex;
+  text-decoration: none;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  box-shadow: inset 0 0 0 0.2rem var(--detail-medium-contrast);
+  width: 3.6rem;
+  height: 3.6rem;
+  z-index: 1;
+  border-radius: 50%;
+  color: var(--text-body);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .embla__button:disabled {
-    color: var(--detail-high-contrast);
+  color: var(--detail-high-contrast);
 }
 .embla__button__svg {
-    width: 35%;
-    height: 35%;
+  width: 35%;
+  height: 35%;
+}
+.ProseMirror {
+  @apply min-h-[100px] outline-none;
+}
+.ProseMirror p.is-editor-empty:first-child::before {
+  @apply text-gray-400;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+.tiptap-container {
+  @apply bg-base-200 rounded-lg border;
+}
+.tiptap-content {
+  @apply min-h-[100px] max-w-none p-3 pt-2;
+}
+.ProseMirror p {
+  @apply my-2;
+}
+.ProseMirror strong {
+  @apply font-bold;
+}
+.ProseMirror em {
+  @apply italic;
+}
+.ProseMirror s {
+  @apply line-through;
+}
+.ProseMirror ul,
+.ProseMirror ol,
+.comment-content ul,
+.comment-content ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+  list-style-position: outside;
+}
+.ProseMirror ul,
+.comment-content ul {
+  list-style-type: disc;
+}
+.ProseMirror ol,
+.comment-content ol {
+  list-style-type: decimal;
+}
+.ProseMirror li > ul,
+.ProseMirror li > ol,
+.comment-content li > ul,
+.comment-content li > ol {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+.ProseMirror li,
+.comment-content li {
+  display: list-item;
+  position: relative;
+  margin-left: 0;
+}
+.ProseMirror blockquote,
+.comment-content blockquote {
+  @apply my-2 border-l-4 border-gray-300 pl-4 italic dark:border-gray-600;
+}
+.ProseMirror code,
+.comment-content code {
+  @apply rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 font-mono text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200;
+}
+.tiptap-mention {
+  @apply inline-block font-semibold text-blue-600 dark:text-blue-400;
+}
+.tippy-box[data-theme~='mention-suggestions'] {
+  @apply border-0 bg-transparent shadow-none;
+}
+.tippy-box[data-theme~='mention-suggestions'] .tippy-content {
+  @apply p-0;
+}
+.dropdown-container {
+  @apply bg-base-100 z-10 mt-1 max-h-60 w-full overflow-auto rounded-md shadow-lg;
+}
+.dropdown-item {
+  @apply hover:bg-base-200 block w-full cursor-pointer px-4 py-2 text-left;
+}
+.dropdown-item-content {
+  @apply flex items-center gap-2;
+}
+.tiptap-menu {
+  @apply bg-base-100 flex gap-1 border-b p-2;
+}
+.tiptap-menu button {
+  @apply hover:bg-base-200 rounded px-2 py-1 text-sm;
+}
+.tiptap-menu button.is-active {
+  @apply bg-base-200;
+}
+.tiptap-link {
+  color: #6366f1;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.tiptap-link:hover {
+  color: #4f46e5;
+}
+.tiptap-controls {
+  margin-bottom: 1rem;
+}
+.tiptap-controls button {
+  margin-right: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  background-color: white;
+  cursor: pointer;
+}
+.tiptap-controls button:hover {
+  background-color: #f9fafb;
+}
+.tiptap-controls button.is-active {
+  background-color: #6366f1;
+  color: white;
+}
+.tiptap-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
