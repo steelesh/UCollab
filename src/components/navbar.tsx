@@ -1,15 +1,17 @@
 'use client';
 
+import { useTheme } from "next-themes";
+import Image from "next/image";
 import Theme from '@components/theme';
 import Link from 'next/link';
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import SignInButton from '~/components/signin-button';
-import { Route } from 'next';
 
 export default function Navbar() {
   const { data: session } = useSession();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { theme } = useTheme(); // Get the current theme (light/dark)
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -18,13 +20,18 @@ export default function Navbar() {
   return (
     <nav className="navbar bg-base-300 p-3 select-none">
       <div className="flex-shrink">
-        <Link href="/" className="text-5xl font-bold">
-          <span className="inline-block origin-center transform transition-transform duration-300 hover:scale-105">
-            <span className="text-primary-content">UC</span>
-            <span className="text-accent-content">ollab</span>
-          </span>
+        {/* Dynamic Logo Switching */}
+        <Link href="/">
+          <Image
+            src={theme === "dark" ? "/UCollab.darkLogo.png" : "/UCollab.lightLogo.png"}
+            alt="UCollab Logo"
+            width={220}
+            height={70}
+            priority
+          />
         </Link>
       </div>
+
       <div className="flex-grow justify-end md:hidden">
         {session ? (
           <button onClick={toggleDrawer} className="btn btn-circle btn-ghost">
@@ -39,6 +46,7 @@ export default function Navbar() {
           </button>
         ) : null}
       </div>
+
       {session ? (
         <div className="hidden flex-1 justify-evenly md:flex">
           <Link className="group text-accent-content pt-1.5 text-xl" href="/explore">
@@ -70,6 +78,7 @@ export default function Navbar() {
           </Link>
         </div>
       )}
+
       <div className="flex-shrink justify-end md:flex-none">
         <div className="flex items-center gap-4">
           {session ? (
@@ -77,22 +86,35 @@ export default function Navbar() {
               <input type="text" placeholder="Search" className="input input-bordered w-48 lg:w-auto" />
             </div>
           ) : (
-            <div>
-              <SignInButton />
-            </div>
+            <SignInButton />
           )}
           <Theme />
           {session ? (
-            <Link href={`/u/${session.user.username}` as Route}>
-              <div className="avatar btn btn-circle btn-ghost">
+            <div className="dropdown dropdown-end">
+              <div tabIndex={0} role="button" className="avatar btn btn-circle btn-ghost">
                 <div className="w-10 rounded-full">
                   <img alt="Avatar" src={session.user.avatar ?? 'https://avatar.iran.liara.run/public'} />
                 </div>
               </div>
-            </Link>
+              <ul className="menu dropdown-content menu-sm rounded-box bg-base-300 z-[1] mt-3 w-52 p-2 shadow">
+                <li>
+                  <Link href="/profile" className="justify-between">
+                    Profile
+                    <span className="badge">New</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/settings">Settings</Link>
+                </li>
+                <li>
+                  <button onClick={() => signOut()}>Sign Out</button>
+                </li>
+              </ul>
+            </div>
           ) : null}
         </div>
       </div>
+
       {session && (
         <div
           className={`bg-base-200 fixed top-0 right-0 h-full w-64 transform p-5 shadow-lg ${
