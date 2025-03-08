@@ -14,7 +14,7 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { projectId } = params;
+  const { projectId } = await params;
   try {
     const projectTitle = await getProjectTitle(projectId);
     return {
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 async function Page({ params, userId }: PageProps) {
-  const { projectId } = params;
+  const { projectId } = await params;
   const project = await getRealTimeProject(projectId, userId);
 
   if (!project) {
