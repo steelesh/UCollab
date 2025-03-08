@@ -108,6 +108,9 @@ model Comment {
   createdBy        User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
   project          Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
   notifications    Notification[] @relation("CommentNotifications")
+  parentId    String?
+  parent      Comment?  @relation("Replies", fields: [parentId], references: [id])
+  replies     Comment[] @relation("Replies")
 
   @@index([projectId])
   @@index([createdById])
