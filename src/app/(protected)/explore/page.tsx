@@ -32,8 +32,8 @@ export async function ExplorePage() {
                   </div>
                 </div>
                 <div>
-                  <Link href={`/projects/${project.id}` as Route} className="font-bold hover:underline">
-                    <h2 className="card-title text-lg font-bold text-white">{project.title}</h2>
+                  <Link href={`/p/${project.id}` as Route} className="font-bold hover:underline">
+                    <h2 className="card-title text-lg font-bold">{project.title}</h2>
                   </Link>
                   <span className="text-accent text-sm">
                     {new Date(project.createdDate).toLocaleDateString('en-US', {
