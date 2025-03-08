@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SessionProvider basePath="/auth">
           <ThemeProvider>
             <Navbar />
-            <main className="relative flex h-0 flex-grow overflow-hidden">{children}</main>
+            <main className="relative flex flex-grow">{children}</main>
             <Footer />
           </ThemeProvider>
         </SessionProvider>
