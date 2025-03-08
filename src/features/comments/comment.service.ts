@@ -111,11 +111,58 @@ export const CommentService = {
     }
   },
 
+  async createReply(
+    data: {
+      content: Comment['content'];
+      projectId: Project['id'];
+      parentId: Comment['id'];
+    },
+    requestUserId: User['id'],
+  ) {
+    return withServiceAuth(requestUserId, null, async () => {
+      try {
+        const comment = await prisma.comment.create({
+          data: {
+            content: data.content,
+            createdById: requestUserId,
+            projectId: data.projectId,
+            parentId: data.parentId,
+          },
+          select: {
+            id: true,
+            content: true,
+            createdDate: true,
+            lastModifiedDate: true,
+            parentId: true,
+            createdBy: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+              },
+            },
+          },
+        });
+
+        return comment;
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          throw new Utils(ErrorMessage.VALIDATION_FAILED);
+        }
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
   async getPaginatedComments(projectId: Project['id'], requestUserId: User['id'], page = 1, limit = 20) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.comment.findMany({
-          where: { projectId },
+          where: {
+            projectId,
+            parentId: null,
+          },
           select: {
             id: true,
             content: true,
@@ -127,6 +174,22 @@ export const CommentService = {
                 username: true,
                 avatar: true,
               },
+            },
+            replies: {
+              select: {
+                id: true,
+                content: true,
+                createdDate: true,
+                lastModifiedDate: true,
+                createdBy: {
+                  select: {
+                    id: true,
+                    username: true,
+                    avatar: true,
+                  },
+                },
+              },
+              orderBy: { createdDate: 'asc' },
             },
           },
           skip: (page - 1) * limit,
