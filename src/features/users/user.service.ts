@@ -7,13 +7,7 @@ import { s3 } from '~/lib/s3';
 import { withServiceAuth } from '~/security/protected-service';
 import { ErrorMessage, Utils } from '~/lib/utils';
 import { isDevelopment } from '~/lib/env';
-import {
-  publicUserSelect,
-  UpdateUserInput,
-  userSelect,
-  CompleteOnboardingData,
-  onboardingSchema,
-} from '~/features/users/user.schema';
+import { UpdateUserInput, userSelect, CompleteOnboardingData, onboardingSchema } from '~/features/users/user.schema';
 import { UserProfile } from './user.types';
 
 export const UserService = {
@@ -144,19 +138,28 @@ export const UserService = {
     });
   },
 
-  async searchUsers(query: string, requestUserId: string, limit = 5) {
-    return withServiceAuth(requestUserId, { adminOnly: true }, async () => {
-      try {
-        return await prisma.user.findMany({
-          where: { username: { startsWith: query.toLowerCase().trim() } },
-          select: publicUserSelect,
-          take: limit,
-          orderBy: { username: 'asc' },
-        });
-      } catch {
-        throw new Utils(ErrorMessage.OPERATION_FAILED);
-      }
-    });
+  async searchUsers(query: string, currentUserId: User['id']) {
+    try {
+      return await prisma.user.findMany({
+        where: {
+          username: {
+            contains: query,
+          },
+          NOT: {
+            id: currentUserId,
+          },
+        },
+        select: {
+          id: true,
+          username: true,
+          avatar: true,
+        },
+        take: 5,
+      });
+    } catch (error) {
+      if (error instanceof Utils) throw error;
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
+    }
   },
 
   async getAdminUserDetails(userId: User['id'], requestUserId: string) {

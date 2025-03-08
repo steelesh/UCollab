@@ -4,7 +4,7 @@ import { onboardingSchema } from '~/features/users/user.schema';
 import { UserService } from '~/features/users/user.service';
 import { auth } from '~/security/auth';
 import { ErrorMessage, Utils } from '~/lib/utils';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { notFound, redirect } from 'next/navigation';
 
 export async function updateOnboarding(formData: FormData) {
@@ -77,4 +77,8 @@ export async function updateUser(formData: FormData) {
     throw new Utils(ErrorMessage.OPERATION_FAILED);
   }
   redirect(`/u/${session.user.username}`);
+}
+
+export async function searchUsers(query: string, currentUserId: User['id']) {
+  return UserService.searchUsers(query, currentUserId);
 }
