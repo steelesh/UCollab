@@ -33,29 +33,31 @@ async function Page({ params, userId }: PageProps) {
 
   if (!project) {
     return (
-      <div className="flex h-full items-center justify-center">
+      <div className="absolute inset-0 flex items-center justify-center">
         <p>Project not found.</p>
       </div>
     );
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-8">
-      <article className="bg-base-100 rounded-lg shadow-xl">
-        <ProjectHeader title={project.title} projectId={projectId} isOwnProject={project.createdById === userId} />
-        <div className="min-w-[500px] px-8 pt-16 pb-6">
-          <ProjectInfo
-            createdDate={project.createdDate}
-            lastModifiedDate={project.lastModifiedDate}
-            githubRepo={project.githubRepo}
-            description={project.description}
-            technologies={project.technologies}
-            postType={project.postType}
-          />
-          <ProjectComments comments={project.comments} currentUserId={userId} projectId={projectId} />
-        </div>
-      </article>
-    </main>
+    <div className="absolute inset-0 overflow-y-auto">
+      <div className="mx-auto w-full max-w-3xl px-4 py-8">
+        <article className="bg-base-100 rounded-lg shadow-xl">
+          <ProjectHeader title={project.title} projectId={projectId} isOwnProject={project.createdById === userId} />
+          <div className="px-8 pt-16 pb-6">
+            <ProjectInfo
+              createdDate={project.createdDate}
+              lastModifiedDate={project.lastModifiedDate}
+              githubRepo={project.githubRepo}
+              description={project.description}
+              technologies={project.technologies}
+              postType={project.postType}
+            />
+            <ProjectComments comments={project.comments} currentUserId={userId} projectId={projectId} />
+          </div>
+        </article>
+      </div>
+    </div>
   );
 }
 
