@@ -4,6 +4,17 @@ import Footer from '@components/footer';
 import { ThemeProvider } from 'next-themes';
 import '~/app/globals.css';
 import { SessionProvider } from 'next-auth/react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'UCollab',
+  description: 'A platform for IT and CS students to collaborate on projects',
+  manifest: '/meta/site.webmanifest',
+  icons: {
+    icon: '/meta/favicon.svg',
+    apple: '/meta/apple-touch-icon.png',
+  },
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

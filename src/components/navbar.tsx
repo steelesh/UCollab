@@ -2,26 +2,38 @@
 
 import Theme from '@components/theme';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import SignInButton from '~/components/signin-button';
 import { Route } from 'next';
+import { useTheme } from 'next-themes';
 
 export default function Navbar() {
   const { data: session } = useSession();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
   };
+
+  if (!mounted) {
+    return null;
+  }
+
+  const logoSrc = resolvedTheme === 'dark' ? '/images/logo-dark.svg' : '/images/logo-light.svg';
 
   return (
     <nav className="navbar bg-base-300 p-3 select-none">
       <div className="flex-shrink">
         <Link href="/" className="text-5xl font-bold">
           <span className="inline-block origin-center transform transition-transform duration-300 hover:scale-105">
-            <span className="text-primary-content">UC</span>
-            <span className="text-accent-content">ollab</span>
+            <img src={logoSrc} alt="UCollab Logo" className="h-16 w-auto" />
           </span>
         </Link>
       </div>

@@ -15,7 +15,7 @@ export function ProfileProjectsList({ projects }: ProfileProjectsListProps) {
         <ul className="list-item py-4 pl-5 text-sm">
           {projects.map((project) => (
             <li key={project.id}>
-              <Link href={`/projects/${project.id}` as Route} className="font-bold hover:underline">
+              <Link href={`/p/${project.id}` as Route} className="font-bold hover:underline">
                 {project.title}
               </Link>
             </li>

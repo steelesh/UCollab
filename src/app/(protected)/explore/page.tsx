@@ -28,7 +28,7 @@ export async function ExplorePage() {
               <div className="mb-2 flex items-center">
                 <div className="avatar mr-4">
                   <div className="w-16 rounded-lg bg-gray-200">
-                    <img src="/project.svg" alt="Project" className="w-full" />
+                    <img src="/images/project.svg" alt="Project" className="w-full" />
                   </div>
                 </div>
                 <div>
