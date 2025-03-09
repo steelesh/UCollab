@@ -18,7 +18,7 @@ test('navigation through public pages works correctly', async ({ page }) => {
 });
 
 test('protected routes redirect to home when unauthenticated users try to access them', async ({ page }) => {
-  const protectedRoutes = ['/explore', '/community', '/create', '/projects/123'];
+  const protectedRoutes = ['/p', '/community', '/create', '/projects/123'];
 
   for (const route of protectedRoutes) {
     await page.goto(route);

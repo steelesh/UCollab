@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import SignInButton from '~/components/signin-button';
 import { Route } from 'next';
 import { useTheme } from 'next-themes';
+import SignOutButton from './signout-button';
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -53,7 +54,7 @@ export default function Navbar() {
       </div>
       {session ? (
         <div className="hidden flex-1 justify-evenly md:flex">
-          <Link className="group text-accent-content pt-1.5 text-xl" href="/explore">
+          <Link className="group text-accent-content pt-1.5 text-xl" href="/p">
             Explore
             <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
           </Link>
@@ -86,7 +87,7 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           {session ? (
             <div className="form-control hidden md:flex">
-              <input type="text" placeholder="Search" className="input input-bordered w-48 lg:w-auto" />
+              <SignOutButton />
             </div>
           ) : (
             <div>
@@ -121,7 +122,7 @@ export default function Navbar() {
             </svg>
           </button>
           <div className="mt-10 flex flex-col">
-            <Link className="text-accent mb-4 text-xl" href="/explore" onClick={toggleDrawer}>
+            <Link className="text-accent mb-4 text-xl" href="/p" onClick={toggleDrawer}>
               Explore
             </Link>
             <Link className="text-accent mb-4 text-xl" href="/p/new" onClick={toggleDrawer}>
