@@ -26,7 +26,7 @@ export default function Navbar() {
     return null;
   }
 
-  const logoSrc = resolvedTheme === 'dark' ? '/ucollab-logo-dark.svg' : '/ucollab-logo.svg';
+  const logoSrc = resolvedTheme === 'dark' ? '/images/logo-dark.svg' : '/images/logo-light.svg';
 
   return (
     <nav className="navbar bg-base-300 p-3 select-none">
