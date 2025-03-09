@@ -47,7 +47,7 @@ async function SettingsPage({ userId }: SettingsPageProps) {
       <input type="hidden" name="userId" value={userId} />
       <div className="w-full max-w-3xl rounded shadow">
         <div className="relative h-48">
-          <Image src="/banner-placeholder.png" alt="Banner" fill className="rounded-t object-cover" />
+          <Image src="/images/banner-placeholder.png" alt="Banner" fill className="rounded-t object-cover" />
           <div className="absolute -bottom-12 left-8">
             <Image
               src={user.avatar}

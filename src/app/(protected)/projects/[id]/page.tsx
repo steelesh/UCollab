@@ -92,7 +92,7 @@ async function ProjectPage({ params, userId: _userId }: Props) {
     <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-8">
       <div className="w-full max-w-3xl rounded shadow">
         <div className="relative h-48">
-          <Image src="/banner-placeholder.png" alt="Banner" fill className="rounded-t object-cover" />
+          <Image src="/images/banner-placeholder.png" alt="Banner" fill className="rounded-t object-cover" />
           <div className="absolute inset-x-0 -bottom-12 flex justify-center">
             <h1 className="px-4 text-2xl font-bold">{project.title}</h1>
           </div>
