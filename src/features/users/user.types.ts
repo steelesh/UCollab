@@ -1,10 +1,14 @@
 import { User, Project as PrismaProject, Comment as PrismaComment, Skill as PrismaSkill } from '@prisma/client';
 
-export type Project = Pick<PrismaProject, 'id' | 'title'>;
+export interface Project extends Pick<PrismaProject, 'id' | 'title' | 'createdDate'> {}
 
-export type Comment = Pick<PrismaComment, 'id' | 'content' | 'projectId'>;
+export interface Comment extends Pick<PrismaComment, 'id' | 'content' | 'projectId' | 'createdDate'> {
+  project: {
+    title: string;
+  };
+}
 
-export type Skill = Pick<PrismaSkill, 'name'>;
+export interface Skill extends Pick<PrismaSkill, 'name'> {}
 
 export interface UserProfile {
   id: User['id'];

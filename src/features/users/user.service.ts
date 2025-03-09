@@ -36,8 +36,6 @@ export const UserService = {
               id: true,
               title: true,
               createdDate: true,
-              lastModifiedDate: true,
-              createdById: true,
             },
           },
           comments: {
@@ -48,8 +46,11 @@ export const UserService = {
               content: true,
               createdDate: true,
               projectId: true,
-              createdById: true,
-              lastModifiedDate: true,
+              project: {
+                select: {
+                  title: true,
+                },
+              },
             },
           },
         },
