@@ -57,7 +57,7 @@ export default function Navbar() {
             Explore
             <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
           </Link>
-          <Link className="group text-accent-content pt-1.5 text-xl" href="/create">
+          <Link className="group text-accent-content pt-1.5 text-xl" href="/p/new">
             Create
             <span className="bg-primary-content block h-0.5 max-w-0 transition-all duration-500 group-hover:max-w-full"></span>
           </Link>
@@ -124,7 +124,7 @@ export default function Navbar() {
             <Link className="text-accent mb-4 text-xl" href="/explore" onClick={toggleDrawer}>
               Explore
             </Link>
-            <Link className="text-accent mb-4 text-xl" href="/create" onClick={toggleDrawer}>
+            <Link className="text-accent mb-4 text-xl" href="/p/new" onClick={toggleDrawer}>
               Create
             </Link>
             <Link className="text-accent text-xl" href="/community" onClick={toggleDrawer}>

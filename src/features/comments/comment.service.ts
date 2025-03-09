@@ -1,162 +1,93 @@
-import { Comment, Prisma, Project, User } from '@prisma/client';
+import { Comment, Project, User } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '~/lib/prisma';
 import { withServiceAuth } from '~/security/protected-service';
-import { ErrorMessage, Utils, ValidationError } from '~/lib/utils';
-import { commentFormSchema, type CreateCommentData, type UpdateCommentData } from '~/features/comments/comment.schema';
+import { ErrorMessage, Utils } from '~/lib/utils';
+import { notFound } from 'next/navigation';
+import { Prisma } from '@prisma/client';
 
 export const CommentService = {
-  async getComments(projectId: Project['id'], requestUserId: User['id']) {
-    return withServiceAuth(requestUserId, null, async () => {
-      return prisma.comment.findMany({
-        where: { projectId },
-        select: {
-          id: true,
-          content: true,
-          createdDate: true,
-          lastModifiedDate: true,
-          createdBy: {
-            select: {
-              id: true,
-              username: true,
-              avatar: true,
-            },
-          },
-        },
-        orderBy: { createdDate: 'desc' },
-      });
-    });
-  },
-
-  async getComment(id: Comment['id'], requestUserId: User['id']) {
-    return withServiceAuth(requestUserId, null, async () => {
-      const comment = await prisma.comment.findUnique({
-        where: { id },
-        select: {
-          id: true,
-          content: true,
-          projectId: true,
-          createdDate: true,
-          lastModifiedDate: true,
-          createdBy: {
-            select: {
-              id: true,
-              username: true,
-              avatar: true,
-            },
-          },
-          project: {
-            select: {
-              id: true,
-              title: true,
-              createdById: true,
-            },
-          },
-        },
-      });
-
-      if (!comment) {
-        throw new Utils(ErrorMessage.NOT_FOUND('Comment'));
-      }
-
-      return comment;
-    });
-  },
-
-  // Authenticated users can create comments
-  async createComment({ content, projectId }: CreateCommentData, requestUserId: User['id']) {
+  async createComment(data: { content: Comment['content']; projectId: Project['id'] }, requestUserId: User['id']) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        const validatedData = commentFormSchema.parse({ content });
+        const comment = await prisma.comment.create({
+          data: {
+            content: data.content,
+            createdById: requestUserId,
+            projectId: data.projectId,
+          },
+          select: {
+            id: true,
+            content: true,
+            createdDate: true,
+            lastModifiedDate: true,
+            createdBy: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+              },
+            },
+          },
+        });
 
-        return await prisma.$transaction(async (tx) => {
-          // await NotificationService.sendCommentNotifications({
-          //   postId: comment.postId,
-          //   postTitle: comment.post.title,
-          //   commentId: comment.id,
-          //   postAuthorId: comment.post.createdById,
-          //   commentAuthorId: comment.createdById,
-          //   commentAuthorName: comment.createdBy.username,
-          //   content: comment.content,
-          // });
+        return comment;
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          throw new Utils(ErrorMessage.VALIDATION_FAILED);
+        }
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+          notFound();
+        }
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
 
-          return tx.comment.create({
+  async updateComment(data: { id: Comment['id']; content: Comment['content'] }, requestUserId: User['id']) {
+    try {
+      const comment = await prisma.comment.findUnique({
+        where: { id: data.id },
+        select: { id: true, createdById: true, projectId: true },
+      });
+
+      if (!comment) notFound();
+
+      return withServiceAuth(requestUserId, { ownerId: comment.createdById }, async () => {
+        try {
+          return await prisma.comment.update({
+            where: { id: data.id },
             data: {
-              content: validatedData.content,
-              projectId,
-              createdById: requestUserId,
+              content: data.content,
+              lastModifiedDate: new Date(),
             },
             select: {
               id: true,
               content: true,
-              projectId: true,
-              createdById: true,
-              project: {
-                select: {
-                  title: true,
-                  createdById: true,
-                },
-              },
+              lastModifiedDate: true,
               createdBy: {
                 select: {
+                  id: true,
                   username: true,
+                  avatar: true,
                 },
               },
             },
           });
-        });
-      } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        } catch (error) {
+          if (error instanceof z.ZodError) {
+            throw new Utils(ErrorMessage.VALIDATION_FAILED);
+          }
           throw new Utils(ErrorMessage.OPERATION_FAILED);
         }
-        if (error instanceof z.ZodError) {
-          throw new ValidationError(ErrorMessage.VALIDATION_FAILED, error);
-        }
-        throw error;
-      }
-    });
-  },
-
-  // Owner or admin can update comments
-  async updateComment({ id, content }: UpdateCommentData, requestUserId: User['id']) {
-    try {
-      const comment = await prisma.comment.findUnique({
-        where: { id },
-        select: { id: true, createdById: true },
-      });
-
-      if (!comment) {
-        throw new Utils(ErrorMessage.NOT_FOUND('Comment'));
-      }
-
-      return withServiceAuth(requestUserId, { ownerId: comment.createdById }, async () => {
-        const validatedData = commentFormSchema.parse({ content });
-
-        return prisma.comment.update({
-          where: { id },
-          select: {
-            id: true,
-            content: true,
-            lastModifiedDate: true,
-          },
-          data: { content: validatedData.content },
-        });
       });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw new Utils(ErrorMessage.NOT_FOUND('Comment'));
-        }
-        throw new Utils(ErrorMessage.OPERATION_FAILED);
-      }
-      if (error instanceof z.ZodError) {
-        throw new ValidationError(ErrorMessage.VALIDATION_FAILED, error);
-      }
-      throw error;
+      if (error instanceof Utils) throw error;
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
-  // Owner or admin can delete comments
   async deleteComment(id: Comment['id'], requestUserId: User['id']) {
     try {
       const comment = await prisma.comment.findUnique({
@@ -164,67 +95,111 @@ export const CommentService = {
         select: { id: true, createdById: true },
       });
 
-      if (!comment) {
-        throw new Utils(ErrorMessage.NOT_FOUND('Comment'));
-      }
+      if (!comment) notFound();
 
       return withServiceAuth(requestUserId, { ownerId: comment.createdById }, async () => {
-        await prisma.comment.delete({ where: { id } });
+        try {
+          await prisma.comment.delete({ where: { id } });
+        } catch (error) {
+          if (error instanceof Utils) throw error;
+          throw new Utils(ErrorMessage.OPERATION_FAILED);
+        }
       });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw new Utils(ErrorMessage.NOT_FOUND('Comment'));
-        }
-        throw new Utils(ErrorMessage.OPERATION_FAILED);
-      }
-      throw error;
+      if (error instanceof Utils) throw error;
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
-  // Public utility method
-  async extractMentionedUserIds(content: Comment['content']) {
-    try {
-      const mentionRegex = /@(\w+)/g;
-      const mentions = content.match(mentionRegex) || [];
-
-      if (mentions.length === 0) return [];
-
-      const usernames = mentions.map((mention) => mention.substring(1));
-
-      const users = await prisma.user.findMany({
-        where: { username: { in: usernames } },
-        select: { id: true },
-      });
-
-      return users.map((user) => user.id);
-    } catch {
-      throw new Utils('Failed to extract mentioned users');
-    }
-  },
-
-  // Authenticated users can view paginated comments
-  async getPaginatedComments(projectId: Project['id'], requestUserId: User['id'], page = 1, limit = 20) {
+  async createReply(
+    data: {
+      content: Comment['content'];
+      projectId: Project['id'];
+      parentId: Comment['id'];
+    },
+    requestUserId: User['id'],
+  ) {
     return withServiceAuth(requestUserId, null, async () => {
-      return prisma.comment.findMany({
-        where: { projectId },
-        select: {
-          id: true,
-          content: true,
-          createdDate: true,
-          lastModifiedDate: true,
-          createdBy: {
-            select: {
-              id: true,
-              username: true,
-              avatar: true,
+      try {
+        const comment = await prisma.comment.create({
+          data: {
+            content: data.content,
+            createdById: requestUserId,
+            projectId: data.projectId,
+            parentId: data.parentId,
+          },
+          select: {
+            id: true,
+            content: true,
+            createdDate: true,
+            lastModifiedDate: true,
+            parentId: true,
+            createdBy: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+              },
             },
           },
-        },
-        skip: (page - 1) * limit,
-        take: limit,
-        orderBy: { createdDate: 'desc' },
-      });
+        });
+
+        return comment;
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          throw new Utils(ErrorMessage.VALIDATION_FAILED);
+        }
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  async getPaginatedComments(projectId: Project['id'], requestUserId: User['id'], page = 1, limit = 20) {
+    return withServiceAuth(requestUserId, null, async () => {
+      try {
+        return await prisma.comment.findMany({
+          where: {
+            projectId,
+            parentId: null,
+          },
+          select: {
+            id: true,
+            content: true,
+            createdDate: true,
+            lastModifiedDate: true,
+            createdBy: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+              },
+            },
+            replies: {
+              select: {
+                id: true,
+                content: true,
+                createdDate: true,
+                lastModifiedDate: true,
+                createdBy: {
+                  select: {
+                    id: true,
+                    username: true,
+                    avatar: true,
+                  },
+                },
+              },
+              orderBy: { createdDate: 'asc' },
+            },
+          },
+          skip: (page - 1) * limit,
+          take: limit,
+          orderBy: { createdDate: 'desc' },
+        });
+      } catch (error) {
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
     });
   },
 };

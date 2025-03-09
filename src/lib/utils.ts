@@ -66,3 +66,11 @@ export class ValidationError extends Utils {
     super(message, ErrorCode.VALIDATION);
   }
 }
+
+export function handleServerActionError(error: unknown) {
+  if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+    throw error;
+  }
+  if (error instanceof Utils) throw error;
+  throw new Utils(ErrorMessage.OPERATION_FAILED);
+}

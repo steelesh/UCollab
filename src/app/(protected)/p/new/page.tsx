@@ -1,0 +1,19 @@
+import { ProjectForm } from '~/app/(protected)/p/components/project-form';
+import { withAuth } from '~/security/protected';
+
+export const metadata = {
+  title: 'UCollab — New Project',
+};
+
+async function Page() {
+  return (
+    <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto pt-8">
+      <div className="bg-base-300 mx-auto w-full max-w-5xl rounded-lg p-4 shadow-lg">
+        <h2 className="mb-6 text-center text-3xl font-bold">New Project</h2>
+        <ProjectForm />
+      </div>
+    </div>
+  );
+}
+
+export default withAuth(Page);
