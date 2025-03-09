@@ -23,7 +23,7 @@ export async function ExplorePage() {
     <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-24">
       <div className="container mx-auto grid gap-8 px-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {projectsWithUser.map((project, index) => (
-          <div key={index} className="card card-bordered bg-base-300 w-full shadow-xl">
+          <div key={index} className="card card-bordered bg-primary-300 w-full shadow-xl">
             <div className="card-body">
               <div className="mb-2 flex items-center">
                 <div className="avatar mr-4">

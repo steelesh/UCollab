@@ -12,7 +12,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-base-200 py-6">
+    <footer className="bg-primary py-6">
       <div className="mx-auto overflow-hidden">
         <nav aria-label="Footer" className="flex flex-wrap justify-center gap-8 text-sm">
           {navigation.main.map((item) => (

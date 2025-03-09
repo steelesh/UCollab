@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`scroll-smooth`} suppressHydrationWarning>
       <body className={`bg-background flex min-h-screen flex-col antialiased`}>
         <SessionProvider basePath="/auth">
-          <ThemeProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <Navbar />
             <main className="relative flex h-0 flex-grow overflow-hidden">{children}</main>
             <Footer />
