@@ -5,7 +5,9 @@ import { ThemeProvider } from 'next-themes';
 import '~/app/globals.css';
 import { SessionProvider } from 'next-auth/react';
 import type { Metadata } from 'next';
+import { Roboto } from 'next/font/google';
 
+const roboto = Roboto({ weight: ['300', '400', '500', '700'], subsets: ['latin'], display: 'swap', variable: '--font-roboto', });
 export const metadata: Metadata = {
   title: 'UCollab',
   description: 'A platform for IT and CS students to collaborate on projects',
@@ -18,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`scroll-smooth`} suppressHydrationWarning>
+    <html lang="en" className={`scroll-smooth ${roboto.variable}`} suppressHydrationWarning>
       <body className={`bg-background flex min-h-screen flex-col antialiased`}>
         <SessionProvider basePath="/auth">
           <ThemeProvider>

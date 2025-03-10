@@ -90,7 +90,9 @@
   --color-error: oklch(71.76% 0.221 22.18);
   --color-error-content: oklch(0% 0 0);
 }
-
+@theme {
+  --font-sans: "Roboto", sans-serif;
+}
 body {
   cursor: default;
 }
