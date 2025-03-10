@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
-import { MENTORSHIP_CONFIG } from '../profile-mentorship-config';
+import { MENTORSHIP_CONFIG } from '../../src/components/profile-mentorship-config';
 import { MentorshipStatus } from '@prisma/client';
 
 describe('MENTORSHIP_CONFIG', () => {

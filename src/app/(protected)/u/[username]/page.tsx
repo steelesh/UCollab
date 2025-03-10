@@ -1,9 +1,9 @@
 import { withAuth } from '~/security/protected';
 import { User } from '@prisma/client';
-import { ProfileUserInfo } from './components/profile-user-info';
-import { ProfileHeader } from './components/profile-header';
-import { ProfileProjectsList } from './components/profile-projects-list';
-import { ProfileCommentsList } from './components/profile-comments-list';
+import { ProfileUserInfo } from '../../../../components/profile-user-info';
+import { ProfileHeader } from '../../../../components/profile-header';
+import { ProfileProjectsList } from '../../../../components/profile-projects-list';
+import { ProfileCommentsList } from '../../../../components/profile-comments-list';
 import { getUserProfile } from '~/features/users/user.queries';
 import { Metadata } from 'next';
 

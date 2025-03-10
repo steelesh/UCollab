@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { ProfileProjectsList } from '../profile-projects-list';
+import { ProfileProjectsList } from '../../src/components/profile-projects-list';
 
 describe('ProfileProjectsList', () => {
   const mockProjects = [
