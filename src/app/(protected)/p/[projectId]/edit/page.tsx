@@ -1,4 +1,4 @@
-import { ProjectForm } from '~/app/(protected)/p/components/project-form';
+import { ProjectForm } from '~/components/project-form';
 import { withAuth } from '~/security/protected';
 import { ProjectService } from '~/features/projects/project.service';
 import { notFound } from 'next/navigation';

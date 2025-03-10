@@ -44,7 +44,9 @@ export function ProjectInfo({
             Last updated: {modified}
           </p>
         )}
-        <p className="text-accent-content flex items-center gap-1 text-sm">Type: {postType.toLowerCase()}</p>
+        <p className="text-accent-content flex items-center gap-1 text-sm">
+          Type: {postType.charAt(0).toUpperCase() + postType.slice(1).toLowerCase()}
+        </p>
         {githubRepo && (
           <p className="text-accent-content flex items-center gap-1 text-sm">
             <Link

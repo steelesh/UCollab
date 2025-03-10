@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { ProfileCommentsList } from '../profile-comments-list';
+import { ProfileCommentsList } from '../../src/components/profile-comments-list';
 
 describe('ProfileCommentsList', () => {
   const mockComments = [

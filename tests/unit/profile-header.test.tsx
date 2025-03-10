@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { ProfileHeader } from '../profile-header';
+import { ProfileHeader } from '../../src/components/profile-header';
 
 describe('ProfileHeader', () => {
   const mockProps = {

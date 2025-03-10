@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { ProfileUserInfo } from '../profile-user-info';
+import { ProfileUserInfo } from '../../src/components/profile-user-info';
 import { describe, expect, it } from 'vitest';
 import { MentorshipStatus } from '@prisma/client';
 

@@ -33,7 +33,7 @@ export function ProjectHeader({ title, projectId, isOwnProject }: ProjectHeaderP
 
   return (
     <div className="relative h-48">
-      <Image src="/banner-placeholder.png" alt="Banner" fill className="rounded-t object-cover" />
+      <Image src="/images/banner-placeholder.png" alt="Banner" fill className="rounded-t object-cover" />
       <div className="absolute -bottom-12 left-8">
         <h1 className="text-2xl font-bold">{title}</h1>
       </div>
