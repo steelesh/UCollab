@@ -1,11 +1,12 @@
 'use client';
-
+import Link from 'next/link';
 import { AuthSection } from './auth-section';
 import { DesktopNav } from './desktop-nav';
-import { FloatingNavWrapper } from './floating-nav-wrapper';
 import { MobileNav } from './mobile-nav';
 import { NavLinkProps } from './nav-link';
-import { NavLogo } from './nav-logo';
+import type { Route } from 'next';
+import Image from 'next/image';
+import { FloatingNavWrapper } from '@components/floating-nav-wrapper';
 
 export interface NavSection {
   title: string;
@@ -18,22 +19,22 @@ const routes: NavSection[] = [
     items: [
       {
         title: 'All Projects',
-        href: '/explore',
+        href: '/p' as Route,
         description: 'Browse all posts across categories',
       },
       {
         title: 'Code Reviews',
-        href: '/feedback',
+        href: '/feedback' as Route,
         description: 'Get feedback on your code and projects',
       },
       {
         title: 'Collaborations',
-        href: '/collaborations',
+        href: '/collaborations' as Route,
         description: 'Find teammates for your projects',
       },
       {
         title: 'Trending',
-        href: '/trending',
+        href: '/trending' as Route,
         description: "See what's popular in the community",
       },
     ],
@@ -43,37 +44,37 @@ const routes: NavSection[] = [
     items: [
       {
         title: 'Community Guide',
-        href: '/community-guide',
+        href: '/community-guide' as Route,
         description: 'How to get the most out of UCollab',
       },
       {
         title: 'Contribution Guide',
-        href: '/contributing',
+        href: '/contributing' as Route,
         description: 'Learn how to contribute to UCollab',
       },
       {
         title: 'Code of Conduct',
-        href: '/code-of-conduct',
+        href: '/code-of-conduct' as Route,
         description: 'Our community values and expectations',
       },
       {
         title: 'User Directory',
-        href: '/community',
+        href: '/community' as Route,
         description: 'Our user base',
       },
       {
         title: 'Mentorship',
-        href: '/mentorship',
+        href: '/mentorship' as Route,
         description: 'Connect with mentors or become one',
       },
       {
         title: 'Q & A',
-        href: '/questions',
+        href: '/questions' as Route,
         description: 'Ask questions and help others with solutions',
       },
       {
         title: 'Discussions',
-        href: '/discussions',
+        href: '/discussions' as Route,
         description: 'Start or join general discussions',
       },
     ],
@@ -82,17 +83,22 @@ const routes: NavSection[] = [
 
 export default function Navbar() {
   return (
-    <div className="bg-background w-full border-b backdrop-blur-sm">
-      <nav className="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-4">
-          <MobileNav items={routes} />
-          <NavLogo />
-        </div>
-        <div className="flex items-center gap-4">
-          <DesktopNav items={routes} />
-          <div className="mx-2 hidden h-6 border-l md:block" />
-        </div>
-      </nav>
-    </div>
+    <FloatingNavWrapper>
+      <div className="bg-background w-full border-b backdrop-blur-sm">
+        <nav className="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-4">
+            <MobileNav items={routes} />
+            <Link href="/" className="cursor-pointer transition-transform hover:scale-105">
+              <Image src="/images/logo-dark.svg" width={140} height={50} alt="UCollab logo" />
+            </Link>
+          </div>
+          <div className="flex items-center gap-4">
+            <DesktopNav items={routes} />
+            <div className="mx-2 hidden h-6 border-l md:block" />
+            <AuthSection />
+          </div>
+        </nav>
+      </div>
+    </FloatingNavWrapper>
   );
 }

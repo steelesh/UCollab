@@ -13,9 +13,11 @@ export function DesktopNav({ items }: { items: NavSection[] }) {
     <NavigationMenu className="hidden md:flex">
       <NavigationMenuList>
         {items.map((section) => (
-          <NavigationMenuItem key={section.title}>
+          <NavigationMenuItem key={section.title} className="relative">
             <NavigationMenuTrigger className="h-9">{section.title}</NavigationMenuTrigger>
             <NavigationMenuContent>
+              {/* Spacer to capture hover while transitioning from trigger to dropdown */}
+              <div className="absolute -top-2 left-0 h-2 w-full" />
               <ul className="w-[300px] p-4">
                 {section.items.map((item: NavLinkProps) => (
                   <li key={item.href}>

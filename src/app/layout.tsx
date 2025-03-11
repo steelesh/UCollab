@@ -7,7 +7,12 @@ import { SessionProvider } from 'next-auth/react';
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
 
-const roboto = Roboto({ weight: ['300', '400', '500', '700'], subsets: ['latin'], display: 'swap', variable: '--font-roboto', });
+const roboto = Roboto({
+  weight: ['300', '400', '500', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-roboto',
+});
 export const metadata: Metadata = {
   title: 'UCollab',
   description: 'A platform for IT and CS students to collaborate on projects',

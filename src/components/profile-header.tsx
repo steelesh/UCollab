@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { User } from '@prisma/client';
 import Link from 'next/link';
 import { Route } from 'next';
-import SignOutButton from '~/components/signout-button';
+import { SignOutButton } from '~/components/signout-button';
 
 interface ProfileHeaderProps {
   avatar: User['avatar'];

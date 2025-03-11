@@ -8,17 +8,14 @@ export function FloatingNavWrapper({ children }: { children: React.ReactNode }) 
   const [visible, setVisible] = useState(true);
 
   useMotionValueEvent(scrollYProgress, 'change', (current) => {
-    if (typeof current === 'number') {
-      const direction = current - scrollYProgress.getPrevious()!;
+    const previous = scrollYProgress.getPrevious();
+    if (typeof previous === 'number') {
+      const direction = current - previous;
 
-      if (scrollYProgress.get() < 0.05) {
+      if (scrollYProgress.get() > 0.05) {
         setVisible(true);
       } else {
-        if (direction < 0) {
-          setVisible(true);
-        } else {
-          setVisible(false);
-        }
+        setVisible(direction < 0);
       }
     }
   });

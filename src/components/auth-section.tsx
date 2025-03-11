@@ -1,33 +1,33 @@
 'use client';
 
-import { auth } from '~/security/auth';
 import Image from 'next/image';
 import { Avatar } from '~/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '~/components/ui/dropdown-menu';
-import { SignOutButton } from './signout-button';
+import { useSession } from 'next-auth/react';
+import { Skeleton } from '~/components/ui/skeleton';
+import { SignInButton } from '~/components/signin-button';
+import Link from 'next/link';
+import { Route } from 'next';
 
-export async function AuthSection() {
-  const session = await auth();
-  if (session) {
-    const { user } = session;
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Avatar className="dark:border-primary hover:bg-primary/10 dark:bg-primary/30 dark:hover:bg-primary/20 data-[state=open]:bg-primary/10 dark:data-[state=open]:bg-primary/20 h-8 w-8 rounded-full border border-black hover:border-[1.5px] data-[state=open]:border-[1.5px]">
-            <Image src={user.avatar} alt="avatar image" width={32} height={32} />
-          </Avatar>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem>
-            <SignOutButton />
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
+export function AuthSection() {
+  const { data: session, status } = useSession();
+
+  if (status === 'loading') {
+    return <Skeleton className="h-8 w-8 rounded-full" />;
   }
+
+  if (!session) {
+    return <SignInButton />;
+  }
+
+  return (
+    <Avatar className="dark:border-primary h-8 w-8 rounded-full border border-black hover:border-[1.5px]">
+      {session.user.avatar ? (
+        <Link href={`/u/${session.user.username}` as Route}>
+          <Image src={session.user.avatar} alt="avatar image" width={32} height={32} />
+        </Link>
+      ) : (
+        <Skeleton className="h-8 w-8 rounded-full" />
+      )}
+    </Avatar>
+  );
 }
