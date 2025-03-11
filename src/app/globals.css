@@ -314,7 +314,9 @@
     color: hsl(var(--uc-grey));
   }
 }
-
+@theme {
+  --font-sans: "Roboto", sans-serif;
+}
 body {
   cursor: default;
 }
