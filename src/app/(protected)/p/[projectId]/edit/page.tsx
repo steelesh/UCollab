@@ -1,4 +1,4 @@
-import { ProjectForm } from '~/components/project-form';
+import { ProjectForm } from '~/components/blocks/projects/project-form';
 import { withAuth } from '~/security/protected';
 import { ProjectService } from '~/features/projects/project.service';
 import { notFound } from 'next/navigation';
@@ -10,7 +10,6 @@ interface PageProps {
   params: Promise<{
     projectId: Project['id'];
   }>;
-  userId: User['id'];
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -22,7 +21,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-async function Page({ params, userId }: PageProps) {
+async function Page({ params, userId }: PageProps & { userId: User['id'] }) {
   const { projectId } = await params;
   const project = await ProjectService.getProjectById(projectId, userId);
 

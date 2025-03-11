@@ -1,4 +1,4 @@
-import { ProjectForm } from '~/components/project-form';
+import { ProjectForm } from '~/components/blocks/projects/project-form';
 import { withAuth } from '~/security/protected';
 
 export const metadata = {

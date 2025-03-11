@@ -1,6 +1,6 @@
 'use server';
 
-import { auth } from '~/security/auth';
+import { auth } from 'auth';
 import { revalidatePath } from 'next/cache';
 import { CommentService } from './comment.service';
 import { commentSchema } from './comment.schema';

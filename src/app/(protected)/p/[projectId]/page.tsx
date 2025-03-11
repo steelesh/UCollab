@@ -1,16 +1,15 @@
 import { withAuth } from '~/security/protected';
 import type { User, Project } from '@prisma/client';
 import { getProjectTitle, getRealTimeProject } from '~/features/projects/project.queries';
-import { ProjectHeader } from '~/components/project-header';
-import { ProjectInfo } from '~/components/project-info';
-import { ProjectComments } from '~/components/project-comments';
+import { ProjectHeader } from '~/components/blocks/projects/project-header';
+import { ProjectInfo } from '~/components/blocks/projects/project-info';
+import { ProjectComments } from '~/components/blocks/projects/project-comments';
 import { Metadata } from 'next';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     projectId: Project['id'];
-  };
-  userId: User['id'];
+  }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -27,7 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-async function Page({ params, userId }: PageProps) {
+async function Page({ params, userId }: PageProps & { userId: User['id'] }) {
   const { projectId } = await params;
   const project = await getRealTimeProject(projectId, userId);
 
@@ -40,7 +39,7 @@ async function Page({ params, userId }: PageProps) {
   }
 
   return (
-    <div className="absolute inset-0 overflow-y-auto">
+    <div>
       <div className="mx-auto w-full max-w-3xl px-4 py-8">
         <article className="bg-base-100 rounded-lg shadow-xl">
           <ProjectHeader title={project.title} projectId={projectId} isOwnProject={project.createdById === userId} />

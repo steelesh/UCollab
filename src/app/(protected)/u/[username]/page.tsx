@@ -1,9 +1,9 @@
 import { withAuth } from '~/security/protected';
 import { User } from '@prisma/client';
-import { ProfileUserInfo } from '../../../../components/profile-user-info';
-import { ProfileHeader } from '../../../../components/profile-header';
-import { ProfileProjectsList } from '../../../../components/profile-projects-list';
-import { ProfileCommentsList } from '../../../../components/profile-comments-list';
+import { ProfileUserInfo } from '../../../../components/blocks/profile/profile-user-info';
+import { ProfileHeader } from '../../../../components/blocks/profile/profile-header';
+import { ProfileProjectsList } from '../../../../components/blocks/profile/profile-projects-list';
+import { ProfileCommentsList } from '../../../../components/blocks/profile/profile-comments-list';
 import { getUserProfile } from '~/features/users/user.queries';
 import { Metadata } from 'next';
 
@@ -11,7 +11,6 @@ interface PageProps {
   params: Promise<{
     username: User['username'];
   }>;
-  userId: User['id'];
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -29,7 +28,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-async function Page({ params, userId }: PageProps) {
+async function Page({ params, userId }: PageProps & { userId: User['id'] }) {
   const { username } = await params;
   const userProfile = await getUserProfile(username);
 

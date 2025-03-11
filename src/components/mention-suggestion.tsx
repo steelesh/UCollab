@@ -6,6 +6,7 @@ import { searchUsers } from '~/features/users/user.actions';
 import { SuggestionProps, SuggestionKeyDownProps } from '@tiptap/suggestion';
 import { Editor } from '@tiptap/core';
 import { User } from '@prisma/client';
+import Image from 'next/image';
 
 interface MentionUser {
   id: User['id'];
@@ -49,10 +50,16 @@ const MentionList = ({ items, command, selectedIndex }: MentionListProps) => {
           role="option"
           aria-selected={index === selectedIndex}
           tabIndex={index === selectedIndex ? 0 : -1}
-          className="dropdown-item">
+          className={`dropdown-item ${index === selectedIndex ? 'bg-accent text-accent-foreground' : ''}`}>
           <div className="dropdown-item-content">
             {item.avatar && (
-              <img src={item.avatar} alt={`${item.username}'s avatar`} className="h-6 w-6 rounded-full" />
+              <Image
+                src={item.avatar}
+                alt={`${item.username}'s avatar`}
+                width={24}
+                height={24}
+                className="rounded-full"
+              />
             )}
             <span>{item.username}</span>
           </div>
@@ -76,6 +83,7 @@ const suggestion = {
     let lastQuery = '';
     let lastItems: MentionUser[] = [];
     let commandFn: ((item: { id: string; label: string }) => void) | null = null;
+    let selectedIndex = 0;
 
     return {
       onStart: (props: SuggestionProps) => {
@@ -96,7 +104,7 @@ const suggestion = {
           if (!rect) {
             return new DOMRect(0, 0, 0, 0);
           }
-          return rect;
+          return rect as DOMRect;
         };
 
         popup = [
@@ -118,18 +126,20 @@ const suggestion = {
         lastItems = props.items as MentionUser[];
         commandFn = props.command;
 
+        selectedIndex = 0;
+
         if (props.items?.length) {
           const getReferenceClientRect: GetReferenceClientRect = () => {
             const rect = props.clientRect?.();
             if (!rect) {
               return new DOMRect(0, 0, 0, 0);
             }
-            return rect;
+            return rect as DOMRect;
           };
 
           component.updateProps({
             ...props,
-            selectedIndex: 0,
+            selectedIndex,
           });
 
           if (popup?.[0]) {
@@ -155,13 +165,27 @@ const suggestion = {
       onKeyDown: (props: SuggestionKeyDownProps) => {
         const { event } = props;
 
-        if (event.key === ' ' && lastQuery && lastItems.length === 1) {
-          const exactMatch = lastItems[0];
-          if (exactMatch && exactMatch.username.toLowerCase() === lastQuery.toLowerCase()) {
-            event.preventDefault();
-            commandFn?.({ id: exactMatch.username, label: exactMatch.username });
-            return true;
+        if (event.key === 'Enter' && lastItems.length > 0) {
+          event.preventDefault();
+          const selectedItem = lastItems[selectedIndex];
+          if (selectedItem) {
+            commandFn?.({ id: selectedItem.username, label: selectedItem.username });
           }
+          return true;
+        }
+
+        if (event.key === 'ArrowUp') {
+          event.preventDefault();
+          selectedIndex = (selectedIndex - 1 + lastItems.length) % lastItems.length;
+          component.updateProps({ selectedIndex });
+          return true;
+        }
+
+        if (event.key === 'ArrowDown') {
+          event.preventDefault();
+          selectedIndex = (selectedIndex + 1) % lastItems.length;
+          component.updateProps({ selectedIndex });
+          return true;
         }
 
         if (event.key === 'Escape') {
@@ -169,15 +193,12 @@ const suggestion = {
           return true;
         }
 
-        if (component?.ref?.onKeyDown) {
-          return component.ref.onKeyDown({ event });
-        }
-
         return false;
       },
 
       onExit: () => {
         commandFn = null;
+        selectedIndex = 0;
         if (popup?.[0]) {
           popup[0].destroy();
         }

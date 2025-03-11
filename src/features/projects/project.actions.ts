@@ -2,7 +2,7 @@
 
 import { projectSchema } from './project.schema';
 import { ProjectService } from './project.service';
-import { auth } from '~/security/auth';
+import { auth } from 'auth';
 import { ErrorMessage, handleServerActionError } from '~/lib/utils';
 import { Project } from '@prisma/client';
 import { redirect } from 'next/navigation';

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import EmblaCarousel from '~/components/embla-carousel';
 import { EmblaOptionsType } from 'embla-carousel';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'UCollab - Home',
@@ -9,19 +10,19 @@ export const metadata: Metadata = {
 
 const OPTIONS: EmblaOptionsType = { loop: true };
 const SLIDES = [
-  <div>
+  <div key="connect">
     <h2 className="mb-4 text-4xl font-bold">Connect with Peers</h2>
     <p className="mb-4 text-lg">Build your network by connecting with students who share your interests and goals.</p>
     <img src="/images/collab.svg" alt="Connect with Peers" className="w-3/4 py-6" />
   </div>,
-  <div>
+  <div key="discover">
     <img src="/images/ideas.svg" alt="Discover Projects" className="w-1/2" />
     <h2 className="mb-4 text-4xl font-bold">Discover new Projects</h2>
     <p className="mb-4 text-lg">
       Explore a wide range of student-led projects and find the ones that ignite your passion.
     </p>
   </div>,
-  <div>
+  <div key="innovate">
     <h2 className="mb-4 text-4xl font-bold">Innovate through Collaboration</h2>
     <p className="mb-4 text-lg">Find new and exciting opportunities to help bring your next great idea to fruition.</p>
     <img src="/images/project.svg" alt="Innovate through Collaboration" className="w-1/2 py-2" />

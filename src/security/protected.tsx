@@ -2,7 +2,7 @@ import { OnboardingStep, Role, User } from '@prisma/client';
 import { redirect } from 'next/navigation';
 import { isDevelopment } from '~/lib/env';
 import React from 'react';
-import { auth } from './auth';
+import { auth } from '../../auth';
 
 export function withAuth<P>(Component: (props: P & { userId: string }) => Promise<React.ReactElement>) {
   return async function AuthComponent(props: P): Promise<React.ReactElement> {

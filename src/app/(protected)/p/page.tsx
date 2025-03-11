@@ -2,12 +2,13 @@ import { prisma } from '~/lib/prisma';
 import { withAuth } from '~/security/protected';
 import Link from 'next/link';
 import type { Route } from 'next';
+import Image from 'next/image';
 
 export const metadata = {
   title: 'UCollab — Explore',
 };
 
-export async function ExplorePage() {
+async function Page() {
   const projectsWithUser = await prisma.project.findMany({
     select: {
       id: true,
@@ -28,7 +29,7 @@ export async function ExplorePage() {
               <div className="mb-2 flex items-center">
                 <div className="avatar mr-4">
                   <div className="w-16 rounded-lg bg-gray-200">
-                    <img src="/images/project.svg" alt="Project" className="w-full" />
+                    <Image src="/images/project.svg" alt="Project" className="w-full" />
                   </div>
                 </div>
                 <div>
@@ -65,4 +66,4 @@ export async function ExplorePage() {
   );
 }
 
-export default withAuth(ExplorePage);
+export default withAuth(Page);
