@@ -7,13 +7,16 @@ import { createProject, updateProject, searchTechnologies } from '~/features/pro
 import { CreateProjectInput, projectSchema } from '~/features/projects/project.schema';
 import { PostType, Project } from '@prisma/client';
 import { Button } from '~/components/ui/button';
+import { Label } from '~/components/ui/label';
+import { Input } from '~/components/ui/input';
+import { Textarea } from '~/components/ui/textarea';
 
-interface ProjectFormProps {
+interface DiscussionFormProps {
   initialData?: CreateProjectInput;
   projectId?: Project['id'];
 }
 
-export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
+export function DiscussionForm({ initialData, projectId }: DiscussionFormProps) {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
@@ -87,12 +90,12 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="border-muted-foreground space-y-6 rounded-lg border p-8">
       <div className="form-control">
         <label className="label" htmlFor="title">
           <span className="label-text">Project Title</span>
         </label>
-        <input
+        <Input
           {...register('title')}
           className="input input-bordered w-full"
           placeholder="Enter project title"
@@ -104,7 +107,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
         <label className="label" htmlFor="description">
           <span className="label-text">Description</span>
         </label>
-        <textarea
+        <Textarea
           {...register('description')}
           className="textarea textarea-bordered w-full"
           placeholder="Describe your project"
@@ -117,9 +120,9 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
         name="technologies"
         render={({ field }) => (
           <div className="form-control">
-            <label className="label" htmlFor="technologies">
+            <Label className="label" htmlFor="technologies">
               <span className="label-text">Technologies</span>
-            </label>
+            </Label>
             <div className="mb-2 flex flex-wrap gap-2">
               {field.value.map((tech) => (
                 <div key={tech} className="badge gap-2">
@@ -137,7 +140,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
               ))}
             </div>
             <div className="relative">
-              <input
+              <Input
                 ref={techInputRef}
                 type="text"
                 className="input input-bordered w-full"
@@ -160,6 +163,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
                 <div ref={suggestionsRef} className="dropdown-container">
                   {suggestions.map((tech) => (
                     <Button
+                      variant="outline"
                       key={tech}
                       type="button"
                       className="dropdown-item"
@@ -182,10 +186,10 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
         )}
       />
       <div className="form-control">
-        <label className="label" htmlFor="githubRepo">
+        <Label className="label" htmlFor="githubRepo">
           <span className="label-text">GitHub Repository</span>
-        </label>
-        <input
+        </Label>
+        <Input
           {...register('githubRepo')}
           className="input input-bordered w-full"
           placeholder="https://github.com/username/repo"
@@ -193,32 +197,6 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
         />
         {errors.githubRepo && <span className="text-error text-sm">{errors.githubRepo.message}</span>}
       </div>
-      <Controller
-        control={control}
-        name="postType"
-        render={({ field }) => (
-          <div className="flex gap-4">
-            {Object.values(PostType).map((type) => (
-              <div key={type} className="flex items-center">
-                <input
-                  type="radio"
-                  id={type}
-                  value={type}
-                  checked={field.value === type}
-                  onChange={() => field.onChange(type)}
-                  className="peer hidden"
-                  disabled={isSubmitting}
-                />
-                <label
-                  htmlFor={type}
-                  className="btn btn-outline btn-xs btn-accent peer-checked:bg-primary-content rounded-lg peer-checked:text-white">
-                  {type.charAt(0) + type.slice(1).toLowerCase()}
-                </label>
-              </div>
-            ))}
-          </div>
-        )}
-      />
       <Button
         type="submit"
         className="w-full cursor-pointer bg-green-600 hover:bg-green-600/80"

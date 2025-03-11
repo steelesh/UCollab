@@ -26,15 +26,15 @@ export function ProfileCommentsList({ comments }: ProfileCommentsListProps) {
       ) : (
         <ul className="space-y-4 py-4">
           {comments.map((comment) => (
-            <li key={comment.id} className="group">
+            <li key={comment.id} className="group bg-muted rounded-lg">
               <Link
                 href={`/p/${comment.projectId}#comment-${comment.id}`}
-                className="bg-base-200/50 hover:bg-base-200 block rounded-lg p-4 transition-colors">
+                className="block rounded-lg p-4 transition-colors">
                 <div
-                  className="line-clamp-2 text-sm"
+                  className="line-clamp-2 text-sm hover:underline"
                   dangerouslySetInnerHTML={{ __html: parseContent(comment.content) }}
                 />
-                <div className="text-base-content/60 mt-2 flex items-center gap-2 text-xs">
+                <div className="text-muted-foreground flex items-center gap-2 text-xs">
                   <span>on {comment.project.title}</span>
                   <span>•</span>
                   <time>{formatDistanceToNow(new Date(comment.createdDate))} ago</time>

@@ -8,7 +8,7 @@ import { ChevronDown, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { NavLink, NavLinkProps } from './nav-link';
 import { NavSection } from './navbar';
-import { SignInButton } from './signin-button';
+import { SignInButton } from '../navigation/signin-button';
 
 export function MobileNav({ items }: { items: NavSection[] }) {
   const [open, setOpen] = useState(false);

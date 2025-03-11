@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import EmblaCarousel from '~/components/embla-carousel';
+import EmblaCarousel from '~/components/ui/embla-carousel';
 import { EmblaOptionsType } from 'embla-carousel';
 
 export const metadata: Metadata = {

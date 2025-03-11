@@ -1,9 +1,9 @@
 import { withAuth } from '~/security/protected';
 import type { User, Project } from '@prisma/client';
 import { getProjectTitle, getRealTimeProject } from '~/features/projects/project.queries';
-import { ProjectHeader } from '~/components/project-header';
-import { ProjectInfo } from '~/components/project-info';
-import { ProjectComments } from '~/components/project-comments';
+import { ProjectHeader } from '~/components/projects/project-header';
+import { ProjectInfo } from '~/components/projects/project-info';
+import { ProjectComments } from '~/components/projects/project-comments';
 import { Metadata } from 'next';
 
 interface PageProps {

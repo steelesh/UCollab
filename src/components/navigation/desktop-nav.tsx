@@ -5,8 +5,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '~/components/ui/navigation-menu';
-import { NavLink, NavLinkProps } from './nav-link';
-import { NavSection } from './navbar';
+import { NavLink, NavLinkProps } from '../navigation/nav-link';
+import { NavSection } from '../navigation/navbar';
 
 export function DesktopNav({ items }: { items: NavSection[] }) {
   return (

@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { AuthSection } from './auth-section';
 import { DesktopNav } from './desktop-nav';
-import { MobileNav } from './mobile-nav';
+import { MobileNav } from '../navigation/mobile-nav';
 import { NavLinkProps } from './nav-link';
 import type { Route } from 'next';
 import Image from 'next/image';
@@ -14,12 +14,27 @@ export interface NavSection {
 
 const routes: NavSection[] = [
   {
+    title: 'Create',
+    items: [
+      {
+        title: 'New Project',
+        href: '/p/new' as Route,
+        description: 'Create a new project',
+      },
+      {
+        title: 'New Discussion',
+        href: '/discussion' as Route,
+        description: 'Create a new discussion',
+      },
+    ],
+  },
+  {
     title: 'Explore',
     items: [
       {
         title: 'All Projects',
         href: '/p' as Route,
-        description: 'Browse all posts across categories',
+        description: 'Browse all projects across categories',
       },
       {
         title: 'Code Reviews',
@@ -42,6 +57,21 @@ const routes: NavSection[] = [
     title: 'Community',
     items: [
       {
+        title: 'All Discussions',
+        href: '/discussions' as Route,
+        description: 'Start or join general discussions',
+      },
+      {
+        title: 'Q & A',
+        href: '/questions' as Route,
+        description: 'Ask questions and help others with solutions',
+      },
+      {
+        title: 'Mentorship',
+        href: '/mentorship' as Route,
+        description: 'Connect with mentors or become one',
+      },
+      {
         title: 'Community Guide',
         href: '/community-guide' as Route,
         description: 'How to get the most out of UCollab',
@@ -58,23 +88,8 @@ const routes: NavSection[] = [
       },
       {
         title: 'User Directory',
-        href: '/community' as Route,
+        href: '/c/all' as Route,
         description: 'Our user base',
-      },
-      {
-        title: 'Mentorship',
-        href: '/mentorship' as Route,
-        description: 'Connect with mentors or become one',
-      },
-      {
-        title: 'Q & A',
-        href: '/questions' as Route,
-        description: 'Ask questions and help others with solutions',
-      },
-      {
-        title: 'Discussions',
-        href: '/discussions' as Route,
-        description: 'Start or join general discussions',
       },
     ],
   },

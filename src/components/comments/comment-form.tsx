@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRef, useState } from 'react';
-import Tiptap, { TiptapRef } from '~/components/tiptap';
+import Tiptap, { TiptapRef } from '~/components/ui/tiptap';
 import { commentSchema, CommentFormData } from '~/features/comments/comment.schema';
 import { Comment, Project, User } from '@prisma/client';
 import { Button } from '~/components/ui/button';
