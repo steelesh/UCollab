@@ -4,6 +4,9 @@ import { prisma } from '~/lib/prisma';
 import { withAuth } from '~/security/protected';
 import { updateUser } from '~/features/users/user.actions';
 import { Route } from 'next';
+import { Button } from '~/components/ui/button';
+import { Input } from '~/components/ui/input';
+import { Textarea } from '~/components/ui/textarea';
 
 interface SettingsPageProps {
   userId: string;
@@ -59,13 +62,17 @@ async function SettingsPage({ userId }: SettingsPageProps) {
           </div>
           <div className="absolute right-1 -bottom-12 flex space-x-2">
             <Link href={`/u/${user.username}` as Route}>
-              <button type="button" className="btn btn-primary-content">
+              <Button type="button" className="cursor-pointer" variant="outline" aria-label="Back">
                 Back
-              </button>
+              </Button>
             </Link>
-            <button type="submit" className="btn btn-primary-content">
+            <Button
+              type="submit"
+              className="cursor-pointer bg-green-600 hover:bg-green-600/80"
+              variant="outline"
+              aria-label="Submit">
               Save
-            </button>
+            </Button>
           </div>
         </div>
         <div className="px-8 pt-14 pb-8">
@@ -75,7 +82,7 @@ async function SettingsPage({ userId }: SettingsPageProps) {
             <input
               type="number"
               name="gradYear"
-              className="input"
+              className="input border-muted border-2"
               defaultValue={user.gradYear ?? ''}
               placeholder="Graduation Year"
             />
@@ -83,8 +90,8 @@ async function SettingsPage({ userId }: SettingsPageProps) {
           <div className="mt-4">
             <fieldset className="fieldset">
               <legend className="fieldset-legend">Mentorship Status</legend>
-              <div className="flex gap-2 filter">
-                <select name="mentorship" defaultValue={user.mentorship || 'NONE'} className="select select-neutral">
+              <div className="mt-2 flex gap-2 filter">
+                <select name="mentorship" defaultValue={user.mentorship || 'NONE'} className="bg-background">
                   <option value="MENTOR">Mentor</option>
                   <option value="MENTEE">Mentee</option>
                   <option value="NONE">None</option>
@@ -94,15 +101,18 @@ async function SettingsPage({ userId }: SettingsPageProps) {
           </div>
           <div className="mt-4">
             <fieldset className="fieldset">
-              <legend className="fieldset-legend">Your bio</legend>
-              <textarea name="bio" className="textarea h-24" placeholder="Bio" defaultValue={user.bio || ''}></textarea>
-              <div className="fieldset-label">Optional</div>
+              <legend className="fieldset-legend">Biography</legend>
+              <Textarea
+                name="bio"
+                className="textarea h-24"
+                placeholder="Tell everyone a little bit about yourself!"
+                defaultValue={user.bio || ''}></Textarea>
             </fieldset>
           </div>
           <div className="mt-4">
-            <fieldset className="fieldset">
+            <fieldset className="fieldset grid w-full max-w-sm items-center">
               <legend className="fieldset-legend">Avatar</legend>
-              <input type="file" name="avatar" accept="image/*" className="file-input" />
+              <Input type="file" name="avatar" accept="image/*" className="file-input" />
             </fieldset>
           </div>
           <div className="mt-8">

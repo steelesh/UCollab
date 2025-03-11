@@ -1,6 +1,7 @@
 import Form from 'next/form';
 import { withOnboarding } from '~/security/protected';
 import { updateOnboarding } from '~/features/users/user.actions';
+import { Button } from '~/components/ui/button';
 
 async function OnboardingPage() {
   return (
@@ -71,9 +72,11 @@ async function OnboardingPage() {
               </label>
             </div>
           </div>
-          <button type="submit" className="btn btn-primary-content mx-auto mt-6 block w-auto px-8">
+          <Button
+            type="submit"
+            className="mx-auto mt-6 block w-auto cursor-pointer bg-green-600 px-8 hover:bg-green-600/80">
             Submit
-          </button>
+          </Button>
         </Form>
       </div>
     </div>

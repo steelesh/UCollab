@@ -10,8 +10,8 @@ import { NavSection } from './navbar';
 
 export function DesktopNav({ items }: { items: NavSection[] }) {
   return (
-    <NavigationMenu className="hidden md:flex">
-      <NavigationMenuList>
+    <NavigationMenu className="mr-4 hidden md:flex">
+      <NavigationMenuList className="gap-12">
         {items.map((section) => (
           <NavigationMenuItem key={section.title} className="relative">
             <NavigationMenuTrigger className="h-9">{section.title}</NavigationMenuTrigger>

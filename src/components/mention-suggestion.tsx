@@ -6,6 +6,7 @@ import { searchUsers } from '~/features/users/user.actions';
 import { SuggestionProps, SuggestionKeyDownProps } from '@tiptap/suggestion';
 import { Editor } from '@tiptap/core';
 import { User } from '@prisma/client';
+import { Button } from '~/components/ui/button';
 
 interface MentionUser {
   id: User['id'];
@@ -42,7 +43,7 @@ const MentionList = ({ items, command, selectedIndex }: MentionListProps) => {
   return (
     <div className="dropdown-container" role="listbox" aria-label="Mention suggestions">
       {items.map((item, index) => (
-        <button
+        <Button
           key={item.id}
           onClick={() => command({ id: item.username, label: item.username })}
           onKeyDown={(e) => onKeyDown(e, item)}
@@ -56,7 +57,7 @@ const MentionList = ({ items, command, selectedIndex }: MentionListProps) => {
             )}
             <span>{item.username}</span>
           </div>
-        </button>
+        </Button>
       ))}
     </div>
   );

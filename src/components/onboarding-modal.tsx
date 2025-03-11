@@ -2,17 +2,18 @@
 
 import Form from 'next/form';
 import { updateOnboarding } from '~/features/users/user.actions';
+import { Button } from '~/components/ui/button';
 
 export default function OnboardingModal() {
   return (
     <>
-      <button className="btn" onClick={() => document.getElementById('onboard_modal').showModal()}>
+      <Button className="btn" onClick={() => document.getElementById('onboard_modal').showModal()}>
         open modal
-      </button>
+      </Button>
       <dialog id="onboard_modal" className="modal">
         <div className="modal-box">
           <form method="dialog">
-            <button className="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">✕</button>
+            <Button className="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">✕</Button>
           </form>
           <h3 className="text-lg font-bold">Onboarding</h3>
           <Form action={updateOnboarding} className="p-4">
@@ -79,9 +80,9 @@ export default function OnboardingModal() {
                 </label>
               </div>
             </div>
-            <button type="submit" className="btn btn-primary-content mx-auto mt-6 block w-auto px-8">
+            <Button type="submit" className="btn btn-primary-content mx-auto mt-6 block w-auto px-8">
               Submit
-            </button>
+            </Button>
           </Form>
         </div>
       </dialog>

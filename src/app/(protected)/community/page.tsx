@@ -40,7 +40,7 @@ async function CommunityPage() {
             <Link href={`/u/${user.username}` as Route} className="font-bold hover:underline">
               {user.username}
             </Link>
-            <p className="text-sm text-gray-500">{user.email}</p>
+            <p className="text-muted-foreground text-sm">{user.email}</p>
           </div>
           <div className="ml-auto text-right">
             <p className="text-sm">Created: {user.createdDate}</p>

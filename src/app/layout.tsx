@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`scroll-smooth ${roboto.variable}`} suppressHydrationWarning>
-      <body className={`bg-background flex min-h-screen flex-col antialiased`}>
+      <body className={`bg-background flex min-h-screen flex-col pt-16 antialiased`}>
         <SessionProvider basePath="/auth">
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <Navbar />

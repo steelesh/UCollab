@@ -6,7 +6,6 @@ import { MobileNav } from './mobile-nav';
 import { NavLinkProps } from './nav-link';
 import type { Route } from 'next';
 import Image from 'next/image';
-import { FloatingNavWrapper } from '@components/floating-nav-wrapper';
 
 export interface NavSection {
   title: string;
@@ -83,22 +82,20 @@ const routes: NavSection[] = [
 
 export default function Navbar() {
   return (
-    <FloatingNavWrapper>
-      <div className="bg-background w-full border-b backdrop-blur-sm">
-        <nav className="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4">
-            <MobileNav items={routes} />
-            <Link href="/" className="cursor-pointer transition-transform hover:scale-105">
-              <Image src="/images/logo-dark.svg" width={140} height={50} alt="UCollab logo" />
-            </Link>
-          </div>
-          <div className="flex items-center gap-4">
-            <DesktopNav items={routes} />
-            <div className="mx-2 hidden h-6 border-l md:block" />
-            <AuthSection />
-          </div>
-        </nav>
-      </div>
-    </FloatingNavWrapper>
+    <div className="bg-background fixed top-0 right-0 left-0 z-50 w-full border-b backdrop-blur-sm">
+      <nav className="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-4">
+          <MobileNav items={routes} />
+          <Link href="/" className="cursor-pointer transition-transform hover:scale-105">
+            <Image src="/images/logo-dark.svg" width={140} height={50} alt="UCollab logo" />
+          </Link>
+        </div>
+        <div className="flex items-center gap-4">
+          <DesktopNav items={routes} />
+          <div className="mx-2 hidden h-6 border-l md:block" />
+          <AuthSection />
+        </div>
+      </nav>
+    </div>
   );
 }

@@ -25,7 +25,7 @@ export function ProjectInfo({
   return (
     <div>
       <div>
-        <p className="text-accent-content flex items-center gap-1 text-sm">
+        <p className="text-muted-foreground flex items-center gap-1 text-sm">
           <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24">
             <g fill="currentColor">
               <path d="M16 2c.183 0 .355.05.502.135l.033.02c.28.177.465.49.465.845v1h1a3 3 0 0 1 2.995 2.824L21 7v12a3 3 0 0 1-2.824 2.995L18 22H6a3 3 0 0 1-2.995-2.824L3 19V7a3 3 0 0 1 2.824-2.995L6 4h1V3a1 1 0 0 1 .514-.874l.093-.046l.066-.025l.1-.029l.107-.019L8 2q.083 0 .161.013l.122.029l.04.012l.06.023c.328.135.568.44.61.806L9 3v1h6V3a1 1 0 0 1 1-1" />
@@ -34,7 +34,7 @@ export function ProjectInfo({
           Created: {created}
         </p>
         {modified && (
-          <p className="text-accent-content flex items-center gap-1 text-sm">
+          <p className="text-muted-foreground flex items-center gap-1 text-sm">
             <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24">
               <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}>
                 <path d="M14 8a2 2 0 0 0-2-2" />
@@ -44,23 +44,19 @@ export function ProjectInfo({
             Last updated: {modified}
           </p>
         )}
-        <p className="text-accent-content flex items-center gap-1 text-sm">
+        <p className="text-muted-foreground flex items-center gap-1 text-sm">
           Type: {postType.charAt(0).toUpperCase() + postType.slice(1).toLowerCase()}
         </p>
         {githubRepo && (
-          <p className="text-accent-content flex items-center gap-1 text-sm">
-            <Link
-              href={`${githubRepo}` as Route}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white hover:underline">
-              {githubRepo}
+          <p className="flex items-center gap-1 text-sm">
+            <Link href={`${githubRepo}` as Route} target="_blank" rel="noopener noreferrer" className="hover:underline">
+              GitHub Repo
             </Link>
           </p>
         )}
       </div>
       <div className="mt-4">
-        <p className="text-sm">{description}</p>
+        <p className="text-md">{description}</p>
       </div>
       {technologies && technologies.length > 0 && (
         <div className="mt-4 border-t pt-4">

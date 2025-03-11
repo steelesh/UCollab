@@ -29,7 +29,7 @@ export function CommentList({ comments, currentUserId, projectId, onUpdate, onDe
   return (
     <div className="space-y-6">
       {comments.map((comment) => (
-        <div key={comment.id} className="space-y-4">
+        <div key={comment.id} className="bg-background space-y-4 rounded-lg p-4">
           <div className="border-b pb-4">
             <CommentHeader
               comment={comment}
