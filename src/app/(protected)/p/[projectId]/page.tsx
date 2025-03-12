@@ -51,7 +51,7 @@ async function Page({ params, userId }: PageProps) {
               githubRepo={project.githubRepo}
               description={project.description}
               technologies={project.technologies}
-              postType={project.postType}
+              projectType={project.projectType}
             />
             <ProjectComments comments={project.comments} currentUserId={userId} projectId={projectId} />
           </div>

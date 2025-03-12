@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { AvatarSource, NotificationType, OnboardingStep, Project, PostType, Skill, User } from '@prisma/client';
+import { AvatarSource, NotificationType, OnboardingStep, Project, ProjectType, Technology, User } from '@prisma/client';
 import { UserService } from '~/features/users/user.service';
 import { prisma } from '~/lib/prisma';
 
@@ -24,30 +24,16 @@ export async function seedDatabase() {
         notificationPreferences: { create: {} },
       },
     });
-    const defaultTechProject = await prisma.project.create({
-      data: {
-        title: 'UCollab',
-        description: 'UCollab is a platform built for students to connect and collaborate!.',
-        postType: PostType.DISCUSSION,
-        createdById: admin.id,
-        githubRepo: 'https://github.com/steelesh/UCollab',
-      },
-    });
 
-    for (const skillName of DEFAULT_SKILLS) {
-      await prisma.skill.create({
-        data: { name: skillName, verified: true, createdById: admin.id },
-      });
-    }
-    for (const techName of DEFAULT_TECHNOLOGIES) {
+    for (const technologyName of DEFAULT_TECHNOLOGIES) {
       await prisma.technology.create({
-        data: { name: techName, verified: true, createdById: defaultTechProject.id },
+        data: { name: technologyName, verified: true, userId: admin.id },
       });
     }
 
-    const allSkills = await prisma.skill.findMany();
+    const allTechnologies = await prisma.technology.findMany();
 
-    await createTestUsers(allSkills);
+    await createTestUsers(allTechnologies);
     await createProjectsAndNotifications();
 
     console.log('✅ Database seeded successfully!');
@@ -59,7 +45,7 @@ export async function seedDatabase() {
   }
 }
 
-async function createTestUsers(allSkills: Skill[]) {
+async function createTestUsers(allTechnologies: Technology[]) {
   const azureId = faker.string.uuid();
   await prisma.user.create({
     data: {
@@ -83,11 +69,11 @@ async function createTestUsers(allSkills: Skill[]) {
         avatarSource: AvatarSource.DEFAULT,
         azureAdId: azureId,
         role: faker.number.int({ min: 1, max: 10 }) === 1 ? 'ADMIN' : 'USER',
-        skills: {
+        technologies: {
           connect: faker.helpers
-            .shuffle(allSkills)
+            .shuffle(allTechnologies)
             .slice(0, faker.number.int({ min: 3, max: 8 }))
-            .map((skill) => ({ id: skill.id })),
+            .map((technology) => ({ id: technology.id })),
         },
         accounts: { create: fakeAccount() },
         notificationPreferences: { create: {} },
@@ -111,8 +97,8 @@ async function createProjectsAndNotifications() {
 }
 
 async function createProject(user: User, allUsers: User[]) {
-  const postType = faker.helpers.arrayElement(Object.values(PostType));
-  const conversation = faker.helpers.arrayElement(POST_CONTENT[postType]);
+  const projectType = faker.helpers.arrayElement(Object.values(ProjectType));
+  const conversation = faker.helpers.arrayElement(POST_CONTENT[projectType]);
   const technologies = await prisma.technology.findMany();
   const techCount = faker.number.int({ min: 1, max: 4 });
   const selectedTechs = faker.helpers.shuffle(technologies).slice(0, techCount);
@@ -121,7 +107,7 @@ async function createProject(user: User, allUsers: User[]) {
     data: {
       title: conversation.title,
       description: conversation.description,
-      postType,
+      projectType,
       createdById: user.id,
       githubRepo: conversation.githubProject
         ? `https://www.github.com/${user.username}/${conversation.githubProject}`
@@ -187,7 +173,6 @@ async function createSystemNotifications(user: User) {
 
 async function clearDatabase() {
   await prisma.$transaction([
-    prisma.skill.deleteMany(),
     prisma.technology.deleteMany(),
     prisma.notification.deleteMany(),
     prisma.comment.deleteMany(),
@@ -241,113 +226,10 @@ const UC_DOMAINS = [
   'innovation.uc.edu',
 ];
 
-const DEFAULT_SKILLS = [
-  'JavaScript',
-  'TypeScript',
-  'Python',
-  'Java',
-  'C#',
-  'C++',
-  'Go',
-  'Rust',
-  'Swift',
-  'Kotlin',
-  'Ruby',
-  'PHP',
-  'Scala',
-  'R',
-  'Dart',
-  'React',
-  'Angular',
-  'Vue.js',
-  'Next.js',
-  'Svelte',
-  'React Native',
-  'Flutter',
-  'HTML5',
-  'CSS3',
-  'Sass/SCSS',
-  'Tailwind CSS',
-  'WebGL',
-  'Node.js',
-  'Express',
-  'NestJS',
-  'Django',
-  'Spring Boot',
-  'ASP.NET Core',
-  'Laravel',
-  'FastAPI',
-  'GraphQL',
-  'REST API Design',
-  'AWS',
-  'Azure',
-  'GCP',
-  'Docker',
-  'Kubernetes',
-  'Terraform',
-  'Ansible',
-  'Jenkins',
-  'GitHub Actions',
-  'CircleCI',
-  'ArgoCD',
-  'Helm',
-  'SQL',
-  'MongoDB',
-  'PostgreSQL',
-  'MySQL',
-  'Redis',
-  'Elasticsearch',
-  'Cassandra',
-  'DynamoDB',
-  'Neo4j',
-  'InfluxDB',
-  'Machine Learning',
-  'Deep Learning',
-  'TensorFlow',
-  'PyTorch',
-  'Scikit-learn',
-  'Computer Vision',
-  'NLP',
-  'Data Analysis',
-  'Big Data',
-  'Data Visualization',
-  'Pandas',
-  'NumPy',
-  'Jupyter',
-  'CUDA',
-  'MLOps',
-  'Cybersecurity',
-  'OAuth/OIDC',
-  'Encryption',
-  'Penetration Testing',
-  'Security Auditing',
-  'Zero Trust Architecture',
-  'Microservices',
-  'Event-Driven Architecture',
-  'Domain-Driven Design',
-  'CQRS',
-  'System Design',
-  'API Design',
-  'Cloud Native',
-  'Project Management',
-  'Agile',
-  'Scrum',
-  'Technical Writing',
-  'Public Speaking',
-  'Team Leadership',
-  'Problem Solving',
-  'Blockchain',
-  'Web3',
-  'IoT',
-  'Edge Computing',
-  'Quantum Computing',
-  'AR/VR',
-  '5G Networks',
-  'Serverless',
-];
-
 export const DEFAULT_TECHNOLOGIES = [
   'React',
+  'JavaScript',
+  'TypeScript',
   'Next.js',
   'Vue.js',
   'Nuxt.js',
@@ -488,7 +370,7 @@ interface ProjectConversation {
   githubProject?: string;
 }
 
-const POST_CONTENT: Record<PostType, ProjectConversation[]> = {
+const POST_CONTENT: Record<ProjectType, ProjectConversation[]> = {
   CONTRIBUTION: [
     {
       title: 'Built a React Component Library',
@@ -712,125 +594,6 @@ const POST_CONTENT: Record<PostType, ProjectConversation[]> = {
         'Consider implementing custom metrics for business KPIs.',
       ],
       githubProject: 'campus-service-mesh',
-    },
-  ],
-  DISCUSSION: [
-    {
-      title: 'Best Practices for Year-Long Projects',
-      description:
-        'Starting a major project next semester. What are some best practices for managing a year-long project? Especially interested in tech stack choices and team collaboration.',
-      comments: [
-        'Git workflow is crucial. We used trunk-based development with feature flags - worked great!',
-        'Regular demos to stakeholders helped us stay on track. Aim for bi-weekly showcases.',
-        'Document everything from day one. Tools like Notion or Confluence are great for this.',
-      ],
-    },
-    {
-      title: 'Modern Web Development Practices',
-      description:
-        'With new technologies like Web Assembly and Edge Computing gaining traction, how should developers prepare for the changing landscape?',
-      comments: [
-        'Focus on understanding the fundamentals first - HTTP, browsers, and JavaScript.',
-        'Learn about containerization and microservices architecture.',
-        'Consider exploring Rust or Go for systems-level programming.',
-      ],
-    },
-    {
-      title: 'Building an Open Source Community',
-      description:
-        'Thinking about starting a coding group focused on open source contributions. Would love to hear ideas about format, meeting frequency, and potential projects.',
-      comments: [
-        'Regular hack sessions work well for maintaining momentum.',
-        'Consider organizing around specific technologies or domains.',
-        'Documentation sprints are a great way to get new contributors started.',
-      ],
-    },
-    {
-      title: 'AI/ML Project Collaboration',
-      description:
-        'Looking for collaborators on a machine learning project focused on natural language processing. Currently working with transformers and BERT models.',
-      comments: [
-        "I've been working with GPT models - would love to share insights!",
-        'Have you looked into the latest developments in few-shot learning?',
-        'We could combine this with some computer vision aspects.',
-      ],
-    },
-    {
-      title: 'Transitioning from Monolith to Microservices',
-      description:
-        'Planning to break down a large academic management system into microservices. Looking for insights on strategy and potential pitfalls.',
-      comments: [
-        'Start with bounded contexts to identify service boundaries.',
-        'Consider using the strangler fig pattern for gradual migration.',
-        'Domain-driven design really helps with service decomposition.',
-        "Don't forget to plan for distributed tracing early on.",
-      ],
-    },
-    {
-      title: 'Edge Computing in Campus Infrastructure',
-      description:
-        'Exploring edge computing solutions for IoT devices across campus. Interested in real-world implementations and best practices.',
-      comments: [
-        'Look into AWS Greengrass for edge processing.',
-        'Consider MQTT for efficient device communication.',
-        'How are you handling device authentication?',
-        'Great use case for federated learning!',
-      ],
-    },
-    {
-      title: 'DevOps Culture in Academic Projects',
-      description:
-        'Building a DevOps culture in our research lab. Looking for tools, practices, and experiences in academic settings.',
-      comments: [
-        'GitLab CI/CD works great for academic projects.',
-        'Consider implementing infrastructure as code early.',
-        'Regular retrospectives helped us a lot.',
-        'Automated testing is crucial for research reproducibility.',
-      ],
-    },
-    {
-      title: 'Implementing Zero-Trust Security Model',
-      description:
-        'Planning to implement a zero-trust security model for our academic services. Looking for experiences and best practices.',
-      comments: [
-        'Start with identity-aware proxies for all services.',
-        'Consider using service accounts with short-lived credentials.',
-        'BeyondCorp architecture might be a good reference.',
-        "Don't forget about device trust assessment.",
-      ],
-    },
-    {
-      title: 'GraphQL Federation Strategy',
-      description:
-        'Moving towards a federated GraphQL architecture. Looking for insights on schema design and performance optimization.',
-      comments: [
-        'Entity interfaces are crucial for federation.',
-        'Consider implementing automated schema checks in CI.',
-        'Persisted queries can help with performance.',
-        'Watch out for n+1 queries across services.',
-      ],
-    },
-    {
-      title: 'Machine Learning Model Deployment Strategies',
-      description:
-        'Discussing strategies for deploying ML models in production. Looking for insights on versioning, A/B testing, and monitoring.',
-      comments: [
-        'Consider using feature stores for consistent training and inference.',
-        'Model versioning with semantic versioning works well.',
-        'Shadow deployments can help validate new models.',
-        "Don't forget about monitoring concept drift.",
-      ],
-    },
-    {
-      title: 'Event Sourcing in Academic Systems',
-      description:
-        'Considering event sourcing for our student records system. Looking for insights on schema evolution and performance at scale.',
-      comments: [
-        'Start with clear event schemas and versioning strategy.',
-        'CQRS pattern pairs well with event sourcing.',
-        'Consider using event store databases.',
-        'Snapshots are crucial for performance.',
-      ],
     },
   ],
 };

@@ -26,7 +26,7 @@ export const UserService = {
           gradYear: true,
           bio: true,
           mentorship: true,
-          skills: {
+          technologies: {
             select: { name: true },
           },
           projects: {
@@ -66,12 +66,7 @@ export const UserService = {
     return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
         const data: CompleteOnboardingData = onboardingSchema.parse(rawData);
-        let mentorship: 'MENTOR' | 'MENTEE' | 'NONE' = 'NONE';
-        if (data.postType === 'Mentor') {
-          mentorship = 'MENTOR';
-        } else if (data.postType === 'Mentee') {
-          mentorship = 'MENTEE';
-        }
+        const mentorship: 'MENTOR' | 'MENTEE' | 'NONE' = 'NONE';
         const gradYearNumber = data.gradYear ? parseInt(data.gradYear, 10) : null;
         return await prisma.$transaction(async (tx) => {
           return tx.user.update({
@@ -81,11 +76,11 @@ export const UserService = {
               githubProfile: data.githubProfile,
               gradYear: gradYearNumber,
               mentorship: mentorship,
-              skills: {
+              technologies: {
                 deleteMany: {},
-                connectOrCreate: data.skills
-                  ? data.skills.split(',').map((s) => {
-                      const trimmed = s.trim();
+                connectOrCreate: Array.isArray(data.technologies)
+                  ? data.technologies.map((tech: string) => {
+                      const trimmed = tech.trim();
                       return {
                         where: { name: trimmed },
                         create: { name: trimmed, verified: false },
@@ -295,6 +290,30 @@ export const UserService = {
     } catch {
       throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
+  },
+
+  async searchTechnologies(query: string, requestUserId: User['id'], limit = 5) {
+    return withServiceAuth(requestUserId, null, async () => {
+      try {
+        return await prisma.technology.findMany({
+          where: {
+            name: {
+              startsWith: query.toLowerCase().trim(),
+            },
+          },
+          select: {
+            name: true,
+          },
+          take: limit,
+          orderBy: {
+            name: 'asc',
+          },
+        });
+      } catch (error) {
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
   async fetchMicrosoftAvatar(accessToken: Account['access_token'], userId: User['id']) {

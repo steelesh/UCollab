@@ -31,7 +31,7 @@ async function Page({ params, userId }: PageProps) {
   const initialData = {
     title: project.title,
     description: project.description,
-    postType: project.postType,
+    projectType: project.projectType,
     technologies: project.technologies?.map((t) => t.name),
     githubRepo: project.githubRepo,
   };

@@ -13,7 +13,7 @@ export async function createProject(formData: FormData) {
 
   const rawData = {
     title: formData.get('title'),
-    postType: formData.get('postType'),
+    projectType: formData.get('projectType'),
     description: formData.get('description'),
     technologies: JSON.parse(formData.get('technologies') as string),
     githubRepo: formData.get('githubRepo'),
@@ -47,7 +47,7 @@ export async function updateProject(projectId: Project['id'], formData: FormData
   try {
     const rawData = {
       title: formData.get('title'),
-      postType: formData.get('postType'),
+      projectType: formData.get('projectType'),
       description: formData.get('description'),
       technologies: JSON.parse(formData.get('technologies') as string),
       githubRepo: formData.get('githubRepo'),

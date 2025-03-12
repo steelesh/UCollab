@@ -11,13 +11,16 @@ export const metadata = {
 
 export async function ExplorePage() {
   const projectsWithUser = await prisma.project.findMany({
+    orderBy: {
+      createdDate: 'desc',
+    },
     select: {
       id: true,
       title: true,
       createdDate: true,
       description: true,
       githubRepo: true,
-      postType: true,
+      projectType: true,
     },
   });
 
@@ -49,7 +52,7 @@ export async function ExplorePage() {
                       className="link link-accent font-bold tracking-wider text-white hover:underline">
                       GitHub Repo
                     </a>
-                    <Badge className="mt-4 flex items-center justify-between">{project.postType}</Badge>
+                    <Badge className="mt-4 flex items-center justify-between">{project.projectType}</Badge>
                   </CardDescription>
                 </div>
               </CardHeader>

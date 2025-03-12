@@ -5,12 +5,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, useEffect, useRef } from 'react';
 import { createProject, updateProject, searchTechnologies } from '~/features/projects/project.actions';
 import { CreateProjectInput, projectSchema } from '~/features/projects/project.schema';
-import { PostType, Project } from '@prisma/client';
+import { ProjectType, Project } from '@prisma/client';
 import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
 import { Input } from '~/components/ui/input';
 import { Textarea } from '~/components/ui/textarea';
 import { Badge } from '~/components/ui/badge';
+import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group';
 
 interface ProjectFormProps {
   initialData?: CreateProjectInput;
@@ -32,7 +33,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
   } = useForm<CreateProjectInput>({
     resolver: zodResolver(projectSchema),
     defaultValues: initialData || {
-      postType: PostType.DISCUSSION,
+      projectType: ProjectType.FEEDBACK,
       technologies: [],
       title: '',
       description: '',
@@ -125,11 +126,11 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
               <span className="label-text">Technologies</span>
             </Label>
             <div className="m-4 flex flex-1">
-              {field.value.map((tech) => (
+              {field.value.map((tech: string) => (
                 <div key={tech}>
                   <Badge
                     onClick={() => {
-                      field.onChange(field.value.filter((t) => t !== tech));
+                      field.onChange(field.value.filter((t: string) => t !== tech));
                     }}
                     className="hover:bg-primary cursor-pointer transition duration-200 ease-in-out hover:scale-105"
                     variant="outline">
@@ -150,9 +151,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
                     e.preventDefault();
                     const inputValue = e.currentTarget.value.trim();
                     if (!inputValue) return;
-                    // Filter out suggestions that are already selected
                     const filteredSuggestions = suggestions.filter((tech) => !field.value.includes(tech));
-                    // Use the first available suggestion from the filtered list.
                     const [closestMatch] = filteredSuggestions;
                     if (closestMatch !== undefined) {
                       field.onChange([...field.value, closestMatch]);
@@ -204,6 +203,29 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
           disabled={isSubmitting}
         />
         {errors.githubRepo && <span className="text-error text-sm">{errors.githubRepo.message}</span>}
+      </div>
+      <div className="form-control mt-2">
+        <Label className="label my-2">
+          <span className="label-text">Category</span>
+        </Label>
+        <Controller
+          control={control}
+          name="projectType"
+          defaultValue="FEEDBACK"
+          render={({ field: { onChange, value } }) => (
+            <RadioGroup value={value ?? 'FEEDBACK'} onValueChange={onChange}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="FEEDBACK" id="feedback" />
+                <Label htmlFor="feedback">Feedback</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="CONTRIBUTION" id="contribution" />
+                <Label htmlFor="contribution">Contribution</Label>
+              </div>
+            </RadioGroup>
+          )}
+        />
+        {errors.projectType && <span className="text-error text-sm">{errors.projectType.message}</span>}
       </div>
       <Button
         type="submit"

@@ -48,7 +48,7 @@ model User {
   projects                Project[]
   bio                     String?                  @prisma.Text
   role                    Role                     @default(USER)
-  skills                  Skill[]
+  technologies            Technology[]
   gradYear                Int?
   githubProfile           String?
   mentorship              MentorshipStatus         @default(NONE)
@@ -64,7 +64,7 @@ model Project {
   lastModifiedDate DateTime       @updatedAt
   title            String         @prisma.Text
   description      String         @prisma.Text
-  postType         PostType
+  projectType      ProjectType
   technologies     Technology[]
   githubRepo       String?
   comments         Comment[]
@@ -76,24 +76,15 @@ model Project {
   @@index([title(length: 191)])
 }
 
-model Skill {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  verified    Boolean  @default(false)
-  createdDate DateTime @default(now())
-  createdById String
-  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
-
-  @@index([name])
-}
-
 model Technology {
   id          String   @id @default(cuid())
   name        String   @unique
   verified    Boolean  @default(false)
   createdDate DateTime @default(now())
-  Project     Project? @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  createdById String?
+  Project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  User        User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId   String?
+  userId      String?
 
   @@index([name])
 }
@@ -168,10 +159,15 @@ enum AvatarSource {
   DEFAULT
 }
 
-enum PostType {
+enum ProjectType {
   CONTRIBUTION
   FEEDBACK
-  DISCUSSION
+}
+
+enum PostType {
+  COMMUNITY
+  QA
+  MENTORSHIP
 }
 
 enum NotificationType {

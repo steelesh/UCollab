@@ -7,7 +7,7 @@ import {
 
 export type Project = Pick<
   PrismaProject,
-  'id' | 'title' | 'description' | 'createdDate' | 'lastModifiedDate' | 'postType' | 'githubRepo' | 'createdById'
+  'id' | 'title' | 'description' | 'createdDate' | 'lastModifiedDate' | 'projectType' | 'githubRepo' | 'createdById'
 >;
 
 export interface Comment {
@@ -28,7 +28,7 @@ export type Technology = Pick<PrismaTechnology, 'name'>;
 
 export type ProjectDetails = Pick<
   PrismaProject,
-  'id' | 'title' | 'description' | 'createdDate' | 'lastModifiedDate' | 'postType' | 'githubRepo' | 'createdById'
+  'id' | 'title' | 'description' | 'createdDate' | 'lastModifiedDate' | 'projectType' | 'githubRepo' | 'createdById'
 > & {
   comments: (Pick<PrismaComment, 'id' | 'content' | 'createdDate' | 'lastModifiedDate'> & {
     createdBy: Pick<User, 'id' | 'username' | 'avatar'>;
