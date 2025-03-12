@@ -10,10 +10,10 @@ interface ProfileUserInfoProps {
 
 export function ProfileUserInfo({ createdDate, gradYear, mentorship, bio }: ProfileUserInfoProps) {
   return (
-    <div className="space-y-2">
-      <p className="text-sm text-gray-500">Joined {new Date(createdDate).toDateString()}</p>
-      <p className="text-sm text-gray-500">Class of {gradYear}</p>
-      <p className="flex items-center gap-1 text-sm text-gray-500">
+    <div>
+      <p className="text-muted-foreground text-sm">Joined {new Date(createdDate).toDateString()}</p>
+      <p className="text-muted-foreground text-sm">Class of {gradYear}</p>
+      <p className="text-muted-foreground flex items-center gap-1 text-sm">
         {MENTORSHIP_CONFIG[mentorship].icon}
         <span>{MENTORSHIP_CONFIG[mentorship].label}</span>
       </p>

@@ -2,8 +2,10 @@
 
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
+import { Button } from '~/components/ui/button';
+import { Spinner } from '~/components/ui/spinner';
 
-export default function SignOutButton() {
+export function SignOutButton() {
   const [isPending, setIsPending] = useState(false);
 
   const handleSignOut = async () => {
@@ -16,14 +18,15 @@ export default function SignOutButton() {
   };
 
   return (
-    <button className="btn btn-primary-content select-none" onClick={handleSignOut} disabled={isPending}>
+    <Button className="cursor-pointer" onClick={handleSignOut} disabled={isPending}>
       {isPending ? (
-        <span className="loading loading-spinner loading-md"></span>
+        <>
+          <Spinner />
+          Signing out...
+        </>
       ) : (
-        <div className="flex items-center gap-1">
-          <div>Sign Out</div>
-        </div>
+        'Sign out'
       )}
-    </button>
+    </Button>
   );
 }

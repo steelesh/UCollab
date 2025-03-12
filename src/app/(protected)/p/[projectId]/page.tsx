@@ -42,7 +42,7 @@ async function Page({ params, userId }: PageProps) {
   return (
     <div className="absolute inset-0 overflow-y-auto">
       <div className="mx-auto w-full max-w-3xl px-4 py-8">
-        <article className="bg-base-100 rounded-lg shadow-xl">
+        <article className="rounded-lg shadow-xl">
           <ProjectHeader title={project.title} projectId={projectId} isOwnProject={project.createdById === userId} />
           <div className="px-8 pt-16 pb-6">
             <ProjectInfo

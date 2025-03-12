@@ -1,24 +1,25 @@
 export const metadata = {
-  title: "UCollab — License",
+  title: 'UCollab — License',
 };
 
 export default function LicensePage() {
   return (
     <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-24">
       <h1 className="text-center text-2xl font-bold select-none">License Agreement</h1>
-      
-      <div className="mt-8 max-w-3xl w-full bg-base-300 p-8 rounded-lg shadow-2xl">
-        <p className="text-accent text-sm mb-4">
+
+      <div className="bg-base-300 mt-8 w-full max-w-3xl rounded-lg p-8 shadow-2xl">
+        <p className="text-secondary mb-4 text-sm">
           <strong>Last Updated:</strong> March 7th, 2025
         </p>
 
         <h2 className="text-lg font-semibold">MIT License</h2>
         <p>
-          This project is licensed under the <strong>MIT License</strong>. By using this software, you agree to the following terms.
+          This project is licensed under the <strong>MIT License</strong>. By using this software, you agree to the
+          following terms.
         </p>
 
-        <div className="bg-base-200 p-4 rounded-md text-sm whitespace-pre-wrap border border-gray-600 mt-4">
-{`MIT License
+        <div className="bg-base-200 border-secondary mt-4 rounded-md border p-4 text-sm whitespace-pre-wrap">
+          {`MIT License
 
 Copyright (c) 2024 UCollab Team
 
@@ -41,13 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.`}
         </div>
 
-        <h2 className="text-lg font-semibold mt-6">Usage and Distribution</h2>
+        <h2 className="mt-6 text-lg font-semibold">Usage and Distribution</h2>
         <p>
           This software can be freely used, modified, and distributed under the terms of the MIT License. However, all
           copies of the software must include the original license text.
         </p>
 
-        <h2 className="text-lg font-semibold mt-6">Disclaimer</h2>
+        <h2 className="mt-6 text-lg font-semibold">Disclaimer</h2>
         <p>
           This software is provided "as is," without warranty of any kind, express or implied, including but not limited
           to the warranties of merchantability, fitness for a particular purpose, and noninfringement.
@@ -56,4 +57,3 @@ THE SOFTWARE.`}
     </div>
   );
 }
-

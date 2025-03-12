@@ -6,6 +6,7 @@ import { useRef, useState } from 'react';
 import Tiptap, { TiptapRef } from '~/components/tiptap';
 import { commentSchema, CommentFormData } from '~/features/comments/comment.schema';
 import { Comment, Project, User } from '@prisma/client';
+import { Button } from '~/components/ui/button';
 
 interface CommentFormProps {
   projectId: Project['id'];
@@ -86,17 +87,24 @@ export function CommentForm({
 
       <div className="flex justify-end gap-2">
         {onCancel && (
-          <button
+          <Button
+            size="sm"
             type="button"
+            variant="outline"
             onClick={onCancel}
-            className="btn btn-ghost btn-sm dark:hover:bg-gray-700"
+            className="hover:bg-primary cursor-pointer"
             disabled={isSubmitting}>
             Cancel
-          </button>
+          </Button>
         )}
-        <button type="submit" className="btn btn-sm" disabled={isSubmitting || (isEditing && !hasChanged)}>
+        <Button
+          size="sm"
+          type="submit"
+          variant="outline"
+          className="cursor-pointer"
+          disabled={isSubmitting || (isEditing && !hasChanged)}>
           {isSubmitting ? 'Saving...' : isEditing ? (hasChanged ? 'Save Changes' : 'No Changes') : 'Post Comment'}
-        </button>
+        </Button>
       </div>
     </form>
   );

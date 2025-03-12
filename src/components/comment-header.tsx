@@ -3,6 +3,7 @@ import { Comment } from '~/features/projects/project.types';
 import Link from 'next/link';
 import type { Route } from 'next';
 import { CommentTimestamp } from './comment-timestamp';
+import { Button } from '~/components/ui/button';
 
 export function CommentHeader({
   comment,
@@ -52,18 +53,21 @@ export function CommentHeader({
 
       <div className="flex gap-2">
         {!isReply && onReply && (
-          <button onClick={onReply} className="btn btn-xs">
+          <Button onClick={onReply} size="sm" variant="outline" className="w-full cursor-pointer sm:w-auto">
             Reply
-          </button>
+          </Button>
         )}
         {isOwnComment && (
           <>
-            <button onClick={onEdit} className="btn btn-xs">
+            <Button onClick={onEdit} variant="outline" className="w-full cursor-pointer sm:w-auto">
               Edit
-            </button>
-            <button onClick={handleDelete} className="btn btn-xs text-red-600">
+            </Button>
+            <Button
+              onClick={handleDelete}
+              variant="outline"
+              className="hover:bg-primary w-full cursor-pointer sm:w-auto">
               Delete
-            </button>
+            </Button>
           </>
         )}
       </div>

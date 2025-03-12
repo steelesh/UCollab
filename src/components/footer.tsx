@@ -12,14 +12,14 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-base-200 py-6">
+    <footer className="bg-background py-6">
       <div className="mx-auto overflow-hidden">
         <nav aria-label="Footer" className="flex flex-wrap justify-center gap-8 text-sm">
           {navigation.main.map((item) => (
             <Link
               key={item.name}
               href={item.href as Route}
-              className="text-accent hover:text-base-content hover:underline">
+              className="text-primary-foreground hover:text-base-content hover:underline">
               {item.name}
             </Link>
           ))}

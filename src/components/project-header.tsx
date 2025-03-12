@@ -7,6 +7,7 @@ import type { Route } from 'next';
 import type { Project } from '~/features/projects/project.types';
 import { deleteProject } from '~/features/projects/project.actions';
 import { useRouter } from 'next/navigation';
+import { Button } from '~/components/ui/button';
 
 interface ProjectHeaderProps {
   title: Project['title'];
@@ -40,7 +41,7 @@ export function ProjectHeader({ title, projectId, isOwnProject }: ProjectHeaderP
       {isOwnProject && (
         <div className="absolute right-1 -bottom-12 flex space-x-2">
           <Link href={`/p/${projectId}/edit` as Route}>
-            <button className="btn btn-accent-content" aria-label="Edit Project">
+            <Button className="bg-muted" aria-label="Edit Project">
               <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
                 <path
                   fill="none"
@@ -51,13 +52,9 @@ export function ProjectHeader({ title, projectId, isOwnProject }: ProjectHeaderP
                   d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1l1-4l9.5-9.5z"
                 />
               </svg>
-            </button>
+            </Button>
           </Link>
-          <button
-            className="btn btn-accent-content"
-            aria-label="Delete Project"
-            onClick={handleDelete}
-            disabled={isDeleting}>
+          <Button className="bg-primary" aria-label="Delete Project" onClick={handleDelete} disabled={isDeleting}>
             {isDeleting ? (
               <span className="loading loading-spinner loading-sm" />
             ) : (
@@ -72,7 +69,7 @@ export function ProjectHeader({ title, projectId, isOwnProject }: ProjectHeaderP
                 />
               </svg>
             )}
-          </button>
+          </Button>
         </div>
       )}
     </div>

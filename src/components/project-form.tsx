@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createProject, updateProject, searchTechnologies } from '~/features/projects/project.actions';
 import { CreateProjectInput, projectSchema } from '~/features/projects/project.schema';
 import { PostType, Project } from '@prisma/client';
+import { Button } from '~/components/ui/button';
 
 interface ProjectFormProps {
   initialData?: CreateProjectInput;
@@ -123,7 +124,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
               {field.value.map((tech) => (
                 <div key={tech} className="badge gap-2">
                   {tech}
-                  <button
+                  <Button
                     type="button"
                     onClick={() => {
                       field.onChange(field.value.filter((t) => t !== tech));
@@ -131,7 +132,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
                     className="btn btn-xs btn-ghost"
                     disabled={isSubmitting}>
                     ×
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
@@ -158,7 +159,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
               {showSuggestions && suggestions.length > 0 && (
                 <div ref={suggestionsRef} className="dropdown-container">
                   {suggestions.map((tech) => (
-                    <button
+                    <Button
                       key={tech}
                       type="button"
                       className="dropdown-item"
@@ -171,7 +172,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
                       }}
                       disabled={isSubmitting}>
                       <div className="dropdown-item-content">{tech}</div>
-                    </button>
+                    </Button>
                   ))}
                 </div>
               )}
@@ -218,9 +219,12 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
           </div>
         )}
       />
-      <button type="submit" className="btn w-full" disabled={isSubmitting}>
+      <Button
+        type="submit"
+        className="w-full cursor-pointer bg-green-600 hover:bg-green-600/80"
+        disabled={isSubmitting}>
         {isSubmitting ? 'Saving...' : projectId ? 'Update Project' : 'Create Project'}
-      </button>
+      </Button>
     </form>
   );
 }
