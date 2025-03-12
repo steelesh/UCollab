@@ -10,6 +10,7 @@ import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
 import { Input } from '~/components/ui/input';
 import { Textarea } from '~/components/ui/textarea';
+import { Badge } from '~/components/ui/badge';
 
 interface ProjectFormProps {
   initialData?: CreateProjectInput;
@@ -123,19 +124,17 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
             <Label className="label" htmlFor="technologies">
               <span className="label-text">Technologies</span>
             </Label>
-            <div className="mb-2 flex flex-wrap gap-2">
+            <div className="m-4 flex flex-1">
               {field.value.map((tech) => (
-                <div key={tech} className="badge gap-2">
-                  {tech}
-                  <Button
-                    type="button"
+                <div key={tech}>
+                  <Badge
                     onClick={() => {
                       field.onChange(field.value.filter((t) => t !== tech));
                     }}
-                    className="btn btn-xs btn-ghost"
-                    disabled={isSubmitting}>
-                    ×
-                  </Button>
+                    className="hover:bg-primary cursor-pointer transition duration-200 ease-in-out hover:scale-105"
+                    variant="outline">
+                    {tech}
+                  </Badge>
                 </div>
               ))}
             </div>
@@ -149,9 +148,14 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    const value = e.currentTarget.value.trim().toLowerCase();
-                    if (value && !field.value.includes(value)) {
-                      field.onChange([...field.value, value]);
+                    const inputValue = e.currentTarget.value.trim();
+                    if (!inputValue) return;
+                    // Filter out suggestions that are already selected
+                    const filteredSuggestions = suggestions.filter((tech) => !field.value.includes(tech));
+                    // Use the first available suggestion from the filtered list.
+                    const [closestMatch] = filteredSuggestions;
+                    if (closestMatch !== undefined) {
+                      field.onChange([...field.value, closestMatch]);
                       e.currentTarget.value = '';
                       setShowSuggestions(false);
                     }
@@ -160,24 +164,28 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
                 disabled={isSubmitting}
               />
               {showSuggestions && suggestions.length > 0 && (
-                <div ref={suggestionsRef} className="dropdown-container">
-                  {suggestions.map((tech) => (
-                    <Button
-                      variant="outline"
-                      key={tech}
-                      type="button"
-                      className="dropdown-item"
-                      onClick={() => {
-                        field.onChange([...field.value, tech]);
-                        setShowSuggestions(false);
-                        if (techInputRef.current) {
-                          techInputRef.current.value = '';
-                        }
-                      }}
-                      disabled={isSubmitting}>
-                      <div className="dropdown-item-content">{tech}</div>
-                    </Button>
-                  ))}
+                <div
+                  ref={suggestionsRef}
+                  className="bg-background absolute top-full left-0 z-10 mt-1 w-full rounded shadow-md">
+                  {suggestions
+                    .filter((tech) => !field.value.includes(tech))
+                    .map((tech) => (
+                      <Button
+                        variant="outline"
+                        key={tech}
+                        type="button"
+                        className="dropdown-item w-full px-4 py-2 text-left"
+                        onClick={() => {
+                          field.onChange([...field.value, tech]);
+                          setShowSuggestions(false);
+                          if (techInputRef.current) {
+                            techInputRef.current.value = '';
+                          }
+                        }}
+                        disabled={isSubmitting}>
+                        <div className="dropdown-item-content">{tech}</div>
+                      </Button>
+                    ))}
                 </div>
               )}
             </div>
