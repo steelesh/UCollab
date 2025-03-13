@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import type { Route } from 'next';
-import type { Project } from '~/features/users/user.types';
+import type { Project } from '@prisma/client';
 
 interface ProfileProjectsListProps {
   projects: Project[];

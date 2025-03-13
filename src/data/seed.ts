@@ -25,11 +25,19 @@ export async function seedDatabase() {
       },
     });
 
-    for (const technologyName of DEFAULT_TECHNOLOGIES) {
-      await prisma.technology.create({
-        data: { name: technologyName, verified: true, userId: admin.id },
-      });
-    }
+    const technologyConnect = DEFAULT_TECHNOLOGIES.map((technologyName) => ({
+      where: { name: technologyName },
+      create: { name: technologyName, verified: true },
+    }));
+
+    await prisma.user.update({
+      where: { id: admin.id },
+      data: {
+        technologies: {
+          connectOrCreate: technologyConnect,
+        },
+      },
+    });
 
     const allTechnologies = await prisma.technology.findMany();
 
@@ -45,8 +53,21 @@ export async function seedDatabase() {
   }
 }
 
-async function createTestUsers(allTechnologies: Technology[]) {
+async function createTestUsers(initialTechnologies: Technology[]) {
+  let allTechnologies = initialTechnologies;
+
+  if (allTechnologies.length === 0) {
+    allTechnologies = await prisma.technology.findMany();
+  }
+
+  if (allTechnologies.length === 0) {
+    console.warn('No technologies available for creating users.');
+    return;
+  }
+
   const azureId = faker.string.uuid();
+  const initialUserTech = faker.helpers.arrayElement(allTechnologies);
+
   await prisma.user.create({
     data: {
       ...generateUCUser(0),
@@ -56,11 +77,30 @@ async function createTestUsers(allTechnologies: Technology[]) {
       azureAdId: azureId,
       accounts: { create: fakeAccount() },
       notificationPreferences: { create: {} },
+      technologies: {
+        connect: [{ id: initialUserTech.id }],
+      },
     },
   });
 
   for (let i = 0; i < 250; i++) {
     const azureId = faker.string.uuid();
+    const technologyIds = (await prisma.technology.findMany({ select: { id: true } })).map((tech) => tech.id);
+    const userTechConnect: { id: string }[] = [];
+
+    if (technologyIds.length > 0) {
+      const guaranteedTechId = faker.helpers.arrayElement(technologyIds);
+      userTechConnect.push({ id: guaranteedTechId });
+      const numAdditionalTechs = faker.number.int({ min: 0, max: Math.min(3, technologyIds.length - 1) });
+      const availableTechIds = faker.helpers.shuffle(technologyIds.filter((id) => id !== guaranteedTechId)); // Shuffle remaining IDs
+      for (let j = 0; j < numAdditionalTechs; j++) {
+        const additionalTechId = availableTechIds[j];
+        if (additionalTechId) {
+          userTechConnect.push({ id: additionalTechId });
+        }
+      }
+    }
+
     await prisma.user.create({
       data: {
         ...generateUCUser(i + 1),
@@ -70,10 +110,7 @@ async function createTestUsers(allTechnologies: Technology[]) {
         azureAdId: azureId,
         role: faker.number.int({ min: 1, max: 10 }) === 1 ? 'ADMIN' : 'USER',
         technologies: {
-          connect: faker.helpers
-            .shuffle(allTechnologies)
-            .slice(0, faker.number.int({ min: 3, max: 8 }))
-            .map((technology) => ({ id: technology.id })),
+          connect: userTechConnect,
         },
         accounts: { create: fakeAccount() },
         notificationPreferences: { create: {} },
@@ -98,27 +135,50 @@ async function createProjectsAndNotifications() {
 
 async function createProject(user: User, allUsers: User[]) {
   const projectType = faker.helpers.arrayElement(Object.values(ProjectType));
-  const conversation = faker.helpers.arrayElement(POST_CONTENT[projectType]);
-  const technologies = await prisma.technology.findMany();
-  const techCount = faker.number.int({ min: 1, max: 4 });
-  const selectedTechs = faker.helpers.shuffle(technologies).slice(0, techCount);
+  const conversation = faker.helpers.arrayElement(POST_CONTENT?.[projectType] || []);
+  const technologyIds = (await prisma.technology.findMany({ select: { id: true } })).map((tech) => tech.id);
+  if (technologyIds.length === 0) {
+    console.warn('No technologies available, skipping project creation with technologies.');
+    return;
+  }
+  const projectTechConnect: { id: string }[] = [];
+  const guaranteedTechId = faker.helpers.arrayElement(technologyIds);
+  projectTechConnect.push({ id: guaranteedTechId });
+  const numAdditionalTechs = faker.number.int({ min: 0, max: Math.min(2, technologyIds.length - 1) });
+  const availableTechIds = faker.helpers.shuffle(technologyIds.filter((id) => id !== guaranteedTechId));
+  for (let j = 0; j < numAdditionalTechs; j++) {
+    const additionalTechId = availableTechIds[j];
+    if (additionalTechId) {
+      projectTechConnect.push({ id: additionalTechId });
+    }
+  }
+
+  const rating = faker.number.float({ min: 0, max: 5, precision: 0.5 });
 
   const project = await prisma.project.create({
     data: {
-      title: conversation.title,
-      description: conversation.description,
+      title: conversation?.title || 'Sample Project',
+      description: conversation?.description || 'A sample project description.',
       projectType,
       createdById: user.id,
-      githubRepo: conversation.githubProject
+      githubRepo: conversation?.githubProject
         ? `https://www.github.com/${user.username}/${conversation.githubProject}`
         : null,
+      rating,
       technologies: {
-        connect: selectedTechs.map((tech) => ({ id: tech.id })),
+        connect: projectTechConnect,
       },
     },
   });
 
-  await createCommentsAndNotifications(project, conversation, allUsers, user);
+  if (project) {
+    await createCommentsAndNotifications(
+      project,
+      conversation || { title: '', description: '', comments: [] },
+      allUsers,
+      user,
+    );
+  }
 }
 
 async function createCommentsAndNotifications(
@@ -185,7 +245,6 @@ async function clearDatabase() {
 function generateUCUser(index: number) {
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
-
   const usernameBase = lastName.toLowerCase().replace(/[^a-zA-Z0-9._-]/g, '');
   const username = `${usernameBase}${firstName[0]?.toLowerCase()}${index}`;
   const domain = faker.helpers.arrayElement(UC_DOMAINS);
@@ -353,6 +412,34 @@ export const DEFAULT_TECHNOLOGIES = [
   'Insomnia',
   'DBeaver',
   'pgAdmin',
+  'Python',
+  'Java',
+  'C',
+  'C++',
+  'C#',
+  'PHP',
+  'Swift',
+  'Kotlin',
+  'Ruby',
+  'Go',
+  'Rust',
+  'Scala',
+  'Haskell',
+  'Elixir',
+  'R',
+  'Objective-C',
+  'Perl',
+  'Lua',
+  'Clojure',
+  'F#',
+  'jQuery',
+  'Bootstrap',
+  'TailwindCSS',
+  'Material-UI',
+  'Redux',
+  'MobX',
+  'RxJS',
+  'Deno',
 ];
 
 const SYSTEM_MESSAGES = [

@@ -21,6 +21,7 @@ export const publicUserSelect = {
   username: true,
   fullName: true,
   avatar: true,
+  technologies: true,
 } as const;
 
 export const userSchema = z.object({

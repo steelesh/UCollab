@@ -14,21 +14,6 @@ export interface NavSection {
 
 const routes: NavSection[] = [
   {
-    title: 'Create',
-    items: [
-      {
-        title: 'New Project',
-        href: '/p/new' as Route,
-        description: 'Create a new project',
-      },
-      {
-        title: 'New Discussion',
-        href: '/discussion' as Route,
-        description: 'Create a new discussion',
-      },
-    ],
-  },
-  {
     title: 'Explore',
     items: [
       {
@@ -38,17 +23,17 @@ const routes: NavSection[] = [
       },
       {
         title: 'Code Reviews',
-        href: '/feedback' as Route,
+        href: '/p/feedback' as Route,
         description: 'Get feedback on your code and projects',
       },
       {
         title: 'Collaborations',
-        href: '/collaborations' as Route,
+        href: '/p/collabs' as Route,
         description: 'Find teammates for your projects',
       },
       {
         title: 'Trending',
-        href: '/trending' as Route,
+        href: '/p/trending' as Route,
         description: "See what's popular in the community",
       },
     ],
@@ -57,38 +42,28 @@ const routes: NavSection[] = [
     title: 'Community',
     items: [
       {
-        title: 'All Discussions',
-        href: '/discussions' as Route,
-        description: 'Start or join general discussions',
-      },
-      {
-        title: 'Q & A',
-        href: '/questions' as Route,
-        description: 'Ask questions and help others with solutions',
-      },
-      {
         title: 'Mentorship',
-        href: '/mentorship' as Route,
+        href: '/m' as Route,
         description: 'Connect with mentors or become one',
       },
       {
         title: 'Community Guide',
-        href: '/community-guide' as Route,
+        href: '/c/community-guide' as Route,
         description: 'How to get the most out of UCollab',
       },
       {
         title: 'Contribution Guide',
-        href: '/contributing' as Route,
+        href: '/c/contribution-guide' as Route,
         description: 'Learn how to contribute to UCollab',
       },
       {
         title: 'Code of Conduct',
-        href: '/code-of-conduct' as Route,
+        href: '/c/code-of-conduct' as Route,
         description: 'Our community values and expectations',
       },
       {
         title: 'User Directory',
-        href: '/c/all' as Route,
+        href: '/u' as Route,
         description: 'Our user base',
       },
     ],

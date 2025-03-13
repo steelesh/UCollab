@@ -1,10 +1,12 @@
-import { User, Project, Comment as PrismaComment, Technology } from '@prisma/client';
+import { User, Project, Comment as PrismaComment, Technology as PrismaTechnology } from '@prisma/client';
 
 export interface Comment extends Pick<PrismaComment, 'id' | 'content' | 'projectId' | 'createdDate'> {
   project: {
     title: string;
   };
 }
+
+export type Technology = Pick<PrismaTechnology, 'name'>;
 
 export interface UserProfile {
   id: User['id'];

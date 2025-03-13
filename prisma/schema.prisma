@@ -48,7 +48,7 @@ model User {
   projects                Project[]
   bio                     String?                  @prisma.Text
   role                    Role                     @default(USER)
-  technologies            Technology[]
+  technologies            Technology[]             @relation("UserTechnologies")
   gradYear                Int?
   githubProfile           String?
   mentorship              MentorshipStatus         @default(NONE)
@@ -65,7 +65,8 @@ model Project {
   title            String         @prisma.Text
   description      String         @prisma.Text
   projectType      ProjectType
-  technologies     Technology[]
+  rating           Float          @default(0)
+  technologies     Technology[]   @relation("ProjectTechnologies")
   githubRepo       String?
   comments         Comment[]
   createdById      String
@@ -77,14 +78,12 @@ model Project {
 }
 
 model Technology {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  verified    Boolean  @default(false)
-  createdDate DateTime @default(now())
-  Project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  User        User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-  projectId   String?
-  userId      String?
+  id          String    @id @default(cuid())
+  name        String    @unique
+  verified    Boolean   @default(false)
+  createdDate DateTime  @default(now())
+  User        User[]    @relation("UserTechnologies")
+  Project     Project[] @relation("ProjectTechnologies")
 
   @@index([name])
 }
@@ -99,9 +98,9 @@ model Comment {
   createdBy        User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
   project          Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
   notifications    Notification[] @relation("CommentNotifications")
-  parentId    String?
-  parent      Comment?  @relation("Replies", fields: [parentId], references: [id])
-  replies     Comment[] @relation("Replies")
+  parentId         String?
+  parent           Comment?       @relation("Replies", fields: [parentId], references: [id])
+  replies          Comment[]      @relation("Replies")
 
   @@index([projectId])
   @@index([createdById])

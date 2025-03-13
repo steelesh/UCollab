@@ -47,6 +47,7 @@ async function Page({ params, userId }: PageProps) {
             createdDate={userProfile.createdDate}
             gradYear={userProfile.gradYear}
             mentorship={userProfile.mentorship}
+            technologies={userProfile.technologies}
             bio={userProfile.bio}
           />
           <section className="mt-8 border-t pt-4">
