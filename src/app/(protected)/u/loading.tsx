@@ -1,6 +1,6 @@
 import { Spinner } from '~/components/ui/spinner';
 
-function SkeletonCard() {
+function LoadingSpinner() {
   return (
     <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center">
       <Spinner />
@@ -8,4 +8,4 @@ function SkeletonCard() {
   );
 }
 
-export default SkeletonCard;
+export default LoadingSpinner;
