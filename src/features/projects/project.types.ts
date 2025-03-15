@@ -24,7 +24,7 @@ export interface Comment {
   parentId?: string | null;
 }
 
-export type Technology = Pick<PrismaTechnology, 'name'>;
+export type Technology = Pick<PrismaTechnology, 'id' | 'name'>;
 
 export type ProjectDetails = Pick<
   PrismaProject,
@@ -37,3 +37,18 @@ export type ProjectDetails = Pick<
   })[];
   technologies: Technology[];
 };
+
+export type ExploreProject = Pick<
+  PrismaProject,
+  'id' | 'title' | 'description' | 'createdDate' | 'projectType' | 'githubRepo' | 'rating'
+> & {
+  technologies: Technology[];
+};
+
+export interface ExplorePageData {
+  projects: ExploreProject[];
+  totalPages: number;
+  currentPage: number;
+  limit: number;
+  totalCount: number;
+}
