@@ -99,7 +99,7 @@
 }
 
 body {
-  cursor: default;
+  @apply bg-background text-foreground cursor-default;
 }
 .embla {
   max-width: 48rem;
