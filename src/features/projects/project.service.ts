@@ -4,7 +4,7 @@ import { prisma } from '~/lib/prisma';
 import { withServiceAuth } from '~/security/protected-service';
 import { ErrorMessage, Utils } from '~/lib/utils';
 import { CreateProjectInput } from './project.schema';
-import { ProjectDetails } from './project.types';
+import { ProjectDetails, ExploreProject } from './project.types';
 
 export const ProjectService = {
   async getAllProjects(requestUserId: string) {
@@ -237,22 +237,42 @@ export const ProjectService = {
     });
   },
 
-  async getPaginatedProjects(page = 1, limit = 20, requestUserId: string) {
+  async getPaginatedProjects(page = 1, limit = 12, requestUserId: User['id']): Promise<ExploreProject[]> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.project.findMany({
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            createdDate: true,
-            projectType: true,
-            githubRepo: true,
+          orderBy: {
+            createdDate: 'desc',
           },
           skip: (page - 1) * limit,
           take: limit,
-          orderBy: { createdDate: 'desc' },
+          select: {
+            id: true,
+            title: true,
+            createdDate: true,
+            description: true,
+            githubRepo: true,
+            projectType: true,
+            rating: true,
+            technologies: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
         });
+      } catch (error) {
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  async getProjectCount(requestUserId: User['id']): Promise<number> {
+    return withServiceAuth(requestUserId, null, async () => {
+      try {
+        return await prisma.project.count();
       } catch (error) {
         if (error instanceof Utils) throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
