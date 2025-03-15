@@ -2,7 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import Tiptap, { TiptapRef } from '~/components/ui/tiptap';
 import { commentSchema, CommentFormData } from '~/features/comments/comment.schema';
 import { Comment, Project, User } from '@prisma/client';
@@ -18,6 +18,7 @@ interface CommentFormProps {
 }
 
 function normalizeHtml(html: string): string {
+  if (typeof document === 'undefined') return html;
   const temp = document.createElement('div');
   temp.innerHTML = html;
   return temp.textContent?.trim().replace(/\s+/g, ' ') || '';
@@ -33,7 +34,11 @@ export function CommentForm({
 }: CommentFormProps) {
   const editorRef = useRef<TiptapRef>(null);
   const [hasChanged, setHasChanged] = useState(false);
-  const initialContentNormalized = useRef(normalizeHtml(initialContent));
+  const initialContentNormalized = useRef('');
+
+  useEffect(() => {
+    initialContentNormalized.current = normalizeHtml(initialContent);
+  }, [initialContent]);
 
   const {
     handleSubmit,
