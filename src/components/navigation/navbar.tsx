@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { AuthSection } from './auth-section';
 import { DesktopNav } from './desktop-nav';
-import { MobileNav } from './mobile-nav';
+import { MobileNav } from '../navigation/mobile-nav';
 import { NavLinkProps } from './nav-link';
 import type { Route } from 'next';
 import Image from 'next/image';
@@ -19,21 +19,21 @@ const routes: NavSection[] = [
       {
         title: 'All Projects',
         href: '/p' as Route,
-        description: 'Browse all posts across categories',
+        description: 'Browse all projects across categories',
       },
       {
         title: 'Code Reviews',
-        href: '/feedback' as Route,
+        href: '/p/feedback' as Route,
         description: 'Get feedback on your code and projects',
       },
       {
         title: 'Collaborations',
-        href: '/collaborations' as Route,
+        href: '/p/collabs' as Route,
         description: 'Find teammates for your projects',
       },
       {
         title: 'Trending',
-        href: '/trending' as Route,
+        href: '/p/trending' as Route,
         description: "See what's popular in the community",
       },
     ],
@@ -42,39 +42,29 @@ const routes: NavSection[] = [
     title: 'Community',
     items: [
       {
+        title: 'Mentorship',
+        href: '/m' as Route,
+        description: 'Connect with mentors or become one',
+      },
+      {
         title: 'Community Guide',
-        href: '/community-guide' as Route,
+        href: '/c/community-guide' as Route,
         description: 'How to get the most out of UCollab',
       },
       {
         title: 'Contribution Guide',
-        href: '/contributing' as Route,
+        href: '/c/contribution-guide' as Route,
         description: 'Learn how to contribute to UCollab',
       },
       {
         title: 'Code of Conduct',
-        href: '/code-of-conduct' as Route,
+        href: '/c/code-of-conduct' as Route,
         description: 'Our community values and expectations',
       },
       {
         title: 'User Directory',
-        href: '/community' as Route,
+        href: '/u' as Route,
         description: 'Our user base',
-      },
-      {
-        title: 'Mentorship',
-        href: '/mentorship' as Route,
-        description: 'Connect with mentors or become one',
-      },
-      {
-        title: 'Q & A',
-        href: '/questions' as Route,
-        description: 'Ask questions and help others with solutions',
-      },
-      {
-        title: 'Discussions',
-        href: '/discussions' as Route,
-        description: 'Start or join general discussions',
       },
     ],
   },

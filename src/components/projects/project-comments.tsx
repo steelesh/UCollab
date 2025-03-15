@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { Comment } from '~/features/projects/project.types';
-import { CommentList } from './comment-list';
-import { CommentForm } from './comment-form';
+import { CommentList } from '../comments/comment-list';
+import { CommentForm } from '../comments/comment-form';
 import { createComment, updateComment, deleteComment, createReply } from '~/features/comments/comment.actions';
 import { User, Project } from '@prisma/client';
 

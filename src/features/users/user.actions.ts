@@ -3,25 +3,26 @@
 import { onboardingSchema } from '~/features/users/user.schema';
 import { UserService } from '~/features/users/user.service';
 import { auth } from '~/security/auth';
-import { ErrorMessage, Utils } from '~/lib/utils';
+import { ErrorMessage, Utils, handleServerActionError } from '~/lib/utils';
 import { Prisma, User } from '@prisma/client';
 import { notFound, redirect } from 'next/navigation';
 
 export async function updateOnboarding(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
-  const { gradYear, skills, githubProfile, postType } = onboardingSchema.parse({
+  const rawData = {
     gradYear: formData.get('gradYear'),
-    skills: formData.get('skills'),
+    technologies: JSON.parse(formData.get('technologies') as string),
     githubProfile: formData.get('githubProfile'),
-    postType: formData.get('postType'),
-  });
+    mentorshipStatus: formData.get('mentorshipStatus'),
+  };
+  const { gradYear, technologies, githubProfile, mentorshipStatus } = onboardingSchema.parse(rawData);
   try {
     await UserService.completeOnboarding(session.user.id, session.user.id, {
       gradYear,
-      skills,
+      technologies,
       githubProfile,
-      postType,
+      mentorshipStatus,
     });
   } catch (error) {
     if (error instanceof Utils) throw error;
@@ -81,4 +82,15 @@ export async function updateUser(formData: FormData) {
 
 export async function searchUsers(query: string, currentUserId: User['id']) {
   return UserService.searchUsers(query, currentUserId);
+}
+export async function searchTechnologies(query: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
+
+  try {
+    const technologies = await UserService.searchTechnologies(query, session.user.id);
+    return technologies.map((t) => t.name);
+  } catch (error) {
+    handleServerActionError(error);
+  }
 }

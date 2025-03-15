@@ -1,4 +1,4 @@
-import { ProjectForm } from '~/components/project-form';
+import { ProjectForm } from '~/components/projects/project-form';
 import { withAuth } from '~/security/protected';
 import { ProjectService } from '~/features/projects/project.service';
 import { notFound } from 'next/navigation';
@@ -31,7 +31,7 @@ async function Page({ params, userId }: PageProps) {
   const initialData = {
     title: project.title,
     description: project.description,
-    postType: project.postType,
+    projectType: project.projectType,
     technologies: project.technologies?.map((t) => t.name),
     githubRepo: project.githubRepo,
   };

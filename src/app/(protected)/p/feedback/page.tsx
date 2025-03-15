@@ -6,11 +6,14 @@ import { Badge } from '~/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 
 export const metadata = {
-  title: 'UCollab — Explore',
+  title: 'UCollab — Feedback',
 };
 
-export async function ExplorePage() {
+export async function FeedbackPage() {
   const projectsWithUser = await prisma.project.findMany({
+    where: {
+      projectType: 'FEEDBACK',
+    },
     orderBy: {
       createdDate: 'desc',
     },
@@ -117,4 +120,4 @@ export async function ExplorePage() {
   );
 }
 
-export default withAuth(ExplorePage);
+export default withAuth(FeedbackPage);

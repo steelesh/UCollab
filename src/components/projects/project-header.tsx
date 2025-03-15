@@ -41,7 +41,7 @@ export function ProjectHeader({ title, projectId, isOwnProject }: ProjectHeaderP
       {isOwnProject && (
         <div className="absolute right-1 -bottom-12 flex space-x-2">
           <Link href={`/p/${projectId}/edit` as Route}>
-            <Button className="bg-muted" aria-label="Edit Project">
+            <Button className="cursor-pointer" variant="outline" aria-label="Edit Project">
               <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
                 <path
                   fill="none"
@@ -54,7 +54,7 @@ export function ProjectHeader({ title, projectId, isOwnProject }: ProjectHeaderP
               </svg>
             </Button>
           </Link>
-          <Button className="bg-primary" aria-label="Delete Project" onClick={handleDelete} disabled={isDeleting}>
+          <Button className="cursor-pointer" aria-label="Delete Project" onClick={handleDelete} disabled={isDeleting}>
             {isDeleting ? (
               <span className="loading loading-spinner loading-sm" />
             ) : (

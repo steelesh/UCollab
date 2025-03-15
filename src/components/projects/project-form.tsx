@@ -5,8 +5,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, useEffect, useRef } from 'react';
 import { createProject, updateProject, searchTechnologies } from '~/features/projects/project.actions';
 import { CreateProjectInput, projectSchema } from '~/features/projects/project.schema';
-import { PostType, Project } from '@prisma/client';
+import { ProjectType, Project } from '@prisma/client';
 import { Button } from '~/components/ui/button';
+import { Label } from '~/components/ui/label';
+import { Input } from '~/components/ui/input';
+import { Textarea } from '~/components/ui/textarea';
+import { Badge } from '~/components/ui/badge';
+import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group';
 
 interface ProjectFormProps {
   initialData?: CreateProjectInput;
@@ -28,7 +33,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
   } = useForm<CreateProjectInput>({
     resolver: zodResolver(projectSchema),
     defaultValues: initialData || {
-      postType: PostType.DISCUSSION,
+      projectType: ProjectType.FEEDBACK,
       technologies: [],
       title: '',
       description: '',
@@ -87,12 +92,12 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="border-muted-foreground space-y-6 rounded-lg border p-8">
       <div className="form-control">
         <label className="label" htmlFor="title">
           <span className="label-text">Project Title</span>
         </label>
-        <input
+        <Input
           {...register('title')}
           className="input input-bordered w-full"
           placeholder="Enter project title"
@@ -104,7 +109,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
         <label className="label" htmlFor="description">
           <span className="label-text">Description</span>
         </label>
-        <textarea
+        <Textarea
           {...register('description')}
           className="textarea textarea-bordered w-full"
           placeholder="Describe your project"
@@ -117,27 +122,25 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
         name="technologies"
         render={({ field }) => (
           <div className="form-control">
-            <label className="label" htmlFor="technologies">
+            <Label className="label" htmlFor="technologies">
               <span className="label-text">Technologies</span>
-            </label>
-            <div className="mb-2 flex flex-wrap gap-2">
-              {field.value.map((tech) => (
-                <div key={tech} className="badge gap-2">
-                  {tech}
-                  <Button
-                    type="button"
+            </Label>
+            <div className="m-4 flex flex-1">
+              {field.value.map((tech: string) => (
+                <div key={tech}>
+                  <Badge
                     onClick={() => {
-                      field.onChange(field.value.filter((t) => t !== tech));
+                      field.onChange(field.value.filter((t: string) => t !== tech));
                     }}
-                    className="btn btn-xs btn-ghost"
-                    disabled={isSubmitting}>
-                    ×
-                  </Button>
+                    className="hover:bg-primary cursor-pointer transition duration-200 ease-in-out hover:scale-105"
+                    variant="outline">
+                    {tech}
+                  </Badge>
                 </div>
               ))}
             </div>
             <div className="relative">
-              <input
+              <Input
                 ref={techInputRef}
                 type="text"
                 className="input input-bordered w-full"
@@ -146,9 +149,12 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    const value = e.currentTarget.value.trim().toLowerCase();
-                    if (value && !field.value.includes(value)) {
-                      field.onChange([...field.value, value]);
+                    const inputValue = e.currentTarget.value.trim();
+                    if (!inputValue) return;
+                    const filteredSuggestions = suggestions.filter((tech) => !field.value.includes(tech));
+                    const [closestMatch] = filteredSuggestions;
+                    if (closestMatch !== undefined) {
+                      field.onChange([...field.value, closestMatch]);
                       e.currentTarget.value = '';
                       setShowSuggestions(false);
                     }
@@ -157,23 +163,28 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
                 disabled={isSubmitting}
               />
               {showSuggestions && suggestions.length > 0 && (
-                <div ref={suggestionsRef} className="dropdown-container">
-                  {suggestions.map((tech) => (
-                    <Button
-                      key={tech}
-                      type="button"
-                      className="dropdown-item"
-                      onClick={() => {
-                        field.onChange([...field.value, tech]);
-                        setShowSuggestions(false);
-                        if (techInputRef.current) {
-                          techInputRef.current.value = '';
-                        }
-                      }}
-                      disabled={isSubmitting}>
-                      <div className="dropdown-item-content">{tech}</div>
-                    </Button>
-                  ))}
+                <div
+                  ref={suggestionsRef}
+                  className="bg-background absolute top-full left-0 z-10 mt-1 w-full rounded shadow-md">
+                  {suggestions
+                    .filter((tech) => !field.value.includes(tech))
+                    .map((tech) => (
+                      <Button
+                        variant="outline"
+                        key={tech}
+                        type="button"
+                        className="dropdown-item w-full px-4 py-2 text-left"
+                        onClick={() => {
+                          field.onChange([...field.value, tech]);
+                          setShowSuggestions(false);
+                          if (techInputRef.current) {
+                            techInputRef.current.value = '';
+                          }
+                        }}
+                        disabled={isSubmitting}>
+                        <div className="dropdown-item-content">{tech}</div>
+                      </Button>
+                    ))}
                 </div>
               )}
             </div>
@@ -182,10 +193,10 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
         )}
       />
       <div className="form-control">
-        <label className="label" htmlFor="githubRepo">
+        <Label className="label" htmlFor="githubRepo">
           <span className="label-text">GitHub Repository</span>
-        </label>
-        <input
+        </Label>
+        <Input
           {...register('githubRepo')}
           className="input input-bordered w-full"
           placeholder="https://github.com/username/repo"
@@ -193,32 +204,29 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
         />
         {errors.githubRepo && <span className="text-error text-sm">{errors.githubRepo.message}</span>}
       </div>
-      <Controller
-        control={control}
-        name="postType"
-        render={({ field }) => (
-          <div className="flex gap-4">
-            {Object.values(PostType).map((type) => (
-              <div key={type} className="flex items-center">
-                <input
-                  type="radio"
-                  id={type}
-                  value={type}
-                  checked={field.value === type}
-                  onChange={() => field.onChange(type)}
-                  className="peer hidden"
-                  disabled={isSubmitting}
-                />
-                <label
-                  htmlFor={type}
-                  className="btn btn-outline btn-xs btn-accent peer-checked:bg-primary-content rounded-lg peer-checked:text-white">
-                  {type.charAt(0) + type.slice(1).toLowerCase()}
-                </label>
+      <div className="form-control mt-2">
+        <Label className="label my-2">
+          <span className="label-text">Category</span>
+        </Label>
+        <Controller
+          control={control}
+          name="projectType"
+          defaultValue="FEEDBACK"
+          render={({ field: { onChange, value } }) => (
+            <RadioGroup value={value ?? 'FEEDBACK'} onValueChange={onChange}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="FEEDBACK" id="feedback" />
+                <Label htmlFor="feedback">Feedback</Label>
               </div>
-            ))}
-          </div>
-        )}
-      />
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="CONTRIBUTION" id="contribution" />
+                <Label htmlFor="contribution">Contribution</Label>
+              </div>
+            </RadioGroup>
+          )}
+        />
+        {errors.projectType && <span className="text-error text-sm">{errors.projectType.message}</span>}
+      </div>
       <Button
         type="submit"
         className="w-full cursor-pointer bg-green-600 hover:bg-green-600/80"

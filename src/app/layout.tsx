@@ -1,6 +1,6 @@
 import React from 'react';
-import Navbar from '@components/navbar';
-import Footer from '@components/footer';
+import Navbar from '~/components/navigation/navbar';
+import Footer from '~/components/navigation/footer';
 import { ThemeProvider } from 'next-themes';
 import '~/app/globals.css';
 import { SessionProvider } from 'next-auth/react';

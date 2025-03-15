@@ -9,7 +9,7 @@ interface ProjectInfoProps {
   githubRepo: Project['githubRepo'];
   description: Project['description'];
   technologies: Technology[];
-  postType: Project['postType'];
+  projectType: Project['projectType'];
 }
 
 export function ProjectInfo({
@@ -18,7 +18,7 @@ export function ProjectInfo({
   githubRepo,
   description,
   technologies,
-  postType,
+  projectType,
 }: ProjectInfoProps) {
   const created = format(new Date(createdDate), 'yyyy-MM-dd');
   const modified = lastModifiedDate ? format(new Date(lastModifiedDate), 'yyyy-MM-dd') : null;
@@ -45,7 +45,7 @@ export function ProjectInfo({
           </p>
         )}
         <p className="text-muted-foreground flex items-center gap-1 text-sm">
-          Type: {postType.charAt(0).toUpperCase() + postType.slice(1).toLowerCase()}
+          Type: {projectType.charAt(0).toUpperCase() + projectType.slice(1).toLowerCase()}
         </p>
         {githubRepo && (
           <p className="flex items-center gap-1 text-sm">

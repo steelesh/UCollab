@@ -21,6 +21,7 @@ export const publicUserSelect = {
   username: true,
   fullName: true,
   avatar: true,
+  technologies: true,
 } as const;
 
 export const userSchema = z.object({
@@ -40,9 +41,9 @@ export const userSchema = z.object({
 
 export const onboardingSchema = z.object({
   gradYear: z.string().regex(/^\d{4}$/, 'Grad year must be a 4-digit year.'),
-  skills: z.string(),
+  technologies: z.array(z.string()),
   githubProfile: z.string().url({ message: 'Invalid URL' }),
-  postType: z.string(),
+  mentorshipStatus: z.enum(['MENTOR', 'MENTEE', 'NONE']),
 });
 
 export const updateUserSchema = z.object({

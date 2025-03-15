@@ -5,10 +5,10 @@ import { withAuth } from '~/security/protected';
 import type { Route } from 'next';
 
 export const metadata = {
-  title: 'UCollab — Community',
+  title: 'UCollab — User Directory',
 };
 
-async function CommunityPage() {
+async function UserDirectoryPage() {
   const users = await prisma.user.findMany({
     select: {
       avatar: true,
@@ -52,4 +52,4 @@ async function CommunityPage() {
   );
 }
 
-export default withAuth(CommunityPage);
+export default withAuth(UserDirectoryPage);

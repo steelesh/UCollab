@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Avatar } from '~/components/ui/avatar';
 import { useSession } from 'next-auth/react';
 import { Skeleton } from '~/components/ui/skeleton';
-import { SignInButton } from '~/components/signin-button';
+import { SignInButton } from '~/components/navigation/signin-button';
 import Link from 'next/link';
 import { Route } from 'next';
 

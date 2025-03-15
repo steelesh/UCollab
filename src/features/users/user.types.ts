@@ -1,6 +1,4 @@
-import { User, Project as PrismaProject, Comment as PrismaComment, Skill as PrismaSkill } from '@prisma/client';
-
-export interface Project extends Pick<PrismaProject, 'id' | 'title' | 'createdDate'> {}
+import { User, Project, Comment as PrismaComment, Technology as PrismaTechnology } from '@prisma/client';
 
 export interface Comment extends Pick<PrismaComment, 'id' | 'content' | 'projectId' | 'createdDate'> {
   project: {
@@ -8,7 +6,7 @@ export interface Comment extends Pick<PrismaComment, 'id' | 'content' | 'project
   };
 }
 
-export interface Skill extends Pick<PrismaSkill, 'name'> {}
+export type Technology = Pick<PrismaTechnology, 'name'>;
 
 export interface UserProfile {
   id: User['id'];
@@ -21,7 +19,7 @@ export interface UserProfile {
   gradYear: User['gradYear'];
   bio: User['bio'];
   mentorship: User['mentorship'];
-  skills: Skill[];
+  technologies: Technology[];
   projects: Project[];
   comments: Comment[];
 }

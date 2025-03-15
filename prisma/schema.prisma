@@ -48,7 +48,7 @@ model User {
   projects                Project[]
   bio                     String?                  @prisma.Text
   role                    Role                     @default(USER)
-  skills                  Skill[]
+  technologies            Technology[]             @relation("UserTechnologies")
   gradYear                Int?
   githubProfile           String?
   mentorship              MentorshipStatus         @default(NONE)
@@ -64,8 +64,9 @@ model Project {
   lastModifiedDate DateTime       @updatedAt
   title            String         @prisma.Text
   description      String         @prisma.Text
-  postType         PostType
-  technologies     Technology[]
+  projectType      ProjectType
+  rating           Float          @default(0)
+  technologies     Technology[]   @relation("ProjectTechnologies")
   githubRepo       String?
   comments         Comment[]
   createdById      String
@@ -76,24 +77,13 @@ model Project {
   @@index([title(length: 191)])
 }
 
-model Skill {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  verified    Boolean  @default(false)
-  createdDate DateTime @default(now())
-  createdById String
-  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
-
-  @@index([name])
-}
-
 model Technology {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  verified    Boolean  @default(false)
-  createdDate DateTime @default(now())
-  Project     Project? @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  createdById String?
+  id          String    @id @default(cuid())
+  name        String    @unique
+  verified    Boolean   @default(false)
+  createdDate DateTime  @default(now())
+  User        User[]    @relation("UserTechnologies")
+  Project     Project[] @relation("ProjectTechnologies")
 
   @@index([name])
 }
@@ -108,9 +98,9 @@ model Comment {
   createdBy        User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
   project          Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
   notifications    Notification[] @relation("CommentNotifications")
-  parentId    String?
-  parent      Comment?  @relation("Replies", fields: [parentId], references: [id])
-  replies     Comment[] @relation("Replies")
+  parentId         String?
+  parent           Comment?       @relation("Replies", fields: [parentId], references: [id])
+  replies          Comment[]      @relation("Replies")
 
   @@index([projectId])
   @@index([createdById])
@@ -168,10 +158,15 @@ enum AvatarSource {
   DEFAULT
 }
 
-enum PostType {
+enum ProjectType {
   CONTRIBUTION
   FEEDBACK
-  DISCUSSION
+}
+
+enum PostType {
+  COMMUNITY
+  QA
+  MENTORSHIP
 }
 
 enum NotificationType {

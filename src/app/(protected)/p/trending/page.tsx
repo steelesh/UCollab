@@ -6,14 +6,11 @@ import { Badge } from '~/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 
 export const metadata = {
-  title: 'UCollab — Explore',
+  title: 'UCollab — Trending',
 };
 
-export async function ExplorePage() {
-  const projectsWithUser = await prisma.project.findMany({
-    orderBy: {
-      createdDate: 'desc',
-    },
+export async function TrendingPage() {
+  const projects = await prisma.project.findMany({
     select: {
       id: true,
       title: true,
@@ -26,11 +23,19 @@ export async function ExplorePage() {
     },
   });
 
+  const trendingProjects = projects
+    .map((project) => {
+      const ageInHours = (Date.now() - new Date(project.createdDate).getTime()) / (1000 * 3600);
+      const trendingScore = project.rating / Math.pow(ageInHours + 2, 1.8);
+      return { ...project, trendingScore };
+    })
+    .sort((a, b) => b.trendingScore - a.trendingScore);
+
   return (
     <div className="absolute inset-0 overflow-x-hidden overflow-y-auto py-24">
       <div className="mx-auto" style={{ maxWidth: 'calc(100vw - 8rem)' }}>
         <div className="mx-auto grid grid-cols-1 gap-20 sm:mx-8 md:grid-cols-2 md:gap-14 lg:grid-cols-3 xl:grid-cols-4">
-          {projectsWithUser.map((project, index) => (
+          {trendingProjects.map((project, index) => (
             <Card
               key={index}
               className="bg-muted shadow-xl transition duration-200 ease-in-out hover:-translate-y-1 hover:scale-110">
@@ -117,4 +122,4 @@ export async function ExplorePage() {
   );
 }
 
-export default withAuth(ExplorePage);
+export default withAuth(TrendingPage);
