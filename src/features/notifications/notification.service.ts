@@ -1,6 +1,6 @@
 import {
   Comment,
-  Notification,
+  Notification as PrismaNotification,
   NotificationPreferences,
   NotificationType,
   Project,
@@ -8,25 +8,39 @@ import {
   User,
 } from '@prisma/client';
 import { mq } from '~/lib/mq';
-import { prisma } from '~/lib/prisma';
 import { withServiceAuth } from '~/security/protected-service';
 import { ErrorMessage, Utils } from '~/lib/utils';
 import { canAccess } from '~/security/protected-role';
-import {
-  CreateBatchNotificationData,
-  CreateNotificationData,
-  notificationSelect,
-} from '~/features/notifications/notification.schema';
 import { CommentService } from '../comments/comment.service';
 import { UserService } from '../users/user.service';
+import { prisma } from '~/lib/prisma';
+import { CreateBatchNotificationData } from './notification.types';
+import { CreateNotificationData } from './notification.types';
 
 export const NotificationService = {
-  async getUserNotifications(userId: User['id'], requestUserId: string) {
+  async getUserNotifications(userId: User['id'], requestUserId: string): Promise<PrismaNotification[]> {
     return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
         return await prisma.notification.findMany({
           where: { userId },
-          select: notificationSelect,
+          select: {
+            id: true,
+            userId: true,
+            message: true,
+            createdDate: true,
+            isRead: true,
+            type: true,
+            projectId: true,
+            commentId: true,
+            triggeredById: true,
+            triggeredBy: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+              },
+            },
+          },
           orderBy: { createdDate: 'desc' },
         });
       } catch (error) {
@@ -36,27 +50,34 @@ export const NotificationService = {
     });
   },
 
-  async getUserNotificationsByStatus(userId: User['id'], isRead: boolean, requestUserId: string) {
-    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
-      try {
-        return await prisma.notification.findMany({
-          where: { userId, isRead },
-          select: notificationSelect,
-          orderBy: { createdDate: 'desc' },
-        });
-      } catch (error) {
-        if (error instanceof Utils) throw error;
-        throw new Utils(ErrorMessage.OPERATION_FAILED);
-      }
-    });
-  },
-
-  async getPaginatedNotifications(userId: User['id'], page = 1, limit = 20, requestUserId: string) {
+  async getPaginatedNotifications(
+    userId: User['id'],
+    page = 1,
+    limit = 20,
+    requestUserId: User['id'],
+  ): Promise<PrismaNotification[]> {
     return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
         return await prisma.notification.findMany({
           where: { userId },
-          select: notificationSelect,
+          select: {
+            id: true,
+            userId: true,
+            message: true,
+            createdDate: true,
+            isRead: true,
+            type: true,
+            projectId: true,
+            commentId: true,
+            triggeredById: true,
+            triggeredBy: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+              },
+            },
+          },
           skip: (page - 1) * limit,
           take: limit,
           orderBy: { createdDate: 'desc' },
@@ -68,7 +89,7 @@ export const NotificationService = {
     });
   },
 
-  async getNotificationsCount(userId: User['id'], requestUserId: string) {
+  async getNotificationsCount(userId: User['id'], requestUserId: User['id']): Promise<number> {
     return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
         return await prisma.notification.count({
@@ -81,7 +102,7 @@ export const NotificationService = {
     });
   },
 
-  async getUnreadNotificationsCount(userId: User['id'], requestUserId: string) {
+  async getUnreadNotificationsCount(userId: User['id'], requestUserId: User['id']): Promise<number> {
     return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
         return await prisma.notification.count({
@@ -94,7 +115,7 @@ export const NotificationService = {
     });
   },
 
-  async markNotificationAsRead(id: Notification['id'], requestUserId: string) {
+  async markNotificationAsRead(id: PrismaNotification['id'], requestUserId: User['id']): Promise<void> {
     try {
       const notification = await prisma.notification.findUnique({
         where: { id },
@@ -105,11 +126,10 @@ export const NotificationService = {
         throw new Utils(ErrorMessage.NOT_FOUND('Notification'));
       }
 
-      return withServiceAuth(requestUserId, { ownerId: notification.userId }, async () => {
-        return prisma.notification.update({
+      await withServiceAuth(requestUserId, { ownerId: notification.userId }, async () => {
+        await prisma.notification.update({
           where: { id },
           data: { isRead: true },
-          select: notificationSelect,
         });
       });
     } catch (error) {
@@ -121,10 +141,10 @@ export const NotificationService = {
     }
   },
 
-  async markAllNotificationsAsRead(userId: User['id'], requestUserId: string) {
+  async markAllNotificationsAsRead(userId: User['id'], requestUserId: User['id']): Promise<void> {
     return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
-        return await prisma.notification.updateMany({
+        await prisma.notification.updateMany({
           where: { userId, isRead: false },
           data: { isRead: true },
         });
@@ -135,22 +155,21 @@ export const NotificationService = {
     });
   },
 
-  async markMultipleNotificationsAsRead(notificationIds: Notification['id'][], requestUserId: string) {
+  async markMultipleNotificationsAsRead(
+    notificationIds: PrismaNotification['id'][],
+    requestUserId: User['id'],
+  ): Promise<void> {
     try {
-      // First get all notifications to check ownership
       const notifications = await prisma.notification.findMany({
         where: { id: { in: notificationIds } },
         select: { id: true, userId: true },
       });
-
-      // Get the first notification's userId for the initial auth check
       const firstNotification = notifications[0];
       if (!firstNotification) {
         throw new Utils(ErrorMessage.NOT_FOUND('Notifications'));
       }
 
-      return withServiceAuth(requestUserId, { ownerId: firstNotification.userId }, async () => {
-        // Then verify access to all notifications
+      await withServiceAuth(requestUserId, { ownerId: firstNotification.userId }, async () => {
         const userRole = await UserService.getUserRole(requestUserId);
 
         for (const notification of notifications) {
@@ -159,13 +178,38 @@ export const NotificationService = {
           }
         }
 
-        return prisma.notification.updateMany({
+        await prisma.notification.updateMany({
           where: { id: { in: notificationIds } },
           data: { isRead: true },
         });
       });
     } catch (error) {
       if (error instanceof Utils) throw error;
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
+    }
+  },
+
+  async deleteNotification(id: PrismaNotification['id'], requestUserId: User['id']): Promise<void> {
+    try {
+      const notification = await prisma.notification.findUnique({
+        where: { id },
+        select: { id: true, userId: true },
+      });
+
+      if (!notification) {
+        throw new Utils(ErrorMessage.NOT_FOUND('Notification'));
+      }
+
+      await withServiceAuth(requestUserId, { ownerId: notification.userId }, async () => {
+        await prisma.notification.delete({
+          where: { id },
+        });
+      });
+    } catch (error) {
+      if (error instanceof Utils) throw error;
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        throw new Utils(ErrorMessage.NOT_FOUND('Notification'));
+      }
       throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
@@ -186,26 +230,6 @@ export const NotificationService = {
     }
   },
 
-  async cleanupOldNotifications(daysToKeep = 30): Promise<void> {
-    return withServiceAuth(undefined, { adminOnly: true }, async () => {
-      try {
-        const cutoffDate = new Date();
-        cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
-
-        await prisma.notification.deleteMany({
-          where: {
-            createdDate: {
-              lt: cutoffDate,
-            },
-            isRead: true,
-          },
-        });
-      } catch {
-        throw new Utils(ErrorMessage.OPERATION_FAILED);
-      }
-    });
-  },
-
   async sendCommentNotifications(data: {
     projectId: Project['id'];
     projectTitle: Project['title'];
@@ -214,6 +238,7 @@ export const NotificationService = {
     commentAuthorId: User['id'];
     commentAuthorName: User['username'];
     content: Comment['content'];
+    parentCommentAuthorId?: User['id'];
   }): Promise<void> {
     try {
       const notifications: Promise<void>[] = [];
@@ -222,17 +247,42 @@ export const NotificationService = {
       const uniqueMentionedUsers = mentionedUserIds
         .filter((id) => id !== data.commentAuthorId)
         .filter((id, index, self) => self.indexOf(id) === index);
-
       if (uniqueMentionedUsers.length > 0) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        const preferences = await this.getNotificationPreferences(uniqueMentionedUsers[0]);
-        if (await this.shouldSend(NotificationType.MENTION, preferences)) {
+        const usersToNotify: User['id'][] = [];
+
+        for (const userId of uniqueMentionedUsers) {
+          const preferences = await this.getNotificationPreferences(userId);
+          if (await this.shouldSend(NotificationType.MENTION, preferences)) {
+            usersToNotify.push(userId);
+          }
+        }
+
+        if (usersToNotify.length > 0) {
           notifications.push(
             this.queueBatchNotifications({
-              userIds: uniqueMentionedUsers,
+              userIds: usersToNotify,
               type: NotificationType.MENTION,
               message: `${data.commentAuthorName} mentioned you in a comment on: ${data.projectTitle}`,
+              projectId: data.projectId,
+              commentId: data.commentId,
+              triggeredById: data.commentAuthorId,
+            }),
+          );
+        }
+      }
+
+      if (
+        data.parentCommentAuthorId &&
+        data.parentCommentAuthorId !== data.commentAuthorId &&
+        !mentionedUserIds.includes(data.parentCommentAuthorId)
+      ) {
+        const preferences = await this.getNotificationPreferences(data.parentCommentAuthorId);
+        if (await this.shouldSend(NotificationType.COMMENT, preferences)) {
+          notifications.push(
+            this.queueNotification({
+              userId: data.parentCommentAuthorId,
+              type: NotificationType.COMMENT,
+              message: `${data.commentAuthorName} replied to your comment on: ${data.projectTitle}`,
               projectId: data.projectId,
               commentId: data.commentId,
               triggeredById: data.commentAuthorId,
@@ -280,17 +330,23 @@ export const NotificationService = {
     }
   },
 
-  async shouldSend(type: Notification['type'], preferences: NotificationPreferences | null): Promise<boolean> {
-    if (!preferences?.enabled) return false;
+  async shouldSend(type: NotificationType, preferences: NotificationPreferences | null): Promise<boolean> {
+    console.log('Checking notification preferences:', { type, preferences });
+    if (!preferences?.enabled) {
+      console.log('Notifications disabled or no preferences found');
+      return false;
+    }
 
-    const preferencesMap: Record<Notification['type'], boolean> = {
+    const preferencesMap: Record<NotificationType, boolean> = {
       [NotificationType.COMMENT]: preferences.allowComments,
       [NotificationType.MENTION]: preferences.allowMentions,
       [NotificationType.PROJECT_UPDATE]: preferences.allowProjectUpdates,
       [NotificationType.SYSTEM]: preferences.allowSystem,
     };
 
-    return preferencesMap[type] ?? false;
+    const shouldSend = preferencesMap[type] ?? false;
+    console.log(`Should send ${type} notification:`, shouldSend);
+    return shouldSend;
   },
 
   async createNotification(data: CreateNotificationData) {
@@ -308,5 +364,16 @@ export const NotificationService = {
     } catch {
       throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
+  },
+
+  async updatePreferences(userId: User['id'], preferences: Omit<NotificationPreferences, 'id' | 'userId'>) {
+    return prisma.notificationPreferences.upsert({
+      where: { userId },
+      create: {
+        userId,
+        ...preferences,
+      },
+      update: preferences,
+    });
   },
 };
