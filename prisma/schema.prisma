@@ -52,6 +52,7 @@ model User {
   gradYear                Int?
   githubProfile           String?
   mentorship              MentorshipStatus         @default(NONE)
+  watchedProjects         ProjectWatcher[]
 
   @@index([username])
   @@index([email])
@@ -69,12 +70,26 @@ model Project {
   technologies     Technology[]   @relation("ProjectTechnologies")
   githubRepo       String?
   comments         Comment[]
+  watchers         ProjectWatcher[]
   createdById      String
   createdBy        User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
   notifications    Notification[] @relation("ProjectNotifications")
 
   @@index([createdById])
   @@index([title(length: 191)])
+}
+
+model ProjectWatcher {
+  id          String   @id @default(cuid())
+  projectId   String
+  userId      String
+  createdDate DateTime @default(now())
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
 }
 
 model Technology {
