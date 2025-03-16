@@ -5,6 +5,7 @@ import { withServiceAuth } from '~/security/protected-service';
 import { ErrorMessage, Utils } from '~/lib/utils';
 import { notFound } from 'next/navigation';
 import { Prisma } from '@prisma/client';
+import { NotificationService } from '~/features/notifications/notification.service';
 
 export const CommentService = {
   async createComment(data: { content: Comment['content']; projectId: Project['id'] }, requestUserId: User['id']) {
@@ -28,7 +29,23 @@ export const CommentService = {
                 avatar: true,
               },
             },
+            project: {
+              select: {
+                title: true,
+                createdById: true,
+              },
+            },
           },
+        });
+
+        await NotificationService.sendCommentNotifications({
+          projectId: data.projectId,
+          projectTitle: comment.project.title,
+          commentId: comment.id,
+          projectAuthorId: comment.project.createdById,
+          commentAuthorId: requestUserId,
+          commentAuthorName: comment.createdBy.username,
+          content: data.content,
         });
 
         return comment;
@@ -141,7 +158,34 @@ export const CommentService = {
                 avatar: true,
               },
             },
+            project: {
+              select: {
+                title: true,
+                createdById: true,
+              },
+            },
+            parent: {
+              select: {
+                createdById: true,
+                createdBy: {
+                  select: {
+                    username: true,
+                  },
+                },
+              },
+            },
           },
+        });
+
+        await NotificationService.sendCommentNotifications({
+          projectId: data.projectId,
+          projectTitle: comment.project.title,
+          commentId: comment.id,
+          projectAuthorId: comment.project.createdById,
+          commentAuthorId: requestUserId,
+          commentAuthorName: comment.createdBy.username,
+          content: data.content,
+          parentCommentAuthorId: comment.parent?.createdById,
         });
 
         return comment;
@@ -201,5 +245,32 @@ export const CommentService = {
         throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
+  },
+
+  async extractMentionedUserIds(content: string): Promise<string[]> {
+    try {
+      const mentionRegex = /@(\w+)/g;
+      const mentions = content.match(mentionRegex) || [];
+
+      const usernames = mentions.map((mention) => mention.substring(1));
+
+      if (usernames.length === 0) return [];
+
+      const users = await prisma.user.findMany({
+        where: {
+          username: {
+            in: usernames,
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      return users.map((user) => user.id);
+    } catch (error) {
+      if (error instanceof Utils) throw error;
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
+    }
   },
 };
