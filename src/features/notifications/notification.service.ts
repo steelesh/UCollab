@@ -365,15 +365,4 @@ export const NotificationService = {
       throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
-
-  async updatePreferences(userId: User['id'], preferences: Omit<NotificationPreferences, 'id' | 'userId'>) {
-    return prisma.notificationPreferences.upsert({
-      where: { userId },
-      create: {
-        userId,
-        ...preferences,
-      },
-      update: preferences,
-    });
-  },
 };
