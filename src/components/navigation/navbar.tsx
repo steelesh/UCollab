@@ -6,6 +6,7 @@ import { MobileNav } from '../navigation/mobile-nav';
 import { NavLinkProps } from './nav-link';
 import type { Route } from 'next';
 import Image from 'next/image';
+import { NotificationBadge } from '../notifications/notification-badge';
 
 export interface NavSection {
   title: string;
@@ -83,6 +84,7 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           <DesktopNav items={routes} />
           <div className="mx-2 hidden h-6 border-l md:block" />
+          <NotificationBadge />
           <AuthSection />
         </div>
       </nav>
