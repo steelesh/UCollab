@@ -1,44 +1,28 @@
-import { auth } from '~/security/auth';
-import { ErrorMessage } from '~/lib/utils';
-import { CreateSystemNotificationInput } from '~/features/notifications/notification.schema';
+'use server';
+
 import { NotificationService } from '~/features/notifications/notification.service';
+import type { NotificationPreferences } from './notification.types';
+import type { Notification, User } from '@prisma/client';
 
-export async function markAsRead(notificationId: string) {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
-
-  await NotificationService.markNotificationAsRead(notificationId, session.user.id);
+export async function markNotificationAsRead(notificationId: Notification['id'], userId: User['id']) {
+  return await NotificationService.markNotificationAsRead(notificationId, userId);
 }
 
-export async function markAllAsRead() {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
-
-  return NotificationService.markAllNotificationsAsRead(session.user.id, session.user.id);
+export async function markMultipleAsRead(notificationIds: Notification['id'][], userId: User['id']) {
+  return await NotificationService.markMultipleNotificationsAsRead(notificationIds, userId);
 }
 
-export async function markMultipleAsRead(notificationIds: string[]) {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
-
-  return NotificationService.markMultipleNotificationsAsRead(notificationIds, session.user.id);
+export async function markAllAsRead(userId: User['id'], requestUserId: User['id']) {
+  return await NotificationService.markAllNotificationsAsRead(userId, requestUserId);
 }
 
-export async function createSystemNotification(data: CreateSystemNotificationInput) {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
-
-  return NotificationService.queueBatchNotifications({
-    userIds: data.userIds,
-    message: data.message,
-    type: data.type,
-    triggeredById: session.user.id,
-  });
+export async function updateNotificationPreferences(
+  userId: User['id'],
+  preferences: Omit<NotificationPreferences, 'id' | 'userId'>,
+) {
+  return await NotificationService.updatePreferences(userId, preferences);
 }
 
-export async function cleanupOldNotifications(daysToKeep = 30) {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
-
-  return NotificationService.cleanupOldNotifications(daysToKeep);
+export async function deleteNotification(notificationId: Notification['id'], userId: User['id']) {
+  return await NotificationService.deleteNotification(notificationId, userId);
 }
