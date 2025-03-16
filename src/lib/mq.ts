@@ -6,7 +6,12 @@ import { CreateBatchNotificationData, CreateNotificationData } from '~/features/
 import { NotificationService } from '~/features/notifications/notification.service';
 
 const queueConfig = {
-  connection: new IORedis(env.REDIS_URL || 'redis://localhost:6379'),
+  connection: new IORedis({
+    host: env.REDIS_HOST,
+    port: Number(env.REDIS_PORT),
+    password: env.REDIS_PASSWORD,
+    maxRetriesPerRequest: null,
+  }),
   defaultJobOptions: {
     attempts: 3,
     backoff: {
