@@ -9,18 +9,17 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     limit?: string;
-  };
+  }>;
   userId: User['id'];
 }
 
 async function Page({ searchParams, userId }: PageProps) {
-  const currentPage = Number(searchParams.page) || 1;
-  const limit = Number(searchParams.limit) || 20;
+  const { page = '1', limit = '20' } = await searchParams;
 
-  const data = await getNotifications(currentPage, limit, userId);
+  const data = await getNotifications(Number(page), Number(limit), userId);
 
   return (
     <NotificationsClient
@@ -30,7 +29,7 @@ async function Page({ searchParams, userId }: PageProps) {
         currentPage: data.currentPage,
         totalPages: data.totalPages,
         totalCount: data.totalCount,
-        limit: data.limit,
+        limit: Number(limit),
       }}
     />
   );
