@@ -600,7 +600,7 @@ export const ProjectService = {
           select: { rating: true },
         });
 
-        return rating?.rating || null;
+        return rating?.rating || 0;
       } catch (error) {
         if (error instanceof Utils) throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
