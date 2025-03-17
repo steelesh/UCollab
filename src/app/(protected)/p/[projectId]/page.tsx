@@ -45,14 +45,7 @@ async function Page({ params, userId }: PageProps) {
         <article className="rounded-lg shadow-xl">
           <ProjectHeader title={project.title} projectId={projectId} isOwnProject={project.createdById === userId} />
           <div className="px-8 pt-16 pb-6">
-            <ProjectInfo
-              createdDate={project.createdDate}
-              lastModifiedDate={project.lastModifiedDate}
-              githubRepo={project.githubRepo}
-              description={project.description}
-              technologies={project.technologies}
-              projectType={project.projectType}
-            />
+            <ProjectInfo project={project} userId={userId} />
             <ProjectComments comments={project.comments} currentUserId={userId} projectId={projectId} />
           </div>
         </article>
