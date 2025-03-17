@@ -80,3 +80,10 @@ export function handleServerActionError(error: unknown) {
   if (error instanceof Utils) throw error;
   throw new Utils(ErrorMessage.OPERATION_FAILED);
 }
+
+export const NOTIFICATION_COUNT_CHANGED = 'notification-count-changed';
+export function emitNotificationCountChanged() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(NOTIFICATION_COUNT_CHANGED));
+  }
+}
