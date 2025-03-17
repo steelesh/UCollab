@@ -15,4 +15,3 @@ export const projectRatingSchema = z.object({
 });
 
 export type CreateProjectInput = z.infer<typeof projectSchema>;
-export type ProjectRatingInput = z.infer<typeof projectRatingSchema>;
