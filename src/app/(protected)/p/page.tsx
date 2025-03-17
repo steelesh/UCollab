@@ -84,7 +84,11 @@ async function Page({ searchParams, userId }: PageProps) {
                       ))}
                     </div>
                     <div className="mt-2">
-                      <StarDisplay rating={project.rating} size="lg" />
+                      {project.rating > 0 ? (
+                        <StarDisplay rating={project.rating} size="md" />
+                      ) : (
+                        <span className="text-muted-foreground text-sm">No ratings yet</span>
+                      )}
                     </div>
                   </CardDescription>
                 </div>
