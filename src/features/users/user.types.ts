@@ -6,7 +6,7 @@ export interface Comment extends Pick<PrismaComment, 'id' | 'content' | 'project
   };
 }
 
-export type Technology = Pick<PrismaTechnology, 'name'>;
+export type Technology = Pick<PrismaTechnology, 'id' | 'name'>;
 
 export interface UserProfile {
   id: User['id'];
