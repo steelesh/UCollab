@@ -342,6 +342,7 @@ export const NotificationService = {
       [NotificationType.MENTION]: preferences.allowMentions,
       [NotificationType.PROJECT_UPDATE]: preferences.allowProjectUpdates,
       [NotificationType.SYSTEM]: preferences.allowSystem,
+      [NotificationType.RATING]: preferences.allowRatings,
     };
 
     const shouldSend = preferencesMap[type] ?? false;
