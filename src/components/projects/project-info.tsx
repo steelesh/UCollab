@@ -1,27 +1,22 @@
 import Link from 'next/link';
 import { format } from 'date-fns';
 import type { Route } from 'next';
-import type { Project, Technology } from '~/features/projects/project.types';
+import type { ProjectDetails } from '~/features/projects/project.types';
+import { ProjectRating } from './project-rating';
+import { User } from '@prisma/client';
+import { StarDisplay } from '~/components/ui/star-rating';
 
 interface ProjectInfoProps {
-  createdDate: Project['createdDate'];
-  lastModifiedDate: Project['lastModifiedDate'];
-  githubRepo: Project['githubRepo'];
-  description: Project['description'];
-  technologies: Technology[];
-  projectType: Project['projectType'];
+  project: ProjectDetails;
+  userId: User['id'];
 }
 
-export function ProjectInfo({
-  createdDate,
-  lastModifiedDate,
-  githubRepo,
-  description,
-  technologies,
-  projectType,
-}: ProjectInfoProps) {
-  const created = format(new Date(createdDate), 'yyyy-MM-dd');
-  const modified = lastModifiedDate ? format(new Date(lastModifiedDate), 'yyyy-MM-dd') : null;
+export function ProjectInfo({ project, userId }: ProjectInfoProps) {
+  const created = format(new Date(project.createdDate), 'yyyy-MM-dd');
+  const modified = format(new Date(project.lastModifiedDate), 'yyyy-MM-dd');
+  const isOwnProject = project.createdById === userId;
+  const hasRating = project.rating > 0;
+
   return (
     <div>
       <div>
@@ -45,30 +40,46 @@ export function ProjectInfo({
           </p>
         )}
         <p className="text-muted-foreground flex items-center gap-1 text-sm">
-          Type: {projectType.charAt(0).toUpperCase() + projectType.slice(1).toLowerCase()}
+          Type: {project.projectType.charAt(0).toUpperCase() + project.projectType.slice(1).toLowerCase()}
         </p>
-        {githubRepo && (
+        <div className="text-muted-foreground flex items-center gap-1 text-sm">
+          Rating:
+          {hasRating ? <StarDisplay rating={project.rating} size="sm" showValue={true} /> : <span>No ratings yet</span>}
+        </div>
+        {project.githubRepo && (
           <p className="flex items-center gap-1 text-sm">
-            <Link href={`${githubRepo}` as Route} target="_blank" rel="noopener noreferrer" className="hover:underline">
+            <Link
+              href={`${project.githubRepo}` as Route}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline">
               GitHub Repo
             </Link>
           </p>
         )}
       </div>
       <div className="mt-4">
-        <p className="text-md">{description}</p>
+        <p className="text-md">{project.description}</p>
       </div>
-      {technologies && technologies.length > 0 && (
+      {project.technologies && project.technologies.length > 0 && (
         <div className="mt-4 border-t pt-4">
           <p className="text-sm font-semibold">Technologies:</p>
           <ul className="list-disc pl-5">
-            {technologies.map((tech, idx) => (
+            {project.technologies.map((tech, idx) => (
               <li key={idx} className="text-sm">
                 {tech.name}
               </li>
             ))}
           </ul>
         </div>
+      )}
+      {!isOwnProject && (
+        <ProjectRating
+          projectId={project.id}
+          userId={userId}
+          initialRating={project.rating}
+          createdById={project.createdById}
+        />
       )}
     </div>
   );
