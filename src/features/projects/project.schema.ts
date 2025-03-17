@@ -9,4 +9,9 @@ export const projectSchema = z.object({
   githubRepo: z.string().url({ message: 'Invalid URL' }).optional().nullable(),
 });
 
+export const projectRatingSchema = z.object({
+  projectId: z.string().min(1, 'Project ID is required'),
+  rating: z.number().int().min(1, 'Rating must be at least 1').max(5, 'Rating cannot exceed 5'),
+});
+
 export type CreateProjectInput = z.infer<typeof projectSchema>;

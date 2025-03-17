@@ -44,6 +44,7 @@ export const ProjectService = {
             githubRepo: true,
             createdById: true,
             technologies: true,
+            rating: true,
             comments: {
               select: {
                 id: true,
@@ -503,5 +504,107 @@ export const ProjectService = {
       if (error instanceof Utils) throw error;
       throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
+  },
+
+  async rateProject(projectId: Project['id'], rating: number, requestUserId: User['id']) {
+    return withServiceAuth(requestUserId, null, async () => {
+      try {
+        const project = await prisma.project.findUnique({
+          where: { id: projectId },
+          select: {
+            id: true,
+            title: true,
+            createdById: true,
+          },
+        });
+
+        if (!project) {
+          notFound();
+        }
+
+        if (project.createdById === requestUserId) {
+          throw new Utils(ErrorMessage.INSUFFICIENT_PERMISSIONS);
+        }
+
+        const userRating = await prisma.$transaction(async (tx) => {
+          const userRating = await tx.projectRating.upsert({
+            where: {
+              projectId_userId: {
+                projectId,
+                userId: requestUserId,
+              },
+            },
+            update: {
+              rating,
+            },
+            create: {
+              projectId,
+              userId: requestUserId,
+              rating,
+            },
+          });
+
+          const ratings = await tx.projectRating.findMany({
+            where: { projectId },
+            select: { rating: true },
+          });
+
+          const averageRating =
+            ratings.length > 0
+              ? Number((ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length).toFixed(1))
+              : 0;
+
+          await tx.project.update({
+            where: { id: projectId },
+            data: { rating: averageRating },
+          });
+
+          return userRating;
+        });
+
+        if (project.createdById !== requestUserId) {
+          const user = await prisma.user.findUnique({
+            where: { id: requestUserId },
+            select: { username: true },
+          });
+
+          if (user && project.createdById) {
+            await NotificationService.queueBatchNotifications({
+              userIds: [project.createdById],
+              type: 'RATING',
+              message: `${user.username} rated your project "${project.title}" with ${rating} stars`,
+              projectId,
+              triggeredById: requestUserId,
+            });
+          }
+        }
+
+        return userRating;
+      } catch (error) {
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  async getUserProjectRating(projectId: Project['id'], userId: User['id']) {
+    return withServiceAuth(userId, null, async () => {
+      try {
+        const rating = await prisma.projectRating.findUnique({
+          where: {
+            projectId_userId: {
+              projectId,
+              userId,
+            },
+          },
+          select: { rating: true },
+        });
+
+        return rating?.rating || 0;
+      } catch (error) {
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 };

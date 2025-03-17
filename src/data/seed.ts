@@ -153,8 +153,6 @@ async function createProject(user: User, allUsers: User[]) {
     }
   }
 
-  const rating = faker.number.float({ min: 0, max: 5, precision: 0.5 });
-
   const project = await prisma.project.create({
     data: {
       title: conversation?.title || 'Sample Project',
@@ -164,7 +162,7 @@ async function createProject(user: User, allUsers: User[]) {
       githubRepo: conversation?.githubProject
         ? `https://www.github.com/${user.username}/${conversation.githubProject}`
         : null,
-      rating,
+      rating: 0,
       technologies: {
         connect: projectTechConnect,
       },
@@ -172,12 +170,48 @@ async function createProject(user: User, allUsers: User[]) {
   });
 
   if (project) {
+    await createProjectRatings(project, allUsers, user);
+
     await createCommentsAndNotifications(
       project,
       conversation || { title: '', description: '', comments: [] },
       allUsers,
       user,
     );
+  }
+}
+
+async function createProjectRatings(project: Project, allUsers: User[], projectCreator: User) {
+  const potentialRaters = allUsers.filter((u) => u.id !== projectCreator.id);
+  const numberOfRaters = faker.number.int({ min: 0, max: Math.min(10, potentialRaters.length) });
+
+  const raters = faker.helpers.shuffle(potentialRaters).slice(0, numberOfRaters);
+
+  if (raters.length === 0) {
+    return;
+  }
+
+  const ratings = [];
+  for (const rater of raters) {
+    const rating = faker.number.int({ min: 1, max: 5 });
+    await prisma.projectRating.create({
+      data: {
+        projectId: project.id,
+        userId: rater.id,
+        rating: rating,
+      },
+    });
+
+    ratings.push(rating);
+  }
+
+  if (ratings.length > 0) {
+    const averageRating = Number((ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(1));
+
+    await prisma.project.update({
+      where: { id: project.id },
+      data: { rating: averageRating },
+    });
   }
 }
 

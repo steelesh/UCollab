@@ -24,3 +24,7 @@ export const getProjects = async (page = 1, limit = 12, userId: User['id']): Pro
     totalCount,
   };
 };
+
+export const getUserProjectRating = async (projectId: Project['id'], userId: User['id']): Promise<number> => {
+  return ProjectService.getUserProjectRating(projectId, userId);
+};

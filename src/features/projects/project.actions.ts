@@ -1,6 +1,6 @@
 'use server';
 
-import { projectSchema } from './project.schema';
+import { projectSchema, projectRatingSchema } from './project.schema';
 import { ProjectService } from './project.service';
 import { auth } from '~/security/auth';
 import { ErrorMessage, handleServerActionError } from '~/lib/utils';
@@ -70,5 +70,20 @@ export async function searchTechnologies(query: string) {
     return technologies.map((t) => t.name);
   } catch (error) {
     handleServerActionError(error);
+  }
+}
+
+export async function rateProject(projectId: Project['id'], rating: number) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
+
+  try {
+    const validatedData = projectRatingSchema.parse({ projectId, rating });
+
+    await ProjectService.rateProject(validatedData.projectId, validatedData.rating, session.user.id);
+
+    return { success: true };
+  } catch (error) {
+    return handleServerActionError(error);
   }
 }

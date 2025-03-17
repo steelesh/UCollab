@@ -28,7 +28,15 @@ export type Technology = Pick<PrismaTechnology, 'id' | 'name'>;
 
 export type ProjectDetails = Pick<
   PrismaProject,
-  'id' | 'title' | 'description' | 'createdDate' | 'lastModifiedDate' | 'projectType' | 'githubRepo' | 'createdById'
+  | 'id'
+  | 'title'
+  | 'description'
+  | 'createdDate'
+  | 'lastModifiedDate'
+  | 'projectType'
+  | 'githubRepo'
+  | 'createdById'
+  | 'rating'
 > & {
   comments: (Pick<PrismaComment, 'id' | 'content' | 'createdDate' | 'lastModifiedDate'> & {
     createdBy: Pick<User, 'id' | 'username' | 'avatar'>;
