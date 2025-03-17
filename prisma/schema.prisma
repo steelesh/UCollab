@@ -46,6 +46,7 @@ model User {
   sessions                Session[]
   comments                Comment[]
   projects                Project[]
+  projectRatings          ProjectRating[]
   bio                     String?                  @prisma.Text
   role                    Role                     @default(USER)
   technologies            Technology[]             @relation("UserTechnologies")
@@ -71,12 +72,27 @@ model Project {
   githubRepo       String?
   comments         Comment[]
   watchers         ProjectWatcher[]
+  ratings          ProjectRating[]
   createdById      String
   createdBy        User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
   notifications    Notification[] @relation("ProjectNotifications")
 
   @@index([createdById])
   @@index([title(length: 191)])
+}
+
+model ProjectRating {
+  id           String   @id @default(cuid())
+  projectId    String
+  userId       String
+  rating       Int
+  createdDate  DateTime @default(now())
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
 }
 
 model ProjectWatcher {
@@ -129,6 +145,7 @@ model NotificationPreferences {
   allowMentions       Boolean @default(true)
   allowProjectUpdates Boolean @default(true)
   allowSystem         Boolean @default(true)
+  allowRatings        Boolean @default(true)
   user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -189,6 +206,7 @@ enum NotificationType {
   MENTION
   PROJECT_UPDATE
   SYSTEM
+  RATING
 }
 
 enum OnboardingStep {
