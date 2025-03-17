@@ -165,6 +165,12 @@ async function testNotificationSystem() {
     );
     console.log(`comment with mention created`);
 
+    await ProjectService.rateProject(targetUserProject.id, 5, testUser1.id);
+    console.log(`test user 1 rated target user's project with 5 stars`);
+
+    await ProjectService.rateProject(targetUserProject.id, 4, testUser2.id);
+    console.log(`test user 2 rated target user's project with 4 stars`);
+
     console.log('waiting for notification processing...');
     await new Promise((resolve) => setTimeout(resolve, 3000));
 
