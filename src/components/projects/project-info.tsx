@@ -9,9 +9,10 @@ import { StarDisplay } from '~/components/ui/star-rating';
 interface ProjectInfoProps {
   project: ProjectDetails;
   userId: User['id'];
+  userProjectRating: number;
 }
 
-export function ProjectInfo({ project, userId }: ProjectInfoProps) {
+export function ProjectInfo({ project, userId, userProjectRating }: ProjectInfoProps) {
   const created = format(new Date(project.createdDate), 'yyyy-MM-dd');
   const modified = format(new Date(project.lastModifiedDate), 'yyyy-MM-dd');
   const isOwnProject = project.createdById === userId;
@@ -74,12 +75,7 @@ export function ProjectInfo({ project, userId }: ProjectInfoProps) {
         </div>
       )}
       {!isOwnProject && (
-        <ProjectRating
-          projectId={project.id}
-          userId={userId}
-          initialRating={project.rating}
-          createdById={project.createdById}
-        />
+        <ProjectRating projectId={project.id} initialRating={project.rating} userRating={userProjectRating} />
       )}
     </div>
   );
