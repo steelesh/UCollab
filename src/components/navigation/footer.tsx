@@ -12,19 +12,15 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-background py-6">
-      <div className="mx-auto overflow-hidden">
-        <nav aria-label="Footer" className="flex flex-wrap justify-center gap-8 text-sm">
-          {navigation.main.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href as Route}
-              className="text-primary-foreground hover:text-base-content hover:underline">
-              {item.name}
-            </Link>
-          ))}
-        </nav>
-      </div>
+    <footer className="mt-6 py-10">
+      <hr className="via-accent mx-auto mb-8 h-0.25 w-1/3 border-0 bg-gradient-to-r from-transparent to-transparent" />
+      <nav aria-label="Footer" className="flex justify-center gap-8 text-sm">
+        {navigation.main.map((item) => (
+          <Link key={item.name} href={item.href as Route} className="text-primary-foreground hover:underline">
+            {item.name}
+          </Link>
+        ))}
+      </nav>
     </footer>
   );
 }

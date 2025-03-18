@@ -8,12 +8,14 @@ import {
 import { NavLink, NavLinkProps } from '../navigation/nav-link';
 import { NavSection } from '../navigation/navbar';
 import { CreateButton } from './create-button';
+import { useSession } from 'next-auth/react';
 
 export function DesktopNav({ items }: { items: NavSection[] }) {
+  const { data: session } = useSession();
   return (
     <NavigationMenu className="mr-4 hidden md:flex">
       <NavigationMenuList className="gap-12">
-        <CreateButton />
+        {session && <CreateButton />}
         {items.map((section) => (
           <NavigationMenuItem key={section.title} className="relative">
             <NavigationMenuTrigger className="h-9">{section.title}</NavigationMenuTrigger>

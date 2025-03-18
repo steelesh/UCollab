@@ -8,7 +8,6 @@ import { ChevronDown, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { NavLink, NavLinkProps } from './nav-link';
 import { NavSection } from './navbar';
-import { SignInButton } from '../navigation/signin-button';
 
 export function MobileNav({ items }: { items: NavSection[] }) {
   const [open, setOpen] = useState(false);
@@ -64,9 +63,6 @@ export function MobileNav({ items }: { items: NavSection[] }) {
               </Collapsible>
             ))}
           </div>
-        </div>
-        <div className="border-t p-6">
-          <SignInButton />
         </div>
       </SheetContent>
     </Sheet>

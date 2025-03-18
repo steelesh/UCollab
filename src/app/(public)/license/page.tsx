@@ -4,7 +4,7 @@ export const metadata = {
 
 export default function LicensePage() {
   return (
-    <div className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-24">
+    <div className="flex flex-col items-center">
       <h1 className="text-center text-2xl font-bold select-none">License Agreement</h1>
 
       <div className="bg-base-300 mt-8 w-full max-w-3xl rounded-lg p-8 shadow-2xl">

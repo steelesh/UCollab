@@ -2,9 +2,7 @@
 
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
-import { Button } from '~/components/ui/button';
-import { LogosMicrosoftIcon } from '~/components/ui/microsoft-brand-icon';
-import { Spinner } from '~/components/ui/spinner';
+import { InteractiveHoverButton } from '../magicui/interactive-hover-button';
 
 export function SignInButton() {
   const [isPending, setIsPending] = useState(false);
@@ -19,18 +17,8 @@ export function SignInButton() {
   };
 
   return (
-    <Button onClick={handleClick} variant="outline" className="w-full cursor-pointer sm:w-auto">
-      {isPending ? (
-        <>
-          <Spinner />
-          Signing in...
-        </>
-      ) : (
-        <>
-          <LogosMicrosoftIcon className="mr-2 h-4 w-4" />
-          Sign in with Microsoft
-        </>
-      )}
-    </Button>
+    <InteractiveHoverButton onClick={handleClick} className="cursor-pointer pr-8 sm:w-auto">
+      {isPending ? <>Signing in...</> : <>Sign in</>}
+    </InteractiveHoverButton>
   );
 }

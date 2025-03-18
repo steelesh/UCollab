@@ -10,6 +10,7 @@ export interface NavLinkProps {
   badge?: string;
   className?: string;
   onClick?: () => void;
+  requiresAuth: boolean;
 }
 
 export function NavLink({ title, href, description, badge, className, onClick }: NavLinkProps) {
