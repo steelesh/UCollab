@@ -1,7 +1,6 @@
 import React from 'react';
 import Navbar from '~/components/navigation/navbar';
 import Footer from '~/components/navigation/footer';
-import { ThemeProvider } from 'next-themes';
 import '~/app/globals.css';
 import { SessionProvider } from 'next-auth/react';
 import type { Metadata } from 'next';
@@ -26,14 +25,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`scroll-smooth ${roboto.variable}`} suppressHydrationWarning>
-      <body className={`bg-background flex min-h-screen flex-col pt-16 antialiased`}>
+      <body className={`flex min-h-screen flex-col overflow-x-clip`}>
         <SessionProvider basePath="/auth">
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            <Navbar />
-            <main className="relative flex h-0 flex-grow overflow-hidden">{children}</main>
-            <Footer />
-          </ThemeProvider>
+          <Navbar />
+          <main className="mt-28 grow">{children}</main>
         </SessionProvider>
+        <Footer />
       </body>
     </html>
   );

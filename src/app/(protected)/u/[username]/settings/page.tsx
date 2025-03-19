@@ -37,19 +37,17 @@ async function SettingsPage({ userId }: SettingsPageProps) {
 
   if (!user) {
     return (
-      <div className="absolute inset-0 flex h-full w-full items-center justify-center">
+      <div className="flex flex-col items-center">
         <p>User not found.</p>
       </div>
     );
   }
 
   return (
-    <form
-      action={updateUser}
-      className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-8">
+    <form action={updateUser} className="flex flex-col items-center">
       <input type="hidden" name="userId" value={userId} />
       <div className="w-full max-w-3xl rounded shadow">
-        <div className="relative h-48">
+        <div className="relative h-42">
           <Image src="/images/banner-placeholder.png" alt="Banner" fill className="rounded-t object-cover" />
           <div className="absolute -bottom-12 left-8">
             <Image

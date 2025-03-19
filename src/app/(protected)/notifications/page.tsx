@@ -22,16 +22,18 @@ async function Page({ searchParams, userId }: PageProps) {
   const data = await getNotifications(Number(page), Number(limit), userId);
 
   return (
-    <NotificationsClient
-      initialNotifications={data.notifications}
-      userId={userId}
-      pagination={{
-        currentPage: data.currentPage,
-        totalPages: data.totalPages,
-        totalCount: data.totalCount,
-        limit: Number(limit),
-      }}
-    />
+    <div className="flex flex-col items-center">
+      <NotificationsClient
+        initialNotifications={data.notifications}
+        userId={userId}
+        pagination={{
+          currentPage: data.currentPage,
+          totalPages: data.totalPages,
+          totalCount: data.totalCount,
+          limit: Number(limit),
+        }}
+      />
+    </div>
   );
 }
 

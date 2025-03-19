@@ -16,7 +16,7 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ avatar, username, isOwnProfile }: ProfileHeaderProps) {
   return (
-    <div className="relative h-48">
+    <div className="relative h-42">
       <Image src="/images/banner-placeholder.png" alt="Banner" fill className="rounded-t object-cover" />
       <div className="absolute -bottom-12 left-8">
         <Image src={avatar} alt={username} width={100} height={100} className="rounded-full border-5" />

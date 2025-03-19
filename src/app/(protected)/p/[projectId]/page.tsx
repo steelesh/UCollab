@@ -34,23 +34,21 @@ async function Page({ params, userId }: PageProps) {
 
   if (!project) {
     return (
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div className="flex flex-col items-center">
         <p>Project not found.</p>
       </div>
     );
   }
 
   return (
-    <div className="absolute inset-0 overflow-y-auto">
-      <div className="mx-auto w-full max-w-3xl px-4 py-8">
-        <article className="rounded-lg shadow-xl">
-          <ProjectHeader title={project.title} projectId={projectId} isOwnProject={project.createdById === userId} />
-          <div className="px-8 pt-16 pb-6">
-            <ProjectInfo project={project} userId={userId} userProjectRating={userProjectRating} />
-            <ProjectComments comments={project.comments} currentUserId={userId} projectId={projectId} />
-          </div>
-        </article>
-      </div>
+    <div className="mx-auto w-full max-w-3xl">
+      <article className="rounded-lg shadow-xl">
+        <ProjectHeader title={project.title} projectId={projectId} isOwnProject={project.createdById === userId} />
+        <div className="px-8 pt-16 pb-6">
+          <ProjectInfo project={project} userId={userId} userProjectRating={userProjectRating} />
+          <ProjectComments comments={project.comments} currentUserId={userId} projectId={projectId} />
+        </div>
+      </article>
     </div>
   );
 }

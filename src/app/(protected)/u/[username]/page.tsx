@@ -34,7 +34,7 @@ async function Page({ params, userId }: PageProps) {
   const userProfile = await getUserProfile(username);
 
   return (
-    <main className="absolute inset-0 flex h-full w-full flex-col items-center overflow-y-auto py-8">
+    <div className="flex flex-col items-center">
       <article className="w-full max-w-3xl rounded shadow">
         <ProfileHeader
           avatar={userProfile.avatar}
@@ -60,7 +60,7 @@ async function Page({ params, userId }: PageProps) {
           </section>
         </div>
       </article>
-    </main>
+    </div>
   );
 }
 
