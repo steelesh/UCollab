@@ -47,7 +47,7 @@ async function SettingsPage({ userId }: SettingsPageProps) {
     <form action={updateUser} className="flex flex-col items-center">
       <input type="hidden" name="userId" value={userId} />
       <div className="w-full max-w-3xl rounded shadow">
-        <div className="relative h-48">
+        <div className="relative h-42">
           <Image src="/images/banner-placeholder.png" alt="Banner" fill className="rounded-t object-cover" />
           <div className="absolute -bottom-12 left-8">
             <Image
