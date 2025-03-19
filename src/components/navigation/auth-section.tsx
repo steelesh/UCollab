@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Avatar } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
@@ -13,8 +13,13 @@ import { signOut } from 'next-auth/react';
 
 export function AuthSection() {
   const { data: session, status } = useSession();
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
 
   const handleToggle = () => setIsOpen((prev) => !prev);
 
