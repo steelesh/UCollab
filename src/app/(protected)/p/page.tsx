@@ -30,7 +30,8 @@ interface PageProps {
   userId: User['id'];
 }
 
-async function Page({ searchParams, userId }: PageProps) {
+async function Page({ searchParams: searchParamsPromise, userId }: PageProps) {
+  const searchParams = await searchParamsPromise;
   const currentPage = Number(searchParams.page) || 1;
   const limit = Number(searchParams.limit) || 12;
   const data = await getProjects(currentPage, limit, userId);
