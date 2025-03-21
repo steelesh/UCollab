@@ -48,7 +48,7 @@ export default function CommunityGuidePage() {
           Need help getting started? Check out these resources:
         </p>
         <ul className="text-secondary-foreground mt-4 list-disc space-y-2 pl-5">
-        <li><span className="text-blue-400">Getting Started Guide (coming soon)</span></li>
+        <a href="/c/getting-started" className="text-blue-400 underline">Getting Started Guide</a>
         <li><a href="/c/contribution-guide" className="text-blue-400 underline">Contribution Guidelines</a></li>
 
         <li><a href="/c/code-of-conduct" className="text-blue-400 underline">Code of Conduct</a></li>

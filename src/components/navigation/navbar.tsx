@@ -55,6 +55,12 @@ const routes: NavSection[] = [
         requiresAuth: true,
       },
       {
+        title: 'Getting Started',
+        href: '/c/getting-started' as Route,
+        description: 'Set up your account and explore UCollab',
+        requiresAuth: false,
+      },
+      {
         title: 'Community Guide',
         href: '/c/community-guide' as Route,
         description: 'How to get the most out of UCollab',
@@ -79,7 +85,7 @@ const routes: NavSection[] = [
         requiresAuth: true,
       },
     ],
-  },
+  }  
 ];
 
 export default function Navbar() {
