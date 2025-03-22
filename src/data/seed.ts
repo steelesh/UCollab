@@ -92,7 +92,7 @@ async function createTestUsers(initialTechnologies: Technology[]) {
       const guaranteedTechId = faker.helpers.arrayElement(technologyIds);
       userTechConnect.push({ id: guaranteedTechId });
       const numAdditionalTechs = faker.number.int({ min: 0, max: Math.min(3, technologyIds.length - 1) });
-      const availableTechIds = faker.helpers.shuffle(technologyIds.filter((id) => id !== guaranteedTechId)); // Shuffle remaining IDs
+      const availableTechIds = faker.helpers.shuffle(technologyIds.filter((id) => id !== guaranteedTechId));
       for (let j = 0; j < numAdditionalTechs; j++) {
         const additionalTechId = availableTechIds[j];
         if (additionalTechId) {
@@ -114,6 +114,8 @@ async function createTestUsers(initialTechnologies: Technology[]) {
         },
         accounts: { create: fakeAccount() },
         notificationPreferences: { create: {} },
+        gradYear: faker.number.int({ min: 2025, max: 2030 }),
+        mentorship: faker.helpers.arrayElement(['MENTOR', 'MENTEE', 'NONE']),
       },
     });
   }
@@ -474,6 +476,10 @@ export const DEFAULT_TECHNOLOGIES = [
   'MobX',
   'RxJS',
   'Deno',
+  'HTML',
+  'CSS',
+  'Prisma',
+  'shadCN',
 ];
 
 const SYSTEM_MESSAGES = [
