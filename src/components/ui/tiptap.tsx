@@ -88,6 +88,7 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
 
 const Tiptap = forwardRef<TiptapRef, TiptapProps>(({ content, onChange, disabled = false, currentUserId }, ref) => {
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         blockquote: undefined,

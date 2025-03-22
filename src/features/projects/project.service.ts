@@ -607,4 +607,40 @@ export const ProjectService = {
       }
     });
   },
+
+  async getUserWatchedProjects(userId: string, requestUserId: string) {
+    return withServiceAuth(requestUserId, null, async () => {
+      try {
+        const watchedProjects = await prisma.projectWatcher.findMany({
+          where: { userId },
+          select: {
+            project: {
+              select: {
+                id: true,
+                title: true,
+                description: true,
+                createdDate: true,
+                lastModifiedDate: true,
+                projectType: true,
+                githubRepo: true,
+                createdById: true,
+                technologies: true,
+                rating: true,
+              },
+            },
+          },
+          orderBy: {
+            project: {
+              createdDate: 'desc',
+            },
+          },
+        });
+
+        return watchedProjects.map((watcher) => watcher.project);
+      } catch (error) {
+        if (error instanceof Utils) throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
 };
