@@ -26,8 +26,8 @@ export function AuthSection() {
   const links = [
     { title: 'My Profile', route: `/u/${session?.user.username}` },
     { title: 'My Settings', route: `/u/${session?.user.username}/settings` },
-    { title: 'My Projects', route: '/my-projects' },
-    { title: 'My Bookmarks', route: '/my-bookmarks' },
+    { title: 'My Projects', route: `/u/${session?.user.username}/projects` },
+    { title: 'My Bookmarks', route: `/u/${session?.user.username}/bookmarks` },
     { title: 'My Connections', route: '/my-connection' },
     { title: 'Sign out', action: signOut },
   ];

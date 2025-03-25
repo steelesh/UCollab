@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { format } from 'date-fns';
 import type { Route } from 'next';
@@ -5,18 +7,40 @@ import type { ProjectDetails } from '~/features/projects/project.types';
 import { ProjectRating } from './project-rating';
 import { User } from '@prisma/client';
 import { StarDisplay } from '~/components/ui/star-rating';
+import { Bookmark, BookmarkCheck } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { getBookmarkStatus, toggleBookmark } from '~/features/projects/project.actions';
 
 interface ProjectInfoProps {
   project: ProjectDetails;
   userId: User['id'];
   userProjectRating: number;
+  initBookmarked: boolean;
 }
 
-export function ProjectInfo({ project, userId, userProjectRating }: ProjectInfoProps) {
+export function ProjectInfo({ project, userId, userProjectRating, initBookmarked }: ProjectInfoProps) {
   const created = format(new Date(project.createdDate), 'yyyy-MM-dd');
   const modified = format(new Date(project.lastModifiedDate), 'yyyy-MM-dd');
   const isOwnProject = project.createdById === userId;
   const hasRating = project.rating > 0;
+  const [isBookmarked, setIsBookmarked] = useState(initBookmarked);
+
+  useEffect(() => {
+    async function fetchBookmarkStatus() {
+      const result = (await getBookmarkStatus(project.id)) as { success: boolean; bookmarked: boolean };
+      if (result.success) {
+        setIsBookmarked(result.bookmarked);
+      }
+    }
+    fetchBookmarkStatus();
+  }, [project.id]);
+
+  const handleBookmarkToggle = async () => {
+    const result = (await toggleBookmark(project.id)) as { success: boolean; watched: boolean };
+    if (result.success) {
+      setIsBookmarked(result.watched);
+    }
+  };
 
   return (
     <div>
@@ -58,6 +82,18 @@ export function ProjectInfo({ project, userId, userProjectRating }: ProjectInfoP
             </Link>
           </p>
         )}
+      </div>
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={handleBookmarkToggle}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            handleBookmarkToggle();
+          }
+        }}
+        className="cursor-pointer focus:outline-none">
+        {isBookmarked ? <BookmarkCheck size={24} className="text-yellow-500" /> : <Bookmark size={24} />}
       </div>
       <div className="mt-4">
         <p className="text-md">{project.description}</p>

@@ -185,7 +185,7 @@ export function NotificationsClient({ initialNotifications, userId, pagination }
         {hasNotifications && (
           <div className="flex items-center justify-between">
             <div className="text-muted-foreground text-sm">
-              {totalCount} notification{totalCount !== 1 ? 's' : ''}
+              Notifications: {totalCount} {totalCount !== 1 ? 's' : ''}
               {unreadCount > 0 && ` (${unreadCount} unread)`}
             </div>
             <div className="flex gap-2">
@@ -220,7 +220,7 @@ export function NotificationsClient({ initialNotifications, userId, pagination }
                     />
                     <div className="relative flex-1">
                       <div className="pr-16">
-                        <p className="text-sm">{notification.message}</p>
+                        <p className="text-sm first-letter:uppercase">{notification.message}</p>
                         <p className="text-muted-foreground text-xs">
                           {formatDistanceToNow(new Date(notification.createdDate), { addSuffix: true })}
                           {' · '}
