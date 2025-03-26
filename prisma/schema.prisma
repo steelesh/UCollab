@@ -79,6 +79,7 @@ model Project {
 
   @@index([createdById])
   @@index([title(length: 191)])
+  @@fulltext([title, description])
 }
 
 model ProjectRating {

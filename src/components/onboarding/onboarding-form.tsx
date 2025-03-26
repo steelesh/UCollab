@@ -10,6 +10,7 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Badge } from '~/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group';
+import { motion } from 'framer-motion';
 
 export interface OnboardingInput {
   gradYear: string;
@@ -35,38 +36,19 @@ export function OnboardingForm() {
     },
   });
 
-  // Watch the technologies field
   const technologies = watch('technologies');
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const suggestionsRef = useRef<HTMLDivElement>(null);
-
-  // Close suggestions if clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)) {
-        setShowSuggestions(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Fetch suggestions when user types
   const handleTechSearch = async (value: string) => {
     if (value.length >= 2) {
       try {
         const results = await searchTechnologies(value);
         setSuggestions(results?.filter((tech) => !technologies.includes(tech)) || []);
-        setShowSuggestions(true);
       } catch (error) {
         console.error('Failed to fetch suggestions:', error);
         setSuggestions([]);
       }
     } else {
       setSuggestions([]);
-      setShowSuggestions(false);
     }
   };
 
@@ -86,83 +68,160 @@ export function OnboardingForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 rounded-lg border p-8">
-      <div className="form-control">
-        <Label htmlFor="gradYear" className="label">
-          <span className="label-text">Graduation Year</span>
-        </Label>
-        <Input
-          id="gradYear"
-          placeholder="2025"
-          {...register('gradYear')}
-          className="input input-bordered w-full"
-          disabled={isSubmitting}
-        />
-        {errors.gradYear && <span className="text-error text-sm">{errors.gradYear.message}</span>}
-      </div>
+      <Controller
+        name="gradYear"
+        control={control}
+        render={({ field }) => {
+          const currentYear = new Date().getFullYear();
+          const years = Array.from({ length: 5 }, (_, i) => currentYear + i);
+          const initialSelected = field.value ? Number(field.value) : currentYear;
+          const [focused, setFocused] = useState<number | null>(null);
+          const [selected, setSelected] = useState<number>(initialSelected);
+          useEffect(() => {
+            if (!field.value) {
+              field.onChange(String(currentYear));
+            }
+          }, [field, currentYear]);
+
+          return (
+            <div className="form-control">
+              <Label htmlFor="gradYear" className="label">
+                <span className="label-text">Graduation Year</span>
+              </Label>
+              <div onMouseLeave={() => setFocused(null)} className="flex items-center">
+                {years.map((year, index) => (
+                  <div key={year} className="flex items-center">
+                    <button
+                      type="button"
+                      onMouseEnter={() => setFocused(year)}
+                      onFocus={() => setFocused(year)}
+                      onClick={() => {
+                        setSelected(year);
+                        field.onChange(String(year));
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          setSelected(year);
+                          field.onChange(String(year));
+                        }
+                      }}
+                      className="relative cursor-pointer border-none bg-transparent px-2 py-1 focus:outline-none">
+                      <span className="relative z-10 text-xs">{year}</span>
+                      {focused === year && (
+                        <motion.div
+                          transition={{ layout: { duration: 0.2, ease: 'easeOut' } }}
+                          className="bg-muted absolute right-0 bottom-[-2px] left-[-10px] z-0 h-[100%] w-[140%] rounded-md"
+                          layoutId="highlight"
+                        />
+                      )}
+                      {selected === year && (
+                        <motion.div
+                          className="bg-primary absolute right-0 bottom-[-10px] left-0 z-0 h-[4px] rounded-md"
+                          layoutId="underline"
+                        />
+                      )}
+                    </button>
+                    {index < years.length - 1 && <span className="mx-2 text-xs text-gray-500">|</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        }}
+      />
       <div className="form-control relative">
         <Controller
           control={control}
           name="technologies"
-          render={({ field }) => (
-            <div className="form-control">
-              <Label className="label" htmlFor="technologies">
-                <span className="label-text">Technologies</span>
-              </Label>
-              <div className="m-4 flex flex-1">
-                {field.value.map((tech: string) => (
-                  <Badge
-                    key={tech}
-                    onClick={() => field.onChange(field.value.filter((t: string) => t !== tech))}
-                    className="hover:bg-primary cursor-pointer transition duration-200 ease-in-out hover:scale-105"
-                    variant="outline">
-                    {tech}
-                  </Badge>
-                ))}
-              </div>
-              <Input
-                ref={inputRef}
-                type="text"
-                className="input input-bordered w-full"
-                placeholder="Add technology"
-                onChange={(e) => handleTechSearch(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const inputValue = e.currentTarget.value.trim();
-                    if (!inputValue) return;
-                    const filteredSuggestions = suggestions.filter((tech) => !field.value.includes(tech));
-                    const [closestMatch] = filteredSuggestions;
-                    if (closestMatch !== undefined) {
-                      field.onChange([...field.value, closestMatch]);
-                      e.currentTarget.value = '';
-                      setShowSuggestions(false);
-                    }
-                  }
-                }}
-                disabled={isSubmitting}
-              />
-              {showSuggestions && suggestions.length > 0 && (
-                <div
-                  ref={suggestionsRef}
-                  className="bg-background absolute top-full left-0 z-10 mt-1 w-full rounded shadow-md">
-                  {suggestions.map((tech) => (
-                    <Button
+          render={({ field }) => {
+            const [techInputValue, setTechInputValue] = useState('');
+            const mirrorRef = useRef<HTMLSpanElement>(null);
+            const [typedWidth, setTypedWidth] = useState(0);
+
+            useEffect(() => {
+              if (mirrorRef.current) {
+                setTypedWidth(mirrorRef.current.offsetWidth);
+              }
+            }, [techInputValue]);
+
+            const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+              const val = e.target.value;
+              setTechInputValue(val);
+              handleTechSearch(val);
+            };
+            const bestMatch = suggestions.find(
+              (sugg) =>
+                sugg.toLowerCase().startsWith(techInputValue.toLowerCase()) && sugg.length > techInputValue.length,
+            );
+            const suggestionRemainder = bestMatch ? bestMatch.substring(techInputValue.length) : '';
+            const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                let techToAdd: string | undefined;
+                if (bestMatch) {
+                  techToAdd = bestMatch;
+                } else if (suggestions.includes(techInputValue)) {
+                  techToAdd = techInputValue;
+                }
+                if (!techToAdd) return;
+                if (field.value.includes(techToAdd)) return;
+                field.onChange([...field.value, techToAdd]);
+                setTechInputValue('');
+              }
+            };
+
+            return (
+              <div className="form-control">
+                <Label className="label" htmlFor="technologies">
+                  <span className="label-text">Technologies</span>
+                </Label>
+                <div className="m-4 flex flex-1">
+                  {field.value.map((tech: string) => (
+                    <Badge
                       key={tech}
-                      type="button"
-                      variant="outline"
-                      className="w-full px-4 py-2 text-left"
-                      onClick={() => {
-                        field.onChange([...field.value, tech]);
-                        setShowSuggestions(false);
-                      }}
-                      disabled={isSubmitting}>
+                      onClick={() => field.onChange(field.value.filter((t: string) => t !== tech))}
+                      className="hover:bg-primary cursor-pointer transition duration-200 ease-in-out hover:scale-105"
+                      variant="outline">
                       {tech}
-                    </Button>
+                    </Badge>
                   ))}
                 </div>
-              )}
-            </div>
-          )}
+                <div className="relative flex w-full items-center">
+                  <span
+                    ref={mirrorRef}
+                    className="invisible absolute text-sm leading-none font-normal whitespace-pre"
+                    style={{
+                      fontFamily: 'inherit',
+                      fontSize: 'inherit',
+                      paddingLeft: '1rem',
+                    }}>
+                    {techInputValue}
+                  </span>
+                  <Input
+                    id="technologies"
+                    type="text"
+                    value={techInputValue}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    className="input input-bordered w-full bg-transparent leading-none"
+                    disabled={isSubmitting}
+                    style={{ color: 'white', caretColor: 'white', paddingLeft: '1rem' }}
+                  />
+                  {techInputValue && suggestionRemainder && (
+                    <span
+                      className="pointer-events-none absolute text-sm leading-none font-normal text-white/50"
+                      style={{
+                        left: typedWidth - 1,
+                        top: '50%',
+                        transform: 'translateY(-47%)',
+                      }}>
+                      {suggestionRemainder}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          }}
         />
         {errors.technologies && <span className="text-error text-sm">{errors.technologies.message}</span>}
       </div>

@@ -3,8 +3,9 @@
 import { projectSchema, projectRatingSchema } from './project.schema';
 import { ProjectService } from './project.service';
 import { auth } from '~/security/auth';
+import { prisma } from '~/lib/prisma';
 import { ErrorMessage, handleServerActionError } from '~/lib/utils';
-import { Project } from '@prisma/client';
+import { Project, ProjectType, Prisma } from '@prisma/client';
 import { redirect } from 'next/navigation';
 
 export async function createProject(formData: FormData) {
@@ -146,6 +147,34 @@ export async function getCreatedProjects() {
   try {
     const createdProjects = await ProjectService.getProjectsByUser(session.user.id, session.user.id);
     return { success: true, projects: createdProjects };
+  } catch (error) {
+    return handleServerActionError(error);
+  }
+}
+
+export async function checkProjectsCount(filters: { query?: string; projectType?: string; minRating?: string }) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
+
+  try {
+    const { query = '', projectType = '', minRating = '' } = filters;
+    const where: Prisma.ProjectWhereInput = {};
+
+    if (query) {
+      // Always use full-text search (even for partial queries)
+      where.OR = [{ title: { search: query } }, { description: { search: query } }];
+    }
+
+    if (projectType) {
+      where.projectType = projectType as ProjectType;
+    }
+
+    if (minRating) {
+      where.rating = { gte: Number(minRating) };
+    }
+
+    const totalCount = await prisma.project.count({ where });
+    return { success: true, totalCount };
   } catch (error) {
     return handleServerActionError(error);
   }
