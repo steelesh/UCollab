@@ -2,8 +2,6 @@
   "prettier.enable": false,
   "editor.formatOnSave": false,
 
-  "editor.foldingImportsByDefault": true,
-
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "never"
