@@ -1,14 +1,18 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { prisma } from '~/lib/prisma';
-import { withAuth } from '~/security/protected';
-import type { Route } from 'next';
+import type { Route } from "next";
+
+import Image from "next/image";
+import Link from "next/link";
+
+import { prisma } from "~/lib/prisma";
+import { withAuth } from "~/security/protected";
 
 export const metadata = {
-  title: 'UCollab — User Directory',
+  title: "UCollab — User Directory",
 };
 
-async function UserDirectoryPage() {
+export const dynamic = "force-dynamic";
+
+async function Page() {
   const users = await prisma.user.findMany({
     select: {
       avatar: true,
@@ -25,16 +29,16 @@ async function UserDirectoryPage() {
     username: string;
     email: string;
     avatar: string;
-  }[] = users.map((user) => ({
+  }[] = users.map(user => ({
     ...user,
-    createdDate: user.createdDate.toISOString().split('T')[0],
-    lastLogin: user.lastLogin.toISOString().split('T')[0],
+    createdDate: user.createdDate.toISOString().split("T")[0],
+    lastLogin: user.lastLogin.toISOString().split("T")[0],
   }));
 
   return (
     <div className="flex flex-col items-center">
-      {formattedUsers.map((user, index) => (
-        <div key={index} className="flex w-full max-w-3xl items-center border-b p-4">
+      {formattedUsers.map(user => (
+        <div key={user.username} className="flex w-full max-w-3xl items-center border-b p-4">
           <Image src={user.avatar} alt={user.username} width={50} height={50} className="rounded-full" />
           <div className="ml-4">
             <Link href={`/u/${user.username}` as Route} className="font-bold hover:underline">
@@ -43,8 +47,14 @@ async function UserDirectoryPage() {
             <p className="text-muted-foreground text-sm">{user.email}</p>
           </div>
           <div className="ml-auto text-right">
-            <p className="text-sm">Created: {user.createdDate}</p>
-            <p className="text-sm">Last Login: {user.lastLogin}</p>
+            <p className="text-sm">
+              Created:
+              {user.createdDate}
+            </p>
+            <p className="text-sm">
+              Last Login:
+              {user.lastLogin}
+            </p>
           </div>
         </div>
       ))}
@@ -52,4 +62,4 @@ async function UserDirectoryPage() {
   );
 }
 
-export default withAuth(UserDirectoryPage);
+export default withAuth(Page);

@@ -1,6 +1,6 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
-@plugin 'tailwindcss-animate';
+@plugin "tailwindcss-animate";
 
 @theme {
   --color-background: hsl(var(--background));
@@ -101,83 +101,11 @@
 body {
   @apply bg-background text-foreground cursor-default;
 }
-.embla {
-  max-width: 48rem;
-  margin: auto;
-  --slide-height: 19rem;
-  --slide-spacing: 1rem;
-  --slide-size: 100%;
-}
-.embla__viewport {
-  overflow: hidden;
-}
-.embla__container {
-  display: flex;
-  touch-action: pan-y pinch-zoom;
-  margin-left: calc(var(--slide-spacing) * -1);
-}
-.embla__slide {
-  transform: translate3d(0, 0, 0);
-  flex: 0 0 var(--slide-size);
-  min-width: 0;
-  padding-left: var(--slide-spacing);
-}
-.embla__slide__number {
-  box-shadow: inset 0 0 0 0.2rem var(--detail-medium-contrast);
-  border-radius: 1.8rem;
-  font-size: 4rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: var(--slide-height);
-  user-select: none;
-}
-.embla__controls {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  justify-content: space-between;
-  gap: 1.2rem;
-  margin-top: 1.8rem;
-}
-.embla__buttons {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.6rem;
-  align-items: center;
-}
-.embla__button {
-  -webkit-tap-highlight-color: rgba(var(--text-high-contrast-rgb-value), 0.5);
-  -webkit-appearance: none;
-  appearance: none;
-  background-color: transparent;
-  touch-action: manipulation;
-  display: inline-flex;
-  text-decoration: none;
-  cursor: pointer;
-  border: 0;
-  padding: 0;
-  margin: 0;
-  box-shadow: inset 0 0 0 0.2rem var(--detail-medium-contrast);
-  width: 3.6rem;
-  height: 3.6rem;
-  z-index: 1;
-  border-radius: 50%;
-  color: var(--text-body);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.embla__button:disabled {
-  color: var(--detail-high-contrast);
-}
-.embla__button__svg {
-  width: 35%;
-  height: 35%;
-}
+
 .ProseMirror {
   @apply min-h-[100px] outline-none;
 }
+
 .ProseMirror p.is-editor-empty:first-child::before {
   @apply text-gray-400;
   content: attr(data-placeholder);
@@ -185,111 +113,65 @@ body {
   height: 0;
   pointer-events: none;
 }
-.tiptap-container {
-  @apply rounded-lg border;
-}
-.tiptap-content {
-  @apply min-h-[100px] max-w-none p-3 pt-2;
-}
+
 .ProseMirror p {
   @apply my-2;
 }
+
 .ProseMirror strong {
   @apply font-bold;
 }
+
 .ProseMirror em {
   @apply italic;
 }
+
 .ProseMirror s {
   @apply line-through;
 }
+
 .ProseMirror ul,
-.ProseMirror ol,
-.comment-content ul,
-.comment-content ol {
-  padding-left: 1.5rem;
-  margin: 0.5rem 0;
-  list-style-position: outside;
+.ProseMirror ol {
+  @apply pl-6 my-2 list-outside;
 }
-.ProseMirror ul,
-.comment-content ul {
+
+.ProseMirror ul {
   list-style-type: disc;
 }
-.ProseMirror ol,
-.comment-content ol {
+
+.ProseMirror ol {
   list-style-type: decimal;
 }
+
+.ProseMirror li {
+  @apply my-0;
+}
+
 .ProseMirror li > ul,
-.ProseMirror li > ol,
-.comment-content li > ul,
-.comment-content li > ol {
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
+.ProseMirror li > ol {
+  @apply my-1;
 }
-.ProseMirror li,
-.comment-content li {
-  display: list-item;
-  position: relative;
-  margin-left: 0;
-}
-.ProseMirror blockquote,
-.comment-content blockquote {
+
+.ProseMirror blockquote {
   @apply border-border my-2 border-l-4 pl-4 italic;
 }
-.ProseMirror code,
-.comment-content code {
-  @apply bg-muted rounded border px-1.5 py-0.5 font-mono text-sm;
-  @apply border-border/50 text-foreground;
+
+.ProseMirror code {
+  @apply bg-muted rounded border px-1.5 py-0.5 font-mono text-sm border-border/50 text-foreground;
 }
-.ProseMirror pre code,
-.comment-content pre code {
-  @apply block w-full overflow-x-auto p-3;
-  @apply bg-muted/50 text-foreground;
+
+.ProseMirror pre code {
+  @apply block w-full overflow-x-auto p-3 bg-muted/50 text-foreground;
 }
+
 .tiptap-mention {
   @apply bg-accent/10 text-primary rounded px-1.5 py-0.5 font-semibold;
 }
-.tippy-box[data-theme~='mention-suggestions'] {
+
+.tippy-box[data-theme~="mention-suggestions"] {
   @apply border-0 bg-transparent shadow-none;
 }
-.tippy-box[data-theme~='mention-suggestions'] .tippy-content {
+
+.tippy-box[data-theme~="mention-suggestions"] .tippy-content {
   @apply p-0;
-}
-.dropdown-container {
-  @apply bg-popover rounded-md border shadow-md;
-  @apply max-h-[200px] w-[200px] overflow-y-auto;
-}
-.dropdown-item {
-  @apply relative flex w-full cursor-pointer items-center px-2 py-1.5 select-none;
-  @apply transition-colors outline-none;
-  @apply hover:bg-accent hover:text-accent-foreground;
-}
-.dropdown-item[aria-selected='true'] {
-  @apply bg-accent text-accent-foreground;
-}
-.dropdown-item-content {
-  @apply flex items-center gap-2;
-}
-.tiptap-menu {
-  @apply flex gap-1 border-b p-2;
-}
-.tiptap-menu button {
-  @apply rounded px-2 py-1 text-sm;
-}
-.tiptap-link {
-  @apply text-primary cursor-pointer underline;
-  @apply hover:text-primary;
-}
-.tiptap-controls {
-  margin-bottom: 1rem;
-}
-.tiptap-controls button {
-  @apply border-border bg-background rounded-md border px-4 py-2 text-sm transition-colors;
-  @apply hover:bg-accent hover:text-accent-foreground;
-}
-.tiptap-controls button.is-active {
-  @apply bg-accent text-accent-foreground;
-}
-.tiptap-controls button:disabled {
-  @apply cursor-not-allowed opacity-50;
 }

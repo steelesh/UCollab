@@ -1,15 +1,17 @@
 export const metadata = {
-  title: 'UCollab — Privacy',
+  title: "UCollab — Privacy",
 };
 
-export default function PrivacyPage() {
+export default function Page() {
   return (
     <div className="flex flex-col items-center">
       <h1 className="text-center text-2xl font-bold select-none">Privacy Policy</h1>
 
       <div className="bg-base-300 mt-8 w-full max-w-3xl rounded-lg p-8 shadow-2xl">
         <p className="text-secondary mb-4 text-sm">
-          <strong>Last Updated:</strong> November 11th, 2024
+          <strong>Last Updated:</strong>
+          {" "}
+          November 11th, 2024
         </p>
 
         <h2 className="text-lg font-semibold">Introduction</h2>
@@ -27,15 +29,21 @@ export default function PrivacyPage() {
         </p>
         <ul className="list-disc space-y-2 pl-5">
           <li>
-            <strong>Personal Information:</strong> Information provided by you, such as your name, email address, and
+            <strong>Personal Information:</strong>
+            {" "}
+            Information provided by you, such as your name, email address, and
             account details.
           </li>
           <li>
-            <strong>Usage Information:</strong> Non-identifiable data such as device type, IP address, browser type, and
+            <strong>Usage Information:</strong>
+            {" "}
+            Non-identifiable data such as device type, IP address, browser type, and
             operating system.
           </li>
           <li>
-            <strong>Application Data:</strong> Preferences, settings, and other customizations that improve user
+            <strong>Application Data:</strong>
+            {" "}
+            Preferences, settings, and other customizations that improve user
             experience.
           </li>
         </ul>
@@ -59,11 +67,15 @@ export default function PrivacyPage() {
         </p>
         <ul className="list-disc space-y-2 pl-5">
           <li>
-            <strong>Service Providers:</strong> Third-party services for hosting, analytics, and payments (contractually
+            <strong>Service Providers:</strong>
+            {" "}
+            Third-party services for hosting, analytics, and payments (contractually
             obligated to protect your data).
           </li>
           <li>
-            <strong>Legal Obligations:</strong> Disclosures required by law or court orders to protect users or comply
+            <strong>Legal Obligations:</strong>
+            {" "}
+            Disclosures required by law or court orders to protect users or comply
             with regulations.
           </li>
         </ul>
@@ -83,16 +95,24 @@ export default function PrivacyPage() {
         <h2 className="mt-6 text-lg font-semibold">6. User Rights and Choices</h2>
         <ul className="list-disc space-y-2 pl-5">
           <li>
-            <strong>Access:</strong> Request access to your personal information.
+            <strong>Access:</strong>
+            {" "}
+            Request access to your personal information.
           </li>
           <li>
-            <strong>Correction:</strong> Request updates to inaccurate or incomplete data.
+            <strong>Correction:</strong>
+            {" "}
+            Request updates to inaccurate or incomplete data.
           </li>
           <li>
-            <strong>Deletion:</strong> Request deletion of personal information no longer needed.
+            <strong>Deletion:</strong>
+            {" "}
+            Request deletion of personal information no longer needed.
           </li>
           <li>
-            <strong>Data Portability:</strong> Request an export of your personal information.
+            <strong>Data Portability:</strong>
+            {" "}
+            Request an export of your personal information.
           </li>
         </ul>
 

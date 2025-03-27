@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import { SignInButton } from './signin-button';
-import { useSession } from 'next-auth/react';
+import { useSession } from "next-auth/react";
+
+import { SignInButton } from "./signin-button";
 
 export function SignInWrapper() {
   const { data: session } = useSession();

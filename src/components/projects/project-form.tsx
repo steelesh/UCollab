@@ -1,22 +1,27 @@
-'use client';
+"use client";
 
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useState, useEffect, useRef } from 'react';
-import { createProject, updateProject, searchTechnologies } from '~/features/projects/project.actions';
-import { CreateProjectInput, projectSchema } from '~/features/projects/project.schema';
-import { ProjectType, Project } from '@prisma/client';
-import { Button } from '~/components/ui/button';
-import { Label } from '~/components/ui/label';
-import { Input } from '~/components/ui/input';
-import { Textarea } from '~/components/ui/textarea';
-import { Badge } from '~/components/ui/badge';
-import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group';
+import type { Project } from "@prisma/client";
 
-interface ProjectFormProps {
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ProjectType } from "@prisma/client";
+import { useEffect, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+
+import type { CreateProjectInput } from "~/features/projects/project.schema";
+
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import { Textarea } from "~/components/ui/textarea";
+import { createProject, searchTechnologies, updateProject } from "~/features/projects/project.actions";
+import { projectSchema } from "~/features/projects/project.schema";
+
+type ProjectFormProps = {
   initialData?: CreateProjectInput;
-  projectId?: Project['id'];
-}
+  projectId?: Project["id"];
+};
 
 export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -35,13 +40,13 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
     defaultValues: initialData || {
       projectType: ProjectType.FEEDBACK,
       technologies: [],
-      title: '',
-      description: '',
-      githubRepo: '',
+      title: "",
+      description: "",
+      githubRepo: "",
     },
   });
 
-  const technologies = watch('technologies');
+  const technologies = watch("technologies");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -50,18 +55,18 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleTechSearch = async (value: string) => {
     if (value.length >= 2) {
       try {
         const results = await searchTechnologies(value);
-        setSuggestions(results?.filter((tech) => !technologies.includes(tech)) || []);
+        setSuggestions(results?.filter(tech => !technologies.includes(tech)) || []);
         setShowSuggestions(true);
       } catch (error) {
-        console.error('Failed to fetch suggestions:', error);
+        console.error("Failed to fetch suggestions:", error);
         setSuggestions([]);
       }
     } else {
@@ -74,7 +79,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
     try {
       const formData = new FormData();
       Object.entries(data).forEach(([key, value]) => {
-        if (key === 'technologies') {
+        if (key === "technologies") {
           formData.append(key, JSON.stringify(value));
         } else if (value) {
           formData.append(key, value.toString());
@@ -87,7 +92,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
         await createProject(formData);
       }
     } catch (error) {
-      console.error('Form submission error:', error);
+      console.error("Form submission error:", error);
     }
   };
 
@@ -98,7 +103,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
           <span className="label-text">Project Title</span>
         </label>
         <Input
-          {...register('title')}
+          {...register("title")}
           className="input input-bordered w-full"
           placeholder="Enter project title"
           disabled={isSubmitting}
@@ -110,7 +115,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
           <span className="label-text">Description</span>
         </label>
         <Textarea
-          {...register('description')}
+          {...register("description")}
           className="textarea textarea-bordered w-full"
           placeholder="Describe your project"
           disabled={isSubmitting}
@@ -133,7 +138,8 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
                       field.onChange(field.value.filter((t: string) => t !== tech));
                     }}
                     className="hover:bg-primary cursor-pointer transition duration-200 ease-in-out hover:scale-105"
-                    variant="outline">
+                    variant="outline"
+                  >
                     {tech}
                   </Badge>
                 </div>
@@ -145,17 +151,18 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
                 type="text"
                 className="input input-bordered w-full"
                 placeholder="Add technology"
-                onChange={(e) => handleTechSearch(e.target.value)}
+                onChange={e => handleTechSearch(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     e.preventDefault();
                     const inputValue = e.currentTarget.value.trim();
-                    if (!inputValue) return;
-                    const filteredSuggestions = suggestions.filter((tech) => !field.value.includes(tech));
+                    if (!inputValue)
+                      return;
+                    const filteredSuggestions = suggestions.filter(tech => !field.value.includes(tech));
                     const [closestMatch] = filteredSuggestions;
                     if (closestMatch !== undefined) {
                       field.onChange([...field.value, closestMatch]);
-                      e.currentTarget.value = '';
+                      e.currentTarget.value = "";
                       setShowSuggestions(false);
                     }
                   }
@@ -165,10 +172,11 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
               {showSuggestions && suggestions.length > 0 && (
                 <div
                   ref={suggestionsRef}
-                  className="bg-background absolute top-full left-0 z-10 mt-1 w-full rounded shadow-md">
+                  className="bg-background absolute top-full left-0 z-10 mt-1 w-full rounded shadow-md"
+                >
                   {suggestions
-                    .filter((tech) => !field.value.includes(tech))
-                    .map((tech) => (
+                    .filter(tech => !field.value.includes(tech))
+                    .map(tech => (
                       <Button
                         variant="outline"
                         key={tech}
@@ -178,10 +186,11 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
                           field.onChange([...field.value, tech]);
                           setShowSuggestions(false);
                           if (techInputRef.current) {
-                            techInputRef.current.value = '';
+                            techInputRef.current.value = "";
                           }
                         }}
-                        disabled={isSubmitting}>
+                        disabled={isSubmitting}
+                      >
                         <div className="dropdown-item-content">{tech}</div>
                       </Button>
                     ))}
@@ -197,7 +206,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
           <span className="label-text">GitHub Repository</span>
         </Label>
         <Input
-          {...register('githubRepo')}
+          {...register("githubRepo")}
           className="input input-bordered w-full"
           placeholder="https://github.com/username/repo"
           disabled={isSubmitting}
@@ -213,7 +222,7 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
           name="projectType"
           defaultValue="FEEDBACK"
           render={({ field: { onChange, value } }) => (
-            <RadioGroup value={value ?? 'FEEDBACK'} onValueChange={onChange}>
+            <RadioGroup value={value ?? "FEEDBACK"} onValueChange={onChange}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="FEEDBACK" id="feedback" />
                 <Label htmlFor="feedback">Feedback</Label>
@@ -230,8 +239,9 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
       <Button
         type="submit"
         className="w-full cursor-pointer bg-green-600 hover:bg-green-600/80"
-        disabled={isSubmitting}>
-        {isSubmitting ? 'Saving...' : projectId ? 'Update Project' : 'Create Project'}
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? "Saving..." : projectId ? "Update Project" : "Create Project"}
       </Button>
     </form>
   );

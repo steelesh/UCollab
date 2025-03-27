@@ -1,23 +1,23 @@
-import { prisma } from '~/lib/prisma';
-import { ErrorMessage } from '~/lib/utils';
+import { prisma } from "~/lib/prisma";
+import { ErrorMessage } from "~/lib/utils";
 
-interface GraphNode {
+type GraphNode = {
   id: string;
   value: number;
   color: string;
   label: string;
   avatar: string;
-}
+};
 
-interface GraphLink {
+type GraphLink = {
   source: string;
   target: string;
   color: string;
-}
+};
 
 function computeTechnologySimilarity(currentTechs: string[], otherTechs: string[]): number {
   const otherSet = new Set(otherTechs);
-  const common = currentTechs.filter((tech) => otherSet.has(tech));
+  const common = currentTechs.filter(tech => otherSet.has(tech));
   const union = new Set([...currentTechs, ...otherTechs]);
   return union.size === 0 ? 0 : common.length / union.size;
 }
@@ -84,15 +84,16 @@ export const MentorshipService = {
           mentorship: true,
         },
       });
-      if (!currentUser) throw new Error(ErrorMessage.OPERATION_FAILED);
+      if (!currentUser)
+        throw new Error(ErrorMessage.OPERATION_FAILED);
 
       const users = await prisma.user.findMany({
         where: {
           id: { not: currentUserId },
-          ...(currentUser.mentorship === 'MENTOR'
-            ? { mentorship: 'MENTEE' }
-            : currentUser.mentorship === 'MENTEE'
-              ? { mentorship: 'MENTOR' }
+          ...(currentUser.mentorship === "MENTOR"
+            ? { mentorship: "MENTEE" }
+            : currentUser.mentorship === "MENTEE"
+              ? { mentorship: "MENTOR" }
               : {}),
         },
         select: {
@@ -106,14 +107,14 @@ export const MentorshipService = {
       });
 
       const commentCounts = await prisma.comment.groupBy({
-        by: ['createdById'],
+        by: ["createdById"],
         _count: { id: true },
       });
-      const countsMap = new Map<string, number>(commentCounts.map((item) => [item.createdById, item._count.id]));
+      const countsMap = new Map<string, number>(commentCounts.map(item => [item.createdById, item._count.id]));
       const currentUserCommentCount = countsMap.get(currentUserId) || 0;
-      const currentUserTechs = currentUser.technologies.map((tech) => tech.name);
+      const currentUserTechs = currentUser.technologies.map(tech => tech.name);
 
-      const userIds = [currentUserId, ...users.map((u) => u.id)];
+      const userIds = [currentUserId, ...users.map(u => u.id)];
       const ratings = await prisma.projectRating.findMany({
         where: { userId: { in: userIds } },
         select: { userId: true, projectId: true, rating: true },
@@ -144,7 +145,7 @@ export const MentorshipService = {
               techCounts[tech.name] = (techCounts[tech.name] || 0) + 1;
             }
           }
-          let primaryTech = '';
+          let primaryTech = "";
           let maxCount = 0;
           for (const tech of currentUserTechs) {
             const count = techCounts[tech] || 0;
@@ -165,9 +166,10 @@ export const MentorshipService = {
       }
 
       for (const user of users) {
-        const userTechs = user.technologies.map((tech) => tech.name);
-        const commonTechs = currentUserTechs.filter((tech) => userTechs.includes(tech));
-        if (commonTechs.length === 0) continue;
+        const userTechs = user.technologies.map(tech => tech.name);
+        const commonTechs = currentUserTechs.filter(tech => userTechs.includes(tech));
+        if (commonTechs.length === 0)
+          continue;
         const otherCommentCount = countsMap.get(user.id) || 0;
         const otherUserRatings = ratingsMap.get(user.id) || new Map();
         const matchScore = computeMatchScore(
@@ -193,17 +195,19 @@ export const MentorshipService = {
       nodes.push({
         id: currentUser.id,
         value: 20,
-        color: '#ffffff',
+        color: "#ffffff",
         label: currentUser.username,
         avatar: currentUser.avatar,
       });
 
       for (const tech of Object.keys(techBranches)) {
         const branch = techBranches[tech];
-        if (!branch || branch.length === 0) continue;
+        if (!branch || branch.length === 0)
+          continue;
         branch.sort((a, b) => b.matchScore - a.matchScore);
         const primary = branch[0];
-        if (!primary) continue;
+        if (!primary)
+          continue;
         const primaryNodeId = `${primary.user.id}-${tech}`;
         nodes.push({
           id: primaryNodeId,
@@ -219,7 +223,8 @@ export const MentorshipService = {
         });
         for (let i = 1; i < branch.length; i++) {
           const secondary = branch[i];
-          if (!secondary) continue;
+          if (!secondary)
+            continue;
           const secondaryNodeId = `${secondary.user.id}-${tech}`;
           nodes.push({
             id: secondaryNodeId,
@@ -238,7 +243,7 @@ export const MentorshipService = {
 
       return { nodes, links };
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Operation failed');
+      throw new Error(error instanceof Error ? error.message : "Operation failed");
     }
   },
 };

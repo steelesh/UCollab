@@ -1,8 +1,8 @@
 export const metadata = {
-  title: 'UCollab — Code of Conduct',
+  title: "UCollab — Code of Conduct",
 };
 
-export default function CodeofConductPage() {
+export default function Page() {
   return (
     <div className="flex flex-col items-center">
       <h1 className="text-center text-2xl font-bold select-none">Code of Conduct</h1>
@@ -15,16 +15,24 @@ export default function CodeofConductPage() {
         <h2 className="text-lg font-semibold">📌 Our Core Values</h2>
         <ul className="text-secondary-foreground mt-4 list-disc space-y-2 pl-5">
           <li>
-            <strong>♦️ Respect:</strong> Treat everyone with kindness and professionalism.
+            <strong>♦️ Respect:</strong>
+            {" "}
+            Treat everyone with kindness and professionalism.
           </li>
           <li>
-            <strong>♦️ Inclusivity:</strong> Embrace diversity and create an open, welcoming space.
+            <strong>♦️ Inclusivity:</strong>
+            {" "}
+            Embrace diversity and create an open, welcoming space.
           </li>
           <li>
-            <strong>♦️ Collaboration:</strong> Work together constructively, valuing all contributions.
+            <strong>♦️ Collaboration:</strong>
+            {" "}
+            Work together constructively, valuing all contributions.
           </li>
           <li>
-            <strong>♦️ Integrity:</strong> Be honest, ethical, and take responsibility for your actions.
+            <strong>♦️ Integrity:</strong>
+            {" "}
+            Be honest, ethical, and take responsibility for your actions.
           </li>
         </ul>
       </div>
@@ -57,16 +65,19 @@ export default function CodeofConductPage() {
       <div className="relative mt-8 w-full max-w-3xl rounded-lg shadow-2xl px-6 py-6">
         <h2 className="text-lg font-semibold">📬 Reporting Violations</h2>
         <p className="text-secondary mt-2 text-sm">
-          If you witness or experience behavior that violates this Code of Conduct, please report it confidentially to{' '}
-          <a href="mailto:support@ucollab.com" className="text-blue-400 underline">support@ucollab.com</a>.
+          If you witness or experience behavior that violates this Code of Conduct, please report it confidentially to
+          {" "}
+          <a href="mailto:support@ucollab.com" className="text-blue-400 underline">support@ucollab.com</a>
+          .
         </p>
       </div>
 
       <p className="mt-8 text-sm text-gray-400">
-        This Code of Conduct is adapted from the Contributor Covenant v2.1. Read more at{' '}
+        This Code of Conduct is adapted from the Contributor Covenant v2.1. Read more at
         <a href="https://www.contributor-covenant.org/version/2/1/code_of_conduct/" target="_blank" rel="noopener noreferrer" className="underline text-blue-400">
           contributor-covenant.org
-        </a>.
+        </a>
+        .
       </p>
     </div>
   );

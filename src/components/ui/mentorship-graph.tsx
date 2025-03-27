@@ -1,34 +1,35 @@
-'use client';
+"use client";
 
-import dynamic from 'next/dynamic';
-import React from 'react';
-import { NodeObject } from 'react-force-graph-2d';
+import type { NodeObject } from "react-force-graph-2d";
 
-const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
+import dynamic from "next/dynamic";
+import React from "react";
 
-interface GraphNode extends NodeObject {
+const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), { ssr: false });
+
+type GraphNode = {
   id: string;
   value: number;
   color: string;
   label: string;
   avatar: string;
   score?: number;
-}
+} & NodeObject;
 
-interface GraphLink extends NodeObject {
+type GraphLink = {
   source: string;
   target: string;
   score?: number;
-}
+} & NodeObject;
 
-interface GraphData {
+type GraphData = {
   nodes: GraphNode[];
   links: GraphLink[];
-}
+};
 
-interface MentorshipGraphProps {
+type MentorshipGraphProps = {
   graphData: GraphData;
-}
+};
 
 export function MentorshipGraph({ graphData }: MentorshipGraphProps) {
   return (
@@ -42,13 +43,14 @@ export function MentorshipGraph({ graphData }: MentorshipGraphProps) {
       height={600}
       width={800}
       onNodeClick={(node) => {
-        if (node && typeof node.label === 'string') {
-          const username = node.label.split(' (')[0];
-          window.open(`/u/${username}`, '_blank');
+        if (node && typeof node.label === "string") {
+          const username = node.label.split(" (")[0];
+          window.open(`/u/${username}`, "_blank");
         }
       }}
       nodeCanvasObject={(node, ctx) => {
-        if (node.x === undefined || node.y === undefined) return;
+        if (node.x === undefined || node.y === undefined)
+          return;
         const size = Math.max(20, node.value);
         ctx.save();
         ctx.beginPath();

@@ -1,20 +1,19 @@
-import { withAuth } from '~/security/protected';
-import { User } from '@prisma/client';
-import { ProfileUserInfo } from '~/components/profiles/profile-user-info';
-import { ProfileHeader } from '~/components/profiles/profile-header';
-import { ProfileProjectsList } from '~/components/profiles/profile-projects-list';
-import { ProfileCommentsList } from '~/components/profiles/profile-comments-list';
-import { getUserProfile } from '~/features/users/user.queries';
-import { Metadata } from 'next';
+import type { User } from "@prisma/client";
+import type { Metadata } from "next";
 
-interface PageProps {
-  params: Promise<{
-    username: User['username'];
-  }>;
-  userId: User['id'];
-}
+import { ProfileCommentsList } from "~/components/profiles/profile-comments-list";
+import { ProfileHeader } from "~/components/profiles/profile-header";
+import { ProfileProjectsList } from "~/components/profiles/profile-projects-list";
+import { ProfileUserInfo } from "~/components/profiles/profile-user-info";
+import { getUserProfile } from "~/features/users/user.queries";
+import { withAuth } from "~/security/protected";
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+type PageProps = {
+  params: Promise<{ username: User["username"] }>;
+  userId: User["id"];
+};
+
+export async function generateMetadata({ params }: { params: Promise<{ username: User["username"] }> }): Promise<Metadata> {
   try {
     const { username } = await params;
     const userProfile = await getUserProfile(username);
@@ -24,7 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   } catch {
     return {
-      title: 'User Not Found | UCollab',
+      title: "User Not Found | UCollab",
     };
   }
 }

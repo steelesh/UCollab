@@ -1,16 +1,18 @@
-import { ProjectService } from './project.service';
-import type { Project, User } from '@prisma/client';
-import type { ExplorePageData, ProjectDetails } from './project.types';
+import type { Project, User } from "@prisma/client";
 
-export const getProjectTitle = async (projectId: Project['id']) => {
+import type { ExplorePageData, ProjectDetails } from "./project.types";
+
+import { ProjectService } from "./project.service";
+
+export async function getProjectTitle(projectId: Project["id"]) {
   return ProjectService.getProjectTitle(projectId);
-};
+}
 
-export const getRealTimeProject = async (projectId: Project['id'], userId: User['id']): Promise<ProjectDetails> => {
+export async function getRealTimeProject(projectId: Project["id"], userId: User["id"]): Promise<ProjectDetails> {
   return ProjectService.getProjectById(projectId, userId);
-};
+}
 
-export const getProjects = async (page = 1, limit = 12, userId: User['id']): Promise<ExplorePageData> => {
+export async function getProjects(page: number, limit: number, userId: User["id"]): Promise<ExplorePageData> {
   const [projects, totalCount] = await Promise.all([
     ProjectService.getPaginatedProjects(page, limit, userId),
     ProjectService.getProjectCount(userId),
@@ -23,8 +25,8 @@ export const getProjects = async (page = 1, limit = 12, userId: User['id']): Pro
     limit,
     totalCount,
   };
-};
+}
 
-export const getUserProjectRating = async (projectId: Project['id'], userId: User['id']): Promise<number> => {
+export async function getUserProjectRating(projectId: Project["id"], userId: User["id"]): Promise<number> {
   return ProjectService.getUserProjectRating(projectId, userId);
-};
+}

@@ -1,8 +1,8 @@
-import { MentorshipStatus } from '@prisma/client';
+import { MentorshipStatus } from "@prisma/client";
 
 export const MENTORSHIP_CONFIG = {
   [MentorshipStatus.MENTOR]: {
-    label: 'Mentor',
+    label: "Mentor",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24">
         <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}>
@@ -13,7 +13,7 @@ export const MENTORSHIP_CONFIG = {
     ),
   },
   [MentorshipStatus.MENTEE]: {
-    label: 'Currently mentored',
+    label: "Currently mentored",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24">
         <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}>
@@ -24,7 +24,7 @@ export const MENTORSHIP_CONFIG = {
     ),
   },
   [MentorshipStatus.NONE]: {
-    label: 'Looking for mentorship',
+    label: "Looking for mentorship",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24">
         <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}>

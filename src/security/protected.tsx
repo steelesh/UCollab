@@ -1,80 +1,54 @@
-import { OnboardingStep, Role, User } from '@prisma/client';
-import { redirect } from 'next/navigation';
-import { isDevelopment } from '~/lib/env';
-import React from 'react';
-import { auth } from './auth';
+import type { User } from "@prisma/client";
+import type React from "react";
 
-export function withAuth<P>(Component: (props: P & { userId: string }) => Promise<React.ReactElement>) {
-  return async function AuthComponent(props: P): Promise<React.ReactElement> {
+import { OnboardingStep } from "@prisma/client";
+import { redirect } from "next/navigation";
+
+import { auth } from "./auth";
+
+export function withAuth<T extends { userId: User["id"] }>(
+  Component: (props: T) => Promise<React.ReactElement>,
+) {
+  return async function AuthComponent(props: Omit<T, "userId">): Promise<React.ReactElement> {
     try {
       const session = await auth();
 
       if (!session?.user?.id) {
-        redirect('/');
+        redirect("/");
       }
 
       if (session.user.onboardingStep !== OnboardingStep.COMPLETE) {
-        redirect('/onboarding');
+        redirect("/onboarding");
       }
 
-      return Component({ ...props, userId: session.user.id as User['id'] });
+      return Component({ ...props, userId: session.user.id as User["id"] } as T);
     } catch (error) {
-      if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+      if (error instanceof Error && error.message === "NEXT_REDIRECT") {
         throw error;
       }
-      console.error('Auth error:', error);
-      redirect('/');
+      console.error("Auth error:", error);
+      redirect("/");
     }
   };
 }
 
-export function withAdmin<P>(Component: (props: P & { userId: string }) => Promise<React.ReactElement>) {
-  return async function AdminComponent(props: P): Promise<React.ReactElement> {
+export function withOnboarding<T extends { userId: User["id"] }>(
+  Component: (props: T) => Promise<React.ReactElement>,
+) {
+  return async function OnboardingComponent(props: Omit<T, "userId">): Promise<React.ReactElement> {
     try {
       const session = await auth();
       if (!session?.user?.id) {
-        redirect('/');
-      }
-
-      if (session.user.role !== Role.ADMIN) {
-        redirect('/');
-      }
-
-      return Component({ ...props, userId: session.user.id as User['id'] });
-    } catch {
-      redirect('/');
-    }
-  };
-}
-
-export function withOnboarding<P>(Component: (props: P & { userId: string }) => Promise<React.ReactElement>) {
-  return async function OnboardingComponent(props: P): Promise<React.ReactElement> {
-    try {
-      const session = await auth();
-      if (!session?.user?.id) {
-        redirect('/');
+        redirect("/");
       }
 
       if (session.user.onboardingStep === OnboardingStep.COMPLETE) {
-        redirect('/');
+        redirect("/");
       }
 
-      return Component({ ...props, userId: session.user.id as User['id'] });
+      return Component({ ...props, userId: session.user.id as User["id"] } as T);
     } catch {
-      redirect('/');
+      redirect("/");
     }
-  };
-}
-
-export function withDevelopment<P>(Component: (props: P & { userId: string }) => Promise<React.ReactElement>) {
-  return async function DevelopmentComponent(props: P): Promise<React.ReactElement> {
-    if (!isDevelopment()) {
-      redirect('/');
-    }
-
-    const session = await auth();
-    const userId = session?.user?.id;
-
-    return Component({ ...props, userId: userId as User['id'] });
   };
 }

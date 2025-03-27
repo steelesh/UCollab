@@ -1,13 +1,15 @@
-import Link from 'next/link';
-import { withAuth } from '~/security/protected';
-import { getBookmarkedProjects } from '~/features/projects/project.actions';
-import type { Project } from '@prisma/client';
+import type { Project } from "@prisma/client";
+
+import Link from "next/link";
+
+import { getBookmarkedProjects } from "~/features/projects/project.actions";
+import { withAuth } from "~/security/protected";
 
 export const metadata = {
-  title: 'UCollab — My Bookmarks',
+  title: "UCollab — My Bookmarks",
 };
 
-async function BookmarksPage() {
+async function Page() {
   const { success, projects } = (await getBookmarkedProjects()) as { success: boolean; projects: Project[] };
 
   if (!success) {
@@ -23,7 +25,13 @@ async function BookmarksPage() {
               {project.title}
             </Link>
             <p className="text-muted-foreground text-sm">
-              Created: {new Date(project.createdDate).toISOString().split('T')[0]} | Rating: {project.rating}
+              Created:
+              {" "}
+              {new Date(project.createdDate).toISOString().split("T")[0]}
+              {" "}
+              | Rating:
+              {" "}
+              {project.rating}
             </p>
           </div>
         </div>
@@ -32,4 +40,4 @@ async function BookmarksPage() {
   );
 }
 
-export default withAuth(BookmarksPage);
+export default withAuth(Page);

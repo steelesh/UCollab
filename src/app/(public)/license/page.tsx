@@ -1,20 +1,25 @@
 export const metadata = {
-  title: 'UCollab — License',
+  title: "UCollab — License",
 };
 
-export default function LicensePage() {
+export default function Page() {
   return (
     <div className="flex flex-col items-center">
       <h1 className="text-center text-2xl font-bold select-none">License Agreement</h1>
 
       <div className="bg-base-300 mt-8 w-full max-w-3xl rounded-lg p-8 shadow-2xl">
         <p className="text-secondary mb-4 text-sm">
-          <strong>Last Updated:</strong> March 7th, 2025
+          <strong>Last Updated:</strong>
+          {" "}
+          March 7th, 2025
         </p>
 
         <h2 className="text-lg font-semibold">MIT License</h2>
         <p>
-          This project is licensed under the <strong>MIT License</strong>. By using this software, you agree to the
+          This project is licensed under the
+          {" "}
+          <strong>MIT License</strong>
+          . By using this software, you agree to the
           following terms.
         </p>
 

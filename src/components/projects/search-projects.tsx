@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import * as R from 'remeda';
-import { checkProjectsCount } from '~/features/projects/project.actions';
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import * as R from "remeda";
+
+import { checkProjectsCount } from "~/features/projects/project.actions";
 
 export default function SearchBar() {
   const router = useRouter();
@@ -11,40 +12,45 @@ export default function SearchBar() {
   const currentParamsString = sp.toString();
 
   // Initialize state from URL (or defaults)
-  const [query, setQuery] = useState(sp.get('query') || '');
-  const [projectType, setProjectType] = useState(sp.get('projectType') || '');
-  const [minRating, setMinRating] = useState(sp.get('minRating') || '');
-  const [sortBy, setSortBy] = useState(sp.get('sortBy') || 'createdDate');
-  const [sortOrder, setSortOrder] = useState(sp.get('sortOrder') || 'desc');
+  const [query, setQuery] = useState(sp.get("query") || "");
+  const [projectType, setProjectType] = useState(sp.get("projectType") || "");
+  const [minRating, setMinRating] = useState(sp.get("minRating") || "");
+  const [sortBy, setSortBy] = useState(sp.get("sortBy") || "createdDate");
+  const [sortOrder, setSortOrder] = useState(sp.get("sortOrder") || "desc");
 
   const updateSearch = useCallback(async () => {
     const params = new URLSearchParams();
-    if (query) params.set('query', query);
-    if (projectType) params.set('projectType', projectType);
-    if (minRating) params.set('minRating', minRating);
-    if (sortBy) params.set('sortBy', sortBy);
-    if (sortOrder) params.set('sortOrder', sortOrder);
+    if (query)
+      params.set("query", query);
+    if (projectType)
+      params.set("projectType", projectType);
+    if (minRating)
+      params.set("minRating", minRating);
+    if (sortBy)
+      params.set("sortBy", sortBy);
+    if (sortOrder)
+      params.set("sortOrder", sortOrder);
 
     // Get current filter values from URL.
     const currentFilter = {
-      query: sp.get('query') || '',
-      projectType: sp.get('projectType') || '',
-      minRating: sp.get('minRating') || '',
-      sortBy: sp.get('sortBy') || 'createdDate',
-      sortOrder: sp.get('sortOrder') || 'desc',
+      query: sp.get("query") || "",
+      projectType: sp.get("projectType") || "",
+      minRating: sp.get("minRating") || "",
+      sortBy: sp.get("sortBy") || "createdDate",
+      sortOrder: sp.get("sortOrder") || "desc",
     };
 
-    const filtersChanged =
-      query !== currentFilter.query ||
-      projectType !== currentFilter.projectType ||
-      minRating !== currentFilter.minRating ||
-      sortBy !== currentFilter.sortBy ||
-      sortOrder !== currentFilter.sortOrder;
+    const filtersChanged
+      = query !== currentFilter.query
+        || projectType !== currentFilter.projectType
+        || minRating !== currentFilter.minRating
+        || sortBy !== currentFilter.sortBy
+        || sortOrder !== currentFilter.sortOrder;
 
     if (filtersChanged) {
-      params.set('page', '1');
+      params.set("page", "1");
     } else {
-      params.set('page', sp.get('page') || '1');
+      params.set("page", sp.get("page") || "1");
     }
 
     const newParamsString = params.toString();
@@ -73,7 +79,7 @@ export default function SearchBar() {
             id="query"
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={e => setQuery(e.target.value)}
             placeholder="Search projects..."
             className="bg-background mt-1 block w-full rounded-md border-gray-300 p-2 text-white"
           />
@@ -85,8 +91,9 @@ export default function SearchBar() {
           <select
             id="projectType"
             value={projectType}
-            onChange={(e) => setProjectType(e.target.value)}
-            className="bg-background mt-1 block w-full rounded-md border-gray-300 p-2 text-white">
+            onChange={e => setProjectType(e.target.value)}
+            className="bg-background mt-1 block w-full rounded-md border-gray-300 p-2 text-white"
+          >
             <option value="">All</option>
             <option value="FEEDBACK">Feedback</option>
             <option value="SHOWCASE">Showcase</option>
@@ -99,8 +106,9 @@ export default function SearchBar() {
           <select
             id="minRating"
             value={minRating}
-            onChange={(e) => setMinRating(e.target.value)}
-            className="bg-background mt-1 block w-full rounded-md border-gray-300 p-2 text-white">
+            onChange={e => setMinRating(e.target.value)}
+            className="bg-background mt-1 block w-full rounded-md border-gray-300 p-2 text-white"
+          >
             <option value="">Any Rating</option>
             <option value="1">1 Star & up</option>
             <option value="2">2 Stars & up</option>
@@ -116,8 +124,9 @@ export default function SearchBar() {
           <select
             id="sortBy"
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="bg-background mt-1 block w-full rounded-md border-gray-300 p-2 text-white">
+            onChange={e => setSortBy(e.target.value)}
+            className="bg-background mt-1 block w-full rounded-md border-gray-300 p-2 text-white"
+          >
             <option value="createdDate">Creation Date</option>
             <option value="lastModifiedDate">Last Updated Date</option>
           </select>
@@ -129,8 +138,9 @@ export default function SearchBar() {
           <select
             id="sortOrder"
             value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="bg-background mt-1 block w-full rounded-md border-gray-300 p-2 text-white">
+            onChange={e => setSortOrder(e.target.value)}
+            className="bg-background mt-1 block w-full rounded-md border-gray-300 p-2 text-white"
+          >
             <option value="desc">Descending</option>
             <option value="asc">Ascending</option>
           </select>

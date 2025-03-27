@@ -1,11 +1,17 @@
 [book]
 title = "UCollab Docs"
-authors = ["Luke Halverson", "Nawrs Alfardous", "Paige Weitz", "Steele Shreve", "Zachary Thomas"]
+authors = [
+  "Luke Halverson",
+  "Nawrs Alfardous",
+  "Paige Weitz",
+  "Steele Shreve",
+  "Zachary Thomas"
+]
 description = "This site provides all of the documentation for UCollab!"
 language = "en"
 multilingual = false
 src = "docs/src"
- 
+
 [build]
 build-dir = "docs/book"
 
@@ -13,4 +19,7 @@ build-dir = "docs/book"
 command = "mdbook-mermaid"
 
 [output.html]
-additional-js = ["mermaid.min.js", "mermaid-init.js"]
+additional-js = [
+  "mermaid.min.js",
+  "mermaid-init.js"
+]

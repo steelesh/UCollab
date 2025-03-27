@@ -1,15 +1,15 @@
-import { MentorshipGraph } from '~/components/ui/mentorship-graph';
-import { getMentorshipGraphData } from '~/features/mentorship/mentorship.action';
+import { MentorshipGraph } from "~/components/ui/mentorship-graph";
+import { getMentorshipGraphData } from "~/features/mentorship/mentorship.action";
 
 export const metadata = {
-  title: 'UCollab — Mentorship',
+  title: "UCollab — Mentorship",
 };
 
-export default async function MentorshipPage() {
+export default async function Page() {
   const { success, graphData } = (await getMentorshipGraphData()) as {
     success: boolean;
     graphData: {
-      nodes: { id: string; value: number; color: string; label: string }[];
+      nodes: { id: string; value: number; color: string; label: string; avatar: string }[];
       links: { source: string; target: string }[];
     };
   };

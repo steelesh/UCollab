@@ -1,19 +1,22 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import type { Route } from 'next';
-import type { Project } from '~/features/projects/project.types';
-import { deleteProject } from '~/features/projects/project.actions';
-import { useRouter } from 'next/navigation';
-import { Button } from '~/components/ui/button';
+import type { Route } from "next";
 
-interface ProjectHeaderProps {
-  title: Project['title'];
-  projectId: Project['id'];
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+
+import type { Project } from "~/features/projects/project.types";
+
+import { Button } from "~/components/ui/button";
+import { deleteProject } from "~/features/projects/project.actions";
+
+type ProjectHeaderProps = {
+  title: Project["title"];
+  projectId: Project["id"];
   isOwnProject: boolean;
-}
+};
 
 export function ProjectHeader({ title, projectId, isOwnProject }: ProjectHeaderProps) {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -23,7 +26,7 @@ export function ProjectHeader({ title, projectId, isOwnProject }: ProjectHeaderP
     try {
       setIsDeleting(true);
       await deleteProject(projectId);
-      router.push('/');
+      router.push("/");
       router.refresh();
     } catch {
       // TODO: handle error, show toast or something
@@ -55,20 +58,22 @@ export function ProjectHeader({ title, projectId, isOwnProject }: ProjectHeaderP
             </Button>
           </Link>
           <Button className="cursor-pointer" aria-label="Delete Project" onClick={handleDelete} disabled={isDeleting}>
-            {isDeleting ? (
-              <span className="loading loading-spinner loading-sm" />
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
-                <path
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"
-                />
-              </svg>
-            )}
+            {isDeleting
+              ? (
+                  <span className="loading loading-spinner loading-sm" />
+                )
+              : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
+                    <path
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"
+                    />
+                  </svg>
+                )}
           </Button>
         </div>
       )}

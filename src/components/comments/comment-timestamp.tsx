@@ -1,5 +1,6 @@
-import { Comment } from '~/features/projects/project.types';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from "date-fns";
+
+import type { Comment } from "~/features/projects/project.types";
 
 export function CommentTimestamp({ comment }: { comment: Comment }) {
   const isEdited = comment.lastModifiedDate && comment.lastModifiedDate > comment.createdDate;

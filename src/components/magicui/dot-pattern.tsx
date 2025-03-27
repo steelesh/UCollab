@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import { cn } from '~/lib/utils';
-import { motion } from 'motion/react';
-import React, { useEffect, useId, useRef, useState } from 'react';
+import { motion } from "motion/react";
+import React, { useEffect, useId, useRef, useState } from "react";
+
+import { cn } from "~/lib/utils";
 
 /**
  *  DotPattern Component Props
@@ -17,7 +18,7 @@ import React, { useEffect, useId, useRef, useState } from 'react';
  * @param {string} [className] - Additional CSS classes to apply to the SVG container
  * @param {boolean} [glow=false] - Whether dots should have a glowing animation effect
  */
-interface DotPatternProps extends React.SVGProps<SVGSVGElement> {
+type DotPatternProps = {
   width?: number;
   height?: number;
   x?: number;
@@ -28,7 +29,7 @@ interface DotPatternProps extends React.SVGProps<SVGSVGElement> {
   className?: string;
   glow?: boolean;
   [key: string]: unknown;
-}
+} & React.SVGProps<SVGSVGElement>;
 
 /**
  * DotPattern Component
@@ -63,8 +64,6 @@ interface DotPatternProps extends React.SVGProps<SVGSVGElement> {
 export function DotPattern({
   width = 16,
   height = 16,
-  x = 0,
-  y = 0,
   cx = 1,
   cy = 1,
   cr = 1,
@@ -80,13 +79,14 @@ export function DotPattern({
     const updateDimensions = () => {
       if (containerRef.current) {
         const { width, height } = containerRef.current.getBoundingClientRect();
+        // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
         setDimensions({ width, height });
       }
     };
 
     updateDimensions();
-    window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
+    window.addEventListener("resize", updateDimensions);
+    return () => window.removeEventListener("resize", updateDimensions);
   }, []);
 
   const dots = Array.from(
@@ -109,21 +109,22 @@ export function DotPattern({
     <svg
       ref={containerRef}
       aria-hidden="true"
-      className={cn('pointer-events-none absolute inset-0 h-full w-full', className)}
-      {...props}>
+      className={cn("pointer-events-none absolute inset-0 h-full w-full", className)}
+      {...props}
+    >
       <defs>
         <radialGradient id={`${id}-gradient`}>
           <stop offset="0%" stopColor="currentColor" stopOpacity="1" />
           <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
         </radialGradient>
       </defs>
-      {dots.map((dot, index) => (
+      {dots.map(dot => (
         <motion.circle
           key={`${dot.x}-${dot.y}`}
           cx={dot.x}
           cy={dot.y}
           r={cr}
-          fill={glow ? `url(#${id}-gradient)` : 'currentColor'}
+          fill={glow ? `url(#${id}-gradient)` : "currentColor"}
           className="text-neutral-400/80"
           initial={glow ? { opacity: 0.4, scale: 1 } : {}}
           animate={
@@ -139,9 +140,9 @@ export function DotPattern({
               ? {
                   duration: dot.duration,
                   repeat: Infinity,
-                  repeatType: 'reverse',
+                  repeatType: "reverse",
                   delay: dot.delay,
-                  ease: 'easeInOut',
+                  ease: "easeInOut",
                 }
               : {}
           }

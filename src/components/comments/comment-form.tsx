@@ -1,40 +1,46 @@
-'use client';
+"use client";
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useRef, useState, useEffect } from 'react';
-import Tiptap, { TiptapRef } from '~/components/ui/tiptap';
-import { commentSchema, CommentFormData } from '~/features/comments/comment.schema';
-import { Comment, Project, User } from '@prisma/client';
-import { Button } from '~/components/ui/button';
+import type { Comment, Project, User } from "@prisma/client";
 
-interface CommentFormProps {
-  projectId: Project['id'];
-  currentUserId: User['id'];
-  onSubmit: (content: Comment['content'], hasChanged: boolean) => Promise<void>;
-  initialContent?: Comment['content'];
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+
+import type { TiptapRef } from "~/components/ui/tiptap";
+import type { CommentFormData } from "~/features/comments/comment.schema";
+
+import { Button } from "~/components/ui/button";
+import Tiptap from "~/components/ui/tiptap";
+import { commentSchema } from "~/features/comments/comment.schema";
+
+type CommentFormProps = {
+  projectId: Project["id"];
+  currentUserId: User["id"];
+  onSubmit: (content: Comment["content"], hasChanged: boolean) => Promise<void>;
+  initialContent?: Comment["content"];
   isEditing?: boolean;
   onCancel?: () => void;
-}
+};
 
 function normalizeHtml(html: string): string {
-  if (typeof document === 'undefined') return html;
-  const temp = document.createElement('div');
+  if (typeof document === "undefined")
+    return html;
+  const temp = document.createElement("div");
   temp.innerHTML = html;
-  return temp.textContent?.trim().replace(/\s+/g, ' ') || '';
+  return temp.textContent?.trim().replace(/\s+/g, " ") || "";
 }
 
 export function CommentForm({
   projectId,
   currentUserId,
   onSubmit,
-  initialContent = '',
+  initialContent = "",
   isEditing = false,
   onCancel,
 }: CommentFormProps) {
   const editorRef = useRef<TiptapRef>(null);
   const [hasChanged, setHasChanged] = useState(false);
-  const initialContentNormalized = useRef('');
+  const initialContentNormalized = useRef("");
 
   useEffect(() => {
     initialContentNormalized.current = normalizeHtml(initialContent);
@@ -52,7 +58,7 @@ export function CommentForm({
       content: initialContent,
       projectId,
     },
-    mode: 'onSubmit',
+    mode: "onSubmit",
   });
 
   const handleFormSubmit = async (data: CommentFormData) => {
@@ -64,7 +70,7 @@ export function CommentForm({
     try {
       await onSubmit(data.content, hasChanged);
       if (!isEditing) {
-        reset({ content: '', projectId }, { keepErrors: false, keepDirty: false });
+        reset({ content: "", projectId }, { keepErrors: false, keepDirty: false });
         editorRef.current?.clearContent();
         clearErrors();
       }
@@ -80,7 +86,7 @@ export function CommentForm({
           ref={editorRef}
           content={initialContent}
           onChange={(content) => {
-            setValue('content', content, { shouldValidate: false });
+            setValue("content", content, { shouldValidate: false });
             const normalizedNew = normalizeHtml(content);
             setHasChanged(normalizedNew !== initialContentNormalized.current);
           }}
@@ -98,7 +104,8 @@ export function CommentForm({
             variant="outline"
             onClick={onCancel}
             className="hover:bg-primary cursor-pointer"
-            disabled={isSubmitting}>
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
         )}
@@ -107,8 +114,9 @@ export function CommentForm({
           type="submit"
           variant="outline"
           className="cursor-pointer"
-          disabled={isSubmitting || (isEditing && !hasChanged)}>
-          {isSubmitting ? 'Saving...' : isEditing ? (hasChanged ? 'Save Changes' : 'No Changes') : 'Post Comment'}
+          disabled={isSubmitting || (isEditing && !hasChanged)}
+        >
+          {isSubmitting ? "Saving..." : isEditing ? (hasChanged ? "Save Changes" : "No Changes") : "Post Comment"}
         </Button>
       </div>
     </form>

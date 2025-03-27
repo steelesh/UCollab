@@ -1,11 +1,11 @@
-import { OnboardingForm } from '~/components/onboarding/onboarding-form';
-import { withOnboarding } from '~/security/protected';
+import { OnboardingForm } from "~/components/onboarding/onboarding-form";
+import { withOnboarding } from "~/security/protected";
 
 export const metadata = {
-  title: 'UCollab — Onboarding',
+  title: "UCollab — Onboarding",
 };
 
-async function OnboardingPage() {
+async function Page() {
   return (
     <div className="flex flex-col items-center">
       <div className="mx-auto w-full max-w-5xl rounded-lg p-4 shadow-lg">
@@ -16,4 +16,4 @@ async function OnboardingPage() {
   );
 }
 
-export default withOnboarding(OnboardingPage);
+export default withOnboarding(Page);

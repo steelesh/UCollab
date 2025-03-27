@@ -1,49 +1,48 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { formatDistanceToNow } from 'date-fns';
-import type { Comment } from '~/features/users/user.types';
+import { formatDistanceToNow } from "date-fns";
+import Link from "next/link";
 
-interface ProfileCommentsListProps {
+import type { Comment } from "~/features/users/user.types";
+
+import { CommentContent } from "~/components/comments/comment-content";
+
+type ProfileCommentsListProps = {
   comments: Comment[];
-}
+};
 
 export function ProfileCommentsList({ comments }: ProfileCommentsListProps) {
-  const parseContent = (content: string) => {
-    return content
-      .replace(/<p>(.*?)<\/p>/g, '$1')
-      .replace(
-        /<span data-type="mention" class="tiptap-mention" data-id="([^"]*)" data-label="([^"]*)">([^<]*)<\/span>/g,
-        '<span class="font-semibold text-primary">@$2</span>',
-      )
-      .trim();
-  };
-
   return (
     <>
-      {comments.length === 0 ? (
-        <p className="text-accent-content pt-2 text-sm">No comments available.</p>
-      ) : (
-        <ul className="space-y-4 py-4">
-          {comments.map((comment) => (
-            <li key={comment.id} className="group bg-muted rounded-lg">
-              <Link
-                href={`/p/${comment.projectId}#comment-${comment.id}`}
-                className="block rounded-lg p-4 transition-colors">
-                <div
-                  className="line-clamp-2 text-sm hover:underline"
-                  dangerouslySetInnerHTML={{ __html: parseContent(comment.content) }}
-                />
-                <div className="text-muted-foreground flex items-center gap-2 text-xs">
-                  <span>on {comment.project.title}</span>
-                  <span>•</span>
-                  <time>{formatDistanceToNow(new Date(comment.createdDate))} ago</time>
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      {comments.length === 0
+        ? (
+            <p className="text-accent-content pt-2 text-sm">No comments available.</p>
+          )
+        : (
+            <ul className="space-y-4 py-4">
+              {comments.map(comment => (
+                <li key={comment.id} className="group bg-muted rounded-lg">
+                  <Link
+                    href={`/p/${comment.projectId}#comment-${comment.id}`}
+                    className="block rounded-lg p-4 transition-colors"
+                  >
+                    <CommentContent content={comment.content} className="hover:underline" />
+                    <div className="text-muted-foreground flex items-center gap-2 text-xs">
+                      <span>
+                        on
+                        {comment.project.title}
+                      </span>
+                      <span>•</span>
+                      <time>
+                        {formatDistanceToNow(new Date(comment.createdDate))}
+                        ago
+                      </time>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
     </>
   );
 }

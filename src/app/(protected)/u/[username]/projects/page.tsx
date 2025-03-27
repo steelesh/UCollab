@@ -1,13 +1,15 @@
-import Link from 'next/link';
-import { withAuth } from '~/security/protected';
-import { getCreatedProjects } from '~/features/projects/project.actions';
-import type { Project } from '@prisma/client';
+import type { Project } from "@prisma/client";
+
+import Link from "next/link";
+
+import { getCreatedProjects } from "~/features/projects/project.actions";
+import { withAuth } from "~/security/protected";
 
 export const metadata = {
-  title: 'UCollab — My Projects',
+  title: "UCollab — My Projects",
 };
 
-async function MyProjectsPage() {
+async function Page() {
   const { success, projects } = (await getCreatedProjects()) as {
     success: boolean;
     projects: Project[];
@@ -26,7 +28,13 @@ async function MyProjectsPage() {
               {project.title}
             </Link>
             <p className="text-muted-foreground text-sm">
-              Created: {new Date(project.createdDate).toISOString().split('T')[0]} | Rating: {project.rating}
+              Created:
+              {" "}
+              {new Date(project.createdDate).toISOString().split("T")[0]}
+              {" "}
+              | Rating:
+              {" "}
+              {project.rating}
             </p>
           </div>
         </div>
@@ -35,4 +43,4 @@ async function MyProjectsPage() {
   );
 }
 
-export default withAuth(MyProjectsPage);
+export default withAuth(Page);

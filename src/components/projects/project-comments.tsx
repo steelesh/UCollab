@@ -1,34 +1,38 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Comment } from '~/features/projects/project.types';
-import { CommentList } from '../comments/comment-list';
-import { CommentForm } from '../comments/comment-form';
-import { createComment, updateComment, deleteComment, createReply } from '~/features/comments/comment.actions';
-import { User, Project } from '@prisma/client';
+import type { Project, User } from "@prisma/client";
 
-interface ProjectCommentsProps {
+import { useState } from "react";
+
+import type { Comment } from "~/features/projects/project.types";
+
+import { createComment, createReply, deleteComment, updateComment } from "~/features/comments/comment.actions";
+
+import { CommentForm } from "../comments/comment-form";
+import { CommentList } from "../comments/comment-list";
+
+type ProjectCommentsProps = {
   comments: Comment[];
-  currentUserId: User['id'];
-  projectId: Project['id'];
-}
+  currentUserId: User["id"];
+  projectId: Project["id"];
+};
 
 export function ProjectComments({ comments: initialComments, currentUserId, projectId }: ProjectCommentsProps) {
   const [comments, setComments] = useState<Comment[]>(initialComments);
 
-  const handleCreate = async (content: Comment['content']) => {
+  const handleCreate = async (content: Comment["content"]) => {
     try {
       const newComment = await createComment(projectId, content);
-      setComments((prev) => [newComment, ...prev]);
+      setComments(prev => [newComment, ...prev]);
     } catch {
       // TODO: handle error, show toast or something
     }
   };
 
-  const handleUpdate = async (commentId: Comment['id'], content: Comment['content']) => {
+  const handleUpdate = async (commentId: Comment["id"], content: Comment["content"]) => {
     try {
       await updateComment(commentId, content, projectId);
-      setComments((prev) =>
+      setComments(prev =>
         prev.map((comment) => {
           if (comment.id === commentId) {
             return {
@@ -40,7 +44,7 @@ export function ProjectComments({ comments: initialComments, currentUserId, proj
           if (comment.replies) {
             return {
               ...comment,
-              replies: comment.replies.map((reply) =>
+              replies: comment.replies.map(reply =>
                 reply.id === commentId
                   ? {
                       ...reply,
@@ -59,16 +63,16 @@ export function ProjectComments({ comments: initialComments, currentUserId, proj
     }
   };
 
-  const handleDelete = async (commentId: Comment['id']) => {
+  const handleDelete = async (commentId: Comment["id"]) => {
     try {
       await deleteComment(commentId, projectId);
-      setComments((prev) =>
+      setComments(prev =>
         prev
-          .map((comment) => ({
+          .map(comment => ({
             ...comment,
-            replies: comment.replies?.filter((reply) => reply.id !== commentId),
+            replies: comment.replies?.filter(reply => reply.id !== commentId),
           }))
-          .filter((comment) => comment.id !== commentId),
+          .filter(comment => comment.id !== commentId),
       );
     } catch {
       // TODO: handle error, show toast or something
@@ -78,8 +82,8 @@ export function ProjectComments({ comments: initialComments, currentUserId, proj
   const handleReply = async (parentId: string, content: string) => {
     try {
       const newReply = await createReply(projectId, parentId, content);
-      setComments((prev) =>
-        prev.map((comment) =>
+      setComments(prev =>
+        prev.map(comment =>
           comment.id === parentId
             ? {
                 ...comment,

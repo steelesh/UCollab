@@ -1,21 +1,21 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const commentSchema = z.object({
   content: z
     .string()
-    .min(1, 'Comment cannot be empty')
-    .max(1000, 'Comment cannot exceed 1000 characters')
-    .transform((str) => str.trim())
+    .min(1, "Comment cannot be empty")
+    .max(1000, "Comment cannot exceed 1000 characters")
+    .transform(str => str.trim())
     .refine(
       (str) => {
-        const textContent = str.replace(/<[^>]*>/g, '').trim();
+        const textContent = str.replace(/<[^>]*>/g, "").trim();
         return textContent.length > 0;
       },
       {
-        message: 'Comment cannot be empty',
+        message: "Comment cannot be empty",
       },
     ),
-  projectId: z.string().min(1, 'Project ID is required'),
+  projectId: z.string().min(1, "Project ID is required"),
 });
 
 export type CommentFormData = z.infer<typeof commentSchema>;

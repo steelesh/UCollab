@@ -1,8 +1,8 @@
 export const metadata = {
-  title: 'UCollab — Community Guide',
+  title: "UCollab — Community Guide",
 };
 
-export default function CommunityGuidePage() {
+export default function Page() {
   return (
     <div className="flex flex-col items-center">
       <h1 className="text-center text-2xl font-bold select-none">Community Guide</h1>
@@ -14,17 +14,25 @@ export default function CommunityGuidePage() {
       <div className="relative mt-8 w-full max-w-3xl rounded-lg shadow-2xl px-6 py-6">
         <h2 className="text-lg font-semibold">📌 How to Get the Most Out of UCollab</h2>
         <ul className="text-secondary-foreground mt-4 list-disc space-y-2 pl-5">
-        <ul>
-            <strong>♦️ Explore Projects:</strong> Discover exciting open-source projects and contribute your skills.
+          <ul>
+            <strong>♦️ Explore Projects:</strong>
+            {" "}
+            Discover exciting open-source projects and contribute your skills.
           </ul>
           <ul>
-            <strong>♦️ Collaborate:</strong> Connect with fellow students and developers to work on meaningful software solutions.
+            <strong>♦️ Collaborate:</strong>
+            {" "}
+            Connect with fellow students and developers to work on meaningful software solutions.
           </ul>
           <ul>
-            <strong>♦️ Share Knowledge:</strong> Help others by answering questions and providing insights.
+            <strong>♦️ Share Knowledge:</strong>
+            {" "}
+            Help others by answering questions and providing insights.
           </ul>
           <ul>
-            <strong>♦️ Follow Best Practices:</strong> Ensure code quality, maintainability, and adherence to community standards.
+            <strong>♦️ Follow Best Practices:</strong>
+            {" "}
+            Ensure code quality, maintainability, and adherence to community standards.
           </ul>
         </ul>
       </div>
@@ -48,18 +56,23 @@ export default function CommunityGuidePage() {
           Need help getting started? Check out these resources:
         </p>
         <ul className="text-secondary-foreground mt-4 list-disc space-y-2 pl-5">
-        <li> <a href="/c/getting-started" className="text-blue-400 underline">Getting Started Guide</a></li>
-        <li><a href="/c/contribution-guide" className="text-blue-400 underline">Contribution Guidelines</a></li>
+          <li>
+            {" "}
+            <a href="/c/getting-started" className="text-blue-400 underline">Getting Started Guide</a>
+          </li>
+          <li><a href="/c/contribution-guide" className="text-blue-400 underline">Contribution Guidelines</a></li>
 
-        <li><a href="/c/code-of-conduct" className="text-blue-400 underline">Code of Conduct</a></li>
+          <li><a href="/c/code-of-conduct" className="text-blue-400 underline">Code of Conduct</a></li>
         </ul>
       </div>
 
       <p className="mt-8 text-sm text-gray-400">
-        Questions? Reach out to us at{' '}
+        Questions? Reach out to us at
+        {" "}
         <a href="mailto:support@ucollab.com" className="underline text-blue-400">
           support@ucollab.com
-        </a>.
+        </a>
+        .
       </p>
     </div>
   );

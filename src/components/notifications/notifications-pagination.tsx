@@ -1,5 +1,6 @@
-'use client';
+"use client";
 
+import { ItemsPerPageSelector } from "~/components/projects/items-per-page-selector";
 import {
   Pagination,
   PaginationContent,
@@ -8,16 +9,15 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from '~/components/ui/pagination';
-import { cn } from '~/lib/utils';
-import { ItemsPerPageSelector } from '~/components/projects/items-per-page-selector';
+} from "~/components/ui/pagination";
+import { cn } from "~/lib/utils";
 
-interface NotificationsPaginationProps {
+type NotificationsPaginationProps = {
   currentPage: number;
   totalPages: number;
   totalCount: number;
   limit: number;
-}
+};
 
 export function NotificationsPagination({ currentPage, totalPages, totalCount, limit }: NotificationsPaginationProps) {
   const itemsPerPageOptions = [10, 20, 50, 100];
@@ -40,14 +40,17 @@ export function NotificationsPagination({ currentPage, totalPages, totalCount, l
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
-                href={currentPage > 1 ? `/notifications?page=${currentPage - 1}&limit=${limit}` : '#'}
-                className={cn(currentPage <= 1 && 'pointer-events-none opacity-50')}
-              />
+                href={currentPage > 1 ? `/notifications?page=${currentPage - 1}&limit=${limit}` : "#"}
+                className={cn(currentPage <= 1 && "pointer-events-none opacity-50")}
+              >
+                Previous
+              </PaginationPrevious>
             </PaginationItem>
             <PaginationItem>
               <PaginationLink
                 href={`/notifications?page=1&limit=${limit}`}
-                className={cn(currentPage === 1 && 'bg-accent text-accent-foreground')}>
+                className={cn(currentPage === 1 && "bg-accent text-accent-foreground")}
+              >
                 1
               </PaginationLink>
             </PaginationItem>
@@ -67,7 +70,8 @@ export function NotificationsPagination({ currentPage, totalPages, totalCount, l
               <PaginationItem>
                 <PaginationLink
                   href={`/notifications?page=${currentPage}&limit=${limit}`}
-                  className="bg-accent text-accent-foreground">
+                  className="bg-accent text-accent-foreground"
+                >
                   {currentPage}
                 </PaginationLink>
               </PaginationItem>
@@ -88,16 +92,19 @@ export function NotificationsPagination({ currentPage, totalPages, totalCount, l
               <PaginationItem>
                 <PaginationLink
                   href={`/notifications?page=${totalPages}&limit=${limit}`}
-                  className={cn(currentPage === totalPages && 'bg-accent text-accent-foreground')}>
+                  className={cn(currentPage === totalPages && "bg-accent text-accent-foreground")}
+                >
                   {totalPages}
                 </PaginationLink>
               </PaginationItem>
             )}
             <PaginationItem>
               <PaginationNext
-                href={currentPage < totalPages ? `/notifications?page=${currentPage + 1}&limit=${limit}` : '#'}
-                className={cn(currentPage >= totalPages && 'pointer-events-none opacity-50')}
-              />
+                href={currentPage < totalPages ? `/notifications?page=${currentPage + 1}&limit=${limit}` : "#"}
+                className={cn(currentPage >= totalPages && "pointer-events-none opacity-50")}
+              >
+                Next
+              </PaginationNext>
             </PaginationItem>
           </PaginationContent>
         </Pagination>

@@ -1,6 +1,8 @@
-import { StatusCodes } from 'http-status-codes';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import type { ClassValue } from "clsx";
+
+import { clsx } from "clsx";
+import { StatusCodes } from "http-status-codes";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -8,10 +10,10 @@ export function cn(...inputs: ClassValue[]) {
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024;
 export const ACCEPTED_IMAGE_TYPES = {
-  JPEG: 'image/jpeg',
-  JPG: 'image/jpg',
-  PNG: 'image/png',
-  WEBP: 'image/webp',
+  JPEG: "image/jpeg",
+  JPG: "image/jpg",
+  PNG: "image/png",
+  WEBP: "image/webp",
 };
 
 export const ErrorCode = {
@@ -23,22 +25,21 @@ export const ErrorCode = {
 } as const;
 
 export const ErrorMessage = {
-  AUTHENTICATION_REQUIRED: 'Authentication required',
-  INSUFFICIENT_PERMISSIONS: 'Insufficient permissions',
-  INSUFFICIENT_ROLE: 'Insufficient role',
+  AUTHENTICATION_REQUIRED: "Authentication required",
+  INSUFFICIENT_PERMISSIONS: "Insufficient permissions",
   MISSING_PERMISSION: (permission: string) => `Missing required permission: ${permission}`,
 
-  VALIDATION_FAILED: 'Validation failed',
-  INVALID_INPUT: 'Invalid input provided',
+  VALIDATION_FAILED: "Validation failed",
+  INVALID_INPUT: "Invalid input provided",
 
   NOT_FOUND: (resource: string) => `${resource} not found`,
   ALREADY_EXISTS: (resource: string) => `${resource} already exists`,
 
-  OPERATION_FAILED: 'Operation failed',
-  SERVER_ERROR: 'Internal server error',
+  OPERATION_FAILED: "Operation failed",
+  SERVER_ERROR: "Internal server error",
 
-  NOTIFICATION_QUEUE_FAILED: 'Failed to queue notification',
-  NOTIFICATION_PREFERENCE_UPDATE_FAILED: 'Failed to update notification preferences',
+  NOTIFICATION_QUEUE_FAILED: "Failed to queue notification",
+  NOTIFICATION_PREFERENCE_UPDATE_FAILED: "Failed to update notification preferences",
 } as const;
 
 export class Utils extends Error {
@@ -74,16 +75,17 @@ export class ValidationError extends Utils {
 }
 
 export function handleServerActionError(error: unknown) {
-  if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+  if (error instanceof Error && error.message === "NEXT_REDIRECT") {
     throw error;
   }
-  if (error instanceof Utils) throw error;
+  if (error instanceof Utils)
+    throw error;
   throw new Utils(ErrorMessage.OPERATION_FAILED);
 }
 
-export const NOTIFICATION_COUNT_CHANGED = 'notification-count-changed';
+export const NOTIFICATION_COUNT_CHANGED = "notification-count-changed";
 export function emitNotificationCountChanged() {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     window.dispatchEvent(new CustomEvent(NOTIFICATION_COUNT_CHANGED));
   }
 }

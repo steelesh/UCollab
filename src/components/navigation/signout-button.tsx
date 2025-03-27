@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { signOut } from 'next-auth/react';
-import { useState } from 'react';
-import { Button } from '~/components/ui/button';
-import { Spinner } from '~/components/ui/spinner';
+import { signOut } from "next-auth/react";
+import { useState } from "react";
+
+import { Button } from "~/components/ui/button";
+import { Spinner } from "~/components/ui/spinner";
 
 export function SignOutButton() {
   const [isPending, setIsPending] = useState(false);
@@ -19,14 +20,16 @@ export function SignOutButton() {
 
   return (
     <Button className="cursor-pointer" onClick={handleSignOut} disabled={isPending}>
-      {isPending ? (
-        <>
-          <Spinner />
-          Signing out...
-        </>
-      ) : (
-        'Sign out'
-      )}
+      {isPending
+        ? (
+            <>
+              <Spinner />
+              Signing out...
+            </>
+          )
+        : (
+            "Sign out"
+          )}
     </Button>
   );
 }
