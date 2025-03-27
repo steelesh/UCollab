@@ -1,6 +1,5 @@
-name: Lint, Test & Build
+name: Lint & Build
 on:
-  push:
   pull_request:
     branches: [main]
 
@@ -25,7 +24,7 @@ jobs:
       - run: npm i
       - run: npx prisma generate
       - run: npm run lint
-      # - run: npm run test:unit
-      # - run: npx playwright install --with-deps
-      # - run: npm run test:e2e
+      - run: npm run test:unit
+      - run: npx playwright install --with-deps
+      - run: npm run test:e2e
       - run: npm run build
