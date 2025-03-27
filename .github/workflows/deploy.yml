@@ -11,7 +11,6 @@ jobs:
       contents: read
     env:
       AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-      AUTH_URL: ${{ secrets.AUTH_URL }}
       MYSQL_URL: ${{ secrets.MYSQL_URL }}
       AUTH_MICROSOFT_ENTRA_ID_TENANT: ${{ secrets.AUTH_MICROSOFT_ENTRA_ID_TENANT }}
       AUTH_MICROSOFT_ENTRA_ID_ID: ${{ secrets.AUTH_MICROSOFT_ENTRA_ID_ID }}
@@ -19,6 +18,8 @@ jobs:
       AUTH_MICROSOFT_ENTRA_ID_ISSUER: ${{ secrets.AUTH_MICROSOFT_ENTRA_ID_ISSUER }}
       AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
       AZURE_STORAGE_CONTAINER_NAME: ${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}
+      APPLICATION_PUBLISH_PROFILE: ${{ secrets.APP_PUBLISH_PROFILE }}
+      WEBAPP_NAME: UCollab-1
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node.js version
@@ -31,24 +32,6 @@ jobs:
           npm run build
           mv ./build/static ./build/standalone/build
           mv ./public ./build/standalone
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: ./build/standalone
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      APPLICATION_PUBLISH_PROFILE: ${{ secrets.APP_PUBLISH_PROFILE }}
-      WEBAPP_NAME: UCollab-1
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: ./build/standalone
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
