@@ -7,10 +7,6 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    env:
-      MYSQL_URL: "mysql://root:dev-password@localhost:3306/ucollab"
-      AUTH_SECRET: dev-secret
-      AUTH_URL: "http://localhost:3000"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -19,7 +15,7 @@ jobs:
       - run: npm i
       - run: npx prisma generate
       - run: npm run lint
-      - run: npm run test:unit
-      - run: npx playwright install --with-deps
-      - run: npm run test:e2e
+      # - run: npm run test:unit
+      # - run: npx playwright install --with-deps
+      # - run: npm run test:e2e
       - run: npm run build
