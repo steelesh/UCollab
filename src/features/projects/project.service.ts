@@ -51,6 +51,9 @@ export const ProjectService = {
             technologies: true,
             rating: true,
             comments: {
+              where: {
+                parentId: null,
+              },
               select: {
                 id: true,
                 content: true,
@@ -62,6 +65,22 @@ export const ProjectService = {
                     username: true,
                     avatar: true,
                   },
+                },
+                replies: {
+                  select: {
+                    id: true,
+                    content: true,
+                    createdDate: true,
+                    lastModifiedDate: true,
+                    createdBy: {
+                      select: {
+                        id: true,
+                        username: true,
+                        avatar: true,
+                      },
+                    },
+                  },
+                  orderBy: { createdDate: "asc" },
                 },
               },
               orderBy: { createdDate: "desc" },
