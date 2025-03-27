@@ -1,18 +1,17 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { prisma } from '~/lib/prisma';
-import { withAuth } from '~/security/protected';
-import { updateUser } from '~/features/users/user.actions';
-import { Route } from 'next';
-import { Button } from '~/components/ui/button';
-import { Input } from '~/components/ui/input';
-import { Textarea } from '~/components/ui/textarea';
+import type { User } from "@prisma/client";
+import type { Route } from "next";
 
-interface SettingsPageProps {
-  userId: string;
-}
+import Image from "next/image";
+import Link from "next/link";
 
-async function SettingsPage({ userId }: SettingsPageProps) {
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
+import { updateUser } from "~/features/users/user.actions";
+import { prisma } from "~/lib/prisma";
+import { withAuth } from "~/security/protected";
+
+async function Page({ userId }: { userId: User["id"] }) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
@@ -68,7 +67,8 @@ async function SettingsPage({ userId }: SettingsPageProps) {
               type="submit"
               className="cursor-pointer bg-green-600 hover:bg-green-600/80"
               variant="outline"
-              aria-label="Submit">
+              aria-label="Submit"
+            >
               Save
             </Button>
           </div>
@@ -81,7 +81,7 @@ async function SettingsPage({ userId }: SettingsPageProps) {
               type="number"
               name="gradYear"
               className="input border-muted border-2"
-              defaultValue={user.gradYear ?? ''}
+              defaultValue={user.gradYear ?? ""}
               placeholder="Graduation Year"
             />
           </fieldset>
@@ -89,7 +89,7 @@ async function SettingsPage({ userId }: SettingsPageProps) {
             <fieldset className="fieldset">
               <legend className="fieldset-legend">Mentorship Status</legend>
               <div className="mt-2 flex gap-2 filter">
-                <select name="mentorship" defaultValue={user.mentorship || 'NONE'} className="bg-background">
+                <select name="mentorship" defaultValue={user.mentorship || "NONE"} className="bg-background">
                   <option value="MENTOR">Mentor</option>
                   <option value="MENTEE">Mentee</option>
                   <option value="NONE">None</option>
@@ -104,7 +104,9 @@ async function SettingsPage({ userId }: SettingsPageProps) {
                 name="bio"
                 className="textarea h-24"
                 placeholder="Tell everyone a little bit about yourself!"
-                defaultValue={user.bio || ''}></Textarea>
+                defaultValue={user.bio || ""}
+              >
+              </Textarea>
             </fieldset>
           </div>
           <div className="mt-4">
@@ -160,4 +162,4 @@ async function SettingsPage({ userId }: SettingsPageProps) {
   );
 }
 
-export default withAuth(SettingsPage);
+export default withAuth(Page);

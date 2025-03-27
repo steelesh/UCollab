@@ -1,39 +1,43 @@
-import { PrismaAdapter } from '@auth/prisma-adapter';
-import { AvatarSource, User as PrismaUser, Role } from '@prisma/client';
-import NextAuth, { DefaultSession, type NextAuthConfig } from 'next-auth';
-import { encode } from 'next-auth/jwt';
-import microsoftEntraId from 'next-auth/providers/microsoft-entra-id';
-import { prisma } from '~/lib/prisma';
-import { isDevelopment } from '~/lib/env';
-import { UserService } from '~/features/users/user.service';
+/* eslint-disable ts/consistent-type-definitions */
+import type { User as PrismaUser } from "@prisma/client";
+import type { DefaultSession, NextAuthConfig } from "next-auth";
 
-declare module 'next-auth' {
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { AvatarSource } from "@prisma/client";
+import NextAuth from "next-auth";
+import { encode } from "next-auth/jwt";
+import microsoftEntraId from "next-auth/providers/microsoft-entra-id";
+
+import { UserService } from "~/features/users/user.service";
+import { env } from "~/lib/env";
+import { prisma } from "~/lib/prisma";
+
+declare module "next-auth" {
   interface Session {
     user: {
-      firstName: PrismaUser['firstName'];
-      lastName: PrismaUser['lastName'];
-      fullName: PrismaUser['fullName'];
-      username: PrismaUser['username'];
-      role: PrismaUser['role'];
-      avatar: PrismaUser['avatar'];
-      onboardingStep: PrismaUser['onboardingStep'];
-    } & DefaultSession['user'];
+      firstName: PrismaUser["firstName"];
+      lastName: PrismaUser["lastName"];
+      fullName: PrismaUser["fullName"];
+      username: PrismaUser["username"];
+      avatar: PrismaUser["avatar"];
+      onboardingStep: PrismaUser["onboardingStep"];
+    } & DefaultSession["user"];
   }
 }
 
 const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
-  basePath: '/auth',
-  session: { strategy: 'database' },
+  basePath: "/auth",
+  session: { strategy: "database" },
   providers: [
     microsoftEntraId({
-      issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
+      issuer: env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
       authorization: {
         params: {
-          scope: 'openid profile email User.Read User.ReadBasic.All',
+          scope: "openid profile email User.Read User.ReadBasic.All",
         },
       },
-      allowDangerousEmailAccountLinking: isDevelopment(),
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
 
@@ -45,7 +49,8 @@ const authConfig: NextAuthConfig = {
       return session;
     },
     async signIn({ user, profile, account }) {
-      if (!profile?.email || !user?.id || !profile.sub) return false;
+      if (!profile?.email || !user?.id || !profile.sub)
+        return false;
 
       try {
         await prisma.session.deleteMany({});
@@ -59,9 +64,9 @@ const authConfig: NextAuthConfig = {
         }
 
         const nameMatch = profile.name?.match(/([^,]+),\s*([^\s(]+)\s*\(([^)]+)\)/);
-        const lastName = nameMatch?.[1]?.trim() ?? '';
-        const firstName = nameMatch?.[2]?.trim() ?? '';
-        const username = nameMatch?.[3]?.trim() ?? '';
+        const lastName = nameMatch?.[1]?.trim() ?? "";
+        const firstName = nameMatch?.[2]?.trim() ?? "";
+        const username = nameMatch?.[3]?.trim() ?? "";
         const fullName = `${firstName} ${lastName}`.trim();
 
         let avatar = await UserService.generateDefaultAvatar(user.id);
@@ -80,14 +85,13 @@ const authConfig: NextAuthConfig = {
             data: {
               id: user.id,
               email: profile.email,
-              azureAdId: profile.sub ?? '',
+              azureAdId: profile.sub ?? "",
               username,
               fullName,
               firstName,
               lastName,
               avatar,
               avatarSource,
-              role: Role.USER,
               notificationPreferences: { create: {} },
             },
           });
@@ -104,19 +108,19 @@ const authConfig: NextAuthConfig = {
 
         return true;
       } catch (error) {
-        console.error('Sign in error:', error);
-        throw new Error('Failed to sign in');
+        console.error("Sign in error:", error);
+        throw new Error("Failed to sign in");
       }
     },
   },
 
   jwt: {
-    encode: async function (params) {
+    async encode(params) {
       if (params.token?.credentials) {
         const sessionToken = crypto.randomUUID();
 
         if (!params.token.sub) {
-          throw new Error('No user ID found in token');
+          throw new Error("No user ID found in token");
         }
 
         const existingSession = await prisma.session.findFirst({
@@ -129,14 +133,14 @@ const authConfig: NextAuthConfig = {
 
         const createdSession = await prisma.session.create({
           data: {
-            sessionToken: sessionToken,
+            sessionToken,
             userId: params.token.sub,
             expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
           },
         });
 
         if (!createdSession) {
-          throw new Error('Failed to create session');
+          throw new Error("Failed to create session");
         }
 
         return sessionToken;
@@ -146,7 +150,7 @@ const authConfig: NextAuthConfig = {
   },
 
   pages: {
-    signIn: '/',
+    signIn: "/",
   },
 };
 

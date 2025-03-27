@@ -1,80 +1,92 @@
-'use client';
+"use client";
 
-import { ReactRenderer } from '@tiptap/react';
-import tippy, { Instance, Props, GetReferenceClientRect } from 'tippy.js';
-import { searchUsers } from '~/features/users/user.actions';
-import { SuggestionProps, SuggestionKeyDownProps } from '@tiptap/suggestion';
-import { Editor } from '@tiptap/core';
-import { User } from '@prisma/client';
-import { Button } from '~/components/ui/button';
+import type { User } from "@prisma/client";
+import type { Editor } from "@tiptap/core";
+import type { SuggestionKeyDownProps, SuggestionProps } from "@tiptap/suggestion";
+import type { GetReferenceClientRect, Instance, Props } from "tippy.js";
 
-interface MentionUser {
-  id: User['id'];
-  username: User['username'];
-  avatar?: User['avatar'];
-}
+import { ReactRenderer } from "@tiptap/react";
+import Image from "next/image";
+import tippy from "tippy.js";
 
-interface MentionListProps {
+import { searchUsers } from "~/features/users/user.actions";
+
+type MentionUser = {
+  id: User["id"];
+  username: User["username"];
+  avatar?: User["avatar"];
+};
+
+type MentionListProps = {
   items: MentionUser[];
-  command: (item: { id: User['id']; label: User['username'] }) => void;
+  command: (item: { id: User["id"]; label: User["username"] }) => void;
   selectedIndex: number;
-}
+};
 
-interface MentionListRef {
+type MentionListRef = {
   onKeyDown: (props: { event: KeyboardEvent }) => boolean;
-}
+};
 
-interface SuggestionItem {
+type SuggestionItem = {
   query: string;
   editor: Editor | null;
   currentUserId: string;
-}
+};
 
-const MentionList = ({ items, command, selectedIndex }: MentionListProps) => {
+function MentionList({ items, command, selectedIndex }: MentionListProps) {
   const onKeyDown = (e: React.KeyboardEvent, item: MentionUser) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       command({ id: item.username, label: item.username });
     }
   };
 
-  if (items.length === 0) return null;
+  if (items.length === 0)
+    return null;
 
   return (
-    <div className="dropdown-container" role="listbox" aria-label="Mention suggestions">
+    <div className="bg-popover rounded-md border shadow-md max-h-[200px] w-[200px] overflow-y-auto" role="listbox" aria-label="Mention suggestions">
       {items.map((item, index) => (
-        <Button
+        <button
+          type="button"
           key={item.id}
           onClick={() => command({ id: item.username, label: item.username })}
-          onKeyDown={(e) => onKeyDown(e, item)}
+          onKeyDown={e => onKeyDown(e, item)}
           role="option"
           aria-selected={index === selectedIndex}
           tabIndex={index === selectedIndex ? 0 : -1}
-          className="dropdown-item">
-          <div className="dropdown-item-content">
+          className="relative flex w-full cursor-pointer items-center px-2 py-1.5 select-none transition-colors outline-none hover:bg-accent hover:text-accent-foreground data-[aria-selected=true]:bg-accent data-[aria-selected=true]:text-accent-foreground"
+        >
+          <div className="flex items-center gap-2">
             {item.avatar && (
-              <img src={item.avatar} alt={`${item.username}'s avatar`} className="h-6 w-6 rounded-full" />
+              <Image
+                src={item.avatar}
+                alt={`${item.username}'s avatar`}
+                className="h-6 w-6 rounded-full"
+                width={24}
+                height={24}
+              />
             )}
             <span>{item.username}</span>
           </div>
-        </Button>
+        </button>
       ))}
     </div>
   );
-};
+}
 
 const suggestion = {
-  char: '@',
+  char: "@",
 
   items: async ({ query, currentUserId }: SuggestionItem) => {
-    const users = await searchUsers(query || '', currentUserId);
+    const users = await searchUsers(query || "", currentUserId);
     return users;
   },
 
   render: () => {
     let component: ReactRenderer<MentionListRef, MentionListProps>;
     let popup: Instance<Props>[];
-    let lastQuery = '';
+    let lastQuery = "";
     let lastItems: MentionUser[] = [];
     let commandFn: ((item: { id: string; label: string }) => void) | null = null;
 
@@ -89,7 +101,7 @@ const suggestion = {
           editor: props.editor,
         });
 
-        const element = document.createElement('div');
+        const element = document.createElement("div");
         document.body.appendChild(element);
 
         const getReferenceClientRect: GetReferenceClientRect = () => {
@@ -107,15 +119,15 @@ const suggestion = {
             content: component.element,
             showOnCreate: true,
             interactive: true,
-            trigger: 'manual',
-            placement: 'bottom-start',
-            theme: 'mention-suggestions',
+            trigger: "manual",
+            placement: "bottom-start",
+            theme: "mention-suggestions",
           }),
         ];
       },
 
       onUpdate: (props: SuggestionProps) => {
-        lastQuery = props.query || '';
+        lastQuery = props.query || "";
         lastItems = props.items as MentionUser[];
         commandFn = props.command;
 
@@ -156,7 +168,7 @@ const suggestion = {
       onKeyDown: (props: SuggestionKeyDownProps) => {
         const { event } = props;
 
-        if (event.key === ' ' && lastQuery && lastItems.length === 1) {
+        if (event.key === " " && lastQuery && lastItems.length === 1) {
           const exactMatch = lastItems[0];
           if (exactMatch && exactMatch.username.toLowerCase() === lastQuery.toLowerCase()) {
             event.preventDefault();
@@ -165,7 +177,7 @@ const suggestion = {
           }
         }
 
-        if (event.key === 'Escape') {
+        if (event.key === "Escape") {
           popup?.[0]?.hide();
           return true;
         }
@@ -191,7 +203,7 @@ const suggestion = {
 
   allowSpaces: false,
   HTMLAttributes: {
-    class: 'tiptap-mention',
+    class: "tiptap-mention",
   },
 };
 

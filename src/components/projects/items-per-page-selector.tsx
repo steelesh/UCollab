@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 
-interface ItemsPerPageSelectorProps {
+type ItemsPerPageSelectorProps = {
   currentLimit: number;
   options: number[];
   totalCount: number;
@@ -10,7 +10,7 @@ interface ItemsPerPageSelectorProps {
   endIndex: number;
   basePath?: string;
   itemName?: string;
-}
+};
 
 export function ItemsPerPageSelector({
   currentLimit,
@@ -18,22 +18,27 @@ export function ItemsPerPageSelector({
   totalCount,
   startIndex,
   endIndex,
-  basePath = '/p',
-  itemName = 'projects',
+  basePath = "/p",
+  itemName = "projects",
 }: ItemsPerPageSelectorProps) {
   return (
     <div className="flex items-center space-x-3">
-      <span className="text-sm">{itemName.charAt(0).toUpperCase() + itemName.slice(1)} per page</span>
+      <span className="text-sm">
+        {itemName.charAt(0).toUpperCase() + itemName.slice(1)}
+        {" "}
+        per page
+      </span>
       <Select
         defaultValue={currentLimit.toString()}
         onValueChange={(value) => {
           window.location.href = `${basePath}?page=1&limit=${value}`;
-        }}>
+        }}
+      >
         <SelectTrigger>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {options.map((option) => (
+          {options.map(option => (
             <SelectItem key={option} value={option.toString()}>
               {option}
             </SelectItem>
@@ -41,7 +46,14 @@ export function ItemsPerPageSelector({
         </SelectContent>
       </Select>
       <span className="text-sm">
-        {startIndex}–{endIndex} of {totalCount} {itemName}
+        {startIndex}
+        –
+        {endIndex}
+        {" "}
+        of
+        {totalCount}
+        {" "}
+        {itemName}
       </span>
     </div>
   );

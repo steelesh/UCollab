@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { SVGProps } from 'react';
+import type { SVGProps } from "react";
 
 export function Spinner(props: SVGProps<SVGSVGElement>) {
   return (
@@ -19,7 +19,9 @@ export function Spinner(props: SVGProps<SVGSVGElement>) {
           dur="0.75s"
           repeatCount="indefinite"
           type="rotate"
-          values="0 12 12;30 12 12;60 12 12;90 12 12;120 12 12;150 12 12;180 12 12;210 12 12;240 12 12;270 12 12;300 12 12;330 12 12;360 12 12"></animateTransform>
+          values="0 12 12;30 12 12;60 12 12;90 12 12;120 12 12;150 12 12;180 12 12;210 12 12;240 12 12;270 12 12;300 12 12;330 12 12;360 12 12"
+        >
+        </animateTransform>
       </g>
     </svg>
   );

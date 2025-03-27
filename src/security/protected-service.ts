@@ -1,12 +1,9 @@
-import { UserService } from '~/features/users/user.service';
-import { Role } from '@prisma/client';
-import { ErrorMessage, Utils, AuthenticationError, AuthorizationError } from '~/lib/utils';
-import { canAccess } from '~/security/protected-role';
+import { UserService } from "~/features/users/user.service";
+import { AuthenticationError, AuthorizationError, ErrorMessage, Utils } from "~/lib/utils";
 
-interface ResourceCheck {
+type ResourceCheck = {
   ownerId?: string;
-  adminOnly?: boolean;
-}
+};
 
 export async function withServiceAuth<T>(
   requestUserId: string | undefined,
@@ -18,13 +15,7 @@ export async function withServiceAuth<T>(
   }
 
   if (resourceCheck) {
-    const userRole = await UserService.getUserRole(requestUserId);
-
-    if (resourceCheck.adminOnly && userRole !== Role.ADMIN) {
-      throw new AuthorizationError(ErrorMessage.INSUFFICIENT_ROLE);
-    }
-
-    if (resourceCheck.ownerId && !canAccess(requestUserId, resourceCheck.ownerId, userRole)) {
+    if (resourceCheck.ownerId && !(await UserService.canAccess(requestUserId, resourceCheck.ownerId))) {
       throw new AuthorizationError(ErrorMessage.INSUFFICIENT_PERMISSIONS);
     }
   }

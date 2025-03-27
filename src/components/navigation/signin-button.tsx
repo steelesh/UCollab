@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import { signIn } from 'next-auth/react';
-import { useState } from 'react';
-import { InteractiveHoverButton } from '../magicui/interactive-hover-button';
+import { signIn } from "next-auth/react";
+import { useState } from "react";
+
+import { InteractiveHoverButton } from "../magicui/interactive-hover-button";
 
 export function SignInButton() {
   const [isPending, setIsPending] = useState(false);
@@ -10,7 +11,7 @@ export function SignInButton() {
   const handleClick = async () => {
     setIsPending(true);
     try {
-      await signIn('microsoft-entra-id', { redirectTo: '/onboarding' });
+      await signIn("microsoft-entra-id", { redirectTo: "/onboarding" });
     } finally {
       setIsPending(false);
     }

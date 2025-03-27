@@ -1,20 +1,24 @@
-'use server';
+"use server";
 
-import { onboardingSchema } from '~/features/users/user.schema';
-import { UserService } from '~/features/users/user.service';
-import { auth } from '~/security/auth';
-import { ErrorMessage, Utils, handleServerActionError } from '~/lib/utils';
-import { Prisma, User } from '@prisma/client';
-import { notFound, redirect } from 'next/navigation';
+import type { User } from "@prisma/client";
+
+import { Prisma } from "@prisma/client";
+import { notFound, redirect } from "next/navigation";
+
+import { onboardingSchema } from "~/features/users/user.schema";
+import { UserService } from "~/features/users/user.service";
+import { ErrorMessage, handleServerActionError, Utils } from "~/lib/utils";
+import { auth } from "~/security/auth";
 
 export async function updateOnboarding(formData: FormData) {
   const session = await auth();
-  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
+  if (!session?.user?.id)
+    throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
   const rawData = {
-    gradYear: formData.get('gradYear'),
-    technologies: JSON.parse(formData.get('technologies') as string),
-    githubProfile: formData.get('githubProfile'),
-    mentorshipStatus: formData.get('mentorshipStatus'),
+    gradYear: formData.get("gradYear"),
+    technologies: JSON.parse(formData.get("technologies") as string),
+    githubProfile: formData.get("githubProfile"),
+    mentorshipStatus: formData.get("mentorshipStatus"),
   };
   const { gradYear, technologies, githubProfile, mentorshipStatus } = onboardingSchema.parse(rawData);
   try {
@@ -25,36 +29,38 @@ export async function updateOnboarding(formData: FormData) {
       mentorshipStatus,
     });
   } catch (error) {
-    if (error instanceof Utils) throw error;
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+    if (error instanceof Utils)
+      throw error;
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
       notFound();
     }
     throw new Utils(ErrorMessage.OPERATION_FAILED);
   }
-  redirect('/');
+  redirect("/");
 }
 
 export async function updateUser(formData: FormData) {
   const session = await auth();
-  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
-  const userId = formData.get('userId')?.toString();
+  if (!session?.user?.id)
+    throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
+  const userId = formData.get("userId")?.toString();
   if (!userId) {
-    throw new Error('User ID is required');
+    throw new Error("User ID is required");
   }
-  const gradYearStr = formData.get('gradYear')?.toString();
-  const gradYear = gradYearStr ? parseInt(gradYearStr, 10) : undefined;
-  const mentorshipValue = formData.get('mentorship')?.toString();
-  const mentorship =
-    mentorshipValue === 'MENTOR' || mentorshipValue === 'MENTEE' || mentorshipValue === 'NONE'
-      ? (mentorshipValue as 'MENTOR' | 'MENTEE' | 'NONE')
+  const gradYearStr = formData.get("gradYear")?.toString();
+  const gradYear = gradYearStr ? Number.parseInt(gradYearStr, 10) : undefined;
+  const mentorshipValue = formData.get("mentorship")?.toString();
+  const mentorship
+    = mentorshipValue === "MENTOR" || mentorshipValue === "MENTEE" || mentorshipValue === "NONE"
+      ? (mentorshipValue as "MENTOR" | "MENTEE" | "NONE")
       : undefined;
-  const bio = formData.get('bio')?.toString() || undefined;
-  const avatarValue = formData.get('avatar');
+  const bio = formData.get("bio")?.toString() || undefined;
+  const avatarValue = formData.get("avatar");
   const avatar = avatarValue instanceof File && avatarValue.size > 0 ? avatarValue : undefined;
-  const allowComments = formData.get('allowComments') === 'on';
-  const allowMentions = formData.get('allowMentions') === 'on';
-  const allowProjectUpdates = formData.get('allowProjectUpdates') === 'on';
-  const allowSystem = formData.get('allowSystem') === 'on';
+  const allowComments = formData.get("allowComments") === "on";
+  const allowMentions = formData.get("allowMentions") === "on";
+  const allowProjectUpdates = formData.get("allowProjectUpdates") === "on";
+  const allowSystem = formData.get("allowSystem") === "on";
   const updateUserInput = {
     gradYear,
     mentorship,
@@ -71,8 +77,9 @@ export async function updateUser(formData: FormData) {
   try {
     await UserService.updateUser(userId, updateUserInput, session.user.id);
   } catch (error) {
-    if (error instanceof Utils) throw error;
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+    if (error instanceof Utils)
+      throw error;
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
       notFound();
     }
     throw new Utils(ErrorMessage.OPERATION_FAILED);
@@ -80,16 +87,17 @@ export async function updateUser(formData: FormData) {
   redirect(`/u/${session.user.username}`);
 }
 
-export async function searchUsers(query: string, currentUserId: User['id']) {
+export async function searchUsers(query: string, currentUserId: User["id"]) {
   return UserService.searchUsers(query, currentUserId);
 }
 export async function searchTechnologies(query: string) {
   const session = await auth();
-  if (!session?.user?.id) throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
+  if (!session?.user?.id)
+    throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
 
   try {
     const technologies = await UserService.searchTechnologies(query, session.user.id);
-    return technologies.map((t) => t.name);
+    return technologies.map(t => t.name);
   } catch (error) {
     handleServerActionError(error);
   }

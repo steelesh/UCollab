@@ -1,14 +1,18 @@
+import { useSession } from "next-auth/react";
+
 import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from '~/components/ui/navigation-menu';
-import { NavLink, NavLinkProps } from '../navigation/nav-link';
-import { NavSection } from '../navigation/navbar';
-import { CreateButton } from './create-button';
-import { useSession } from 'next-auth/react';
+} from "~/components/ui/navigation-menu";
+
+import type { NavLinkProps } from "../navigation/nav-link";
+import type { NavSection } from "../navigation/navbar";
+
+import { NavLink } from "../navigation/nav-link";
+import { CreateButton } from "./create-button";
 
 export function DesktopNav({ items }: { items: NavSection[] }) {
   const { data: session } = useSession();
@@ -16,7 +20,7 @@ export function DesktopNav({ items }: { items: NavSection[] }) {
     <NavigationMenu className="mr-4 hidden md:flex">
       <NavigationMenuList className="gap-12">
         {session && <CreateButton />}
-        {items.map((section) => (
+        {items.map(section => (
           <NavigationMenuItem key={section.title} className="relative">
             <NavigationMenuTrigger className="h-9">{section.title}</NavigationMenuTrigger>
             <NavigationMenuContent>

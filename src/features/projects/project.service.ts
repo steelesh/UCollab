@@ -1,11 +1,15 @@
-import { Project, Prisma, Technology, User } from '@prisma/client';
-import { notFound } from 'next/navigation';
-import { prisma } from '~/lib/prisma';
-import { withServiceAuth } from '~/security/protected-service';
-import { ErrorMessage, Utils } from '~/lib/utils';
-import { CreateProjectInput } from './project.schema';
-import { ExploreProject, ProjectDetails } from './project.types';
-import { NotificationService } from '~/features/notifications/notification.service';
+import type { Project, Technology, User } from "@prisma/client";
+
+import { Prisma } from "@prisma/client";
+import { notFound } from "next/navigation";
+
+import { NotificationService } from "~/features/notifications/notification.service";
+import { prisma } from "~/lib/prisma";
+import { ErrorMessage, Utils } from "~/lib/utils";
+import { withServiceAuth } from "~/security/protected-service";
+
+import type { CreateProjectInput } from "./project.schema";
+import type { ExploreProject, ProjectDetails } from "./project.types";
 
 export const ProjectService = {
   async getAllProjects(requestUserId: string) {
@@ -20,16 +24,17 @@ export const ProjectService = {
             projectType: true,
             githubRepo: true,
           },
-          orderBy: { createdDate: 'desc' },
+          orderBy: { createdDate: "desc" },
         });
       } catch (error) {
-        if (error instanceof Utils) throw error;
+        if (error instanceof Utils)
+          throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
 
-  async getProjectById(id: Project['id'], requestUserId: string): Promise<ProjectDetails> {
+  async getProjectById(id: Project["id"], requestUserId: string): Promise<ProjectDetails> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         const project = await prisma.project.findUnique({
@@ -59,31 +64,34 @@ export const ProjectService = {
                   },
                 },
               },
-              orderBy: { createdDate: 'desc' },
+              orderBy: { createdDate: "desc" },
             },
           },
         });
 
-        if (!project) notFound();
+        if (!project)
+          notFound();
         return project as ProjectDetails;
       } catch (error) {
-        if (error instanceof Utils) throw error;
+        if (error instanceof Utils)
+          throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
 
-  async getProjectTitle(id: Project['id']): Promise<Project['title']> {
+  async getProjectTitle(id: Project["id"]): Promise<Project["title"]> {
     const project = await prisma.project.findUnique({ where: { id }, select: { title: true } });
-    if (!project) notFound();
+    if (!project)
+      notFound();
     return project.title;
   },
 
-  async createProject(data: CreateProjectInput, requestUserId: User['id']) {
+  async createProject(data: CreateProjectInput, requestUserId: User["id"]) {
     return withServiceAuth(requestUserId, { ownerId: requestUserId }, async () => {
       try {
         const project = await prisma.$transaction(async (tx) => {
-          const techNames = data.technologies.map((tech) => tech.toLowerCase().trim());
+          const techNames = data.technologies.map(tech => tech.toLowerCase().trim());
 
           const newProject = await tx.project.create({
             data: {
@@ -93,7 +101,7 @@ export const ProjectService = {
               githubRepo: data.githubRepo || null,
               createdBy: { connect: { id: requestUserId } },
               technologies: {
-                connectOrCreate: techNames.map((name) => ({
+                connectOrCreate: techNames.map(name => ({
                   where: { name },
                   create: { name },
                 })),
@@ -122,7 +130,7 @@ export const ProjectService = {
 
         await NotificationService.queueBatchNotifications({
           userIds: [requestUserId],
-          type: 'PROJECT_UPDATE',
+          type: "PROJECT_UPDATE",
           message: `project "${project.title}" has been created`,
           projectId: project.id,
           triggeredById: requestUserId,
@@ -130,22 +138,25 @@ export const ProjectService = {
 
         return project;
       } catch (error) {
-        if (error instanceof Utils) throw error;
+        if (error instanceof Utils)
+          throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
 
-  async deleteProject(id: Project['id'], requestUserId: string) {
+  async deleteProject(id: Project["id"], requestUserId: string) {
     const project = await this.getProjectById(id, requestUserId);
     return withServiceAuth(requestUserId, { ownerId: project.createdById }, async () => {
       try {
-        await this.sendProjectUpdateNotification(id, 'deleted', requestUserId);
+        await this.sendProjectUpdateNotification(id, "deleted", requestUserId);
         await prisma.project.delete({ where: { id } });
       } catch (error) {
-        if (error instanceof Utils) throw error;
+        if (error instanceof Utils)
+          throw error;
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === 'P2025') notFound();
+          if (error.code === "P2025")
+            notFound();
         }
         throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
@@ -171,7 +182,8 @@ export const ProjectService = {
           take: limit,
         });
       } catch (error) {
-        if (error instanceof Utils) throw error;
+        if (error instanceof Utils)
+          throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
@@ -190,10 +202,11 @@ export const ProjectService = {
             projectType: true,
             githubRepo: true,
           },
-          orderBy: { createdDate: 'desc' },
+          orderBy: { createdDate: "desc" },
         });
       } catch (error) {
-        if (error instanceof Utils) throw error;
+        if (error instanceof Utils)
+          throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
@@ -216,16 +229,17 @@ export const ProjectService = {
             projectType: true,
             githubRepo: true,
           },
-          orderBy: { createdDate: 'desc' },
+          orderBy: { createdDate: "desc" },
         });
       } catch (error) {
-        if (error instanceof Utils) throw error;
+        if (error instanceof Utils)
+          throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
 
-  async getProjectsByTechnologies(techNames: Technology['name'][], matchAll = false, requestUserId: string) {
+  async getProjectsByTechnologies(techNames: Technology["name"][], matchAll = false, requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.project.findMany({
@@ -233,12 +247,12 @@ export const ProjectService = {
             technologies: matchAll
               ? {
                   every: {
-                    name: { in: techNames.map((t) => t.toLowerCase().trim()) },
+                    name: { in: techNames.map(t => t.toLowerCase().trim()) },
                   },
                 }
               : {
                   some: {
-                    name: { in: techNames.map((t) => t.toLowerCase().trim()) },
+                    name: { in: techNames.map(t => t.toLowerCase().trim()) },
                   },
                 },
           },
@@ -250,21 +264,22 @@ export const ProjectService = {
             projectType: true,
             githubRepo: true,
           },
-          orderBy: { createdDate: 'desc' },
+          orderBy: { createdDate: "desc" },
         });
       } catch (error) {
-        if (error instanceof Utils) throw error;
+        if (error instanceof Utils)
+          throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
 
-  async getPaginatedProjects(page = 1, limit = 12, requestUserId: User['id']): Promise<ExploreProject[]> {
+  async getPaginatedProjects(page = 1, limit = 12, requestUserId: User["id"]): Promise<ExploreProject[]> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.project.findMany({
           orderBy: {
-            createdDate: 'desc',
+            createdDate: "desc",
           },
           skip: (page - 1) * limit,
           take: limit,
@@ -285,24 +300,26 @@ export const ProjectService = {
           },
         });
       } catch (error) {
-        if (error instanceof Utils) throw error;
+        if (error instanceof Utils)
+          throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
 
-  async getProjectCount(requestUserId: User['id']): Promise<number> {
+  async getProjectCount(requestUserId: User["id"]): Promise<number> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.project.count();
       } catch (error) {
-        if (error instanceof Utils) throw error;
+        if (error instanceof Utils)
+          throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
 
-  async searchTechnologies(query: string, requestUserId: User['id'], limit = 5) {
+  async searchTechnologies(query: string, requestUserId: User["id"], limit = 5) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.technology.findMany({
@@ -316,23 +333,24 @@ export const ProjectService = {
           },
           take: limit,
           orderBy: {
-            name: 'asc',
+            name: "asc",
           },
         });
       } catch (error) {
-        if (error instanceof Utils) throw error;
+        if (error instanceof Utils)
+          throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
 
-  async updateProject(id: Project['id'], data: CreateProjectInput, requestUserId: string) {
+  async updateProject(id: Project["id"], data: CreateProjectInput, requestUserId: string) {
     const project = await this.getProjectById(id, requestUserId);
 
     return withServiceAuth(requestUserId, { ownerId: project.createdById }, async () => {
       try {
         const updatedProject = await prisma.$transaction(async (tx) => {
-          const techNames = data.technologies.map((tech) => tech.toLowerCase().trim());
+          const techNames = data.technologies.map(tech => tech.toLowerCase().trim());
 
           const existingTechs = await tx.project.findUnique({
             where: { id },
@@ -343,9 +361,9 @@ export const ProjectService = {
             },
           });
 
-          const existingTechNames = existingTechs?.technologies.map((t) => t.name) || [];
-          const techsToDisconnect = existingTechNames.filter((name) => !techNames.includes(name));
-          const techsToAdd = techNames.filter((name) => !existingTechNames.includes(name));
+          const existingTechNames = existingTechs?.technologies.map(t => t.name) || [];
+          const techsToDisconnect = existingTechNames.filter(name => !techNames.includes(name));
+          const techsToAdd = techNames.filter(name => !existingTechNames.includes(name));
 
           const updatedProject = await tx.project.update({
             where: { id },
@@ -355,8 +373,8 @@ export const ProjectService = {
               projectType: data.projectType,
               githubRepo: data.githubRepo,
               technologies: {
-                disconnect: techsToDisconnect.map((name) => ({ name })),
-                connectOrCreate: techsToAdd.map((name) => ({
+                disconnect: techsToDisconnect.map(name => ({ name })),
+                connectOrCreate: techsToAdd.map(name => ({
                   where: { name },
                   create: { name },
                 })),
@@ -373,16 +391,17 @@ export const ProjectService = {
             },
           });
 
-          await this.sendProjectUpdateNotification(id, 'updated', requestUserId);
+          await this.sendProjectUpdateNotification(id, "updated", requestUserId);
 
           return updatedProject;
         });
 
         return updatedProject;
       } catch (error) {
-        console.error('Project update error:', error);
-        if (error instanceof Utils) throw error;
-        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        console.error("Project update error:", error);
+        if (error instanceof Utils)
+          throw error;
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
           notFound();
         }
         throw new Utils(ErrorMessage.OPERATION_FAILED);
@@ -416,7 +435,7 @@ export const ProjectService = {
         if (watcher.project.createdById !== userId) {
           await NotificationService.queueBatchNotifications({
             userIds: [watcher.project.createdById],
-            type: 'PROJECT_UPDATE',
+            type: "PROJECT_UPDATE",
             message: `${watcher.user.username} is now watching "${watcher.project.title}"`,
             projectId,
             triggeredById: userId,
@@ -425,7 +444,7 @@ export const ProjectService = {
 
         return watcher;
       } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
           return null;
         }
         throw new Utils(ErrorMessage.OPERATION_FAILED);
@@ -445,7 +464,7 @@ export const ProjectService = {
           },
         });
       } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
           return null;
         }
         throw new Utils(ErrorMessage.OPERATION_FAILED);
@@ -468,12 +487,13 @@ export const ProjectService = {
         },
       });
     } catch (error) {
-      if (error instanceof Utils) throw error;
+      if (error instanceof Utils)
+        throw error;
       throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
-  async sendProjectUpdateNotification(projectId: string, action: 'updated' | 'deleted', requestUserId: string) {
+  async sendProjectUpdateNotification(projectId: string, action: "updated" | "deleted", requestUserId: string) {
     try {
       const project = await this.getProjectById(projectId, requestUserId);
       const watchers = await this.getProjectWatchers(projectId);
@@ -484,29 +504,30 @@ export const ProjectService = {
 
       const watcherIds = watchers
         .filter(
-          (w) =>
-            w.user.notificationPreferences?.enabled &&
-            w.user.notificationPreferences?.allowProjectUpdates &&
-            w.userId !== requestUserId,
+          w =>
+            w.user.notificationPreferences?.enabled
+            && w.user.notificationPreferences?.allowProjectUpdates
+            && w.userId !== requestUserId,
         )
-        .map((w) => w.userId);
+        .map(w => w.userId);
 
       if (watcherIds.length > 0 && user) {
         await NotificationService.queueBatchNotifications({
           userIds: watcherIds,
-          type: 'PROJECT_UPDATE',
+          type: "PROJECT_UPDATE",
           message: `${user.username} has ${action} project "${project.title}"`,
           projectId: project.id,
           triggeredById: requestUserId,
         });
       }
     } catch (error) {
-      if (error instanceof Utils) throw error;
+      if (error instanceof Utils)
+        throw error;
       throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
 
-  async rateProject(projectId: Project['id'], rating: number, requestUserId: User['id']) {
+  async rateProject(projectId: Project["id"], rating: number, requestUserId: User["id"]) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         const project = await prisma.project.findUnique({
@@ -549,8 +570,8 @@ export const ProjectService = {
             select: { rating: true },
           });
 
-          const averageRating =
-            ratings.length > 0
+          const averageRating
+            = ratings.length > 0
               ? Number((ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length).toFixed(1))
               : 0;
 
@@ -571,7 +592,7 @@ export const ProjectService = {
           if (user && project.createdById) {
             await NotificationService.queueBatchNotifications({
               userIds: [project.createdById],
-              type: 'RATING',
+              type: "RATING",
               message: `${user.username} rated your project "${project.title}" with ${rating} stars`,
               projectId,
               triggeredById: requestUserId,
@@ -581,13 +602,14 @@ export const ProjectService = {
 
         return userRating;
       } catch (error) {
-        if (error instanceof Utils) throw error;
+        if (error instanceof Utils)
+          throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
   },
 
-  async getUserProjectRating(projectId: Project['id'], userId: User['id']) {
+  async getUserProjectRating(projectId: Project["id"], userId: User["id"]) {
     return withServiceAuth(userId, null, async () => {
       try {
         const rating = await prisma.projectRating.findUnique({
@@ -602,7 +624,8 @@ export const ProjectService = {
 
         return rating?.rating || 0;
       } catch (error) {
-        if (error instanceof Utils) throw error;
+        if (error instanceof Utils)
+          throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });
@@ -631,14 +654,15 @@ export const ProjectService = {
           },
           orderBy: {
             project: {
-              createdDate: 'desc',
+              createdDate: "desc",
             },
           },
         });
 
-        return watchedProjects.map((watcher) => watcher.project);
+        return watchedProjects.map(watcher => watcher.project);
       } catch (error) {
-        if (error instanceof Utils) throw error;
+        if (error instanceof Utils)
+          throw error;
         throw new Utils(ErrorMessage.OPERATION_FAILED);
       }
     });

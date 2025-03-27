@@ -48,7 +48,6 @@ model User {
   projects                Project[]
   projectRatings          ProjectRating[]
   bio                     String?                  @prisma.Text
-  role                    Role                     @default(USER)
   technologies            Technology[]             @relation("UserTechnologies")
   gradYear                Int?
   githubProfile           String?
@@ -61,35 +60,36 @@ model User {
 }
 
 model Project {
-  id               String         @id @default(cuid())
-  createdDate      DateTime       @default(now())
-  lastModifiedDate DateTime       @updatedAt
-  title            String         @prisma.Text
-  description      String         @prisma.Text
+  id               String           @id @default(cuid())
+  createdDate      DateTime         @default(now())
+  lastModifiedDate DateTime         @updatedAt
+  title            String           @prisma.Text
+  description      String           @prisma.Text
   projectType      ProjectType
-  rating           Float          @default(0)
-  technologies     Technology[]   @relation("ProjectTechnologies")
+  rating           Float            @default(0)
+  technologies     Technology[]     @relation("ProjectTechnologies")
   githubRepo       String?
   comments         Comment[]
   watchers         ProjectWatcher[]
   ratings          ProjectRating[]
   createdById      String
-  createdBy        User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  notifications    Notification[] @relation("ProjectNotifications")
+  createdBy        User             @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  notifications    Notification[]   @relation("ProjectNotifications")
 
   @@index([createdById])
   @@index([title(length: 191)])
+  @@fulltext([title, description])
 }
 
 model ProjectRating {
-  id           String   @id @default(cuid())
-  projectId    String
-  userId       String
-  rating       Int
-  createdDate  DateTime @default(now())
-  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id          String   @id @default(cuid())
+  projectId   String
+  userId      String
+  rating      Int
+  createdDate DateTime @default(now())
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([projectId, userId])
   @@index([projectId])
   @@index([userId])
@@ -215,11 +215,6 @@ enum OnboardingStep {
   STEP_THREE
   STEP_FOUR
   COMPLETE
-}
-
-enum Role {
-  ADMIN
-  USER
 }
 
 enum MentorshipStatus {

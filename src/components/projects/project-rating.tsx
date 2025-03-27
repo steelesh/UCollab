@@ -1,17 +1,19 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { User as UserIcon } from 'lucide-react';
-import { Project } from '@prisma/client';
-import { rateProject } from '~/features/projects/project.actions';
-import { useRouter } from 'next/navigation';
-import { StarRating } from '~/components/ui/star-rating';
+import type { Project } from "@prisma/client";
 
-interface ProjectRatingProps {
-  projectId: Project['id'];
+import { User as UserIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+import { StarRating } from "~/components/ui/star-rating";
+import { rateProject } from "~/features/projects/project.actions";
+
+type ProjectRatingProps = {
+  projectId: Project["id"];
   initialRating: number;
   userRating: number;
-}
+};
 
 export function ProjectRating({ projectId, userRating = 0 }: ProjectRatingProps) {
   const [userCurrentRating, setUserCurrentRating] = useState<number>(userRating);
@@ -39,13 +41,19 @@ export function ProjectRating({ projectId, userRating = 0 }: ProjectRatingProps)
       <StarRating rating={userCurrentRating} onChange={handleRating} size="md" disabled={isLoading} />
       <div className="text-muted-foreground mt-2 flex items-center gap-2 text-xs">
         <UserIcon className="h-4 w-4" />
-        {userCurrentRating > 0 ? (
-          <span>
-            You rated this project {userCurrentRating} {userCurrentRating === 1 ? 'star' : 'stars'}
-          </span>
-        ) : (
-          <span>You haven't rated this project yet</span>
-        )}
+        {userCurrentRating > 0
+          ? (
+              <span>
+                You rated this project
+                {" "}
+                {userCurrentRating}
+                {" "}
+                {userCurrentRating === 1 ? "star" : "stars"}
+              </span>
+            )
+          : (
+              <span>You haven't rated this project yet</span>
+            )}
       </div>
     </div>
   );

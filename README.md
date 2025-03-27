@@ -97,9 +97,10 @@ classDiagram
     Comment --> Post : belongs to
     Notification --> User : notifies
 ```
+
 ## Build Instructions
 
-> [!Important]  
+> [!Important]
 > Building this project from source requires installing [Git](https://git-scm.com/), [NodeJS](https://nodejs.org/en), and [Docker](https://www.docker.com/products/docker-desktop/).
 
 1. Clone the repository and change into the directory
@@ -113,7 +114,7 @@ classDiagram
 3. Install the dependencies
    ```
     npm install
-    ```
+   ```
 4. Start Docker Desktop
    ```
    docker desktop start
@@ -122,7 +123,6 @@ classDiagram
    ```
    npm run dev
    ```
-
 
 ### Created by
 

@@ -1,18 +1,20 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { User } from '@prisma/client';
-import Link from 'next/link';
-import { Route } from 'next';
-import { SignOutButton } from '~/components/navigation/signout-button';
-import { Button } from '~/components/ui/button';
-import { Settings } from 'lucide-react';
+import type { User } from "@prisma/client";
+import type { Route } from "next";
 
-interface ProfileHeaderProps {
-  avatar: User['avatar'];
-  username: User['username'];
+import { Settings } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+
+import { SignOutButton } from "~/components/navigation/signout-button";
+import { Button } from "~/components/ui/button";
+
+type ProfileHeaderProps = {
+  avatar: User["avatar"];
+  username: User["username"];
   isOwnProfile: boolean;
-}
+};
 
 export function ProfileHeader({ avatar, username, isOwnProfile }: ProfileHeaderProps) {
   return (

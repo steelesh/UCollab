@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "Prisma.prisma",
+    "tamasfe.even-better-toml",
+    "bradlc.vscode-tailwindcss",
+    "csstools.postcss",
+    "aaron-bond.better-comments",
+    "redhat.vscode-yaml"
+  ]
+}

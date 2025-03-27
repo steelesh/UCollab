@@ -1,16 +1,16 @@
-import {
-  Project as PrismaProject,
+import type {
   Comment as PrismaComment,
+  Project as PrismaProject,
   Technology as PrismaTechnology,
   User,
-} from '@prisma/client';
+} from "@prisma/client";
 
 export type Project = Pick<
   PrismaProject,
-  'id' | 'title' | 'description' | 'createdDate' | 'lastModifiedDate' | 'projectType' | 'githubRepo' | 'createdById'
+  "id" | "title" | "description" | "createdDate" | "lastModifiedDate" | "projectType" | "githubRepo" | "createdById"
 >;
 
-export interface Comment {
+export type Comment = {
   id: string;
   content: string;
   createdDate: Date;
@@ -22,24 +22,24 @@ export interface Comment {
   };
   replies?: Comment[];
   parentId?: string | null;
-}
+};
 
-export type Technology = Pick<PrismaTechnology, 'id' | 'name'>;
+export type Technology = Pick<PrismaTechnology, "id" | "name">;
 
 export type ProjectDetails = Pick<
   PrismaProject,
-  | 'id'
-  | 'title'
-  | 'description'
-  | 'createdDate'
-  | 'lastModifiedDate'
-  | 'projectType'
-  | 'githubRepo'
-  | 'createdById'
-  | 'rating'
+  | "id"
+  | "title"
+  | "description"
+  | "createdDate"
+  | "lastModifiedDate"
+  | "projectType"
+  | "githubRepo"
+  | "createdById"
+  | "rating"
 > & {
-  comments: (Pick<PrismaComment, 'id' | 'content' | 'createdDate' | 'lastModifiedDate'> & {
-    createdBy: Pick<User, 'id' | 'username' | 'avatar'>;
+  comments: (Pick<PrismaComment, "id" | "content" | "createdDate" | "lastModifiedDate"> & {
+    createdBy: Pick<User, "id" | "username" | "avatar">;
     replies?: Comment[];
     parentId?: string | null;
   })[];
@@ -48,15 +48,15 @@ export type ProjectDetails = Pick<
 
 export type ExploreProject = Pick<
   PrismaProject,
-  'id' | 'title' | 'description' | 'createdDate' | 'projectType' | 'githubRepo' | 'rating'
+  "id" | "title" | "description" | "createdDate" | "projectType" | "githubRepo" | "rating"
 > & {
   technologies: Technology[];
 };
 
-export interface ExplorePageData {
+export type ExplorePageData = {
   projects: ExploreProject[];
   totalPages: number;
   currentPage: number;
   limit: number;
   totalCount: number;
-}
+};
