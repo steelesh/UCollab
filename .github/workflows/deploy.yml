@@ -11,6 +11,7 @@ jobs:
       contents: read
     env:
       AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+      AUTH_URL: ${{ secrets.AUTH_URL }}
       MYSQL_URL: ${{ secrets.MYSQL_URL }}
       AUTH_MICROSOFT_ENTRA_ID_TENANT: ${{ secrets.AUTH_MICROSOFT_ENTRA_ID_TENANT }}
       AUTH_MICROSOFT_ENTRA_ID_ID: ${{ secrets.AUTH_MICROSOFT_ENTRA_ID_ID }}
