@@ -66,6 +66,7 @@ export function UserCard({ username, firstName, lastName, avatar, email, gradYea
             <GraduationCap className="w-4 h-4" />
             <Small noMargin>
               Class of
+              {" "}
               {gradYear}
             </Small>
           </Muted>
