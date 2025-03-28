@@ -6,7 +6,7 @@ import Link from "next/link";
 import SearchBar from "~/components/projects/search-projects";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import { DataPagination } from "~/components/ui/data-pagination";
+import { Pagination } from "~/components/ui/pagination";
 import { StarDisplay } from "~/components/ui/star-rating";
 import { prisma } from "~/lib/prisma";
 import { withAuth } from "~/security/protected";
@@ -155,7 +155,7 @@ async function Page({ searchParams, userId }: PageProps) {
         ))}
       </div>
       {totalCount > 0 && (
-        <DataPagination
+        <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
           totalCount={totalCount}
