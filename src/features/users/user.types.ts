@@ -1,4 +1,4 @@
-import type { Comment as PrismaComment, Technology as PrismaTechnology, Project, User } from "@prisma/client";
+import type { Comment as PrismaComment, Project, User } from "@prisma/client";
 
 export type Comment = {
   project: {
@@ -6,7 +6,12 @@ export type Comment = {
   };
 } & Pick<PrismaComment, "id" | "content" | "projectId" | "createdDate">;
 
-export type Technology = Pick<PrismaTechnology, "id" | "name">;
+export type Technology = {
+  id: string;
+  name: string;
+  createdDate: Date;
+  verified: boolean;
+};
 
 export type UserProfile = {
   id: User["id"];
@@ -22,4 +27,13 @@ export type UserProfile = {
   technologies: Technology[];
   projects: Project[];
   comments: Comment[];
+};
+
+export type MinimalUserForDirectory = {
+  id: User["id"];
+  avatar: User["avatar"];
+  firstName: User["firstName"];
+  lastName: User["lastName"];
+  username: User["username"];
+  technologies: Technology[];
 };

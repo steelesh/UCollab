@@ -1,64 +1,45 @@
-import type { Route } from "next";
+import type { MinimalUserForDirectory } from "~/features/users/user.types";
 
-import Image from "next/image";
-import Link from "next/link";
-
-import { prisma } from "~/lib/prisma";
+import { PageBreadcrumb } from "~/components/navigation/page-breadcrumb";
+import { Container } from "~/components/ui/container";
+import { Header } from "~/components/ui/header";
+import { H1 } from "~/components/ui/heading";
+import { UserCard } from "~/components/ui/user-card";
+import { getUserDirectory } from "~/features/users/user.queries";
 import { withAuth } from "~/security/protected";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "UCollab — User Directory",
 };
 
-export const dynamic = "force-dynamic";
-
 async function Page() {
-  const users = await prisma.user.findMany({
-    select: {
-      avatar: true,
-      username: true,
-      email: true,
-      createdDate: true,
-      lastLogin: true,
-    },
-  });
-
-  const formattedUsers: {
-    createdDate: string | undefined;
-    lastLogin: string | undefined;
-    username: string;
-    email: string;
-    avatar: string;
-  }[] = users.map(user => ({
-    ...user,
-    createdDate: user.createdDate.toISOString().split("T")[0],
-    lastLogin: user.lastLogin.toISOString().split("T")[0],
-  }));
+  const users: MinimalUserForDirectory[] = await getUserDirectory();
 
   return (
-    <div className="flex flex-col items-center">
-      {formattedUsers.map(user => (
-        <div key={user.username} className="flex w-full max-w-3xl items-center border-b p-4">
-          <Image src={user.avatar} alt={user.username} width={50} height={50} className="rounded-full" />
-          <div className="ml-4">
-            <Link href={`/u/${user.username}` as Route} className="font-bold hover:underline">
-              {user.username}
-            </Link>
-            <p className="text-muted-foreground text-sm">{user.email}</p>
-          </div>
-          <div className="ml-auto text-right">
-            <p className="text-sm">
-              Created:
-              {user.createdDate}
-            </p>
-            <p className="text-sm">
-              Last Login:
-              {user.lastLogin}
-            </p>
-          </div>
-        </div>
-      ))}
-    </div>
+    <Container>
+      <PageBreadcrumb
+        items={[
+          { label: "User Directory", isCurrent: true },
+        ]}
+      />
+      <Header>
+        <H1>User Directory</H1>
+      </Header>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {users.map(user => (
+          <UserCard
+            key={user.username}
+            username={user.username}
+            avatar={user.avatar}
+            firstName={user.firstName}
+            lastName={user.lastName}
+            technologies={user.technologies}
+          />
+        ))}
+      </div>
+    </Container>
   );
 }
 
