@@ -1,84 +1,96 @@
+import { PageBreadcrumb } from "~/components/navigation/page-breadcrumb";
+import { Container } from "~/components/ui/container";
+import { Header } from "~/components/ui/header";
+import { H1 } from "~/components/ui/heading";
+import { Large } from "~/components/ui/large";
+import { TypographyLink } from "~/components/ui/link";
+import { List, ListItem } from "~/components/ui/list";
+import { Muted } from "~/components/ui/muted";
+import { P } from "~/components/ui/p";
+import { Section } from "~/components/ui/section";
+import { Small } from "~/components/ui/small";
+
 export const metadata = {
   title: "UCollab — Code of Conduct",
 };
 
 export default function Page() {
   return (
-    <div className="flex flex-col items-center">
-      <h1 className="text-center text-2xl font-bold select-none">Code of Conduct</h1>
-      <h2 className="mt-8 text-xl font-bold">🌎 UCollab Community Guidelines</h2>
-      <p className="text-secondary mt-2 max-w-2xl text-center text-sm italic">
-        UCollab is committed to maintaining a respectful, inclusive, and collaborative environment for all members.
-      </p>
-
-      <div className="relative mt-8 w-full max-w-3xl rounded-lg shadow-2xl px-6 py-6">
-        <h2 className="text-lg font-semibold">📌 Our Core Values</h2>
-        <ul className="text-secondary-foreground mt-4 list-disc space-y-2 pl-5">
-          <li>
+    <Container as="article">
+      <PageBreadcrumb
+        items={[
+          { label: "Code of Conduct", isCurrent: true },
+        ]}
+      />
+      <Header>
+        <H1>Code of Conduct</H1>
+        <P className="italic">UCollab is committed to maintaining a respectful, inclusive, and collaborative environment for all members.</P>
+      </Header>
+      <Section>
+        <Large>📌 Our Core Values</Large>
+        <List>
+          <ListItem>
             <strong>♦️ Respect:</strong>
             {" "}
             Treat everyone with kindness and professionalism.
-          </li>
-          <li>
+          </ListItem>
+          <ListItem>
             <strong>♦️ Inclusivity:</strong>
             {" "}
             Embrace diversity and create an open, welcoming space.
-          </li>
-          <li>
+          </ListItem>
+          <ListItem>
             <strong>♦️ Collaboration:</strong>
             {" "}
             Work together constructively, valuing all contributions.
-          </li>
-          <li>
+          </ListItem>
+          <ListItem>
             <strong>♦️ Integrity:</strong>
             {" "}
             Be honest, ethical, and take responsibility for your actions.
-          </li>
-        </ul>
-      </div>
-
-      <div className="relative mt-8 w-full max-w-3xl rounded-lg shadow-2xl px-6 py-6">
-        <h2 className="text-lg font-semibold">🚫 Unacceptable Behavior</h2>
-        <p className="text-secondary mt-2 text-sm">
-          The following behaviors are not tolerated within UCollab:
-        </p>
-        <ul className="text-secondary-foreground mt-4 list-disc space-y-2 pl-5">
-          <li>Harassment, discrimination, or targeted attacks.</li>
-          <li>Hate speech, offensive language, or disrespectful conduct.</li>
-          <li>Disruptive behavior or intentional misinformation.</li>
-          <li>Sharing private or sensitive data without consent.</li>
-        </ul>
-      </div>
-
-      <div className="relative mt-8 w-full max-w-3xl rounded-lg shadow-2xl px-6 py-6">
-        <h2 className="text-lg font-semibold">⚖️ Consequences & Enforcement</h2>
-        <p className="text-secondary mt-2 text-sm">
-          Violations of this Code of Conduct may result in the following actions:
-        </p>
-        <ul className="text-secondary-foreground mt-4 list-disc space-y-2 pl-5">
-          <li>Warning from moderators or administrators.</li>
-          <li>Temporary or permanent suspension from UCollab.</li>
-          <li>Escalation to university authorities or legal action (if applicable).</li>
-        </ul>
-      </div>
-
-      <div className="relative mt-8 w-full max-w-3xl rounded-lg shadow-2xl px-6 py-6">
-        <h2 className="text-lg font-semibold">📬 Reporting Violations</h2>
-        <p className="text-secondary mt-2 text-sm">
+          </ListItem>
+        </List>
+      </Section>
+      <Section>
+        <Large>🚫 Unacceptable Behavior</Large>
+        <Muted>The following behaviors are not tolerated within UCollab:</Muted>
+        <List>
+          <ListItem>Harassment, discrimination, or targeted attacks.</ListItem>
+          <ListItem>Hate speech, offensive language, or disrespectful conduct.</ListItem>
+          <ListItem>Disruptive behavior or intentional misinformation.</ListItem>
+          <ListItem>Sharing private or sensitive data without consent.</ListItem>
+        </List>
+      </Section>
+      <Section>
+        <Large>⚖️ Consequences & Enforcement</Large>
+        <Muted>Violations of this Code of Conduct may result in the following actions:</Muted>
+        <List>
+          <ListItem>Warning from moderators or administrators.</ListItem>
+          <ListItem>Temporary or permanent suspension from UCollab.</ListItem>
+          <ListItem>Escalation to university authorities or legal action (if applicable).</ListItem>
+        </List>
+      </Section>
+      <Section>
+        <Large>📬 Reporting Violations</Large>
+        <Muted>
           If you witness or experience behavior that violates this Code of Conduct, please report it confidentially to
           {" "}
-          <a href="mailto:support@ucollab.com" className="text-blue-400 underline">support@ucollab.com</a>
+          <TypographyLink href="mailto:support@ucollab.com">support@ucollab.com</TypographyLink>
           .
-        </p>
-      </div>
-
-      <p className="mt-8 text-sm text-gray-400">
-        This Code of Conduct is adapted from the Contributor Covenant v2.1. Read more at
-        <a href="https://www.contributor-covenant.org/version/2/1/code_of_conduct/" target="_blank" rel="noopener noreferrer" className="underline text-blue-400">
-          contributor-covenant.org
-        </a>
-        .
-      </p>
-    </div>
+        </Muted>
+      </Section>
+      <Section className="text-center mt-20">
+        <Small>
+          <Muted>
+            This Code of Conduct is adapted from the Contributor Covenant v2.1. Read more at
+            {" "}
+            <TypographyLink href="https://www.contributor-covenant.org/version/2/1/code_of_conduct/" isExternal>
+              contributor-covenant.org
+            </TypographyLink>
+            .
+          </Muted>
+        </Small>
+      </Section>
+    </Container>
   );
 }

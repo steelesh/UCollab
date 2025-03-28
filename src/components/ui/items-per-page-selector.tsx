@@ -8,8 +8,9 @@ type ItemsPerPageSelectorProps = {
   totalCount: number;
   startIndex: number;
   endIndex: number;
-  basePath?: string;
-  itemName?: string;
+  basePath: string;
+  itemName: string;
+  onValueChange?: (value: string) => void;
 };
 
 export function ItemsPerPageSelector({
@@ -20,6 +21,7 @@ export function ItemsPerPageSelector({
   endIndex,
   basePath = "/p",
   itemName = "projects",
+  onValueChange,
 }: ItemsPerPageSelectorProps) {
   return (
     <div className="flex items-center space-x-3">
@@ -31,7 +33,11 @@ export function ItemsPerPageSelector({
       <Select
         defaultValue={currentLimit.toString()}
         onValueChange={(value) => {
-          window.location.href = `${basePath}?page=1&limit=${value}`;
+          if (onValueChange) {
+            onValueChange(value);
+          } else {
+            window.location.href = `${basePath}?page=1&limit=${value}`;
+          }
         }}
       >
         <SelectTrigger>
@@ -51,6 +57,7 @@ export function ItemsPerPageSelector({
         {endIndex}
         {" "}
         of
+        {" "}
         {totalCount}
         {" "}
         {itemName}

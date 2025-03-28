@@ -30,11 +30,13 @@ export function ProfileCommentsList({ comments }: ProfileCommentsListProps) {
                     <div className="text-muted-foreground flex items-center gap-2 text-xs">
                       <span>
                         on
+                        {" "}
                         {comment.project.title}
                       </span>
                       <span>•</span>
                       <time>
                         {formatDistanceToNow(new Date(comment.createdDate))}
+                        {" "}
                         ago
                       </time>
                     </div>

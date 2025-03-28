@@ -91,6 +91,7 @@ export function CommentHeader({
           <DialogHeader>
             <DialogTitle>
               Delete
+              {" "}
               {isReply ? "Reply" : "Comment"}
             </DialogTitle>
             <DialogDescription>{message}</DialogDescription>

@@ -5,10 +5,6 @@ import { NotificationsClient } from "~/components/notifications/notifications-cl
 import { getNotifications } from "~/features/notifications/notification.queries";
 import { withAuth } from "~/security/protected";
 
-export const metadata: Metadata = {
-  title: "Notifications | UCollab",
-};
-
 export const dynamic = "force-dynamic";
 
 type PageProps = {
@@ -16,23 +12,25 @@ type PageProps = {
   userId: User["id"];
 };
 
+export const metadata: Metadata = {
+  title: "Notifications | UCollab",
+};
+
 async function Page({ userId, searchParams }: PageProps) {
   const { page = "1", limit = "20" } = await searchParams;
   const data = await getNotifications(Number(page), Number(limit), userId);
 
   return (
-    <div className="flex flex-col items-center">
-      <NotificationsClient
-        initialNotifications={data.notifications}
-        userId={userId}
-        pagination={{
-          currentPage: data.currentPage,
-          totalPages: data.totalPages,
-          totalCount: data.totalCount,
-          limit: Number(limit),
-        }}
-      />
-    </div>
+    <NotificationsClient
+      initialNotifications={data.notifications}
+      userId={userId}
+      pagination={{
+        currentPage: data.currentPage,
+        totalPages: data.totalPages,
+        totalCount: data.totalCount,
+        limit: Number(limit),
+      }}
+    />
   );
 }
 

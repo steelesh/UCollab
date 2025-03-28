@@ -1,97 +1,200 @@
-import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from "lucide-react";
-import * as React from "react";
+"use client";
 
-import type { Button } from "~/components/ui/button";
-
-import { buttonVariants } from "~/components/ui/button";
+import { ItemsPerPageSelector } from "~/components/ui/items-per-page-selector";
+import {
+  ShadcnPagination,
+  ShadcnPaginationContent,
+  ShadcnPaginationEllipsis,
+  ShadcnPaginationItem,
+  ShadcnPaginationLink,
+  ShadcnPaginationNext,
+  ShadcnPaginationPrevious,
+} from "~/components/ui/shadcn-pagination";
 import { cn } from "~/lib/utils";
 
-function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
-  return <nav role="navigation" aria-label="pagination" data-slot="pagination" className={cn(className)} {...props} />;
-}
-
-function PaginationContent({ className, ...props }: React.ComponentProps<"ul">) {
-  return <ul data-slot="pagination-content" className={cn("flex flex-row items-center gap-1", className)} {...props} />;
-}
-
-function PaginationItem({ ...props }: React.ComponentProps<"li">) {
-  return <li data-slot="pagination-item" {...props} />;
-}
-
-type PaginationLinkProps = {
-  isActive?: boolean;
-  children: React.ReactNode;
-} & Pick<React.ComponentProps<typeof Button>, "size"> &
-React.ComponentProps<"a">;
-
-function PaginationLink({ className, isActive, size = "icon", children, ...props }: PaginationLinkProps) {
-  return (
-    <a
-      aria-current={isActive ? "page" : undefined}
-      data-slot="pagination-link"
-      data-active={isActive}
-      className={cn(
-        buttonVariants({
-          variant: isActive ? "outline" : "ghost",
-          size,
-        }),
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </a>
-  );
-}
-
-function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
-  return (
-    <PaginationLink
-      aria-label="Go to previous page"
-      size="default"
-      className={cn("gap-1 px-2.5 sm:pl-2.5", className)}
-      {...props}
-    >
-      <ChevronLeftIcon />
-      <span className="hidden sm:block">Previous</span>
-    </PaginationLink>
-  );
-}
-
-function PaginationNext({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
-  return (
-    <PaginationLink
-      aria-label="Go to next page"
-      size="default"
-      className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
-      {...props}
-    >
-      <span className="hidden sm:block">Next</span>
-      <ChevronRightIcon />
-    </PaginationLink>
-  );
-}
-
-function PaginationEllipsis({ className, ...props }: React.ComponentProps<"span">) {
-  return (
-    <span
-      aria-hidden
-      data-slot="pagination-ellipsis"
-      className={cn("flex size-9 items-center justify-center", className)}
-      {...props}
-    >
-      <MoreHorizontalIcon className="size-4" />
-      <span className="sr-only">More pages</span>
-    </span>
-  );
-}
-
-export {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
+type DataPaginationProps = {
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  limit: number;
+  itemsPerPageOptions: number[];
+  basePath: string;
+  itemName?: string;
+  onPageChange?: (page: number) => void;
+  onLimitChange?: (limit: number) => void;
 };
+
+export function Pagination({
+  currentPage,
+  totalPages,
+  totalCount,
+  limit,
+  itemsPerPageOptions,
+  basePath,
+  itemName = "items",
+  onPageChange,
+  onLimitChange,
+}: DataPaginationProps) {
+  const startIndex = (currentPage - 1) * limit + 1;
+  const endIndex = Math.min(startIndex + limit - 1, totalCount);
+
+  if (totalCount === 0) {
+    return null;
+  }
+
+  const buildPageUrl = (page: number) => {
+    if (onPageChange) {
+      return "#";
+    }
+    return `${basePath}?page=${page}&limit=${limit}`;
+  };
+
+  const handlePageClick = (page: number) => {
+    if (onPageChange) {
+      onPageChange(page);
+    }
+  };
+
+  const handleLimitChange = (newLimit: string) => {
+    if (onLimitChange) {
+      onLimitChange(Number(newLimit));
+    } else {
+      window.location.href = `${basePath}?page=1&limit=${newLimit}`;
+    }
+  };
+
+  return (
+    <div className="mt-8 border-t pt-4">
+      <div className="flex items-center justify-between px-4">
+        <ItemsPerPageSelector
+          currentLimit={limit}
+          options={itemsPerPageOptions}
+          totalCount={totalCount}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          basePath={basePath}
+          itemName={itemName}
+          onValueChange={handleLimitChange}
+        />
+        <ShadcnPagination>
+          <ShadcnPaginationContent>
+            <ShadcnPaginationItem>
+              <ShadcnPaginationPrevious
+                href={buildPageUrl(currentPage - 1)}
+                onClick={(e) => {
+                  if (onPageChange) {
+                    e.preventDefault();
+                    handlePageClick(currentPage - 1);
+                  }
+                }}
+                className={cn(currentPage <= 1 && "pointer-events-none opacity-50")}
+              >
+                Previous
+              </ShadcnPaginationPrevious>
+            </ShadcnPaginationItem>
+            <ShadcnPaginationItem>
+              <ShadcnPaginationLink
+                href={buildPageUrl(1)}
+                onClick={(e) => {
+                  if (onPageChange) {
+                    e.preventDefault();
+                    handlePageClick(1);
+                  }
+                }}
+                className={cn(currentPage === 1 && "bg-accent text-accent-foreground")}
+              >
+                1
+              </ShadcnPaginationLink>
+            </ShadcnPaginationItem>
+            {currentPage > 3 && (
+              <ShadcnPaginationItem>
+                <ShadcnPaginationEllipsis />
+              </ShadcnPaginationItem>
+            )}
+            {currentPage > 2 && currentPage <= totalPages && (
+              <ShadcnPaginationItem>
+                <ShadcnPaginationLink
+                  href={buildPageUrl(currentPage - 1)}
+                  onClick={(e) => {
+                    if (onPageChange) {
+                      e.preventDefault();
+                      handlePageClick(currentPage - 1);
+                    }
+                  }}
+                >
+                  {currentPage - 1}
+                </ShadcnPaginationLink>
+              </ShadcnPaginationItem>
+            )}
+            {currentPage !== 1 && currentPage !== totalPages && (
+              <ShadcnPaginationItem>
+                <ShadcnPaginationLink
+                  href={buildPageUrl(currentPage)}
+                  onClick={(e) => {
+                    if (onPageChange) {
+                      e.preventDefault();
+                      handlePageClick(currentPage);
+                    }
+                  }}
+                  className="bg-accent text-accent-foreground"
+                >
+                  {currentPage}
+                </ShadcnPaginationLink>
+              </ShadcnPaginationItem>
+            )}
+            {currentPage < totalPages - 1 && (
+              <ShadcnPaginationItem>
+                <ShadcnPaginationLink
+                  href={buildPageUrl(currentPage + 1)}
+                  onClick={(e) => {
+                    if (onPageChange) {
+                      e.preventDefault();
+                      handlePageClick(currentPage + 1);
+                    }
+                  }}
+                >
+                  {currentPage + 1}
+                </ShadcnPaginationLink>
+              </ShadcnPaginationItem>
+            )}
+            {currentPage < totalPages - 2 && (
+              <ShadcnPaginationItem>
+                <ShadcnPaginationEllipsis />
+              </ShadcnPaginationItem>
+            )}
+            {totalPages > 1 && (
+              <ShadcnPaginationItem>
+                <ShadcnPaginationLink
+                  href={buildPageUrl(totalPages)}
+                  onClick={(e) => {
+                    if (onPageChange) {
+                      e.preventDefault();
+                      handlePageClick(totalPages);
+                    }
+                  }}
+                  className={cn(currentPage === totalPages && "bg-accent text-accent-foreground")}
+                >
+                  {totalPages}
+                </ShadcnPaginationLink>
+              </ShadcnPaginationItem>
+            )}
+            <ShadcnPaginationItem>
+              <ShadcnPaginationNext
+                href={buildPageUrl(currentPage + 1)}
+                onClick={(e) => {
+                  if (onPageChange) {
+                    e.preventDefault();
+                    handlePageClick(currentPage + 1);
+                  }
+                }}
+                className={cn(currentPage >= totalPages && "pointer-events-none opacity-50")}
+              >
+                Next
+              </ShadcnPaginationNext>
+            </ShadcnPaginationItem>
+          </ShadcnPaginationContent>
+        </ShadcnPagination>
+      </div>
+    </div>
+  );
+}

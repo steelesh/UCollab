@@ -14,7 +14,7 @@ import { prisma } from "~/lib/prisma";
 import { ErrorMessage, Utils } from "~/lib/utils";
 import { withServiceAuth } from "~/security/protected-service";
 
-import type { UserProfile } from "./user.types";
+import type { MinimalUserForDirectory, UserProfile } from "./user.types";
 
 export const UserService = {
   async getUserProfile(username: User["username"]): Promise<UserProfile> {
@@ -64,6 +64,36 @@ export const UserService = {
       if (!user)
         notFound();
       return user as UserProfile;
+    } catch {
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
+    }
+  },
+
+  async getUserDirectory(page = 1, limit = 12): Promise<{ users: MinimalUserForDirectory[]; totalCount: number }> {
+    try {
+      const [users, totalCount] = await Promise.all([
+        prisma.user.findMany({
+          select: {
+            id: true,
+            avatar: true,
+            firstName: true,
+            lastName: true,
+            username: true,
+            gradYear: true,
+            email: true,
+            technologies: true,
+            mentorship: true,
+          },
+          orderBy: {
+            createdDate: "desc",
+          },
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+        prisma.user.count(),
+      ]);
+
+      return { users: users satisfies MinimalUserForDirectory[], totalCount };
     } catch {
       throw new Utils(ErrorMessage.OPERATION_FAILED);
     }

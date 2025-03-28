@@ -17,6 +17,7 @@ export function ProfileUserInfo({ createdDate, gradYear, mentorship, bio, techno
     <div>
       <p className="text-muted-foreground text-sm">
         Joined
+        {" "}
         {new Date(createdDate).toDateString()}
       </p>
       <p className="text-muted-foreground text-sm">

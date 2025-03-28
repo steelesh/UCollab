@@ -1,21 +1,18 @@
 import type { Metadata } from "next";
 
 import { SessionProvider } from "next-auth/react";
-import { Roboto } from "next/font/google";
 
 import "~/app/globals.css";
 
+import "devicon/devicon.min.css";
 import React from "react";
 
 import Footer from "~/components/navigation/footer";
 import Navbar from "~/components/navigation/navbar";
+import { Body } from "~/components/ui/body";
+import { Main } from "~/components/ui/main";
+import { roboto } from "~/lib/fonts";
 
-const roboto = Roboto({
-  weight: ["300", "400", "500", "700"],
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-roboto",
-});
 export const metadata: Metadata = {
   title: "UCollab",
   description: "A platform for IT and CS students to collaborate on projects",
@@ -29,13 +26,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`scroll-smooth ${roboto.variable}`} suppressHydrationWarning>
-      <body className="flex min-h-screen flex-col overflow-x-clip">
+      <Body>
         <SessionProvider basePath="/auth">
           <Navbar />
-          <main className="mt-28 grow">{children}</main>
+          <Main>{children}</Main>
         </SessionProvider>
         <Footer />
-      </body>
+      </Body>
     </html>
   );
 }

@@ -16,6 +16,8 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
         outline: "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+        glossy: "relative overflow-hidden bg-gradient-to-br from-neutral-800 to-neutral-900 text-neutral-100 border border-neutral-700/30 shadow-[0_0_10px_rgba(0,0,0,0.25),0_0_2px_rgba(255,255,255,0.08)] backdrop-blur-sm before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/[0.02] before:to-transparent after:absolute after:inset-0 after:bg-gradient-to-t after:from-black/10 after:to-transparent transition-all duration-300 ease-in-out group-hover:shadow-[0_0_15px_rgba(0,0,0,0.35),0_0_3px_rgba(255,255,255,0.12)] group-hover:border-neutral-600/50",
+        glossyPrimary: "relative overflow-hidden bg-gradient-to-br from-primary/90 to-primary text-primary-foreground border border-primary/20 shadow-[0_0_10px_rgba(var(--primary),0.3),0_0_2px_rgba(255,255,255,0.1)] backdrop-blur-sm before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/[0.1] before:to-transparent after:absolute after:inset-0 after:bg-gradient-to-t after:from-black/20 after:to-transparent transition-all duration-300 ease-in-out group-hover:shadow-[0_0_15px_rgba(var(--primary),0.4),0_0_3px_rgba(255,255,255,0.15)] group-hover:border-primary/30",
       },
     },
     defaultVariants: {
