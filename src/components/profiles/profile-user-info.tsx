@@ -1,7 +1,11 @@
+"use client";
+
 import type { User } from "@prisma/client";
 
 import type { Technology } from "~/features/projects/project.types";
 
+import { Badge } from "../ui/badge";
+import { TechnologyIcon } from "../ui/technology-icon";
 import { MENTORSHIP_CONFIG } from "./profile-mentorship-config";
 
 type ProfileUserInfoProps = {
@@ -13,12 +17,22 @@ type ProfileUserInfoProps = {
 };
 
 export function ProfileUserInfo({ createdDate, gradYear, mentorship, bio, technologies }: ProfileUserInfoProps) {
+  const maxTechnologies = 4;
+  const displayTechnologies = technologies.slice(0, maxTechnologies);
+  const remainingCount = technologies.length - maxTechnologies;
+
   return (
     <div>
       <p className="text-muted-foreground text-sm">
         Joined
         {" "}
-        {new Date(createdDate).toDateString()}
+        {new Date(createdDate)
+          .toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })
+          .replace(",", "")}
       </p>
       <p className="text-muted-foreground text-sm">
         Class of
@@ -29,20 +43,26 @@ export function ProfileUserInfo({ createdDate, gradYear, mentorship, bio, techno
         {MENTORSHIP_CONFIG[mentorship].icon}
         <span>{MENTORSHIP_CONFIG[mentorship].label}</span>
       </p>
-      <div className="mt-4 border-t pt-4">
-        <p className="text-sm font-semibold">Technologies:</p>
-        <p className="text-sm">
-          {(() => {
-            const techNames = technologies.map(tech => tech.name);
-            if (techNames.length === 0)
-              return "";
-            if (techNames.length === 1)
-              return `${techNames[0]}.`;
-            return `${techNames.slice(0, -1).join(", ")}, & ${techNames[techNames.length - 1]}.`;
-          })()}
-        </p>
+      <p className="text-sm font-semibold pt-4">About me:</p>
+      <p className={`text-sm whitespace-pre-wrap py-2 ${!bio || !bio.trim() ? "text-muted-foreground italic" : ""}`}>
+        {bio && bio.trim() ? bio : "This user hasn't set a bio yet."}
+      </p>
+      <p className="text-sm font-semibold">Skills:</p>
+      <div className="flex flex-wrap items-center gap-2 pt-2">
+        {displayTechnologies.map(tech => (
+          <Badge key={tech.id || tech.name} variant="glossy" className="flex items-center gap-1">
+            <TechnologyIcon name={tech.name} colored />
+            <span className="truncate">{tech.name}</span>
+          </Badge>
+        ))}
+        {remainingCount > 0 && (
+          <Badge variant="glossy" className="flex items-center">
+            +
+            {" "}
+            {remainingCount}
+          </Badge>
+        )}
       </div>
-      <p className="mt-4 text-sm whitespace-pre-wrap">{bio}</p>
     </div>
   );
 }
