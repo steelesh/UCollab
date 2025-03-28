@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { Badge } from "~/components/ui/badge";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import TechBadge from "~/components/ui/tech-badge";
 
 type TechnologiesControlProps = {
   field: {
@@ -53,12 +53,17 @@ export default function TechnologiesControl({
       let techToAdd: string | undefined;
       if (bestMatch) {
         techToAdd = bestMatch;
-      } else if (suggestions.includes(techInputValue)) {
-        techToAdd = techInputValue;
+      } else {
+        const found = suggestions.find(
+          sugg => sugg.toLowerCase() === techInputValue.toLowerCase(),
+        );
+        if (found) {
+          techToAdd = found;
+        }
       }
       if (!techToAdd)
         return;
-      if (field.value.includes(techToAdd))
+      if (field.value.some(t => t.toLowerCase() === techToAdd.toLowerCase()))
         return;
       field.onChange([...field.value, techToAdd]);
       setTechInputValue("");
@@ -70,16 +75,14 @@ export default function TechnologiesControl({
       <Label htmlFor="technologies" className="label">
         <span className="label-text">Technologies</span>
       </Label>
-      <div className="m-4 flex flex-1">
+      <div className="m-4 flex flex-1 space-x-2">
         {field.value.map((tech: string) => (
-          <Badge
+          <TechBadge
             key={tech}
-            onClick={() => field.onChange(field.value.filter((t: string) => t !== tech))}
-            className="hover:bg-primary cursor-pointer transition duration-200 ease-in-out hover:scale-105"
-            variant="outline"
-          >
-            {tech}
-          </Badge>
+            tech={tech}
+            onRemove={() =>
+              field.onChange(field.value.filter((t: string) => t.toLowerCase() !== tech.toLowerCase()))}
+          />
         ))}
       </div>
       <div className="relative flex w-full items-center">
@@ -106,11 +109,11 @@ export default function TechnologiesControl({
         />
         {techInputValue && suggestionRemainder && (
           <span
-            className="pointer-events-none absolute text-sm leading-none font-normal text-white/50"
+            className="pointer-events-none absolute text-sm leading-none font-normal text-muted-foreground/50"
             style={{
               left: widthRef.current - 1,
-              top: "50%",
-              transform: "translateY(-47%)",
+              top: "52%",
+              transform: "translateY(-48%)",
             }}
           >
             {suggestionRemainder}
