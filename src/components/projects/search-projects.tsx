@@ -9,9 +9,7 @@ import { checkProjectsCount } from "~/features/projects/project.actions";
 export default function SearchBar() {
   const router = useRouter();
   const sp = useSearchParams();
-  const currentParamsString = sp.toString();
 
-  // Initialize state from URL (or defaults)
   const [query, setQuery] = useState(sp.get("query") || "");
   const [projectType, setProjectType] = useState(sp.get("projectType") || "");
   const [minRating, setMinRating] = useState(sp.get("minRating") || "");
@@ -31,7 +29,6 @@ export default function SearchBar() {
     if (sortOrder)
       params.set("sortOrder", sortOrder);
 
-    // Get current filter values from URL.
     const currentFilter = {
       query: sp.get("query") || "",
       projectType: sp.get("projectType") || "",
@@ -55,12 +52,13 @@ export default function SearchBar() {
 
     const newParamsString = params.toString();
 
-    // Preflight: Check if matching projects exist.
+    const currentParamsString = sp.toString();
+
     const result = await checkProjectsCount({ query, projectType, minRating });
     if (result && result.success && result.totalCount > 0 && currentParamsString !== newParamsString) {
       router.replace(`/p?${newParamsString}`);
     }
-  }, [query, projectType, minRating, sortBy, sortOrder, router, sp, currentParamsString]);
+  }, [query, projectType, minRating, sortBy, sortOrder, router, sp]);
 
   const funnel = useMemo(() => R.funnel(updateSearch, { minQuietPeriodMs: 500 }), [updateSearch]);
 
@@ -96,7 +94,7 @@ export default function SearchBar() {
           >
             <option value="">All</option>
             <option value="FEEDBACK">Feedback</option>
-            <option value="SHOWCASE">Showcase</option>
+            <option value="CONTRIBUTION">Contribution</option>
           </select>
         </div>
         <div>

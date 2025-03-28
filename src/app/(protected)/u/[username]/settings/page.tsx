@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "~/components/ui/button";
+import GraduationYearControl from "~/components/ui/gradyear-control";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { updateUser } from "~/features/users/user.actions";
@@ -76,18 +77,15 @@ async function Page({ userId }: { userId: User["id"] }) {
         <div className="px-8 pt-14 pb-8">
           <h1 className="pb-2 text-2xl font-bold">Settings</h1>
           <fieldset className="fieldset">
-            <legend className="fieldset-legend">Graduation Year</legend>
-            <input
-              type="number"
-              name="gradYear"
-              className="input border-muted border-2"
-              defaultValue={user.gradYear ?? ""}
-              placeholder="Graduation Year"
+            <legend className="text-sm font-medium">Graduation Year</legend>
+            <GraduationYearControl
+              initialYear={user.gradYear ? String(user.gradYear) : undefined}
+              currentYear={new Date().getFullYear()}
             />
           </fieldset>
           <div className="mt-4">
             <fieldset className="fieldset">
-              <legend className="fieldset-legend">Mentorship Status</legend>
+              <legend className="text-sm font-medium">Mentorship Status</legend>
               <div className="mt-2 flex gap-2 filter">
                 <select name="mentorship" defaultValue={user.mentorship || "NONE"} className="bg-background">
                   <option value="MENTOR">Mentor</option>
@@ -99,7 +97,7 @@ async function Page({ userId }: { userId: User["id"] }) {
           </div>
           <div className="mt-4">
             <fieldset className="fieldset">
-              <legend className="fieldset-legend">Biography</legend>
+              <legend className="text-sm font-medium">Biography</legend>
               <Textarea
                 name="bio"
                 className="textarea h-24"
@@ -111,13 +109,13 @@ async function Page({ userId }: { userId: User["id"] }) {
           </div>
           <div className="mt-4">
             <fieldset className="fieldset grid w-full max-w-sm items-center">
-              <legend className="fieldset-legend">Avatar</legend>
+              <legend className="text-sm font-medium">Avatar</legend>
               <Input type="file" name="avatar" accept="image/*" className="file-input" />
             </fieldset>
           </div>
           <div className="mt-8">
             <fieldset className="fieldset bg-base-100 border-base-300 rounded-box w-64 border p-4">
-              <legend className="fieldset-legend">Notifications</legend>
+              <legend className="text-sm font-medium">Notifications</legend>
               <label className="fieldset-label flex items-center gap-2">
                 <input
                   type="checkbox"
