@@ -8,8 +8,8 @@ type ItemsPerPageSelectorProps = {
   totalCount: number;
   startIndex: number;
   endIndex: number;
-  basePath?: string;
-  itemName?: string;
+  basePath: string;
+  itemName: string;
   onValueChange?: (value: string) => void;
 };
 
