@@ -1,132 +1,137 @@
+import { PageBreadcrumb } from "~/components/navigation/page-breadcrumb";
+import { Container } from "~/components/ui/container";
+import { Header } from "~/components/ui/header";
+import { H1 } from "~/components/ui/heading";
+import { Large } from "~/components/ui/large";
+import { TypographyLink } from "~/components/ui/link";
+import { List, ListItem } from "~/components/ui/list";
+import { Muted } from "~/components/ui/muted";
+import { P } from "~/components/ui/p";
+import { Section } from "~/components/ui/section";
+import { Small } from "~/components/ui/small";
+
 export const metadata = {
   title: "UCollab — Privacy",
 };
 
 export default function Page() {
   return (
-    <div className="flex flex-col items-center">
-      <h1 className="text-center text-2xl font-bold select-none">Privacy Policy</h1>
-
-      <div className="bg-base-300 mt-8 w-full max-w-3xl rounded-lg p-8 shadow-2xl">
-        <p className="text-secondary mb-4 text-sm">
-          <strong>Last Updated:</strong>
-          {" "}
-          November 11th, 2024
-        </p>
-
-        <h2 className="text-lg font-semibold">Introduction</h2>
-        <p>
-          UCollab (“we,” “our,” or “us”) is committed to protecting your privacy. This Privacy Policy explains how we
-          collect, use, disclose, and safeguard your information when you use our application or any associated services
-          (collectively, the “Service”). By using the Service, you agree to the collection and use of information in
-          accordance with this Privacy Policy.
-        </p>
-
-        <h2 className="mt-6 text-lg font-semibold">1. Information Collection</h2>
-        <p>
-          We only collect information that is necessary for the operation, maintenance, and improvement of our Service.
-          The types of data we collect are as follows:
-        </p>
-        <ul className="list-disc space-y-2 pl-5">
-          <li>
+    <Container as="article" size="4xl">
+      <PageBreadcrumb
+        items={[
+          { label: "Privacy", isCurrent: true },
+        ]}
+      />
+      <Header>
+        <H1>Privacy Policy</H1>
+        <Muted>
+          <Small>
+            Last Updated:
+            {" "}
+            November 11th, 2024
+          </Small>
+        </Muted>
+        <P className="italic">UCollab ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information.</P>
+      </Header>
+      <Section>
+        <Large>🔒 Introduction</Large>
+        <Muted>
+          By using our application or any associated services (collectively, the "Service"), you agree to the collection
+          and use of information in accordance with this Privacy Policy.
+        </Muted>
+        <Large className="mt-8">📊 1. Information Collection</Large>
+        <Muted>We only collect information that is necessary for the operation, maintenance, and improvement of our Service.</Muted>
+        <List>
+          <ListItem>
             <strong>Personal Information:</strong>
             {" "}
-            Information provided by you, such as your name, email address, and
-            account details.
-          </li>
-          <li>
+            Information provided by you, such as your name, email address, and account details.
+          </ListItem>
+          <ListItem>
             <strong>Usage Information:</strong>
             {" "}
-            Non-identifiable data such as device type, IP address, browser type, and
-            operating system.
-          </li>
-          <li>
+            Non-identifiable data such as device type, IP address, browser type, and operating system.
+          </ListItem>
+          <ListItem>
             <strong>Application Data:</strong>
             {" "}
-            Preferences, settings, and other customizations that improve user
-            experience.
-          </li>
-        </ul>
-
-        <h2 className="mt-6 text-lg font-semibold">2. Use of Information</h2>
-        <p>
-          We only use your information for purposes directly related to the operation of our Service, including but not
-          limited to:
-        </p>
-        <ul className="list-disc space-y-2 pl-5">
-          <li>Account creation, verification, and management.</li>
-          <li>Providing customer support and responding to inquiries.</li>
-          <li>Ensuring the security, stability, and functionality of the Service.</li>
-          <li>Analyzing usage data to improve the quality and functionality of the Service.</li>
-          <li>Conducting internal research and analytics for product development.</li>
-        </ul>
-
-        <h2 className="mt-6 text-lg font-semibold">3. Data Sharing and Disclosure</h2>
-        <p>
-          Your privacy is a priority. We do not sell, rent, or trade your personal information with any third parties.
-        </p>
-        <ul className="list-disc space-y-2 pl-5">
-          <li>
+            Preferences, settings, and other customizations that improve user experience.
+          </ListItem>
+        </List>
+        <Large className="mt-8">🎯 2. Use of Information</Large>
+        <Muted>We only use your information for purposes directly related to the operation of our Service:</Muted>
+        <List>
+          <ListItem>Account creation, verification, and management.</ListItem>
+          <ListItem>Providing customer support and responding to inquiries.</ListItem>
+          <ListItem>Ensuring the security, stability, and functionality of the Service.</ListItem>
+          <ListItem>Analyzing usage data to improve the quality and functionality of the Service.</ListItem>
+          <ListItem>Conducting internal research and analytics for product development.</ListItem>
+        </List>
+        <Large className="mt-8">🤝 3. Data Sharing and Disclosure</Large>
+        <Muted>Your privacy is a priority. We do not sell, rent, or trade your personal information with any third parties.</Muted>
+        <List>
+          <ListItem>
             <strong>Service Providers:</strong>
             {" "}
-            Third-party services for hosting, analytics, and payments (contractually
-            obligated to protect your data).
-          </li>
-          <li>
+            Third-party services for hosting, analytics, and payments (contractually obligated to protect your data).
+          </ListItem>
+          <ListItem>
             <strong>Legal Obligations:</strong>
             {" "}
-            Disclosures required by law or court orders to protect users or comply
-            with regulations.
-          </li>
-        </ul>
-
-        <h2 className="mt-6 text-lg font-semibold">4. Data Retention</h2>
-        <p>
+            Disclosures required by law or court orders to protect users or comply with regulations.
+          </ListItem>
+        </List>
+        <Large className="mt-8">⏳ 4. Data Retention</Large>
+        <Muted>
           We retain your personal information only as long as necessary for Service functionality and legal compliance.
           Upon request, we will delete or anonymize your data.
-        </p>
-
-        <h2 className="mt-6 text-lg font-semibold">5. Security of Your Information</h2>
-        <p>
+        </Muted>
+        <Large className="mt-8">🛡️ 5. Security of Your Information</Large>
+        <Muted>
           We implement commercially reasonable security measures to protect your data but cannot guarantee absolute
           security.
-        </p>
-
-        <h2 className="mt-6 text-lg font-semibold">6. User Rights and Choices</h2>
-        <ul className="list-disc space-y-2 pl-5">
-          <li>
+        </Muted>
+        <Large className="mt-8">👤 6. User Rights and Choices</Large>
+        <List>
+          <ListItem>
             <strong>Access:</strong>
             {" "}
             Request access to your personal information.
-          </li>
-          <li>
+          </ListItem>
+          <ListItem>
             <strong>Correction:</strong>
             {" "}
             Request updates to inaccurate or incomplete data.
-          </li>
-          <li>
+          </ListItem>
+          <ListItem>
             <strong>Deletion:</strong>
             {" "}
             Request deletion of personal information no longer needed.
-          </li>
-          <li>
+          </ListItem>
+          <ListItem>
             <strong>Data Portability:</strong>
             {" "}
             Request an export of your personal information.
-          </li>
-        </ul>
-
-        <h2 className="mt-6 text-lg font-semibold">7. Changes to This Privacy Policy</h2>
-        <p>
-          We may update this Privacy Policy periodically. Any updates will be reflected in the "Last Updated" section.
-        </p>
-
-        <h2 className="mt-6 text-lg font-semibold">Conclusion</h2>
-        <p>
+          </ListItem>
+        </List>
+        <Large className="mt-8">📝 7. Changes to This Privacy Policy</Large>
+        <Muted>We may update this Privacy Policy periodically. Any updates will be reflected in the "Last Updated" section.</Muted>
+        <Large className="mt-8">✨ Conclusion</Large>
+        <Muted>
           At UCollab, we prioritize your privacy. We follow strict security and data protection standards to ensure your
           information remains safe while providing the best user experience.
-        </p>
-      </div>
-    </div>
+        </Muted>
+      </Section>
+      <Section className="text-center mt-20">
+        <Muted>
+          <Small>
+            Have questions? Reach out at
+            {" "}
+            <TypographyLink href="mailto:support@ucollab.com">support@ucollab.com</TypographyLink>
+            .
+          </Small>
+        </Muted>
+      </Section>
+    </Container>
   );
 }

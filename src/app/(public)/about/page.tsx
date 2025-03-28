@@ -1,7 +1,20 @@
 "use client";
+
 import { useState } from "react";
 
+import { PageBreadcrumb } from "~/components/navigation/page-breadcrumb";
 import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Container } from "~/components/ui/container";
+import { Header } from "~/components/ui/header";
+import { H1 } from "~/components/ui/heading";
+import { Large } from "~/components/ui/large";
+import { TypographyLink } from "~/components/ui/link";
+import { List, ListItem } from "~/components/ui/list";
+import { Muted } from "~/components/ui/muted";
+import { P } from "~/components/ui/p";
+import { Section } from "~/components/ui/section";
+import { Small } from "~/components/ui/small";
 
 export default function Page() {
   const teamMembers = [
@@ -53,76 +66,91 @@ export default function Page() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <div className="flex flex-col items-center">
-      <h1 className="text-center text-2xl font-bold select-none">About Us</h1>
-      <h2 className="mt-8 text-xl font-bold">🚀 Meet the Team</h2>
-      <p className="text-secondary mt-2 max-w-2xl text-center text-sm italic">
-        We are a team of passionate developers, designers, and problem-solvers committed to making collaboration more
-        efficient.
-      </p>
-      <div className="relative mt-8 flex w-full justify-center">
-        <div
-          className="text-secondary-foreground mt-4 list-disc space-y-2 rounded-lg pl-5 text-left shadow-2xl"
-          style={{ maxWidth: "calc(50vw" }}
-        >
-          <h3 className="text-secondary-foreground text-xl font-semibold">{teamMembers[activeIndex]?.name}</h3>
-          <p className="text-secondary text-sm font-medium">{teamMembers[activeIndex]?.role}</p>
-          <p className="text-secondary-foreground mt-4 text-sm">{teamMembers[activeIndex]?.bio}</p>
-          <p className="mt-2 text-sm">
-            <strong>Skills:</strong>
-            {" "}
-            {teamMembers[activeIndex]?.skills}
-          </p>
-          <p className="mt-2 text-sm">
-            <strong>Contributions:</strong>
-            {" "}
-            {teamMembers[activeIndex]?.contributions}
-          </p>
-          <a
-            href={teamMembers[activeIndex]?.linkedin}
-            target="_blank"
-            className="text-secondary mt-2 block text-sm underline"
-          >
-            LinkedIn Profile
-          </a>
+    <Container as="article" size="4xl">
+      <PageBreadcrumb
+        items={[
+          { label: "About Us", isCurrent: true },
+        ]}
+      />
+      <Header>
+        <H1>About Us</H1>
+        <Muted>
+          We are a team of passionate developers, designers, and problem-solvers committed to making collaboration more efficient.
+        </Muted>
+      </Header>
+      <Section>
+        <Large>🚀 Meet the Team</Large>
+        <div className="relative mt-8">
+          <Card variant="glossy" className="w-full h-[600px]">
+            <CardHeader>
+              <CardTitle className="text-xl">{teamMembers[activeIndex]?.name}</CardTitle>
+              <Muted>{teamMembers[activeIndex]?.role}</Muted>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <P>{teamMembers[activeIndex]?.bio}</P>
+                <div>
+                  <strong>Skills:</strong>
+                  <P>{teamMembers[activeIndex]?.skills}</P>
+                </div>
+                <div>
+                  <strong>Contributions:</strong>
+                  <P>{teamMembers[activeIndex]?.contributions}</P>
+                </div>
+              </div>
+              <div className="mt-10">
+                <TypographyLink href={teamMembers[activeIndex]?.linkedin ?? "#"} isExternal>
+                  LinkedIn Profile
+                </TypographyLink>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      </div>
-      <div className="my-6 flex space-x-2">
-        {teamMembers.map((member, index) => (
-          <Button
-            key={member.name}
-            className={`h-3 w-3 cursor-pointer rounded-full ${index === activeIndex ? "bg-primary" : "bg-muted"}`}
-            onClick={() => setActiveIndex(index)}
-          >
-          </Button>
-        ))}
-      </div>
-      <div className="mt-8 w-full max-w-3xl rounded-lg shadow-2xl" style={{ maxWidth: "calc(50vw" }}>
-        <h2 className="text-lg font-semibold">🛠 Our Core Values</h2>
-        <ul className="text-secondary-foreground mt-4 list-disc space-y-2 pl-5">
-          <ul>
+        <div className="my-6 flex space-x-2">
+          {teamMembers.map((member, index) => (
+            <Button
+              key={member.name}
+              className={`h-3 w-3 cursor-pointer rounded-full ${index === activeIndex ? "bg-primary" : "bg-muted"}`}
+              onClick={() => setActiveIndex(index)}
+            />
+          ))}
+        </div>
+      </Section>
+      <Section>
+        <Large>🛠 Our Core Values</Large>
+        <List>
+          <ListItem>
             <strong>♦️ Collaboration:</strong>
             {" "}
             We thrive in teamwork, ensuring that every contribution is valued.
-          </ul>
-          <ul>
+          </ListItem>
+          <ListItem>
             <strong>♦️ Innovation:</strong>
             {" "}
             We embrace creativity and forward-thinking solutions.
-          </ul>
-          <ul>
+          </ListItem>
+          <ListItem>
             <strong>♦️ Growth:</strong>
             {" "}
             Learning never stops, and we are committed to continuous development.
-          </ul>
-          <ul>
+          </ListItem>
+          <ListItem>
             <strong>♦️ Open-Source Culture:</strong>
             {" "}
-            Transparency and inclusivity define our approach to building
-            technology.
-          </ul>
-        </ul>
-      </div>
-    </div>
+            Transparency and inclusivity define our approach to building technology.
+          </ListItem>
+        </List>
+      </Section>
+      <Section className="text-center mt-20">
+        <Muted>
+          <Small>
+            Have questions? Reach out at
+            {" "}
+            <TypographyLink href="mailto:support@ucollab.com">support@ucollab.com</TypographyLink>
+            .
+          </Small>
+        </Muted>
+      </Section>
+    </Container>
   );
 }
