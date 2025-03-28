@@ -18,7 +18,6 @@ type ConfirmDialogProps = {
   confirmText: string;
   cancelText: string;
   onConfirm: () => void;
-  variant: "default" | "destructive";
 };
 
 export function ConfirmDialog({
@@ -29,7 +28,6 @@ export function ConfirmDialog({
   confirmText,
   cancelText,
   onConfirm,
-  variant,
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -42,7 +40,7 @@ export function ConfirmDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {cancelText}
           </Button>
-          <Button variant={variant} onClick={onConfirm}>
+          <Button variant="destructive" onClick={onConfirm}>
             {confirmText}
           </Button>
         </DialogFooter>
