@@ -17,7 +17,7 @@ export const metadata = {
 
 export default function Page() {
   return (
-    <Container as="article">
+    <Container as="article" size="4xl">
       <PageBreadcrumb
         items={[
           { label: "Contribution Guide", isCurrent: true },

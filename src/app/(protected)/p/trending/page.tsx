@@ -3,8 +3,12 @@ import type { Route } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
+import { PageBreadcrumb } from "~/components/navigation/page-breadcrumb";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { Container } from "~/components/ui/container";
+import { Header } from "~/components/ui/header";
+import { H1 } from "~/components/ui/heading";
 import { prisma } from "~/lib/prisma";
 import { withAuth } from "~/security/protected";
 
@@ -37,7 +41,15 @@ async function Page() {
     .sort((a, b) => b.trendingScore - a.trendingScore);
 
   return (
-    <div className="mx-auto" style={{ maxWidth: "calc(100vw - 8rem)" }}>
+    <Container>
+      <PageBreadcrumb
+        items={[
+          { label: "Trending Projects", isCurrent: true },
+        ]}
+      />
+      <Header>
+        <H1>Trending Projects</H1>
+      </Header>
       <div className="mx-auto grid grid-cols-1 gap-20 sm:mx-8 md:grid-cols-2 md:gap-14 lg:grid-cols-3 xl:grid-cols-4">
         {trendingProjects.map(project => (
           <Card
@@ -131,7 +143,7 @@ async function Page() {
           </Card>
         ))}
       </div>
-    </div>
+    </Container>
   );
 }
 

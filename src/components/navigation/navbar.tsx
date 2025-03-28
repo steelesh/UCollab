@@ -29,7 +29,7 @@ const routes: NavSection[] = [
         requiresAuth: true,
       },
       {
-        title: "Code Reviews",
+        title: "Project Feedback",
         href: "/p/feedback" as Route,
         description: "Get feedback on your code and projects",
         requiresAuth: true,

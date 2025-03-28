@@ -1,3 +1,7 @@
+import { PageBreadcrumb } from "~/components/navigation/page-breadcrumb";
+import { Container } from "~/components/ui/container";
+import { Header } from "~/components/ui/header";
+import { H1 } from "~/components/ui/heading";
 import { MentorshipGraph } from "~/components/ui/mentorship-graph";
 import { getMentorshipGraphData } from "~/features/mentorship/mentorship.action";
 
@@ -19,11 +23,16 @@ export default async function Page() {
   }
 
   return (
-    <div className="flex flex-col items-center">
-      <h1 className="text-center text-2xl font-bold select-none">Mentorship</h1>
-      <div className="border-muted mt-6 flex w-full max-w-4xl justify-center overflow-hidden border shadow-xl">
-        <MentorshipGraph graphData={graphData} />
-      </div>
-    </div>
+    <Container>
+      <PageBreadcrumb
+        items={[
+          { label: "Mentorship", isCurrent: true },
+        ]}
+      />
+      <Header>
+        <H1>Mentorship</H1>
+      </Header>
+      <MentorshipGraph graphData={graphData} />
+    </Container>
   );
 }

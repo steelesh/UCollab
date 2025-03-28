@@ -3,9 +3,13 @@ import type { Prisma, ProjectType, User } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 
+import { PageBreadcrumb } from "~/components/navigation/page-breadcrumb";
 import SearchBar from "~/components/projects/search-projects";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { Container } from "~/components/ui/container";
+import { Header } from "~/components/ui/header";
+import { H1 } from "~/components/ui/heading";
 import { Pagination } from "~/components/ui/pagination";
 import { StarDisplay } from "~/components/ui/star-rating";
 import { prisma } from "~/lib/prisma";
@@ -94,7 +98,15 @@ async function Page({ searchParams, userId }: PageProps) {
   const limit = Number(Array.isArray(params.limit) ? params.limit[0] : params.limit) || 12;
 
   return (
-    <div className="mx-auto" style={{ maxWidth: "calc(100vw - 8rem)" }}>
+    <Container>
+      <PageBreadcrumb
+        items={[
+          { label: "All Projects", isCurrent: true },
+        ]}
+      />
+      <Header>
+        <H1>All Projects</H1>
+      </Header>
       <SearchBar />
       <div className="mx-auto grid grid-cols-1 gap-20 sm:mx-8 md:grid-cols-2 md:gap-14 lg:grid-cols-3 xl:grid-cols-4">
         {projects.map(project => (
@@ -165,7 +177,7 @@ async function Page({ searchParams, userId }: PageProps) {
           itemsPerPageOptions={[12, 24, 48, 96]}
         />
       )}
-    </div>
+    </Container>
   );
 }
 

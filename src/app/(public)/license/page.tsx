@@ -1,30 +1,43 @@
+import { PageBreadcrumb } from "~/components/navigation/page-breadcrumb";
+import { Card } from "~/components/ui/card";
+import { Container } from "~/components/ui/container";
+import { Header } from "~/components/ui/header";
+import { H1, H3 } from "~/components/ui/heading";
+import { Large } from "~/components/ui/large";
+import { TypographyLink } from "~/components/ui/link";
+import { Muted } from "~/components/ui/muted";
+import { P } from "~/components/ui/p";
+import { Section } from "~/components/ui/section";
+import { Small } from "~/components/ui/small";
+
 export const metadata = {
   title: "UCollab — License",
 };
 
 export default function Page() {
   return (
-    <div className="flex flex-col items-center">
-      <h1 className="text-center text-2xl font-bold select-none">License Agreement</h1>
-
-      <div className="bg-base-300 mt-8 w-full max-w-3xl rounded-lg p-8 shadow-2xl">
-        <p className="text-secondary mb-4 text-sm">
-          <strong>Last Updated:</strong>
-          {" "}
-          March 7th, 2025
-        </p>
-
-        <h2 className="text-lg font-semibold">MIT License</h2>
-        <p>
-          This project is licensed under the
-          {" "}
-          <strong>MIT License</strong>
-          . By using this software, you agree to the
-          following terms.
-        </p>
-
-        <div className="bg-base-200 border-secondary mt-4 rounded-md border p-4 text-sm whitespace-pre-wrap">
-          {`MIT License
+    <Container as="article" size="4xl">
+      <PageBreadcrumb
+        items={[
+          { label: "License", isCurrent: true },
+        ]}
+      />
+      <Header>
+        <H1>License Agreement</H1>
+        <Muted>
+          <Small>
+            Last Updated:
+            {" "}
+            March 7th, 2025
+          </Small>
+        </Muted>
+        <P className="italic">This project is licensed under the MIT License. By using this software, you agree to the following terms.</P>
+      </Header>
+      <Section>
+        <H3 noMargin>MIT License</H3>
+        <Card variant="glossy" className="p-4 max-w-2xl">
+          <pre className="whitespace-pre-wrap text-sm">
+            {`MIT License
 
 Copyright (c) 2024 UCollab Team
 
@@ -45,20 +58,36 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.`}
-        </div>
+          </pre>
+        </Card>
+      </Section>
 
-        <h2 className="mt-6 text-lg font-semibold">Usage and Distribution</h2>
-        <p>
+      <Section>
+        <Large>📜 Usage and Distribution</Large>
+        <Muted>
           This software can be freely used, modified, and distributed under the terms of the MIT License. However, all
           copies of the software must include the original license text.
-        </p>
+        </Muted>
+      </Section>
 
-        <h2 className="mt-6 text-lg font-semibold">Disclaimer</h2>
-        <p>
+      <Section>
+        <Large>⚠️ Disclaimer</Large>
+        <Muted>
           This software is provided "as is," without warranty of any kind, express or implied, including but not limited
           to the warranties of merchantability, fitness for a particular purpose, and noninfringement.
-        </p>
-      </div>
-    </div>
+        </Muted>
+      </Section>
+
+      <Section className="text-center mt-20">
+        <Muted>
+          <Small>
+            Have questions? Reach out at
+            {" "}
+            <TypographyLink href="mailto:support@ucollab.com">support@ucollab.com</TypographyLink>
+            .
+          </Small>
+        </Muted>
+      </Section>
+    </Container>
   );
 }
