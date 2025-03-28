@@ -177,89 +177,91 @@ async function Page({ searchParams, userId }: PageProps) {
           </Card>
         ))}
       </div>
-      <div className="mt-8 border-t pt-4">
-        <div className="flex items-center justify-between px-4">
-          <ItemsPerPageSelector
-            currentLimit={limit}
-            options={itemsPerPageOptions}
-            totalCount={totalCount}
-            startIndex={startIndex}
-            endIndex={endIndex}
-          />
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href={currentPage > 1 ? `/p?${buildQueryString(params, { page: String(currentPage - 1) })}` : "#"}
-                  className={cn(currentPage <= 1 && "pointer-events-none opacity-50")}
-                >
-                  Previous
-                </PaginationPrevious>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink
-                  href={`/p?${buildQueryString(params, { page: "1" })}`}
-                  className={cn(currentPage === 1 && "bg-accent text-accent-foreground")}
-                >
-                  1
-                </PaginationLink>
-              </PaginationItem>
-              {currentPage > 3 && (
+      {totalCount > 0 && (
+        <div className="mt-8 border-t pt-4">
+          <div className="flex items-center justify-between px-4">
+            <ItemsPerPageSelector
+              currentLimit={limit}
+              options={itemsPerPageOptions}
+              totalCount={totalCount}
+              startIndex={startIndex}
+              endIndex={endIndex}
+            />
+            <Pagination>
+              <PaginationContent>
                 <PaginationItem>
-                  <PaginationEllipsis />
+                  <PaginationPrevious
+                    href={currentPage > 1 ? `/p?${buildQueryString(params, { page: String(currentPage - 1) })}` : "#"}
+                    className={cn(currentPage <= 1 && "pointer-events-none opacity-50")}
+                  >
+                    Previous
+                  </PaginationPrevious>
                 </PaginationItem>
-              )}
-              {currentPage > 2 && currentPage <= totalPages && (
-                <PaginationItem>
-                  <PaginationLink href={`/p?${buildQueryString(params, { page: String(currentPage - 1) })}`}>
-                    {currentPage - 1}
-                  </PaginationLink>
-                </PaginationItem>
-              )}
-              {currentPage !== 1 && currentPage !== totalPages && (
                 <PaginationItem>
                   <PaginationLink
-                    href={`/p?${buildQueryString(params, { page: String(currentPage) })}`}
-                    className="bg-accent text-accent-foreground"
+                    href={`/p?${buildQueryString(params, { page: "1" })}`}
+                    className={cn(currentPage === 1 && "bg-accent text-accent-foreground")}
                   >
-                    {currentPage}
+                    1
                   </PaginationLink>
                 </PaginationItem>
-              )}
-              {currentPage < totalPages - 1 && (
+                {currentPage > 3 && (
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
+                {currentPage > 2 && currentPage <= totalPages && (
+                  <PaginationItem>
+                    <PaginationLink href={`/p?${buildQueryString(params, { page: String(currentPage - 1) })}`}>
+                      {currentPage - 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                )}
+                {currentPage !== 1 && currentPage !== totalPages && (
+                  <PaginationItem>
+                    <PaginationLink
+                      href={`/p?${buildQueryString(params, { page: String(currentPage) })}`}
+                      className="bg-accent text-accent-foreground"
+                    >
+                      {currentPage}
+                    </PaginationLink>
+                  </PaginationItem>
+                )}
+                {currentPage < totalPages - 1 && (
+                  <PaginationItem>
+                    <PaginationLink href={`/p?${buildQueryString(params, { page: String(currentPage + 1) })}`}>
+                      {currentPage + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                )}
+                {currentPage < totalPages - 2 && (
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
+                {totalPages > 1 && (
+                  <PaginationItem>
+                    <PaginationLink
+                      href={`/p?${buildQueryString(params, { page: String(totalPages) })}`}
+                      className={cn(currentPage === totalPages && "bg-accent text-accent-foreground")}
+                    >
+                      {totalPages}
+                    </PaginationLink>
+                  </PaginationItem>
+                )}
                 <PaginationItem>
-                  <PaginationLink href={`/p?${buildQueryString(params, { page: String(currentPage + 1) })}`}>
-                    {currentPage + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              )}
-              {currentPage < totalPages - 2 && (
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              )}
-              {totalPages > 1 && (
-                <PaginationItem>
-                  <PaginationLink
-                    href={`/p?${buildQueryString(params, { page: String(totalPages) })}`}
-                    className={cn(currentPage === totalPages && "bg-accent text-accent-foreground")}
+                  <PaginationNext
+                    href={currentPage < totalPages ? `/p?${buildQueryString(params, { page: String(currentPage + 1) })}` : "#"}
+                    className={cn(currentPage >= totalPages && "pointer-events-none opacity-50")}
                   >
-                    {totalPages}
-                  </PaginationLink>
+                    Next
+                  </PaginationNext>
                 </PaginationItem>
-              )}
-              <PaginationItem>
-                <PaginationNext
-                  href={currentPage < totalPages ? `/p?${buildQueryString(params, { page: String(currentPage + 1) })}` : "#"}
-                  className={cn(currentPage >= totalPages && "pointer-events-none opacity-50")}
-                >
-                  Next
-                </PaginationNext>
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+              </PaginationContent>
+            </Pagination>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
