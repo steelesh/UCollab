@@ -4,8 +4,8 @@ import type { Route } from "next";
 
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { SignInButton } from "~/components/navigation/signin-button";
 import { Avatar } from "~/components/ui/avatar";
@@ -16,8 +16,16 @@ export function AuthSection() {
   const { data: session, status } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleToggle = () => setIsOpen(prev => !prev);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsOpen(false);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [pathname]);
 
   const links = [
     { title: "My Profile", route: `/u/${session?.user.username}` },
@@ -94,6 +102,7 @@ export function AuthSection() {
                             variant="ghost"
                             className="flex w-full cursor-pointer justify-start font-thin tracking-wide"
                             onClick={() => {
+                              setIsOpen(false);
                               if (link.action) {
                                 link.action();
                               } else {
