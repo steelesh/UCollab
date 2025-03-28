@@ -69,22 +69,31 @@ export const UserService = {
     }
   },
 
-  async getUserDirectory(): Promise<MinimalUserForDirectory[]> {
+  async getUserDirectory(page = 1, limit = 12): Promise<{ users: MinimalUserForDirectory[]; totalCount: number }> {
     try {
-      const users = await prisma.user.findMany({
-        select: {
-          id: true,
-          avatar: true,
-          firstName: true,
-          lastName: true,
-          username: true,
-          technologies: true,
-        } satisfies Record<keyof MinimalUserForDirectory, true>,
-        orderBy: {
-          createdDate: "desc",
-        },
-      });
-      return users satisfies MinimalUserForDirectory[];
+      const [users, totalCount] = await Promise.all([
+        prisma.user.findMany({
+          select: {
+            id: true,
+            avatar: true,
+            firstName: true,
+            lastName: true,
+            username: true,
+            gradYear: true,
+            email: true,
+            technologies: true,
+            mentorship: true,
+          },
+          orderBy: {
+            createdDate: "desc",
+          },
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+        prisma.user.count(),
+      ]);
+
+      return { users: users satisfies MinimalUserForDirectory[], totalCount };
     } catch {
       throw new Utils(ErrorMessage.OPERATION_FAILED);
     }

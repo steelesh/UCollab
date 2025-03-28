@@ -35,5 +35,8 @@ export type MinimalUserForDirectory = {
   firstName: User["firstName"];
   lastName: User["lastName"];
   username: User["username"];
+  email: User["email"];
+  gradYear: User["gradYear"];
   technologies: Technology[];
+  mentorship: User["mentorship"];
 };
