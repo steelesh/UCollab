@@ -24,6 +24,11 @@ export function NotificationsPagination({ currentPage, totalPages, totalCount, l
   const startIndex = (currentPage - 1) * limit + 1;
   const endIndex = Math.min(startIndex + limit - 1, totalCount);
 
+  // Don't render pagination if there are no items
+  if (totalCount === 0) {
+    return null;
+  }
+
   return (
     <div className="mt-8 border-t pt-4">
       <div className="flex items-center justify-between px-4">
