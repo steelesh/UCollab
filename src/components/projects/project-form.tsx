@@ -106,7 +106,6 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
         />
         {errors.description && <span className="text-error text-sm">{errors.description.message}</span>}
       </div>
-      {/* Use the new TechnologiesControl as the sole renderer for the technologies field */}
       <Controller
         control={control}
         name="technologies"
