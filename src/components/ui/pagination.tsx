@@ -1,6 +1,6 @@
 "use client";
 
-import { ItemsPerPageSelector } from "~/components/projects/items-per-page-selector";
+import { ItemsPerPageSelector } from "~/components/ui/items-per-page-selector";
 import {
   ShadcnPagination,
   ShadcnPaginationContent,
