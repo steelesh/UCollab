@@ -98,10 +98,6 @@
   }
 }
 
-body {
-  @apply bg-background text-foreground cursor-default;
-}
-
 .ProseMirror {
   @apply min-h-[100px] outline-none;
 }
