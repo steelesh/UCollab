@@ -51,6 +51,7 @@ export function ItemsPerPageSelector({
         {endIndex}
         {" "}
         of
+        {" "}
         {totalCount}
         {" "}
         {itemName}
