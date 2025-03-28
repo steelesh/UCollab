@@ -4,16 +4,16 @@ import type { Project } from "@prisma/client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ProjectType } from "@prisma/client";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import type { CreateProjectInput } from "~/features/projects/project.schema";
 
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import TechnologiesControl from "~/components/ui/technologies-control";
 import { Textarea } from "~/components/ui/textarea";
 import { createProject, searchTechnologies, updateProject } from "~/features/projects/project.actions";
 import { projectSchema } from "~/features/projects/project.schema";
@@ -25,9 +25,6 @@ type ProjectFormProps = {
 
 export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const suggestionsRef = useRef<HTMLDivElement>(null);
-  const techInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -48,30 +45,17 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
 
   const technologies = watch("technologies");
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)) {
-        setShowSuggestions(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   const handleTechSearch = async (value: string) => {
     if (value.length >= 2) {
       try {
         const results = await searchTechnologies(value);
         setSuggestions(results?.filter(tech => !technologies.includes(tech)) || []);
-        setShowSuggestions(true);
       } catch (error) {
         console.error("Failed to fetch suggestions:", error);
         setSuggestions([]);
       }
     } else {
       setSuggestions([]);
-      setShowSuggestions(false);
     }
   };
 
@@ -122,85 +106,20 @@ export function ProjectForm({ initialData, projectId }: ProjectFormProps) {
         />
         {errors.description && <span className="text-error text-sm">{errors.description.message}</span>}
       </div>
+      {/* Use the new TechnologiesControl as the sole renderer for the technologies field */}
       <Controller
         control={control}
         name="technologies"
         render={({ field }) => (
-          <div className="form-control">
-            <Label className="label" htmlFor="technologies">
-              <span className="label-text">Technologies</span>
-            </Label>
-            <div className="m-4 flex flex-1">
-              {field.value.map((tech: string) => (
-                <div key={tech}>
-                  <Badge
-                    onClick={() => {
-                      field.onChange(field.value.filter((t: string) => t !== tech));
-                    }}
-                    className="hover:bg-primary cursor-pointer transition duration-200 ease-in-out hover:scale-105"
-                    variant="outline"
-                  >
-                    {tech}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-            <div className="relative">
-              <Input
-                ref={techInputRef}
-                type="text"
-                className="input input-bordered w-full"
-                placeholder="Add technology"
-                onChange={e => handleTechSearch(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    const inputValue = e.currentTarget.value.trim();
-                    if (!inputValue)
-                      return;
-                    const filteredSuggestions = suggestions.filter(tech => !field.value.includes(tech));
-                    const [closestMatch] = filteredSuggestions;
-                    if (closestMatch !== undefined) {
-                      field.onChange([...field.value, closestMatch]);
-                      e.currentTarget.value = "";
-                      setShowSuggestions(false);
-                    }
-                  }
-                }}
-                disabled={isSubmitting}
-              />
-              {showSuggestions && suggestions.length > 0 && (
-                <div
-                  ref={suggestionsRef}
-                  className="bg-background absolute top-full left-0 z-10 mt-1 w-full rounded shadow-md"
-                >
-                  {suggestions
-                    .filter(tech => !field.value.includes(tech))
-                    .map(tech => (
-                      <Button
-                        variant="outline"
-                        key={tech}
-                        type="button"
-                        className="dropdown-item w-full px-4 py-2 text-left"
-                        onClick={() => {
-                          field.onChange([...field.value, tech]);
-                          setShowSuggestions(false);
-                          if (techInputRef.current) {
-                            techInputRef.current.value = "";
-                          }
-                        }}
-                        disabled={isSubmitting}
-                      >
-                        <div className="dropdown-item-content">{tech}</div>
-                      </Button>
-                    ))}
-                </div>
-              )}
-            </div>
-            {errors.technologies && <span className="text-error text-sm">{errors.technologies.message}</span>}
-          </div>
+          <TechnologiesControl
+            field={field}
+            isSubmitting={isSubmitting}
+            suggestions={suggestions}
+            handleTechSearch={handleTechSearch}
+          />
         )}
       />
+      {errors.technologies && <span className="text-error text-sm">{errors.technologies.message}</span>}
       <div className="form-control">
         <Label className="label" htmlFor="githubRepo">
           <span className="label-text">GitHub Repository</span>
