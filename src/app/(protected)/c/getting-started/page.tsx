@@ -22,7 +22,7 @@ export default function Page() {
         <p className="text-secondary mt-2 text-sm">
           Browse open-source projects, find a team, or start your own project. Visit the
           {" "}
-          <a href="/projects" className="text-blue-400 underline">Projects Page</a>
+          <a href="/onboarding" className="text-blue-400 underline">Projects Page</a>
           {" "}
           to see what’s available.
         </p>
