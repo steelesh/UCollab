@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export const metadata = {
   title: "UCollab — Getting Started",
 };
@@ -22,7 +24,7 @@ export default function Page() {
         <p className="text-secondary mt-2 text-sm">
           Browse open-source projects, find a team, or start your own project. Visit the
           {" "}
-          <a href="/onboarding" className="text-blue-400 underline">Projects Page</a>
+          <Link href="/p" className="text-blue-400 underline">Projects Page</Link>
           {" "}
           to see what’s available.
         </p>
