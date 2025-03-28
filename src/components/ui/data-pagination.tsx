@@ -12,22 +12,56 @@ import {
 } from "~/components/ui/pagination";
 import { cn } from "~/lib/utils";
 
-type NotificationsPaginationProps = {
+type DataPaginationProps = {
   currentPage: number;
   totalPages: number;
   totalCount: number;
   limit: number;
+  itemsPerPageOptions: number[];
+  basePath: string;
+  itemName?: string;
+  onPageChange?: (page: number) => void;
+  onLimitChange?: (limit: number) => void;
 };
 
-export function NotificationsPagination({ currentPage, totalPages, totalCount, limit }: NotificationsPaginationProps) {
-  const itemsPerPageOptions = [10, 20, 50, 100];
+export function DataPagination({
+  currentPage,
+  totalPages,
+  totalCount,
+  limit,
+  itemsPerPageOptions,
+  basePath,
+  itemName = "items",
+  onPageChange,
+  onLimitChange,
+}: DataPaginationProps) {
   const startIndex = (currentPage - 1) * limit + 1;
   const endIndex = Math.min(startIndex + limit - 1, totalCount);
 
-  // Don't render pagination if there are no items
   if (totalCount === 0) {
     return null;
   }
+
+  const buildPageUrl = (page: number) => {
+    if (onPageChange) {
+      return "#";
+    }
+    return `${basePath}?page=${page}&limit=${limit}`;
+  };
+
+  const handlePageClick = (page: number) => {
+    if (onPageChange) {
+      onPageChange(page);
+    }
+  };
+
+  const handleLimitChange = (newLimit: string) => {
+    if (onLimitChange) {
+      onLimitChange(Number(newLimit));
+    } else {
+      window.location.href = `${basePath}?page=1&limit=${newLimit}`;
+    }
+  };
 
   return (
     <div className="mt-8 border-t pt-4">
@@ -38,14 +72,21 @@ export function NotificationsPagination({ currentPage, totalPages, totalCount, l
           totalCount={totalCount}
           startIndex={startIndex}
           endIndex={endIndex}
-          basePath="/notifications"
-          itemName="notifications"
+          basePath={basePath}
+          itemName={itemName}
+          onValueChange={handleLimitChange}
         />
         <Pagination>
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
-                href={currentPage > 1 ? `/notifications?page=${currentPage - 1}&limit=${limit}` : "#"}
+                href={buildPageUrl(currentPage - 1)}
+                onClick={(e) => {
+                  if (onPageChange) {
+                    e.preventDefault();
+                    handlePageClick(currentPage - 1);
+                  }
+                }}
                 className={cn(currentPage <= 1 && "pointer-events-none opacity-50")}
               >
                 Previous
@@ -53,7 +94,13 @@ export function NotificationsPagination({ currentPage, totalPages, totalCount, l
             </PaginationItem>
             <PaginationItem>
               <PaginationLink
-                href={`/notifications?page=1&limit=${limit}`}
+                href={buildPageUrl(1)}
+                onClick={(e) => {
+                  if (onPageChange) {
+                    e.preventDefault();
+                    handlePageClick(1);
+                  }
+                }}
                 className={cn(currentPage === 1 && "bg-accent text-accent-foreground")}
               >
                 1
@@ -66,7 +113,15 @@ export function NotificationsPagination({ currentPage, totalPages, totalCount, l
             )}
             {currentPage > 2 && currentPage <= totalPages && (
               <PaginationItem>
-                <PaginationLink href={`/notifications?page=${currentPage - 1}&limit=${limit}`}>
+                <PaginationLink
+                  href={buildPageUrl(currentPage - 1)}
+                  onClick={(e) => {
+                    if (onPageChange) {
+                      e.preventDefault();
+                      handlePageClick(currentPage - 1);
+                    }
+                  }}
+                >
                   {currentPage - 1}
                 </PaginationLink>
               </PaginationItem>
@@ -74,7 +129,13 @@ export function NotificationsPagination({ currentPage, totalPages, totalCount, l
             {currentPage !== 1 && currentPage !== totalPages && (
               <PaginationItem>
                 <PaginationLink
-                  href={`/notifications?page=${currentPage}&limit=${limit}`}
+                  href={buildPageUrl(currentPage)}
+                  onClick={(e) => {
+                    if (onPageChange) {
+                      e.preventDefault();
+                      handlePageClick(currentPage);
+                    }
+                  }}
                   className="bg-accent text-accent-foreground"
                 >
                   {currentPage}
@@ -83,7 +144,15 @@ export function NotificationsPagination({ currentPage, totalPages, totalCount, l
             )}
             {currentPage < totalPages - 1 && (
               <PaginationItem>
-                <PaginationLink href={`/notifications?page=${currentPage + 1}&limit=${limit}`}>
+                <PaginationLink
+                  href={buildPageUrl(currentPage + 1)}
+                  onClick={(e) => {
+                    if (onPageChange) {
+                      e.preventDefault();
+                      handlePageClick(currentPage + 1);
+                    }
+                  }}
+                >
                   {currentPage + 1}
                 </PaginationLink>
               </PaginationItem>
@@ -96,7 +165,13 @@ export function NotificationsPagination({ currentPage, totalPages, totalCount, l
             {totalPages > 1 && (
               <PaginationItem>
                 <PaginationLink
-                  href={`/notifications?page=${totalPages}&limit=${limit}`}
+                  href={buildPageUrl(totalPages)}
+                  onClick={(e) => {
+                    if (onPageChange) {
+                      e.preventDefault();
+                      handlePageClick(totalPages);
+                    }
+                  }}
                   className={cn(currentPage === totalPages && "bg-accent text-accent-foreground")}
                 >
                   {totalPages}
@@ -105,7 +180,13 @@ export function NotificationsPagination({ currentPage, totalPages, totalCount, l
             )}
             <PaginationItem>
               <PaginationNext
-                href={currentPage < totalPages ? `/notifications?page=${currentPage + 1}&limit=${limit}` : "#"}
+                href={buildPageUrl(currentPage + 1)}
+                onClick={(e) => {
+                  if (onPageChange) {
+                    e.preventDefault();
+                    handlePageClick(currentPage + 1);
+                  }
+                }}
                 className={cn(currentPage >= totalPages && "pointer-events-none opacity-50")}
               >
                 Next

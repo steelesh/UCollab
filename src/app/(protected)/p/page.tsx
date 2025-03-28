@@ -3,22 +3,12 @@ import type { Prisma, ProjectType, User } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 
-import { ItemsPerPageSelector } from "~/components/projects/items-per-page-selector";
 import SearchBar from "~/components/projects/search-projects";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "~/components/ui/pagination";
+import { DataPagination } from "~/components/ui/data-pagination";
 import { StarDisplay } from "~/components/ui/star-rating";
 import { prisma } from "~/lib/prisma";
-import { cn } from "~/lib/utils";
 import { withAuth } from "~/security/protected";
 
 export const dynamic = "force-dynamic";
@@ -31,16 +21,6 @@ type PageProps = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
   userId: User["id"];
 };
-
-function buildQueryString(searchParams: { [key: string]: string | string[] | undefined }, override: Record<string, string>) {
-  const plainParams = Object.fromEntries(
-    Object.entries(searchParams)
-      .filter(([_, value]) => value !== undefined && value !== "")
-      .map(([key, value]) => [key, Array.isArray(value) ? value[0] : value]),
-  ) as Record<string, string>;
-  const finalParams = { ...plainParams, ...override };
-  return new URLSearchParams(finalParams).toString();
-}
 
 async function getFilteredProjects(searchParams: { [key: string]: string | string[] | undefined }, _userId: User["id"]) {
   try {
@@ -112,9 +92,6 @@ async function Page({ searchParams, userId }: PageProps) {
   const { projects, totalCount, totalPages } = await getFilteredProjects(params, userId);
   const currentPage = Number(Array.isArray(params.page) ? params.page[0] : params.page) || 1;
   const limit = Number(Array.isArray(params.limit) ? params.limit[0] : params.limit) || 12;
-  const itemsPerPageOptions = [12, 24, 48, 96];
-  const startIndex = (currentPage - 1) * limit + 1;
-  const endIndex = Math.min(startIndex + limit - 1, totalCount);
 
   return (
     <div className="mx-auto" style={{ maxWidth: "calc(100vw - 8rem)" }}>
@@ -178,89 +155,15 @@ async function Page({ searchParams, userId }: PageProps) {
         ))}
       </div>
       {totalCount > 0 && (
-        <div className="mt-8 border-t pt-4">
-          <div className="flex items-center justify-between px-4">
-            <ItemsPerPageSelector
-              currentLimit={limit}
-              options={itemsPerPageOptions}
-              totalCount={totalCount}
-              startIndex={startIndex}
-              endIndex={endIndex}
-            />
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    href={currentPage > 1 ? `/p?${buildQueryString(params, { page: String(currentPage - 1) })}` : "#"}
-                    className={cn(currentPage <= 1 && "pointer-events-none opacity-50")}
-                  >
-                    Previous
-                  </PaginationPrevious>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink
-                    href={`/p?${buildQueryString(params, { page: "1" })}`}
-                    className={cn(currentPage === 1 && "bg-accent text-accent-foreground")}
-                  >
-                    1
-                  </PaginationLink>
-                </PaginationItem>
-                {currentPage > 3 && (
-                  <PaginationItem>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                )}
-                {currentPage > 2 && currentPage <= totalPages && (
-                  <PaginationItem>
-                    <PaginationLink href={`/p?${buildQueryString(params, { page: String(currentPage - 1) })}`}>
-                      {currentPage - 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                )}
-                {currentPage !== 1 && currentPage !== totalPages && (
-                  <PaginationItem>
-                    <PaginationLink
-                      href={`/p?${buildQueryString(params, { page: String(currentPage) })}`}
-                      className="bg-accent text-accent-foreground"
-                    >
-                      {currentPage}
-                    </PaginationLink>
-                  </PaginationItem>
-                )}
-                {currentPage < totalPages - 1 && (
-                  <PaginationItem>
-                    <PaginationLink href={`/p?${buildQueryString(params, { page: String(currentPage + 1) })}`}>
-                      {currentPage + 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                )}
-                {currentPage < totalPages - 2 && (
-                  <PaginationItem>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                )}
-                {totalPages > 1 && (
-                  <PaginationItem>
-                    <PaginationLink
-                      href={`/p?${buildQueryString(params, { page: String(totalPages) })}`}
-                      className={cn(currentPage === totalPages && "bg-accent text-accent-foreground")}
-                    >
-                      {totalPages}
-                    </PaginationLink>
-                  </PaginationItem>
-                )}
-                <PaginationItem>
-                  <PaginationNext
-                    href={currentPage < totalPages ? `/p?${buildQueryString(params, { page: String(currentPage + 1) })}` : "#"}
-                    className={cn(currentPage >= totalPages && "pointer-events-none opacity-50")}
-                  >
-                    Next
-                  </PaginationNext>
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
-        </div>
+        <DataPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalCount={totalCount}
+          limit={limit}
+          basePath="/p"
+          itemName="projects"
+          itemsPerPageOptions={[12, 24, 48, 96]}
+        />
       )}
     </div>
   );
