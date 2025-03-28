@@ -25,7 +25,7 @@ export function Container<T extends React.ElementType = "div">({
     "xl": "max-w-xl",
     "2xl": "max-w-2xl",
     "full": "max-w-full",
-    "default": "max-w-4xl",
+    "default": "max-w-5xl",
   }[size];
 
   return (

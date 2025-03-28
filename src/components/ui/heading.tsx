@@ -6,6 +6,7 @@ type HeadingLevel = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
 type HeadingProps = {
   level: HeadingLevel;
+  noMargin?: boolean;
   children: React.ReactNode;
   className?: string;
 } & Omit<React.ComponentPropsWithoutRef<"h1">, "className" | "children">;
@@ -19,11 +20,11 @@ const headingStyles: Record<HeadingLevel, string> = {
   h6: "scroll-m-20 text-base font-semibold tracking-tight mb-1",
 };
 
-export function Heading({ ref, level, children, className, ...props }: HeadingProps & { ref?: React.RefObject<HTMLHeadingElement | null> }) {
+export function Heading({ ref, level, children, className, noMargin, ...props }: HeadingProps & { ref?: React.RefObject<HTMLHeadingElement | null> }) {
   return createElement(
     level,
     {
-      className: cn(headingStyles[level], className),
+      className: cn(headingStyles[level], !noMargin && "mb-6", className),
       ref,
       ...props,
     },
