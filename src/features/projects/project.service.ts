@@ -9,7 +9,7 @@ import { ErrorMessage, Utils } from "~/lib/utils";
 import { withServiceAuth } from "~/security/protected-service";
 
 import type { CreateProjectInput } from "./project.schema";
-import type { ExploreProject, ProjectDetails } from "./project.types";
+import type { ExplorePageData, ExploreProject, ProjectDetails } from "./project.types";
 
 export const ProjectService = {
   async getAllProjects(requestUserId: string) {
@@ -50,6 +50,12 @@ export const ProjectService = {
             createdById: true,
             technologies: true,
             rating: true,
+            createdBy: {
+              select: {
+                username: true,
+                avatar: true,
+              },
+            },
             comments: {
               where: {
                 parentId: null,
@@ -85,12 +91,48 @@ export const ProjectService = {
               },
               orderBy: { createdDate: "desc" },
             },
+            watchers: {
+              select: {
+                id: true,
+                userId: true,
+                user: {
+                  select: {
+                    username: true,
+                    avatar: true,
+                  },
+                },
+              },
+            },
           },
         });
 
         if (!project)
           notFound();
-        return project as ProjectDetails;
+
+        const ageInHours = (Date.now() - new Date(project.createdDate).getTime()) / (1000 * 3600);
+        const timeDecay = (1 / (ageInHours + 48) ** 1.1) * 100;
+
+        const ratingWeight = 0.7;
+        const watcherWeight = 0.2;
+        const commentWeight = 0.1;
+
+        const ratingScore = project.rating / 5;
+        const nonOwnerWatchers = project.watchers.filter(w => w.userId !== project.createdById);
+        const watcherScore = Math.min((nonOwnerWatchers.length) / 10, 1);
+        const commentScore = Math.min(project.comments.length / 20, 1);
+
+        const engagementScore
+          = (ratingScore * ratingWeight)
+            + (watcherScore * watcherWeight)
+            + (commentScore * commentWeight);
+
+        const projectWithScore = {
+          ...project,
+          trendingScore: engagementScore * timeDecay,
+          watchers: nonOwnerWatchers,
+        };
+
+        return projectWithScore satisfies ProjectDetails;
       } catch (error) {
         if (error instanceof Utils)
           throw error;
@@ -143,7 +185,6 @@ export const ProjectService = {
               userId: requestUserId,
             },
           });
-
           return newProject;
         });
 
@@ -311,6 +352,7 @@ export const ProjectService = {
               githubRepo: true,
               projectType: true,
               rating: true,
+              createdById: true,
               technologies: {
                 select: {
                   id: true,
@@ -323,12 +365,55 @@ export const ProjectService = {
                   avatar: true,
                 },
               },
+              watchers: {
+                select: {
+                  id: true,
+                  userId: true,
+                  user: {
+                    select: {
+                      username: true,
+                      avatar: true,
+                    },
+                  },
+                },
+              },
+              comments: {
+                select: {
+                  id: true,
+                },
+              },
             },
           }),
           prisma.project.count(),
         ]);
 
-        return { projects: projects satisfies ExploreProject[], totalCount };
+        const projectsWithScores = projects.map((project) => {
+          const ageInHours = (Date.now() - new Date(project.createdDate).getTime()) / (1000 * 3600);
+          const timeDecay = (1 / (ageInHours + 48) ** 1.1) * 100;
+
+          const ratingWeight = 0.7;
+          const watcherWeight = 0.2;
+          const commentWeight = 0.1;
+
+          const ratingScore = project.rating / 5;
+          const nonOwnerWatchers = project.watchers.filter(w => w.userId !== project.createdById);
+          const watcherScore = Math.min((nonOwnerWatchers.length) / 10, 1);
+          const commentScore = Math.min(project.comments.length / 20, 1);
+
+          const engagementScore
+            = (ratingScore * ratingWeight)
+              + (watcherScore * watcherWeight)
+              + (commentScore * commentWeight);
+
+          const trendingScore = engagementScore * timeDecay;
+          return {
+            ...project,
+            trendingScore,
+            watchers: nonOwnerWatchers,
+          };
+        });
+
+        return { projects: projectsWithScores satisfies ExploreProject[], totalCount };
       } catch (error) {
         if (error instanceof Utils)
           throw error;
@@ -661,6 +746,54 @@ export const ProjectService = {
     });
   },
 
+  async deleteRating(projectId: Project["id"], userId: User["id"]) {
+    return withServiceAuth(userId, null, async () => {
+      try {
+        const project = await prisma.project.findUnique({
+          where: { id: projectId },
+          select: { id: true },
+        });
+
+        if (!project) {
+          notFound();
+        }
+
+        const result = await prisma.$transaction(async (tx) => {
+          const deleteResult = await tx.projectRating.delete({
+            where: {
+              projectId_userId: {
+                projectId,
+                userId,
+              },
+            },
+          }).catch(() => null);
+
+          const ratings = await tx.projectRating.findMany({
+            where: { projectId },
+            select: { rating: true },
+          });
+
+          const averageRating = ratings.length > 0
+            ? Number((ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length).toFixed(1))
+            : 0;
+
+          await tx.project.update({
+            where: { id: projectId },
+            data: { rating: averageRating },
+          });
+
+          return deleteResult;
+        });
+
+        return result;
+      } catch (error) {
+        if (error instanceof Utils)
+          throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
   async getUserWatchedProjects(userId: string, requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
@@ -690,6 +823,129 @@ export const ProjectService = {
         });
 
         return watchedProjects.map(watcher => watcher.project);
+      } catch (error) {
+        if (error instanceof Utils)
+          throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  async isProjectBookmarked(projectId: Project["id"], userId: User["id"]) {
+    return withServiceAuth(userId, null, async () => {
+      try {
+        const bookmark = await prisma.projectWatcher.findUnique({
+          where: {
+            projectId_userId: {
+              projectId,
+              userId,
+            },
+          },
+        });
+
+        return !!bookmark;
+      } catch (error) {
+        if (error instanceof Utils)
+          throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  async getTrendingProjects(requestUserId: User["id"], page = 1, limit = 12): Promise<ExplorePageData> {
+    return withServiceAuth(requestUserId, null, async () => {
+      try {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const projects = await prisma.project.findMany({
+          where: {
+            rating: {
+              gt: 0,
+            },
+            createdDate: {
+              gte: thirtyDaysAgo,
+            },
+          },
+          select: {
+            id: true,
+            title: true,
+            createdDate: true,
+            description: true,
+            githubRepo: true,
+            projectType: true,
+            rating: true,
+            createdById: true,
+            technologies: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            createdBy: {
+              select: {
+                username: true,
+                avatar: true,
+              },
+            },
+            watchers: {
+              select: {
+                id: true,
+                userId: true,
+                user: {
+                  select: {
+                    username: true,
+                    avatar: true,
+                  },
+                },
+              },
+            },
+            comments: {
+              select: {
+                id: true,
+              },
+            },
+          },
+          skip: (page - 1) * limit,
+          take: limit,
+        });
+
+        const projectsWithScores = projects
+          .map((project) => {
+            const ageInHours = (Date.now() - new Date(project.createdDate).getTime()) / (1000 * 3600);
+            const timeDecay = (1 / (ageInHours + 48) ** 1.1) * 100;
+
+            const ratingWeight = 0.7;
+            const watcherWeight = 0.2;
+            const commentWeight = 0.1;
+
+            const ratingScore = project.rating / 5;
+            const nonOwnerWatchers = project.watchers.filter(w => w.userId !== project.createdById);
+            const watcherScore = Math.min((nonOwnerWatchers.length) / 10, 1);
+            const commentScore = Math.min(project.comments.length / 20, 1);
+
+            const engagementScore
+              = (ratingScore * ratingWeight)
+                + (watcherScore * watcherWeight)
+                + (commentScore * commentWeight);
+
+            const trendingScore = engagementScore * timeDecay;
+            return {
+              ...project,
+              trendingScore,
+              watchers: nonOwnerWatchers,
+            };
+          })
+          .filter(project => project.trendingScore > 0.5)
+          .sort((a, b) => b.trendingScore - a.trendingScore);
+
+        return {
+          projects: projectsWithScores satisfies ExploreProject[],
+          totalCount: projectsWithScores.length,
+          currentPage: page,
+          totalPages: Math.ceil(projectsWithScores.length / limit),
+          limit,
+        };
       } catch (error) {
         if (error instanceof Utils)
           throw error;
