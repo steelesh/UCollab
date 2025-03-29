@@ -157,6 +157,26 @@ async function createProject(user: User, allUsers: User[]) {
   });
 
   if (project) {
+    await prisma.projectWatcher.create({
+      data: {
+        projectId: project.id,
+        userId: user.id,
+      },
+    });
+
+    const potentialWatchers = allUsers.filter(u => u.id !== user.id);
+    const numberOfWatchers = faker.number.int({ min: 0, max: Math.min(5, potentialWatchers.length) });
+    const watchers = faker.helpers.shuffle(potentialWatchers).slice(0, numberOfWatchers);
+
+    for (const watcher of watchers) {
+      await prisma.projectWatcher.create({
+        data: {
+          projectId: project.id,
+          userId: watcher.id,
+        },
+      });
+    }
+
     await createProjectRatings(project, allUsers, user);
 
     await createCommentsAndNotifications(
@@ -308,7 +328,6 @@ const UC_DOMAINS = [
 ];
 
 export const DEFAULT_TECHNOLOGIES = [
-  // Programming Languages
   { name: "c" },
   { name: "cplusplus" },
   { name: "csharp" },
@@ -335,8 +354,6 @@ export const DEFAULT_TECHNOLOGIES = [
   { name: "scala" },
   { name: "swift" },
   { name: "typescript" },
-
-  // Frontend Frameworks & Libraries
   { name: "angular" },
   { name: "angularjs" },
   { name: "astro" },
@@ -356,8 +373,6 @@ export const DEFAULT_TECHNOLOGIES = [
   { name: "tailwindcss" },
   { name: "threejs" },
   { name: "vuejs" },
-
-  // Backend Frameworks
   { name: "adonisjs" },
   { name: "django" },
   { name: "express" },
@@ -370,8 +385,6 @@ export const DEFAULT_TECHNOLOGIES = [
   { name: "rails" },
   { name: "spring" },
   { name: "symfony" },
-
-  // Databases
   { name: "cassandra" },
   { name: "couchdb" },
   { name: "elasticsearch" },
@@ -386,8 +399,6 @@ export const DEFAULT_TECHNOLOGIES = [
   { name: "redis" },
   { name: "sqlite" },
   { name: "supabase" },
-
-  // DevOps & Cloud
   { name: "amazonwebservices" },
   { name: "azure" },
   { name: "circleci" },
@@ -401,8 +412,6 @@ export const DEFAULT_TECHNOLOGIES = [
   { name: "netlify" },
   { name: "terraform" },
   { name: "vercel" },
-
-  // Tools & Others
   { name: "apache" },
   { name: "apachekafka" },
   { name: "apachespark" },
@@ -726,7 +735,6 @@ const POST_CONTENT: Record<ProjectType, ProjectConversation[]> = {
   ],
 };
 
-// Run the seed
 seedDatabase().catch((e) => {
   console.error("Error during seeding:", e);
   process.exit(1);

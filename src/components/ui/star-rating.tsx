@@ -4,7 +4,7 @@ import React from "react";
 import { cn } from "~/lib/utils";
 
 type StarDisplayProps = {
-  rating: number;
+  rating: number | null;
   size?: "sm" | "md" | "lg";
   className?: string;
   showValue?: boolean;
@@ -19,13 +19,14 @@ export function StarDisplay({ rating, size = "md", className, showValue = false,
   };
 
   const starSizeClass = sizeClasses[size];
+  const displayRating = rating && rating > 0 ? rating : 0;
 
   return (
     <div className={cn("flex items-center gap-1", className)}>
       <div className="flex">
         {Array.from({ length: maxStars }).map((_, i) => {
           const starNumber = i + 1;
-          const fillPercentage = Math.max(0, Math.min(1, rating - i));
+          const fillPercentage = rating && rating > 0 ? Math.max(0, Math.min(1, rating - i)) : 0;
           return (
             <div key={starNumber} className={cn("relative", starSizeClass)}>
               <Star className={cn("absolute inset-0", starSizeClass, "text-yellow-400")} fill="none" strokeWidth={2} />
@@ -38,7 +39,7 @@ export function StarDisplay({ rating, size = "md", className, showValue = false,
           );
         })}
       </div>
-      {showValue && (
+      {showValue && rating && rating > 0 && (
         <span
           className={cn(
             "ml-1 font-medium",
@@ -47,7 +48,19 @@ export function StarDisplay({ rating, size = "md", className, showValue = false,
             size === "lg" && "text-base",
           )}
         >
-          {rating.toFixed(1)}
+          {displayRating.toFixed(1)}
+        </span>
+      )}
+      {showValue && (!rating || rating <= 0) && (
+        <span
+          className={cn(
+            "ml-1 font-medium text-muted-foreground",
+            size === "sm" && "text-xs",
+            size === "md" && "text-sm",
+            size === "lg" && "text-base",
+          )}
+        >
+          Not rated
         </span>
       )}
     </div>
@@ -57,7 +70,7 @@ export function StarDisplay({ rating, size = "md", className, showValue = false,
 type StarRatingProps = {
   rating: number | null;
   onChange?: (rating: number) => void;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   disabled?: boolean;
   className?: string;
   maxStars?: number;
@@ -77,6 +90,7 @@ export function StarRating({
     sm: "h-3 w-3",
     md: "h-4 w-4",
     lg: "h-5 w-5",
+    xl: "h-6 w-6",
   };
 
   const starSizeClass = sizeClasses[size];
@@ -85,7 +99,7 @@ export function StarRating({
     <div className={cn("flex gap-1", className)}>
       {Array.from({ length: maxStars }).map((_, i) => {
         const starNumber = i + 1;
-        const isActive = hoverRating !== null ? starNumber <= hoverRating : rating !== null && starNumber <= rating;
+        const isActive = hoverRating !== null ? starNumber <= hoverRating : rating !== null && rating > 0 && starNumber <= rating;
         return (
           <button
             key={starNumber}
@@ -95,7 +109,7 @@ export function StarRating({
             onMouseEnter={() => setHoverRating(starNumber)}
             onMouseLeave={() => setHoverRating(null)}
             className={cn(
-              "focus:ring-primary relative transition-transform hover:scale-110 focus:ring-1 focus:outline-none",
+              "focus:ring-primary relative transition-transform hover:scale-110 focus:ring-1 focus:outline-none cursor-pointer",
               starSizeClass,
               disabled && "cursor-not-allowed opacity-50",
             )}

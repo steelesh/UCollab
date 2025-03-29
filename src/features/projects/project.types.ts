@@ -2,6 +2,7 @@ import type {
   Comment as PrismaComment,
   Project as PrismaProject,
   Technology as PrismaTechnology,
+  ProjectType,
   User,
 } from "@prisma/client";
 
@@ -44,13 +45,45 @@ export type ProjectDetails = Pick<
     parentId?: string | null;
   })[];
   technologies: Technology[];
+  createdBy: {
+    username: User["username"];
+    avatar: User["avatar"];
+  };
+  watchers: {
+    id: User["id"];
+    user: {
+      username: User["username"];
+      avatar: User["avatar"];
+    };
+  }[];
+  trendingScore: number;
 };
 
-export type ExploreProject = Pick<
-  PrismaProject,
-  "id" | "title" | "description" | "createdDate" | "projectType" | "githubRepo" | "rating"
-> & {
-  technologies: Technology[];
+export type ExploreProject = {
+  id: string;
+  title: string;
+  description: string;
+  createdDate: Date;
+  githubRepo: string | null;
+  projectType: ProjectType;
+  rating: number;
+  technologies: {
+    id: string;
+    name: string;
+  }[];
+  createdBy: {
+    username: string;
+    avatar: string;
+  };
+  watchers: {
+    id: string;
+    user: {
+      username: string;
+      avatar: string;
+    };
+  }[];
+  comments: { id: string }[];
+  trendingScore: number;
 };
 
 export type ExplorePageData = {

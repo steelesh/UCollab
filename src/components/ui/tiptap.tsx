@@ -106,17 +106,59 @@ function Tiptap({ ref, content, onChange, disabled = false, currentUserId }: Tip
         codeBlock: false,
         heading: false,
         horizontalRule: false,
-        blockquote: false,
-        bulletList: false,
-        listItem: false,
-        orderedList: false,
-        bold: false,
-        italic: false,
-        strike: false,
-        code: false,
-        history: false,
+        blockquote: {
+          HTMLAttributes: {
+            class: "border-l-4 border-border pl-4 my-2 italic",
+          },
+        },
+        bulletList: {
+          HTMLAttributes: {
+            class: "list-disc pl-6 my-2",
+          },
+        },
+        listItem: {
+          HTMLAttributes: {
+            class: "my-0",
+          },
+        },
+        orderedList: {
+          HTMLAttributes: {
+            class: "list-decimal pl-6 my-2",
+          },
+        },
+        bold: {
+          HTMLAttributes: {
+            class: "font-bold",
+          },
+        },
+        italic: {
+          HTMLAttributes: {
+            class: "italic",
+          },
+        },
+        strike: {
+          HTMLAttributes: {
+            class: "line-through",
+          },
+        },
+        code: {
+          HTMLAttributes: {
+            class: "bg-muted rounded px-1.5 py-0.5 font-mono text-sm",
+          },
+        },
+        history: {},
         dropcursor: false,
         gapcursor: false,
+        paragraph: {
+          HTMLAttributes: {
+            class: "my-2",
+          },
+        },
+        hardBreak: {
+          HTMLAttributes: {
+            class: "my-2",
+          },
+        },
       }),
       Mention.configure({
         HTMLAttributes: { class: "bg-accent/10 text-primary rounded px-1.5 py-0.5 font-semibold" },
