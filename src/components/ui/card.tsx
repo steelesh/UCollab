@@ -4,7 +4,7 @@ import { cn } from "~/lib/utils";
 
 const cardVariants = {
   default: "bg-card text-card-foreground border shadow-sm",
-  glossy: "relative overflow-hidden bg-gradient-to-br from-neutral-950 to-neutral-900 text-neutral-100 border border-neutral-800/30 shadow-[0_0_20px_rgba(0,0,0,0.35),0_0_4px_rgba(255,255,255,0.12)] backdrop-blur-sm before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/[0.03] before:to-transparent before:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-t after:from-black/20 after:to-transparent after:pointer-events-none",
+  glossy: "relative overflow-hidden bg-gradient-to-br from-background to-background/95 text-foreground border border-border/30 shadow-md backdrop-blur-sm before:absolute before:inset-0 before:bg-gradient-to-b before:from-foreground/[0.02] before:to-transparent before:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-t after:from-background/10 after:to-transparent after:pointer-events-none dark:shadow-xl dark:before:from-white/[0.03] dark:after:from-black/20",
 };
 
 function Card({ className, variant = "default", ...props }: React.ComponentProps<"div"> & { variant?: keyof typeof cardVariants }) {
@@ -14,7 +14,7 @@ function Card({ className, variant = "default", ...props }: React.ComponentProps
       className={cn(
         "flex flex-col gap-6 rounded-xl py-6 transition-all duration-500 ease-in-out",
         cardVariants[variant],
-        variant === "glossy" && "hover:shadow-[0_0_30px_rgba(0,0,0,0.45),0_0_6px_rgba(255,255,255,0.18)] hover:border-neutral-700/50",
+        variant === "glossy" && "hover:shadow-lg hover:border-border/50 dark:hover:shadow-2xl dark:hover:border-border/50",
         className,
       )}
       {...props}
