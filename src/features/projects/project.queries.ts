@@ -13,10 +13,7 @@ export async function getRealTimeProject(projectId: Project["id"], userId: User[
 }
 
 export async function getProjects(page: number, limit: number, userId: User["id"]): Promise<ExplorePageData> {
-  const [projects, totalCount] = await Promise.all([
-    ProjectService.getPaginatedProjects(page, limit, userId),
-    ProjectService.getProjectCount(userId),
-  ]);
+  const { projects, totalCount } = await ProjectService.getPaginatedProjects(page, limit, userId);
 
   return {
     projects,

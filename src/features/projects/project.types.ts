@@ -2,6 +2,7 @@ import type {
   Comment as PrismaComment,
   Project as PrismaProject,
   Technology as PrismaTechnology,
+  ProjectType,
   User,
 } from "@prisma/client";
 
@@ -46,11 +47,22 @@ export type ProjectDetails = Pick<
   technologies: Technology[];
 };
 
-export type ExploreProject = Pick<
-  PrismaProject,
-  "id" | "title" | "description" | "createdDate" | "projectType" | "githubRepo" | "rating"
-> & {
-  technologies: Technology[];
+export type ExploreProject = {
+  id: string;
+  title: string;
+  description: string;
+  createdDate: Date;
+  githubRepo: string | null;
+  projectType: ProjectType;
+  rating: number;
+  technologies: {
+    id: string;
+    name: string;
+  }[];
+  createdBy: {
+    username: string;
+    avatar: string;
+  };
 };
 
 export type ExplorePageData = {

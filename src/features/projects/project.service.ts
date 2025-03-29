@@ -293,31 +293,42 @@ export const ProjectService = {
     });
   },
 
-  async getPaginatedProjects(page = 1, limit = 12, requestUserId: User["id"]): Promise<ExploreProject[]> {
+  async getPaginatedProjects(page = 1, limit = 12, requestUserId: User["id"]): Promise<{ projects: ExploreProject[]; totalCount: number }> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        return await prisma.project.findMany({
-          orderBy: {
-            createdDate: "desc",
-          },
-          skip: (page - 1) * limit,
-          take: limit,
-          select: {
-            id: true,
-            title: true,
-            createdDate: true,
-            description: true,
-            githubRepo: true,
-            projectType: true,
-            rating: true,
-            technologies: {
-              select: {
-                id: true,
-                name: true,
+        const [projects, totalCount] = await Promise.all([
+          prisma.project.findMany({
+            orderBy: {
+              createdDate: "desc",
+            },
+            skip: (page - 1) * limit,
+            take: limit,
+            select: {
+              id: true,
+              title: true,
+              createdDate: true,
+              description: true,
+              githubRepo: true,
+              projectType: true,
+              rating: true,
+              technologies: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+              createdBy: {
+                select: {
+                  username: true,
+                  avatar: true,
+                },
               },
             },
-          },
-        });
+          }),
+          prisma.project.count(),
+        ]);
+
+        return { projects: projects satisfies ExploreProject[], totalCount };
       } catch (error) {
         if (error instanceof Utils)
           throw error;

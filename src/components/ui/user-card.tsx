@@ -32,12 +32,12 @@ export function UserCard({ username, firstName, lastName, avatar, email, gradYea
   const hasMoreTechnologies = technologies.length > 4;
 
   return (
-    <Card variant="glossy" className="group w-full h-[200px]">
-      <CardHeader className="flex flex-row items-start gap-4">
+    <Card variant="glossy" className="group w-full h-[200px] pt-0">
+      <CardHeader className="flex flex-row items-start gap-4 p-6">
         <Avatar className="h-18 w-18">
           <AvatarImage src={avatar} alt={username} />
         </Avatar>
-        <div className="flex flex-col gap-2 flex-1">
+        <div className="flex flex-col gap-3 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
             <Link
               href={`/u/${username}`}
@@ -103,14 +103,13 @@ export function UserCard({ username, firstName, lastName, avatar, email, gradYea
             <Small noMargin>Skills:</Small>
           </Muted>
           {displayTechnologies.map(tech => (
-            <Badge key={tech.id} variant="glossy" className="flex items-center gap-1 group-hover:text-white/90">
+            <Badge key={tech.id} variant="glossy">
               <TechnologyIcon name={tech.name} colored />
               <span className="truncate">{tech.name}</span>
-
             </Badge>
           ))}
           {hasMoreTechnologies && (
-            <Badge variant="glossy" className="group-hover:text-white/90">
+            <Badge variant="glossy">
               and
               {" "}
               {technologies.length - 4}
