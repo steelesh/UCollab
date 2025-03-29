@@ -57,8 +57,8 @@ export function CommentList({ comments, currentUserId, projectId, onUpdate, onDe
                   />
                 )
               : (
-                  <div className="comment-content prose prose-sm prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:my-2 prose-blockquote:italic prose-code:bg-gray-100 prose-code:rounded prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:text-sm prose-ul:pl-6 prose-ol:pl-6 prose-li:my-0 dark:prose-blockquote:border-gray-600 dark:prose-code:bg-gray-800 mt-2 max-w-none">
-                    <CommentContent content={comment.content} className="line-clamp-2" />
+                  <div className="mt-2 space-y-2">
+                    <CommentContent content={comment.content} />
                   </div>
                 )}
           </div>
@@ -102,8 +102,8 @@ export function CommentList({ comments, currentUserId, projectId, onUpdate, onDe
                         />
                       )
                     : (
-                        <div className="comment-content prose prose-sm prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:my-2 prose-blockquote:italic prose-code:bg-gray-100 prose-code:rounded prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:text-sm prose-ul:pl-6 prose-ol:pl-6 prose-li:my-0 dark:prose-blockquote:border-gray-600 dark:prose-code:bg-gray-800 mt-2 max-w-none">
-                          <CommentContent content={reply.content} className="line-clamp-2" />
+                        <div className="mt-2 space-y-2">
+                          <CommentContent content={reply.content} />
                         </div>
                       )}
                 </div>

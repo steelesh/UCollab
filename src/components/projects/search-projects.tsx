@@ -70,7 +70,7 @@ export default function SearchBar() {
     <div className="bg-muted mb-8 rounded-xl p-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <label htmlFor="query" className="block text-sm font-medium text-white">
+          <label htmlFor="query" className="block text-sm font-medium text-foreground">
             Search Query
           </label>
           <input
@@ -79,18 +79,18 @@ export default function SearchBar() {
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search projects..."
-            className="bg-background mt-1 block w-full rounded-md border-gray-300 p-2 text-white"
+            className="bg-background mt-1 block w-full rounded-md border border-input p-2 text-foreground placeholder:text-muted-foreground"
           />
         </div>
         <div>
-          <label htmlFor="projectType" className="block text-sm font-medium text-white">
+          <label htmlFor="projectType" className="block text-sm font-medium text-foreground">
             Project Type
           </label>
           <select
             id="projectType"
             value={projectType}
             onChange={e => setProjectType(e.target.value)}
-            className="bg-background mt-1 block w-full rounded-md border-gray-300 p-2 text-white"
+            className="bg-background mt-1 block w-full rounded-md border border-input p-2 text-foreground"
           >
             <option value="">All</option>
             <option value="FEEDBACK">Feedback</option>
@@ -98,14 +98,14 @@ export default function SearchBar() {
           </select>
         </div>
         <div>
-          <label htmlFor="minRating" className="block text-sm font-medium text-white">
+          <label htmlFor="minRating" className="block text-sm font-medium text-foreground">
             Minimum Rating
           </label>
           <select
             id="minRating"
             value={minRating}
             onChange={e => setMinRating(e.target.value)}
-            className="bg-background mt-1 block w-full rounded-md border-gray-300 p-2 text-white"
+            className="bg-background mt-1 block w-full rounded-md border border-input p-2 text-foreground"
           >
             <option value="">Any Rating</option>
             <option value="1">1 Star & up</option>
@@ -116,28 +116,28 @@ export default function SearchBar() {
           </select>
         </div>
         <div>
-          <label htmlFor="sortBy" className="block text-sm font-medium text-white">
+          <label htmlFor="sortBy" className="block text-sm font-medium text-foreground">
             Sort By
           </label>
           <select
             id="sortBy"
             value={sortBy}
             onChange={e => setSortBy(e.target.value)}
-            className="bg-background mt-1 block w-full rounded-md border-gray-300 p-2 text-white"
+            className="bg-background mt-1 block w-full rounded-md border border-input p-2 text-foreground"
           >
             <option value="createdDate">Creation Date</option>
             <option value="lastModifiedDate">Last Updated Date</option>
           </select>
         </div>
         <div className="sm:col-span-2 lg:col-span-1">
-          <label htmlFor="sortOrder" className="block text-sm font-medium text-white">
+          <label htmlFor="sortOrder" className="block text-sm font-medium text-foreground">
             Sort Order
           </label>
           <select
             id="sortOrder"
             value={sortOrder}
             onChange={e => setSortOrder(e.target.value)}
-            className="bg-background mt-1 block w-full rounded-md border-gray-300 p-2 text-white"
+            className="bg-background mt-1 block w-full rounded-md border border-input p-2 text-foreground"
           >
             <option value="desc">Descending</option>
             <option value="asc">Ascending</option>

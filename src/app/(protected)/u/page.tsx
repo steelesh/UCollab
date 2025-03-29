@@ -34,7 +34,7 @@ async function Page({ searchParams }: PageProps) {
       <Header>
         <H1>User Directory</H1>
       </Header>
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         {data.users.map(user => (
           <UserCard
             key={user.username}

@@ -97,20 +97,6 @@ export async function rateProject(projectId: Project["id"], rating: number) {
   }
 }
 
-export async function getBookmarkStatus(projectId: Project["id"]) {
-  const session = await auth();
-  if (!session?.user?.id)
-    throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
-
-  try {
-    const watchedProjects = await ProjectService.getUserWatchedProjects(session.user.id, session.user.id);
-    const isWatched = watchedProjects.some(proj => proj.id === projectId);
-    return { success: true, bookmarked: isWatched };
-  } catch (error) {
-    return handleServerActionError(error);
-  }
-}
-
 export async function getBookmarkedProjects() {
   const session = await auth();
   if (!session?.user?.id)
@@ -124,28 +110,27 @@ export async function getBookmarkedProjects() {
   }
 }
 
-export async function toggleBookmark(projectId: Project["id"]) {
+export async function bookmarkProject(projectId: Project["id"]) {
   const session = await auth();
   if (!session?.user?.id)
     throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
 
   try {
-    const { success, bookmarked } = (await getBookmarkStatus(projectId)) as {
-      success: boolean;
-      bookmarked: boolean;
-    };
+    await ProjectService.watchProject(projectId, session.user.id);
+    return { success: true };
+  } catch (error) {
+    return handleServerActionError(error);
+  }
+}
 
-    if (!success) {
-      throw new Error(ErrorMessage.OPERATION_FAILED);
-    }
+export async function unbookmarkProject(projectId: Project["id"]) {
+  const session = await auth();
+  if (!session?.user?.id)
+    throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
 
-    if (bookmarked) {
-      await ProjectService.unwatchProject(projectId, session.user.id);
-      return { success: true, watched: false };
-    } else {
-      await ProjectService.watchProject(projectId, session.user.id);
-      return { success: true, watched: true };
-    }
+  try {
+    await ProjectService.unwatchProject(projectId, session.user.id);
+    return { success: true };
   } catch (error) {
     return handleServerActionError(error);
   }
@@ -188,6 +173,19 @@ export async function checkProjectsCount(filters: { query?: string; projectType?
 
     const totalCount = await prisma.project.count({ where });
     return { success: true, totalCount };
+  } catch (error) {
+    return handleServerActionError(error);
+  }
+}
+
+export async function deleteRating(projectId: Project["id"]) {
+  const session = await auth();
+  if (!session?.user?.id)
+    throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
+
+  try {
+    await ProjectService.deleteRating(projectId, session.user.id);
+    return { success: true };
   } catch (error) {
     return handleServerActionError(error);
   }

@@ -1,21 +1,15 @@
 import type { User } from "@prisma/client";
 import type { Route } from "next";
 
+import { Edit, Reply, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
 import type { Comment } from "~/features/projects/project.types";
 
-import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
+import { ActionButton } from "~/components/ui/action-button";
+import { ConfirmDialog } from "~/components/ui/confirm-dialog";
 
 import { CommentTimestamp } from "./comment-timestamp";
 
@@ -65,53 +59,38 @@ export function CommentHeader({
 
         <div className="flex gap-2">
           {!isReply && onReply && (
-            <Button onClick={onReply} size="sm" variant="outline" className="w-full cursor-pointer sm:w-auto">
+            <ActionButton icon={<Reply />} onClick={onReply}>
               Reply
-            </Button>
+            </ActionButton>
           )}
           {isOwnComment && (
             <>
-              <Button onClick={onEdit} variant="outline" className="w-full cursor-pointer sm:w-auto">
+              <ActionButton icon={<Edit />} onClick={onEdit}>
                 Edit
-              </Button>
-              <Button
+              </ActionButton>
+              <ActionButton
+                icon={<Trash2 />}
+                variant="destructive"
                 onClick={() => setShowDeleteDialog(true)}
-                variant="outline"
-                className="hover:bg-primary w-full cursor-pointer sm:w-auto"
               >
                 Delete
-              </Button>
+              </ActionButton>
             </>
           )}
         </div>
       </div>
-
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              Delete
-              {" "}
-              {isReply ? "Reply" : "Comment"}
-            </DialogTitle>
-            <DialogDescription>{message}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                onDelete();
-                setShowDeleteDialog(false);
-              }}
-            >
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title={`Delete ${isReply ? "Reply" : "Comment"}`}
+        description={message}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={() => {
+          onDelete();
+          setShowDeleteDialog(false);
+        }}
+      />
     </>
   );
 }

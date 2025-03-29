@@ -13,10 +13,7 @@ export async function getRealTimeProject(projectId: Project["id"], userId: User[
 }
 
 export async function getProjects(page: number, limit: number, userId: User["id"]): Promise<ExplorePageData> {
-  const [projects, totalCount] = await Promise.all([
-    ProjectService.getPaginatedProjects(page, limit, userId),
-    ProjectService.getProjectCount(userId),
-  ]);
+  const { projects, totalCount } = await ProjectService.getPaginatedProjects(page, limit, userId);
 
   return {
     projects,
@@ -29,4 +26,12 @@ export async function getProjects(page: number, limit: number, userId: User["id"
 
 export async function getUserProjectRating(projectId: Project["id"], userId: User["id"]): Promise<number> {
   return ProjectService.getUserProjectRating(projectId, userId);
+}
+
+export async function getTrendingProjects(userId: User["id"], page = 1, limit = 12): Promise<ExplorePageData> {
+  return ProjectService.getTrendingProjects(userId, page, limit);
+}
+
+export async function isProjectBookmarked(projectId: Project["id"], userId: User["id"]): Promise<boolean> {
+  return ProjectService.isProjectBookmarked(projectId, userId);
 }
