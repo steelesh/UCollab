@@ -11,6 +11,7 @@ import Footer from "~/components/navigation/footer";
 import Navbar from "~/components/navigation/navbar";
 import { Body } from "~/components/ui/body";
 import { Main } from "~/components/ui/main";
+import { ThemeProvider } from "~/components/ui/theme-provider";
 import { roboto } from "~/lib/fonts";
 
 export const metadata: Metadata = {
@@ -27,11 +28,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`scroll-smooth ${roboto.variable}`} suppressHydrationWarning>
       <Body>
-        <SessionProvider basePath="/auth">
-          <Navbar />
-          <Main>{children}</Main>
-        </SessionProvider>
-        <Footer />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SessionProvider basePath="/auth">
+            <Navbar />
+            <Main>{children}</Main>
+          </SessionProvider>
+          <Footer />
+        </ThemeProvider>
       </Body>
     </html>
   );

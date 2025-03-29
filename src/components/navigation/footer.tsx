@@ -2,6 +2,8 @@ import type { Route } from "next";
 
 import Link from "next/link";
 
+import { ModeToggle } from "~/components/ui/mode-toggle";
+
 export default function Footer() {
   const navigation = {
     main: [
@@ -14,13 +16,18 @@ export default function Footer() {
 
   return (
     <footer className="mt-6 py-10">
-      <hr className="via-accent mx-auto mb-8 h-0.25 w-1/3 border-0 bg-gradient-to-r from-transparent to-transparent" />
-      <nav aria-label="Footer" className="flex justify-center gap-8 text-sm">
+      <hr className="mx-auto mb-8 h-0.25 w-1/3 border-0 bg-gradient-to-r from-transparent via-border to-transparent" />
+      <nav aria-label="Footer" className="flex items-center justify-center gap-8 text-sm">
         {navigation.main.map(item => (
-          <Link key={item.name} href={item.href as Route} className="text-primary-foreground hover:underline">
+          <Link
+            key={item.name}
+            href={item.href as Route}
+            className="font-medium text-foreground/80 hover:text-foreground transition-colors duration-200"
+          >
             {item.name}
           </Link>
         ))}
+        <ModeToggle />
       </nav>
     </footer>
   );
