@@ -2,8 +2,6 @@ import type { Route } from "next";
 
 import Link from "next/link";
 
-import { ModeToggle } from "~/components/ui/mode-toggle";
-
 export default function Footer() {
   const navigation = {
     main: [
@@ -27,7 +25,6 @@ export default function Footer() {
             {item.name}
           </Link>
         ))}
-        <ModeToggle />
       </nav>
     </footer>
   );
