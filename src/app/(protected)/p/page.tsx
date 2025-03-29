@@ -52,6 +52,9 @@ async function Page({ searchParams, userId }: PageProps) {
               username: project.createdBy.username,
               avatar: project.createdBy.avatar,
             }}
+            trendingScore={project.trendingScore}
+            watchers={project.watchers}
+            comments={project.comments.length}
           />
         ))}
       </div>
