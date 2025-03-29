@@ -2,14 +2,14 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import TechnologiesControl from "~/components/ui/technologies-control";
 import { searchTechnologies, updateOnboarding } from "~/features/users/user.actions";
 import { onboardingSchema } from "~/features/users/user.schema";
 
@@ -79,107 +79,6 @@ function GraduationYearControl({ field, currentYear }: { field: any; currentYear
   );
 }
 
-function TechnologiesControl({ field, isSubmitting, suggestions, handleTechSearch }: {
-  field: any;
-  isSubmitting: boolean;
-  suggestions: string[];
-  handleTechSearch: (value: string) => void;
-}) {
-  const [techInputValue, setTechInputValue] = useState("");
-  const mirrorRef = useRef<HTMLSpanElement>(null);
-  const widthRef = useRef(0);
-
-  useEffect(() => {
-    if (mirrorRef.current) {
-      widthRef.current = mirrorRef.current.offsetWidth;
-    }
-  }, [techInputValue]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setTechInputValue(val);
-    handleTechSearch(val);
-  };
-
-  const bestMatch = suggestions.find(
-    sugg => sugg.toLowerCase().startsWith(techInputValue.toLowerCase()) && sugg.length > techInputValue.length,
-  );
-  const suggestionRemainder = bestMatch ? bestMatch.substring(techInputValue.length) : "";
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      let techToAdd: string | undefined;
-      if (bestMatch) {
-        techToAdd = bestMatch;
-      } else if (suggestions.includes(techInputValue)) {
-        techToAdd = techInputValue;
-      }
-      if (!techToAdd)
-        return;
-      if (field.value.includes(techToAdd))
-        return;
-      field.onChange([...field.value, techToAdd]);
-      setTechInputValue("");
-    }
-  };
-
-  return (
-    <div className="form-control">
-      <Label className="label" htmlFor="technologies">
-        <span className="label-text">Technologies</span>
-      </Label>
-      <div className="m-4 flex flex-1">
-        {field.value.map((tech: string) => (
-          <Badge
-            key={tech}
-            onClick={() => field.onChange(field.value.filter((t: string) => t !== tech))}
-            className="hover:bg-primary cursor-pointer transition duration-200 ease-in-out hover:scale-105"
-            variant="outline"
-          >
-            {tech}
-          </Badge>
-        ))}
-      </div>
-      <div className="relative flex w-full items-center">
-        <span
-          ref={mirrorRef}
-          className="invisible absolute text-sm leading-none font-normal whitespace-pre"
-          style={{
-            fontFamily: "inherit",
-            fontSize: "inherit",
-            paddingLeft: "1rem",
-          }}
-        >
-          {techInputValue}
-        </span>
-        <Input
-          id="technologies"
-          type="text"
-          value={techInputValue}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          className="input input-bordered w-full bg-transparent leading-none"
-          disabled={isSubmitting}
-          style={{ color: "white", caretColor: "white", paddingLeft: "1rem" }}
-        />
-        {techInputValue && suggestionRemainder && (
-          <span
-            className="pointer-events-none absolute text-sm leading-none font-normal text-white/50"
-            style={{
-              left: widthRef.current - 1,
-              top: "50%",
-              transform: "translateY(-47%)",
-            }}
-          >
-            {suggestionRemainder}
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
-
 export function OnboardingForm() {
   const {
     register,
@@ -214,11 +113,11 @@ export function OnboardingForm() {
   };
 
   const onSubmit = async (data: OnboardingInput) => {
+    console.warn("Submitted data:", data);
     const formData = new FormData();
     formData.append("gradYear", data.gradYear);
     formData.append("technologies", JSON.stringify(data.technologies));
     formData.append("githubProfile", data.githubProfile);
-    formData.append("projectType", data.mentorshipStatus);
     formData.append("mentorshipStatus", data.mentorshipStatus || "NONE");
     try {
       await updateOnboarding(formData);
@@ -236,7 +135,7 @@ export function OnboardingForm() {
           <GraduationYearControl field={field} currentYear={new Date().getFullYear()} />
         )}
       />
-      <div className="form-control relative">
+      <div className="form-control">
         <Controller
           control={control}
           name="technologies"
@@ -271,22 +170,25 @@ export function OnboardingForm() {
           control={control}
           name="mentorshipStatus"
           defaultValue="NONE"
-          render={({ field: { onChange, value } }) => (
-            <RadioGroup value={value ?? "NONE"} onValueChange={onChange}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="MENTOR" id="mentor" />
-                <Label htmlFor="mentor">Mentor</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="MENTEE" id="mentee" />
-                <Label htmlFor="mentee">Mentee</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="NONE" id="none" />
-                <Label htmlFor="none">None</Label>
-              </div>
-            </RadioGroup>
-          )}
+          render={({ field: { onChange, value } }) => {
+            console.warn("Mentorship status value:", value);
+            return (
+              <RadioGroup value={value ?? "NONE"} onValueChange={onChange}>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="MENTOR" id="mentor" />
+                  <Label htmlFor="mentor">Mentor</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="MENTEE" id="mentee" />
+                  <Label htmlFor="mentee">Mentee</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="NONE" id="none" />
+                  <Label htmlFor="none">None</Label>
+                </div>
+              </RadioGroup>
+            );
+          }}
         />
         {errors.mentorshipStatus && <span className="text-error text-sm">{errors.mentorshipStatus.message}</span>}
       </div>
