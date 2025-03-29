@@ -11,6 +11,7 @@ import Footer from "~/components/navigation/footer";
 import Navbar from "~/components/navigation/navbar";
 import { Body } from "~/components/ui/body";
 import { Main } from "~/components/ui/main";
+import { Toaster } from "~/components/ui/sonner";
 import { ThemeProvider } from "~/components/ui/theme-provider";
 import { roboto } from "~/lib/fonts";
 
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SessionProvider basePath="/auth">
             <Navbar />
             <Main>{children}</Main>
+            <Toaster />
           </SessionProvider>
           <Footer />
         </ThemeProvider>
