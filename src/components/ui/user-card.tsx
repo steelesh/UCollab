@@ -30,7 +30,7 @@ export function UserCard({ username, firstName, lastName, avatar, email, gradYea
   const hasMoreTechnologies = technologies.length > 4;
 
   return (
-    <Card variant="glossy" className="group w-full h-[200px] pt-0">
+    <Card variant="glossy" className="group w-full pt-0">
       <CardHeader className="flex flex-row items-start gap-4 p-6">
         <Avatar className="h-18 w-18">
           <AvatarImage src={avatar} alt={username} />
@@ -82,7 +82,7 @@ export function UserCard({ username, firstName, lastName, avatar, email, gradYea
           {displayTechnologies.map(tech => (
             <Badge key={tech.id} variant="glossy">
               <TechnologyIcon name={tech.name} colored />
-              <span className="truncate">{tech.name}</span>
+              <span>{tech.name}</span>
             </Badge>
           ))}
           {hasMoreTechnologies && (
