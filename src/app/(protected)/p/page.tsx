@@ -39,8 +39,8 @@ async function getFilteredProjects(searchParams: { [key: string]: string | strin
     if (query) {
       const queryStr = Array.isArray(query) ? query[0] : query;
       where.OR = [
-        { title: { contains: queryStr } },
-        { description: { contains: queryStr } },
+        { title: { search: queryStr } },
+        { description: { search: queryStr } },
       ];
     }
 

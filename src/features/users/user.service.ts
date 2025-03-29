@@ -103,7 +103,6 @@ export const UserService = {
     return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
         const data: CompleteOnboardingData = onboardingSchema.parse(rawData);
-        const mentorship: "MENTOR" | "MENTEE" | "NONE" = "NONE";
         const gradYearNumber = data.gradYear ? Number.parseInt(data.gradYear, 10) : null;
         return await prisma.$transaction(async (tx) => {
           return tx.user.update({
@@ -112,7 +111,7 @@ export const UserService = {
               onboardingStep: "COMPLETE",
               githubProfile: data.githubProfile,
               gradYear: gradYearNumber,
-              mentorship,
+              mentorship: data.mentorshipStatus,
               technologies: {
                 deleteMany: {},
                 connectOrCreate: Array.isArray(data.technologies)
