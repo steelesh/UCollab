@@ -100,7 +100,6 @@ export function ProjectComments({ comments: initialComments, currentUserId, proj
   return (
     <div className="mt-8 space-y-8">
       <div className="border-b pb-6">
-        <h3 className="mb-4 text-lg font-semibold">Comments</h3>
         <CommentForm projectId={projectId} currentUserId={currentUserId} onSubmit={handleCreate} />
       </div>
       <CommentList
