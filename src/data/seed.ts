@@ -1,9 +1,9 @@
 /* eslint-disable ts/no-use-before-define */
 /* eslint-disable no-console */
-import type { Project, Technology, User } from "@prisma/client";
+import type { Post, Technology, User } from "@prisma/client";
 
 import { faker } from "@faker-js/faker";
-import { AvatarSource, NotificationType, OnboardingStep, ProjectType } from "@prisma/client";
+import { AvatarSource, NeedType, NotificationType, OnboardingStep } from "@prisma/client";
 
 import { UserService } from "~/features/users/user.service";
 import { prisma } from "~/lib/prisma";
@@ -46,7 +46,7 @@ export async function seedDatabase() {
     const allTechnologies = await prisma.technology.findMany();
 
     await createTestUsers(allTechnologies);
-    await createProjectsAndNotifications();
+    await createPostsAndNotifications();
 
     console.log("✅ Database seeded successfully!");
   } catch (error) {
@@ -106,60 +106,106 @@ async function createTestUsers(initialTechnologies: Technology[]) {
   }
 }
 
-async function createProjectsAndNotifications() {
+async function createPostsAndNotifications() {
   const completedUsers = await prisma.user.findMany({
     where: { onboardingStep: OnboardingStep.COMPLETE },
   });
 
   for (const user of completedUsers) {
-    const projectCount = faker.number.int({ min: 1, max: 2 });
-    for (let i = 0; i < projectCount; i++) {
-      await createProject(user, completedUsers);
+    const postCount = faker.number.int({ min: 1, max: 2 });
+    for (let i = 0; i < postCount; i++) {
+      await createPost(user, completedUsers);
     }
     await createSystemNotifications(user);
   }
 }
 
-async function createProject(user: User, allUsers: User[]) {
-  const projectType = faker.helpers.arrayElement(Object.values(ProjectType));
-  const conversation = faker.helpers.arrayElement(POST_CONTENT?.[projectType] || []);
-  const technologyIds = (await prisma.technology.findMany({ select: { id: true } })).map(tech => tech.id);
-  if (technologyIds.length === 0) {
-    console.warn("No technologies available, skipping project creation with technologies.");
-    return;
-  }
-  const projectTechConnect: { id: string }[] = [];
-  const guaranteedTechId = faker.helpers.arrayElement(technologyIds);
-  projectTechConnect.push({ id: guaranteedTechId });
-  const numAdditionalTechs = faker.number.int({ min: 0, max: Math.min(2, technologyIds.length - 1) });
-  const availableTechIds = faker.helpers.shuffle(technologyIds.filter(id => id !== guaranteedTechId));
-  for (let j = 0; j < numAdditionalTechs; j++) {
-    const additionalTechId = availableTechIds[j];
-    if (additionalTechId) {
-      projectTechConnect.push({ id: additionalTechId });
+async function createPost(user: User, allUsers: User[]) {
+  const needType = faker.helpers.arrayElement(Object.values(NeedType));
+  const needCombinations = {
+    [NeedType.FEEDBACK]: faker.helpers.maybe(() => NeedType.CONTRIBUTION, { probability: 0.3 }),
+    [NeedType.CONTRIBUTION]: faker.helpers.maybe(() => NeedType.FEEDBACK, { probability: 0.3 }),
+    [NeedType.DEVELOPER_AVAILABLE]: null,
+    [NeedType.SEEKING_MENTOR]: null,
+    [NeedType.MENTOR_AVAILABLE]: null,
+    [NeedType.TEAM_FORMATION]: null,
+  };
+  const secondaryNeedType = needCombinations[needType];
+
+  const conversation = POST_CONTENT[needType] && POST_CONTENT[needType].length > 0
+    ? faker.helpers.arrayElement(POST_CONTENT[needType])
+    : { title: `Sample ${getNeedTypeLabel(needType)} Post`, description: `A sample post for ${getNeedTypeLabel(needType)}.`, comments: [], githubProject: undefined };
+
+  const isProjectPost = needType === NeedType.FEEDBACK || needType === NeedType.CONTRIBUTION
+    || secondaryNeedType === NeedType.FEEDBACK || secondaryNeedType === NeedType.CONTRIBUTION;
+
+  const shouldAllowRatings = needType === NeedType.FEEDBACK || secondaryNeedType === NeedType.FEEDBACK;
+
+  const postTechConnect: { id: string }[] = [];
+  if (isProjectPost) {
+    const technologyIds = (await prisma.technology.findMany({ select: { id: true } })).map(tech => tech.id);
+    if (technologyIds.length > 0) {
+      const guaranteedTechId = faker.helpers.arrayElement(technologyIds);
+      postTechConnect.push({ id: guaranteedTechId });
+      const numAdditionalTechs = faker.number.int({ min: 0, max: Math.min(2, technologyIds.length - 1) });
+      const availableTechIds = faker.helpers.shuffle(technologyIds.filter(id => id !== guaranteedTechId));
+      for (let j = 0; j < numAdditionalTechs; j++) {
+        const additionalTechId = availableTechIds[j];
+        if (additionalTechId) {
+          postTechConnect.push({ id: additionalTechId });
+        }
+      }
+    } else {
+      console.warn("No technologies available for project post.");
     }
   }
 
-  const project = await prisma.project.create({
+  const githubRepo = (isProjectPost && conversation?.githubProject)
+    ? `https://www.github.com/${user.username}/${conversation.githubProject}`
+    : null;
+
+  const primaryNeed = await prisma.postNeed.create({
     data: {
-      title: conversation?.title || "Sample Project",
-      description: conversation?.description || "A sample project description.",
-      projectType,
+      needType,
+      isPrimary: true,
+    },
+  });
+
+  let secondaryNeed = null;
+  if (secondaryNeedType) {
+    secondaryNeed = await prisma.postNeed.create({
+      data: {
+        needType: secondaryNeedType,
+        isPrimary: false,
+      },
+    });
+  }
+
+  const post = await prisma.post.create({
+    data: {
+      title: conversation?.title || "Sample Post",
+      description: conversation?.description || "A sample post description.",
       createdById: user.id,
-      githubRepo: conversation?.githubProject
-        ? `https://www.github.com/${user.username}/${conversation.githubProject}`
-        : null,
+      githubRepo,
       rating: 0,
+      allowRatings: shouldAllowRatings,
+      allowComments: faker.datatype.boolean({ probability: 0.9 }),
       technologies: {
-        connect: projectTechConnect,
+        connect: postTechConnect,
+      },
+      postNeeds: {
+        connect: [
+          { id: primaryNeed.id },
+          ...(secondaryNeed ? [{ id: secondaryNeed.id }] : []),
+        ],
       },
     },
   });
 
-  if (project) {
-    await prisma.projectWatcher.create({
+  if (post) {
+    await prisma.postWatcher.create({
       data: {
-        projectId: project.id,
+        postId: post.id,
         userId: user.id,
       },
     });
@@ -169,27 +215,31 @@ async function createProject(user: User, allUsers: User[]) {
     const watchers = faker.helpers.shuffle(potentialWatchers).slice(0, numberOfWatchers);
 
     for (const watcher of watchers) {
-      await prisma.projectWatcher.create({
+      await prisma.postWatcher.create({
         data: {
-          projectId: project.id,
+          postId: post.id,
           userId: watcher.id,
         },
       });
     }
 
-    await createProjectRatings(project, allUsers, user);
-
+    await createPostRatings(post, allUsers, user);
     await createCommentsAndNotifications(
-      project,
-      conversation || { title: "", description: "", comments: [] },
+      post,
+      conversation || { title: "", description: "", comments: [], githubProject: undefined },
       allUsers,
       user,
+      needType,
     );
   }
 }
 
-async function createProjectRatings(project: Project, allUsers: User[], projectCreator: User) {
-  const potentialRaters = allUsers.filter(u => u.id !== projectCreator.id);
+async function createPostRatings(post: Post, allUsers: User[], postCreator: User) {
+  if (!post.allowRatings) {
+    return;
+  }
+
+  const potentialRaters = allUsers.filter(u => u.id !== postCreator.id);
   const numberOfRaters = faker.number.int({ min: 0, max: Math.min(10, potentialRaters.length) });
 
   const raters = faker.helpers.shuffle(potentialRaters).slice(0, numberOfRaters);
@@ -201,9 +251,9 @@ async function createProjectRatings(project: Project, allUsers: User[], projectC
   const ratings = [];
   for (const rater of raters) {
     const rating = faker.number.int({ min: 1, max: 5 });
-    await prisma.projectRating.create({
+    await prisma.postRating.create({
       data: {
-        projectId: project.id,
+        postId: post.id,
         userId: rater.id,
         rating,
       },
@@ -215,23 +265,32 @@ async function createProjectRatings(project: Project, allUsers: User[], projectC
   if (ratings.length > 0) {
     const averageRating = Number((ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(1));
 
-    await prisma.project.update({
-      where: { id: project.id },
+    await prisma.post.update({
+      where: { id: post.id },
       data: { rating: averageRating },
     });
   }
 }
 
 async function createCommentsAndNotifications(
-  project: Project,
-  conversation: ProjectConversation,
+  post: Post,
+  conversation: PostConversation,
   allUsers: User[],
-  projectCreator: User,
+  postCreator: User,
+  needType: NeedType,
 ) {
+  if (!post.allowComments) {
+    return;
+  }
+
+  const commentsToCreate = conversation.comments.length > 0
+    ? conversation.comments
+    : generateDefaultComments(needType, post.title);
+
   const commenters = faker.helpers
     .shuffle([...allUsers])
-    .filter(u => u.id !== projectCreator.id)
-    .slice(0, conversation.comments.length);
+    .filter(u => u.id !== postCreator.id)
+    .slice(0, commentsToCreate.length);
 
   for (let i = 0; i < commenters.length; i++) {
     const commenter = commenters[i];
@@ -240,23 +299,96 @@ async function createCommentsAndNotifications(
 
     const comment = await prisma.comment.create({
       data: {
-        content: conversation.comments[i] || "",
+        content: commentsToCreate[i] || "",
         createdById: commenter.id,
-        projectId: project.id,
+        postId: post.id,
       },
     });
 
     await prisma.notification.create({
       data: {
-        userId: project.createdById,
-        message: `${commenter.username} commented on your post "${project.title}"`,
+        userId: post.createdById,
+        message: `${commenter.username} commented on your post "${post.title}"`,
         type: NotificationType.COMMENT,
         commentId: comment.id,
+        postId: post.id,
         triggeredById: commenter.id,
         isRead: faker.datatype.boolean(),
       },
     });
   }
+}
+
+function generateDefaultComments(needType: NeedType, postTitle: string): string[] {
+  const defaultCommentCount = faker.number.int({ min: 1, max: 3 });
+  const comments: string[] = [];
+
+  for (let i = 0; i < defaultCommentCount; i++) {
+    let comment = "";
+
+    switch (needType) {
+      case NeedType.FEEDBACK:
+        comment = faker.helpers.arrayElement([
+          "Have you considered testing this with a different approach?",
+          "The UI looks great, but the UX flow could be improved.",
+          "I like what you've done here. Maybe add some error handling?",
+          "Great project! What testing framework are you using?",
+          "Have you considered making this accessible for screen readers?",
+        ]);
+        break;
+      case NeedType.CONTRIBUTION:
+        comment = faker.helpers.arrayElement([
+          "I'd be interested in contributing to this project. What areas need help?",
+          "Could I help with the documentation for this project?",
+          "I have experience with this technology stack. How can I join?",
+          "What's the development environment setup like?",
+          "Is there a contribution guide or coding standards document?",
+        ]);
+        break;
+      case NeedType.DEVELOPER_AVAILABLE:
+        comment = faker.helpers.arrayElement([
+          "What kind of projects are you most interested in working on?",
+          "Do you have a portfolio or GitHub profile to share?",
+          "I might have a project that matches your skills. Can we connect?",
+          "How much time can you commit to a project weekly?",
+          "What's your preferred communication method for project collaboration?",
+        ]);
+        break;
+      case NeedType.SEEKING_MENTOR:
+        comment = faker.helpers.arrayElement([
+          "I could help mentor you. What specific areas do you want to focus on?",
+          "Have you tried working through any tutorials on this topic yet?",
+          "I mentor in this area. Let's set up a time to talk more.",
+          "What's your learning style? I'd adjust my mentoring approach accordingly.",
+          "Do you have any specific goals or projects you want to work on?",
+        ]);
+        break;
+      case NeedType.MENTOR_AVAILABLE:
+        comment = faker.helpers.arrayElement([
+          "I'd appreciate your mentorship. How do we get started?",
+          "What areas do you specialize in mentoring?",
+          "How often would you be available for mentoring sessions?",
+          "Do you prefer to mentor through pair programming or code reviews?",
+          "I'm looking to grow in this field. Would you be open to regular check-ins?",
+        ]);
+        break;
+      case NeedType.TEAM_FORMATION:
+        comment = faker.helpers.arrayElement([
+          "I'd be interested in joining. What roles are you still looking to fill?",
+          "What's the expected time commitment for this team?",
+          "Do you have a project timeline or roadmap already?",
+          "I have experience in this area and would like to join your team.",
+          "How will the team be collaborating? Regular meetings?",
+        ]);
+        break;
+      default:
+        comment = `Interesting post about "${postTitle}"!`;
+    }
+
+    comments.push(comment);
+  }
+
+  return comments;
 }
 
 async function createSystemNotifications(user: User) {
@@ -278,7 +410,10 @@ async function clearDatabase() {
     prisma.technology.deleteMany(),
     prisma.notification.deleteMany(),
     prisma.comment.deleteMany(),
-    prisma.project.deleteMany(),
+    prisma.postNeed.deleteMany(),
+    prisma.postWatcher.deleteMany(),
+    prisma.postRating.deleteMany(),
+    prisma.post.deleteMany(),
     prisma.account.deleteMany(),
     prisma.user.deleteMany(),
   ]);
@@ -326,6 +461,25 @@ const UC_DOMAINS = [
   "mailuc.mail.onmicrosoft.com",
   "innovation.uc.edu",
 ];
+
+function getNeedTypeLabel(type: NeedType): string {
+  switch (type) {
+    case NeedType.FEEDBACK:
+      return "Project Feedback";
+    case NeedType.CONTRIBUTION:
+      return "Project Contribution";
+    case NeedType.DEVELOPER_AVAILABLE:
+      return "Developer Available";
+    case NeedType.SEEKING_MENTOR:
+      return "Seeking Mentor";
+    case NeedType.MENTOR_AVAILABLE:
+      return "Mentor Available";
+    case NeedType.TEAM_FORMATION:
+      return "Team Formation";
+    default:
+      return "Unknown";
+  }
+}
 
 export const DEFAULT_TECHNOLOGIES = [
   { name: "c" },
@@ -495,19 +649,125 @@ export const DEFAULT_TECHNOLOGIES = [
 const SYSTEM_MESSAGES = [
   "Welcome to UCollab! Complete your profile to get started.",
   "New feature alert: You can now follow other users!",
-  "Don't forget to check out the trending projects.",
+  "Don't forget to check out the trending posts.",
   "Your profile is gaining attention! Consider adding more skills.",
   "Weekly digest: Check out the most active discussions.",
 ];
 
-type ProjectConversation = {
+type PostConversation = {
   title: string;
   description: string;
   comments: string[];
   githubProject?: string;
 };
 
-const POST_CONTENT: Record<ProjectType, ProjectConversation[]> = {
+const POST_CONTENT: Record<NeedType, PostConversation[]> = {
+  FEEDBACK: [
+    {
+      title: "Review My First Browser Extension",
+      description:
+        "Built a browser extension that helps students track assignment deadlines across different learning platforms. Would love feedback on the UI and feature set.",
+      comments: [
+        "The UI is clean, but you might want to improve color contrast for accessibility.",
+        "Consider adding calendar export functionality - that would be super useful!",
+        "Found a sync issue with one of the platforms - happy to help debug.",
+      ],
+      githubProject: "deadline-tracker-extension",
+    },
+    {
+      title: "Need Input on Database Design",
+      description:
+        "Working on a research project tracking user engagement patterns. Need feedback on my current MongoDB schema design, especially around handling time-series data.",
+      comments: [
+        "For time-series data, TimescaleDB might be a better fit than MongoDB.",
+        "Your current schema might have scalability issues. Let's discuss denormalization strategies.",
+        "Have you considered using a hybrid approach with Redis for real-time analytics?",
+      ],
+      githubProject: "engagement-tracker",
+    },
+    {
+      title: "Code Review: OAuth Implementation",
+      description:
+        "Implementing OAuth2 for user authentication. Would appreciate a security review of the current implementation.",
+      comments: [
+        "Your token handling looks solid, but you might want to add refresh token rotation.",
+        "Consider implementing rate limiting on the token endpoint.",
+        "Don't forget to sanitize state parameters to prevent CSRF attacks.",
+      ],
+      githubProject: "oauth-service",
+    },
+    {
+      title: "Code Review: GraphQL API Design",
+      description:
+        "Building a GraphQL API for a campus events platform. Looking for feedback on schema design and resolver patterns.",
+      comments: [
+        "Consider using DataLoader to prevent N+1 queries.",
+        "The mutation structure looks good, but you might want to add input validation.",
+        "Have you considered implementing cursor-based pagination?",
+        "Great use of interfaces for shared fields!",
+      ],
+      githubProject: "campus-events-api",
+    },
+    {
+      title: "Performance Review: Real-time Chat System",
+      description:
+        "Built a real-time chat system using Socket.io and Redis. Looking for feedback on scaling and performance optimization.",
+      comments: [
+        "Consider implementing message queuing for better reliability.",
+        "The Redis pub/sub implementation looks solid.",
+        "Have you load tested with multiple concurrent connections?",
+        "You might want to add message persistence for offline users.",
+      ],
+      githubProject: "campus-chat",
+    },
+    {
+      title: "Security Audit: Authentication System",
+      description: "Implementing OAuth2 and OIDC for a multi-tenant application. Would appreciate a security review.",
+      comments: [
+        "Consider implementing refresh token rotation.",
+        "The PKCE implementation looks good.",
+        "You might want to add rate limiting on token endpoints.",
+        "Great job with the state parameter validation!",
+      ],
+      githubProject: "auth-service",
+    },
+    {
+      title: "Review: Serverless Data Processing Pipeline",
+      description:
+        "Building a serverless pipeline using AWS Lambda and Step Functions for processing research data. Looking for feedback on architecture and cost optimization.",
+      comments: [
+        "Consider using Lambda Power Tuning for optimal memory configuration.",
+        "The state machine design looks clean. Have you considered using Map states for parallelization?",
+        "Would suggest adding DLQ for failed executions.",
+        "Great use of S3 lifecycle policies!",
+      ],
+      githubProject: "research-data-pipeline",
+    },
+    {
+      title: "Code Review: WebAssembly Module",
+      description:
+        "Developing a WebAssembly module in Rust for complex calculations in our web-based simulation tool. Need feedback on performance and browser compatibility.",
+      comments: [
+        "The memory management looks solid. Consider using web-workers for heavy computations.",
+        "Have you benchmarked against asm.js?",
+        "Great use of wasm-bindgen!",
+        "Consider adding SIMD support for modern browsers.",
+      ],
+      githubProject: "wasm-sim-engine",
+    },
+    {
+      title: "Architecture Review: Service Mesh Implementation",
+      description:
+        "Implementing Istio service mesh in our microservices architecture. Looking for feedback on configuration and observability setup.",
+      comments: [
+        "The mTLS setup looks good. Consider enabling strict mode.",
+        "Have you looked into using WebAssembly filters?",
+        "Great approach to circuit breaking configuration.",
+        "Consider implementing custom metrics for business KPIs.",
+      ],
+      githubProject: "campus-service-mesh",
+    },
+  ],
   CONTRIBUTION: [
     {
       title: "Built a React Component Library",
@@ -627,110 +887,94 @@ const POST_CONTENT: Record<ProjectType, ProjectConversation[]> = {
       githubProject: "lms-cache-layer",
     },
   ],
-  FEEDBACK: [
+  DEVELOPER_AVAILABLE: [
     {
-      title: "Review My First Browser Extension",
+      title: "Frontend Developer Available for Projects",
       description:
-        "Built a browser extension that helps students track assignment deadlines across different learning platforms. Would love feedback on the UI and feature set.",
+        "I'm a frontend developer with experience in React, TypeScript, and modern CSS frameworks. Looking to join innovative projects to contribute my skills. Proficient in responsive design and accessibility.",
       comments: [
-        "The UI is clean, but you might want to improve color contrast for accessibility.",
-        "Consider adding calendar export functionality - that would be super useful!",
-        "Found a sync issue with one of the platforms - happy to help debug.",
+        "I'm working on a campus events app that could use your frontend skills. Would you be interested?",
+        "Your experience with TypeScript would be perfect for our project. Can we connect?",
+        "How much time can you commit weekly to a project?",
       ],
-      githubProject: "deadline-tracker-extension",
+      githubProject: "portfolio-showcase",
     },
     {
-      title: "Need Input on Database Design",
+      title: "Backend Developer Looking for Collaborations",
       description:
-        "Working on a research project tracking user engagement patterns. Need feedback on my current MongoDB schema design, especially around handling time-series data.",
+        "Backend developer specializing in Node.js, Express, and MongoDB. Interested in joining projects that need API development, database optimization, or server architecture.",
       comments: [
-        "For time-series data, TimescaleDB might be a better fit than MongoDB.",
-        "Your current schema might have scalability issues. Let's discuss denormalization strategies.",
-        "Have you considered using a hybrid approach with Redis for real-time analytics?",
+        "We're building a research data platform and could use your backend expertise.",
+        "Do you have experience with real-time applications?",
+        "Would you be interested in helping optimize our API performance?",
       ],
-      githubProject: "engagement-tracker",
+      githubProject: "api-portfolio",
+    },
+  ],
+  SEEKING_MENTOR: [
+    {
+      title: "Looking for Machine Learning Mentor",
+      description:
+        "Computer science junior seeking guidance in machine learning and AI. I have basic experience with Python and TensorFlow but need mentorship to develop more advanced skills.",
+      comments: [
+        "I'd be happy to mentor you! I work in ML at a research lab. Let's connect.",
+        "Have you tried any specific ML projects yet?",
+        "I recommend starting with some Kaggle competitions. Would be glad to guide you through them.",
+      ],
     },
     {
-      title: "Code Review: OAuth Implementation",
+      title: "Need Web Development Mentorship",
       description:
-        "Implementing OAuth2 for user authentication. Would appreciate a security review of the current implementation.",
+        "First-year CS student looking for a mentor in web development. I understand HTML/CSS basics but want to learn modern frameworks and best practices.",
       comments: [
-        "Your token handling looks solid, but you might want to add refresh token rotation.",
-        "Consider implementing rate limiting on the token endpoint.",
-        "Don't forget to sanitize state parameters to prevent CSRF attacks.",
+        "I can help you with React and modern frontend practices. DM me to set up a time.",
+        "Do you have any specific areas of web dev you're most interested in?",
+        "I recommend building a simple project first. Would be happy to review your code.",
       ],
-      githubProject: "oauth-service",
+    },
+  ],
+  MENTOR_AVAILABLE: [
+    {
+      title: "Offering Mobile Development Mentorship",
+      description:
+        "Senior mobile developer with 5+ years of experience in iOS and Android development. Available to mentor students interested in mobile app development. Can help with Swift, Kotlin, or React Native.",
+      comments: [
+        "I'm working on my first iOS app and could really use your guidance!",
+        "Do you have any recommended resources for getting started with Swift?",
+        "Would you be available for weekly code reviews?",
+      ],
     },
     {
-      title: "Code Review: GraphQL API Design",
+      title: "DevOps Engineer Available as Mentor",
       description:
-        "Building a GraphQL API for a campus events platform. Looking for feedback on schema design and resolver patterns.",
+        "Experienced DevOps engineer offering mentorship in CI/CD pipelines, containerization, and cloud infrastructure. Can guide you through AWS, Docker, Kubernetes, and modern deployment strategies.",
       comments: [
-        "Consider using DataLoader to prevent N+1 queries.",
-        "The mutation structure looks good, but you might want to add input validation.",
-        "Have you considered implementing cursor-based pagination?",
-        "Great use of interfaces for shared fields!",
+        "I'm trying to set up my first CI/CD pipeline and getting stuck. Would appreciate your help!",
+        "Do you have experience with GitHub Actions specifically?",
+        "Would love to learn more about Kubernetes networking from you.",
       ],
-      githubProject: "campus-events-api",
+    },
+  ],
+  TEAM_FORMATION: [
+    {
+      title: "Forming Team for Hackathon Project",
+      description:
+        "Looking for teammates for the upcoming campus hackathon. Interested in building a sustainability-focused application. Need frontend and backend developers, and someone with data visualization skills.",
+      comments: [
+        "I'm a backend developer with Express/Node experience. Would love to join!",
+        "I can handle the data visualization part. Have experience with D3.js.",
+        "When are you planning to meet for planning sessions?",
+      ],
     },
     {
-      title: "Performance Review: Real-time Chat System",
+      title: "Seeking Members for Research Project Team",
       description:
-        "Built a real-time chat system using Socket.io and Redis. Looking for feedback on scaling and performance optimization.",
+        "Forming a team for a semester-long research project on campus accessibility mapping. Need developers, designers, and someone with accessibility expertise.",
       comments: [
-        "Consider implementing message queuing for better reliability.",
-        "The Redis pub/sub implementation looks solid.",
-        "Have you load tested with multiple concurrent connections?",
-        "You might want to add message persistence for offline users.",
+        "I've worked on accessibility projects before and would like to contribute.",
+        "I can help with frontend development and UX design.",
+        "Is this going to be open source? I'd love to contribute.",
       ],
-      githubProject: "campus-chat",
-    },
-    {
-      title: "Security Audit: Authentication System",
-      description: "Implementing OAuth2 and OIDC for a multi-tenant application. Would appreciate a security review.",
-      comments: [
-        "Consider implementing refresh token rotation.",
-        "The PKCE implementation looks good.",
-        "You might want to add rate limiting on token endpoints.",
-        "Great job with the state parameter validation!",
-      ],
-      githubProject: "auth-service",
-    },
-    {
-      title: "Review: Serverless Data Processing Pipeline",
-      description:
-        "Building a serverless pipeline using AWS Lambda and Step Functions for processing research data. Looking for feedback on architecture and cost optimization.",
-      comments: [
-        "Consider using Lambda Power Tuning for optimal memory configuration.",
-        "The state machine design looks clean. Have you considered using Map states for parallelization?",
-        "Would suggest adding DLQ for failed executions.",
-        "Great use of S3 lifecycle policies!",
-      ],
-      githubProject: "research-data-pipeline",
-    },
-    {
-      title: "Code Review: WebAssembly Module",
-      description:
-        "Developing a WebAssembly module in Rust for complex calculations in our web-based simulation tool. Need feedback on performance and browser compatibility.",
-      comments: [
-        "The memory management looks solid. Consider using web-workers for heavy computations.",
-        "Have you benchmarked against asm.js?",
-        "Great use of wasm-bindgen!",
-        "Consider adding SIMD support for modern browsers.",
-      ],
-      githubProject: "wasm-sim-engine",
-    },
-    {
-      title: "Architecture Review: Service Mesh Implementation",
-      description:
-        "Implementing Istio service mesh in our microservices architecture. Looking for feedback on configuration and observability setup.",
-      comments: [
-        "The mTLS setup looks good. Consider enabling strict mode.",
-        "Have you looked into using WebAssembly filters?",
-        "Great approach to circuit breaking configuration.",
-        "Consider implementing custom metrics for business KPIs.",
-      ],
-      githubProject: "campus-service-mesh",
     },
   ],
 };
