@@ -259,10 +259,23 @@ export const ProjectService = {
             title: true,
             description: true,
             createdDate: true,
+            lastModifiedDate: true,
             projectType: true,
             githubRepo: true,
+            createdBy: {
+              select: {
+                username: true,
+                avatar: true,
+              },
+            },
+            technologies: true,
+            rating: true,
+            watchers: true,
+            comments: true,
           },
-          orderBy: { createdDate: "desc" },
+          orderBy: {
+            createdDate: "desc",
+          },
         });
       } catch (error) {
         if (error instanceof Utils)
@@ -809,9 +822,16 @@ export const ProjectService = {
                 lastModifiedDate: true,
                 projectType: true,
                 githubRepo: true,
-                createdById: true,
+                createdBy: {
+                  select: {
+                    username: true,
+                    avatar: true,
+                  },
+                },
                 technologies: true,
                 rating: true,
+                watchers: true,
+                comments: true,
               },
             },
           },
