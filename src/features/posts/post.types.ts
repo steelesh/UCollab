@@ -1,15 +1,23 @@
 import type {
+  NeedType,
   Comment as PrismaComment,
-  Project as PrismaProject,
+  Post as PrismaPost,
   Technology as PrismaTechnology,
-  ProjectType,
   User,
 } from "@prisma/client";
 
-export type Project = Pick<
-  PrismaProject,
-  "id" | "title" | "description" | "createdDate" | "lastModifiedDate" | "projectType" | "githubRepo" | "createdById"
->;
+export type Post = Pick<
+  PrismaPost,
+  "id" | "title" | "description" | "createdDate" | "lastModifiedDate" | "githubRepo" | "createdById" | "allowRatings" | "allowComments"
+> & {
+  postNeeds: PostNeed[];
+};
+
+export type PostNeed = {
+  id: string;
+  needType: NeedType;
+  isPrimary: boolean;
+};
 
 export type Comment = {
   id: string;
@@ -27,18 +35,20 @@ export type Comment = {
 
 export type Technology = Pick<PrismaTechnology, "id" | "name">;
 
-export type ProjectDetails = Pick<
-  PrismaProject,
+export type PostDetails = Pick<
+  PrismaPost,
   | "id"
   | "title"
   | "description"
   | "createdDate"
   | "lastModifiedDate"
-  | "projectType"
   | "githubRepo"
   | "createdById"
   | "rating"
+  | "allowRatings"
+  | "allowComments"
 > & {
+  postNeeds: PostNeed[];
   comments: (Pick<PrismaComment, "id" | "content" | "createdDate" | "lastModifiedDate"> & {
     createdBy: Pick<User, "id" | "username" | "avatar">;
     replies?: Comment[];
@@ -59,14 +69,16 @@ export type ProjectDetails = Pick<
   trendingScore: number;
 };
 
-export type ExploreProject = {
+export type ExplorePost = {
   id: string;
   title: string;
   description: string;
   createdDate: Date;
   githubRepo: string | null;
-  projectType: ProjectType;
+  postNeeds: PostNeed[];
   rating: number;
+  allowRatings: boolean;
+  allowComments: boolean;
   technologies: {
     id: string;
     name: string;
@@ -87,7 +99,7 @@ export type ExploreProject = {
 };
 
 export type ExplorePageData = {
-  projects: ExploreProject[];
+  posts: ExplorePost[];
   totalPages: number;
   currentPage: number;
   limit: number;

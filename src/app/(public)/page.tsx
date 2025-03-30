@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { DotPattern } from "~/components/magicui/dot-pattern";
 import { SignInWrapper } from "~/components/navigation/signin-wrapper";
 import { H1, H3 } from "~/components/ui/heading";
-import { ProjectCardXs } from "~/components/ui/project-card-xs";
-import { getTrendingProjects } from "~/features/projects/project.queries";
+import { PostCardXs } from "~/components/ui/post-card-xs";
+import { getTrendingPosts } from "~/features/posts/post.actions";
 import { cn } from "~/lib/utils";
 import { auth } from "~/security/auth";
 
@@ -15,9 +15,9 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   const session = await auth();
-  if (session?.user) {
-    const trendingData = await getTrendingProjects(session.user.id!);
-    const trendingProjects = trendingData.projects;
+  if (session?.user?.id) {
+    const trendingData = await getTrendingPosts(session.user.id);
+    const trendingPosts = trendingData?.success ? trendingData.posts : [];
 
     return (
       <>
@@ -35,33 +35,33 @@ export default async function Page() {
             <span className="font-thin">{session.user.username}</span>
             !
           </H1>
-          <H3 className="mt-8">Trending Projects</H3>
-          {trendingProjects.length > 0
+          <H3 className="mt-8">Trending Posts</H3>
+          {trendingPosts.length > 0
             ? (
                 <div className="grid gap-4 lg:grid-cols-2 mt-4">
-                  {trendingProjects.map(project => (
-                    <ProjectCardXs
-                      key={project.id}
-                      id={project.id}
-                      title={project.title}
-                      githubRepo={project.githubRepo}
-                      technologies={project.technologies}
-                      projectType={project.projectType}
+                  {trendingPosts.map(post => (
+                    <PostCardXs
+                      key={post.id}
+                      id={post.id}
+                      title={post.title}
+                      githubRepo={post.githubRepo}
+                      technologies={post.technologies}
+                      postNeeds={post.postNeeds}
                       user={{
-                        username: project.createdBy.username,
-                        avatar: project.createdBy.avatar,
+                        username: post.createdBy.username,
+                        avatar: post.createdBy.avatar,
                       }}
-                      watchers={project.watchers}
+                      watchers={post.watchers}
                     />
                   ))}
                 </div>
               )
             : (
-                <p className="mt-4">No trending projects to display.</p>
+                <p className="mt-4">No trending posts to display.</p>
               )}
           <H3 className="mt-12">Recent Activity</H3>
           <p className="mt-2 text-gray-600">
-            Recent activity on your projects will appear here.
+            Recent activity on your posts will appear here.
           </p>
         </div>
       </>

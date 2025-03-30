@@ -28,7 +28,7 @@ async function Page({ userId }: { userId: User["id"] }) {
         select: {
           allowComments: true,
           allowMentions: true,
-          allowProjectUpdates: true,
+          allowPostUpdates: true,
           allowSystem: true,
         },
       },
@@ -137,11 +137,11 @@ async function Page({ userId }: { userId: User["id"] }) {
               <label className="fieldset-label flex items-center gap-2">
                 <input
                   type="checkbox"
-                  name="allowProjectUpdates"
-                  defaultChecked={user.notificationPreferences?.allowProjectUpdates}
+                  name="allowPostUpdates"
+                  defaultChecked={user.notificationPreferences?.allowPostUpdates}
                   className="toggle"
                 />
-                Projects
+                Posts
               </label>
               <label className="fieldset-label flex items-center gap-2">
                 <input

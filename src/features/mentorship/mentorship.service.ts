@@ -26,8 +26,8 @@ function computeRatingSimilarity(
   currentUserRatings: Map<string, number>,
   otherUserRatings: Map<string, number>,
 ): number {
-  for (const [projectId, currRating] of currentUserRatings.entries()) {
-    const otherRating = otherUserRatings.get(projectId);
+  for (const [postId, currRating] of currentUserRatings.entries()) {
+    const otherRating = otherUserRatings.get(postId);
     if (otherRating !== undefined && Math.abs(currRating - otherRating) <= 2) {
       return 1;
     }
@@ -115,9 +115,9 @@ export const MentorshipService = {
       const currentUserTechs = currentUser.technologies.map(tech => tech.name);
 
       const userIds = [currentUserId, ...users.map(u => u.id)];
-      const ratings = await prisma.projectRating.findMany({
+      const ratings = await prisma.postRating.findMany({
         where: { userId: { in: userIds } },
-        select: { userId: true, projectId: true, rating: true },
+        select: { userId: true, postId: true, rating: true },
       });
       const ratingsMap = new Map<string, Map<string, number>>();
       for (const rating of ratings) {
@@ -126,22 +126,22 @@ export const MentorshipService = {
           userMap = new Map<string, number>();
           ratingsMap.set(rating.userId, userMap);
         }
-        userMap.set(rating.projectId, rating.rating);
+        userMap.set(rating.postId, rating.rating);
       }
       const currentUserRatings = ratingsMap.get(currentUserId) || new Map();
 
       const userPrimaryTech: Record<string, string> = {};
       await Promise.all(
         users.map(async (user) => {
-          const projects = await prisma.project.findMany({
+          const posts = await prisma.post.findMany({
             where: { createdById: user.id },
             select: {
               technologies: { select: { name: true } },
             },
           });
           const techCounts: Record<string, number> = {};
-          for (const proj of projects) {
-            for (const tech of proj.technologies) {
+          for (const post of posts) {
+            for (const tech of post.technologies) {
               techCounts[tech.name] = (techCounts[tech.name] || 0) + 1;
             }
           }

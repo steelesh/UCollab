@@ -1,22 +1,22 @@
-import type { Project, ProjectType, User } from "@prisma/client";
+import type { NeedType, User } from "@prisma/client";
 
 import Link from "next/link";
 
-import type { Technology } from "~/features/projects/project.types";
+import type { PostNeed, Technology } from "~/features/posts/post.types";
 
 import { Avatar, AvatarImage } from "./avatar";
 import { Badge } from "./badge";
 import { Card } from "./card";
-import { ProjectTypeBadge } from "./project-badges";
+import { PostTypeBadge } from "./post-badges";
 import { Small } from "./small";
 import { TechnologyIcon } from "./technology-icon";
 
-type ProjectCardXsProps = {
-  id: Project["id"];
-  title: Project["title"];
+type PostCardXsProps = {
+  id: string;
+  title: string;
   technologies: Technology[];
-  githubRepo: Project["githubRepo"];
-  projectType: ProjectType;
+  githubRepo: string | null;
+  postNeeds: PostNeed[];
   user: {
     username: User["username"];
     avatar: User["avatar"];
@@ -30,15 +30,19 @@ type ProjectCardXsProps = {
   }[];
 };
 
-export function ProjectCardXs({
+export function PostCardXs({
   id,
   title,
   technologies,
-  projectType,
+  postNeeds,
   user,
-}: ProjectCardXsProps) {
+}: PostCardXsProps) {
   const displayTechnologies = technologies.slice(0, 4);
   const hasMoreTechnologies = technologies.length > 4;
+
+  // Get primary need type for PostTypeBadge
+  const primaryNeed = postNeeds.find(need => need.isPrimary);
+  const needType = primaryNeed ? primaryNeed.needType : (postNeeds[0]?.needType as NeedType);
 
   return (
     <Link
@@ -54,7 +58,7 @@ export function ProjectCardXs({
               </Small>
             </div>
             <div className="space-y-1">
-              <ProjectTypeBadge type={projectType} className="px-2" />
+              {needType && <PostTypeBadge type={needType} className="px-2" />}
               <div className="flex flex-wrap items-center gap-1">
                 {displayTechnologies.map(tech => (
                   <Badge key={tech.id} variant="glossy" className="text-xs">

@@ -1,17 +1,19 @@
 "use client";
 
+import type { NeedType } from "@prisma/client";
+
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import * as R from "remeda";
 
-import { checkProjectsCount } from "~/features/projects/project.actions";
+import { checkPostsCount } from "~/features/posts/post.actions";
 
 export default function SearchBar() {
   const router = useRouter();
   const sp = useSearchParams();
 
   const [query, setQuery] = useState(sp.get("query") || "");
-  const [projectType, setProjectType] = useState(sp.get("projectType") || "");
+  const [postNeeds, setPostNeeds] = useState(sp.get("postNeeds") || "");
   const [minRating, setMinRating] = useState(sp.get("minRating") || "");
   const [sortBy, setSortBy] = useState(sp.get("sortBy") || "createdDate");
   const [sortOrder, setSortOrder] = useState(sp.get("sortOrder") || "desc");
@@ -20,8 +22,8 @@ export default function SearchBar() {
     const params = new URLSearchParams();
     if (query)
       params.set("query", query);
-    if (projectType)
-      params.set("projectType", projectType);
+    if (postNeeds)
+      params.set("postNeeds", postNeeds);
     if (minRating)
       params.set("minRating", minRating);
     if (sortBy)
@@ -31,7 +33,7 @@ export default function SearchBar() {
 
     const currentFilter = {
       query: sp.get("query") || "",
-      projectType: sp.get("projectType") || "",
+      postNeeds: sp.get("postNeeds") || "",
       minRating: sp.get("minRating") || "",
       sortBy: sp.get("sortBy") || "createdDate",
       sortOrder: sp.get("sortOrder") || "desc",
@@ -39,7 +41,7 @@ export default function SearchBar() {
 
     const filtersChanged
       = query !== currentFilter.query
-        || projectType !== currentFilter.projectType
+        || postNeeds !== currentFilter.postNeeds
         || minRating !== currentFilter.minRating
         || sortBy !== currentFilter.sortBy
         || sortOrder !== currentFilter.sortOrder;
@@ -54,17 +56,17 @@ export default function SearchBar() {
 
     const currentParamsString = sp.toString();
 
-    const result = await checkProjectsCount({ query, projectType, minRating });
+    const result = await checkPostsCount({ query, needType: postNeeds as NeedType, minRating });
     if (result && result.success && result.totalCount > 0 && currentParamsString !== newParamsString) {
       router.replace(`/p?${newParamsString}`);
     }
-  }, [query, projectType, minRating, sortBy, sortOrder, router, sp]);
+  }, [query, postNeeds, minRating, sortBy, sortOrder, router, sp]);
 
   const funnel = useMemo(() => R.funnel(updateSearch, { minQuietPeriodMs: 500 }), [updateSearch]);
 
   useEffect(() => {
     funnel.call();
-  }, [funnel, query, projectType, minRating, sortBy, sortOrder]);
+  }, [funnel, query, postNeeds, minRating, sortBy, sortOrder]);
 
   return (
     <div className="bg-muted mb-8 rounded-xl p-4">
@@ -78,18 +80,18 @@ export default function SearchBar() {
             type="text"
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Search projects..."
+            placeholder="Search posts..."
             className="bg-background mt-1 block w-full rounded-md border border-input p-2 text-foreground placeholder:text-muted-foreground"
           />
         </div>
         <div>
-          <label htmlFor="projectType" className="block text-sm font-medium text-foreground">
-            Project Type
+          <label htmlFor="postNeeds" className="block text-sm font-medium text-foreground">
+            Post Needs
           </label>
           <select
-            id="projectType"
-            value={projectType}
-            onChange={e => setProjectType(e.target.value)}
+            id="postNeeds"
+            value={postNeeds}
+            onChange={e => setPostNeeds(e.target.value)}
             className="bg-background mt-1 block w-full rounded-md border border-input p-2 text-foreground"
           >
             <option value="">All</option>

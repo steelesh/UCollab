@@ -59,7 +59,7 @@ export async function updateUser(formData: FormData) {
   const avatar = avatarValue instanceof File && avatarValue.size > 0 ? avatarValue : undefined;
   const allowComments = formData.get("allowComments") === "on";
   const allowMentions = formData.get("allowMentions") === "on";
-  const allowProjectUpdates = formData.get("allowProjectUpdates") === "on";
+  const allowPostUpdates = formData.get("allowPostUpdates") === "on";
   const allowSystem = formData.get("allowSystem") === "on";
   const updateUserInput = {
     gradYear,
@@ -69,7 +69,7 @@ export async function updateUser(formData: FormData) {
     notificationPreferences: {
       allowComments,
       allowMentions,
-      allowProjectUpdates,
+      allowPostUpdates,
       allowSystem,
     },
   };

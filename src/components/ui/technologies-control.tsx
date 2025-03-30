@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 import TechBadge from "~/components/ui/tech-badge";
 
 type TechnologiesControlProps = {
@@ -71,11 +70,8 @@ export default function TechnologiesControl({
   };
 
   return (
-    <div className="form-control">
-      <Label htmlFor="technologies" className="label">
-        <span className="label-text">Technologies</span>
-      </Label>
-      <div className="m-4 flex flex-1 space-x-2">
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2 mb-2">
         {field.value.map((tech: string) => (
           <TechBadge
             key={tech}
@@ -85,14 +81,16 @@ export default function TechnologiesControl({
           />
         ))}
       </div>
-      <div className="relative flex w-full items-center">
+      <div className="relative flex w-full">
         <span
           ref={mirrorRef}
-          className="invisible absolute text-sm leading-none font-normal whitespace-pre"
           style={{
+            visibility: "hidden",
+            position: "absolute",
             fontFamily: "inherit",
             fontSize: "inherit",
             paddingLeft: "1rem",
+            whiteSpace: "pre",
           }}
         >
           {techInputValue}
@@ -103,17 +101,21 @@ export default function TechnologiesControl({
           value={techInputValue}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          className="input input-bordered w-full bg-transparent leading-none"
           disabled={isSubmitting}
-          style={{ color: "white", caretColor: "white", paddingLeft: "1rem" }}
+          placeholder="Type a technology and press Enter"
+          style={{ paddingLeft: "1rem" }}
         />
         {techInputValue && suggestionRemainder && (
           <span
-            className="pointer-events-none absolute text-sm leading-none font-normal text-muted-foreground/50"
+            className="pointer-events-none absolute text-muted-foreground/50"
             style={{
+              position: "absolute",
               left: widthRef.current - 1,
               top: "52%",
               transform: "translateY(-48%)",
+              fontSize: "0.875rem",
+              lineHeight: "1",
+              fontWeight: "normal",
             }}
           >
             {suggestionRemainder}

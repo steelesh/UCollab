@@ -64,7 +64,7 @@ export const updateUserSchema = z.object({
     .object({
       allowComments: z.boolean().optional(),
       allowMentions: z.boolean().optional(),
-      allowProjectUpdates: z.boolean().optional(),
+      allowPostUpdates: z.boolean().optional(),
       allowSystem: z.boolean().optional(),
     })
     .optional(),

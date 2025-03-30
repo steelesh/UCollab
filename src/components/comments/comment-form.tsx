@@ -1,6 +1,6 @@
 "use client";
 
-import type { Comment, Project, User } from "@prisma/client";
+import type { Comment, Post, User } from "@prisma/client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
@@ -14,7 +14,7 @@ import Tiptap from "~/components/ui/tiptap";
 import { commentSchema } from "~/features/comments/comment.schema";
 
 type CommentFormProps = {
-  projectId: Project["id"];
+  postId: Post["id"];
   currentUserId: User["id"];
   onSubmit: (content: Comment["content"], hasChanged: boolean) => Promise<void>;
   initialContent?: Comment["content"];
@@ -31,7 +31,7 @@ function normalizeHtml(html: string): string {
 }
 
 export function CommentForm({
-  projectId,
+  postId,
   currentUserId,
   onSubmit,
   initialContent = "",
@@ -56,7 +56,7 @@ export function CommentForm({
     resolver: zodResolver(commentSchema),
     defaultValues: {
       content: initialContent,
-      projectId,
+      postId,
     },
     mode: "onSubmit",
   });
@@ -70,7 +70,7 @@ export function CommentForm({
     try {
       await onSubmit(data.content, hasChanged);
       if (!isEditing) {
-        reset({ content: "", projectId }, { keepErrors: false, keepDirty: false });
+        reset({ content: "", postId }, { keepErrors: false, keepDirty: false });
         editorRef.current?.clearContent();
         clearErrors();
       }

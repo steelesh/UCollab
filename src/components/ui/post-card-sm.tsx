@@ -1,26 +1,28 @@
-import type { Project, ProjectType, User } from "@prisma/client";
+import type { Post, User } from "@prisma/client";
 
 import { formatDate } from "date-fns";
 import { ArrowUpRight, Calendar, Star } from "lucide-react";
 import Link from "next/link";
 
-import type { Technology } from "~/features/projects/project.types";
+import type { PostNeed, Technology } from "~/features/posts/post.types";
 
 import { Avatar, AvatarImage } from "./avatar";
 import { Badge } from "./badge";
 import { Card, CardContent, CardHeader } from "./card";
 import { Large } from "./large";
-import { ProjectTypeBadge } from "./project-badges";
+import { PostNeedsBadges } from "./post-badges";
 import { Small } from "./small";
 import { TechnologyIcon } from "./technology-icon";
 
-type ProjectCardSmallProps = {
-  id: Project["id"];
-  title: Project["title"];
-  createdDate: Project["createdDate"];
+type PostCardSmallProps = {
+  id: Post["id"];
+  title: Post["title"];
+  createdDate: Post["createdDate"];
   technologies: Technology[];
-  githubRepo: Project["githubRepo"];
-  projectType: ProjectType;
+  githubRepo: Post["githubRepo"];
+  postNeeds: PostNeed[];
+  rating: number;
+  allowRatings: boolean;
   user: {
     username: User["username"];
     avatar: User["avatar"];
@@ -32,18 +34,18 @@ type ProjectCardSmallProps = {
       avatar: User["avatar"];
     };
   }[];
-  rating: number;
 };
 
-export function ProjectCardSmall({
+export function PostCardSmall({
   id,
   title,
   createdDate,
   technologies,
-  projectType,
+  postNeeds,
   user,
   rating,
-}: ProjectCardSmallProps) {
+  allowRatings,
+}: PostCardSmallProps) {
   const displayTechnologies = technologies.slice(0, 4);
   const hasMoreTechnologies = technologies.length > 4;
 
@@ -68,16 +70,20 @@ export function ProjectCardSmall({
             <Small noMargin>{formatDate(createdDate, "MMMM dd, yyyy")}</Small>
           </div>
           <div>
-            <ProjectTypeBadge type={projectType} className="py-1 px-2" />
+            {postNeeds.length > 0 && (
+              <PostNeedsBadges needs={postNeeds} className="justify-start" size="sm" />
+            )}
           </div>
-          <div>
-            <Badge variant="rating" className="px-2 inline-block">
-              <Small noMargin className="flex items-center gap-1">
-                <Star className="w-4 h-4 fill-yellow-400 stroke-black stroke-[1.5px]" />
-                {rating > 0 ? rating.toFixed(1) : "Not yet rated"}
-              </Small>
-            </Badge>
-          </div>
+          {allowRatings && (
+            <div>
+              <Badge variant="rating" className="px-2 inline-block">
+                <Small noMargin className="flex items-center gap-1">
+                  <Star className="w-4 h-4 fill-yellow-400 stroke-black stroke-[1.5px]" />
+                  {rating > 0 ? rating.toFixed(1) : "Not yet rated"}
+                </Small>
+              </Badge>
+            </div>
+          )}
         </div>
       </CardHeader>
       <CardContent className="flex items-center justify-between">

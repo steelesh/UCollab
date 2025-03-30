@@ -1,10 +1,10 @@
 "use client";
 
-import type { Project, User } from "@prisma/client";
+import type { Post, User } from "@prisma/client";
 
 import { useState } from "react";
 
-import type { Comment } from "~/features/projects/project.types";
+import type { Comment } from "~/features/posts/post.types";
 
 import { CommentContent } from "./comment-content";
 import { CommentForm } from "./comment-form";
@@ -13,13 +13,13 @@ import { CommentHeader } from "./comment-header";
 type CommentListProps = {
   comments: Comment[];
   currentUserId: User["id"];
-  projectId: Project["id"];
+  postId: Post["id"];
   onUpdate: (commentId: Comment["id"], content: Comment["content"]) => Promise<void>;
   onDelete: (commentId: Comment["id"]) => Promise<void>;
   onReply: (parentId: Comment["id"], content: Comment["content"]) => Promise<void>;
 };
 
-export function CommentList({ comments, currentUserId, projectId, onUpdate, onDelete, onReply }: CommentListProps) {
+export function CommentList({ comments, currentUserId, postId, onUpdate, onDelete, onReply }: CommentListProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
 
@@ -46,7 +46,7 @@ export function CommentList({ comments, currentUserId, projectId, onUpdate, onDe
             {editingId === comment.id
               ? (
                   <CommentForm
-                    projectId={projectId}
+                    postId={postId}
                     currentUserId={currentUserId}
                     initialContent={comment.content}
                     isEditing={true}
@@ -66,7 +66,7 @@ export function CommentList({ comments, currentUserId, projectId, onUpdate, onDe
           {replyingToId === comment.id && (
             <div className="ml-8">
               <CommentForm
-                projectId={projectId}
+                postId={postId}
                 currentUserId={currentUserId}
                 onSubmit={async (content) => {
                   await onReply(comment.id, content);
@@ -91,7 +91,7 @@ export function CommentList({ comments, currentUserId, projectId, onUpdate, onDe
                   {editingId === reply.id
                     ? (
                         <CommentForm
-                          projectId={projectId}
+                          postId={postId}
                           currentUserId={currentUserId}
                           initialContent={reply.content}
                           isEditing={true}

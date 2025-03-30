@@ -1,28 +1,28 @@
 "use client";
 
-import type { Project, User } from "@prisma/client";
+import type { Post, User } from "@prisma/client";
 
 import { useState } from "react";
 
-import type { Comment } from "~/features/projects/project.types";
+import type { Comment } from "~/features/posts/post.types";
 
 import { createComment, createReply, deleteComment, updateComment } from "~/features/comments/comment.actions";
 
 import { CommentForm } from "../comments/comment-form";
 import { CommentList } from "../comments/comment-list";
 
-type ProjectCommentsProps = {
+type PostCommentsProps = {
   comments: Comment[];
   currentUserId: User["id"];
-  projectId: Project["id"];
+  postId: Post["id"];
 };
 
-export function ProjectComments({ comments: initialComments, currentUserId, projectId }: ProjectCommentsProps) {
+export function PostComments({ comments: initialComments, currentUserId, postId }: PostCommentsProps) {
   const [comments, setComments] = useState<Comment[]>(initialComments);
 
   const handleCreate = async (content: Comment["content"]) => {
     try {
-      const newComment = await createComment(projectId, content);
+      const newComment = await createComment(postId, content);
       setComments(prev => [newComment, ...prev]);
     } catch {
       // TODO: handle error, show toast or something
@@ -31,7 +31,7 @@ export function ProjectComments({ comments: initialComments, currentUserId, proj
 
   const handleUpdate = async (commentId: Comment["id"], content: Comment["content"]) => {
     try {
-      await updateComment(commentId, content, projectId);
+      await updateComment(commentId, content, postId);
       setComments(prev =>
         prev.map((comment) => {
           if (comment.id === commentId) {
@@ -65,7 +65,7 @@ export function ProjectComments({ comments: initialComments, currentUserId, proj
 
   const handleDelete = async (commentId: Comment["id"]) => {
     try {
-      await deleteComment(commentId, projectId);
+      await deleteComment(commentId, postId);
       setComments(prev =>
         prev
           .map(comment => ({
@@ -81,7 +81,7 @@ export function ProjectComments({ comments: initialComments, currentUserId, proj
 
   const handleReply = async (parentId: string, content: string) => {
     try {
-      const newReply = await createReply(projectId, parentId, content);
+      const newReply = await createReply(postId, parentId, content);
       setComments(prev =>
         prev.map(comment =>
           comment.id === parentId
@@ -100,12 +100,12 @@ export function ProjectComments({ comments: initialComments, currentUserId, proj
   return (
     <div className="mt-8 space-y-8">
       <div className="border-b pb-6">
-        <CommentForm projectId={projectId} currentUserId={currentUserId} onSubmit={handleCreate} />
+        <CommentForm postId={postId} currentUserId={currentUserId} onSubmit={handleCreate} />
       </div>
       <CommentList
         comments={comments}
         currentUserId={currentUserId}
-        projectId={projectId}
+        postId={postId}
         onUpdate={handleUpdate}
         onDelete={handleDelete}
         onReply={handleReply}

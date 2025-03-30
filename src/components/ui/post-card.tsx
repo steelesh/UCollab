@@ -1,11 +1,11 @@
-import type { Project, ProjectType, User } from "@prisma/client";
+import type { Post, User } from "@prisma/client";
 
 import { formatDate } from "date-fns";
 import { ArrowUpRight, Calendar, ChartNoAxesColumn, Github, MessageSquare, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import type { Technology } from "~/features/projects/project.types";
+import type { PostNeed, Technology } from "~/features/posts/post.types";
 
 import { AvatarCircles } from "../magicui/avatar-circles";
 import { Avatar, AvatarImage } from "./avatar";
@@ -14,19 +14,20 @@ import { Card, CardContent, CardHeader } from "./card";
 import { Large } from "./large";
 import { Muted } from "./muted";
 import { P } from "./p";
-import { ProjectTypeBadge, TrendingBadge } from "./project-badges";
+import { PostNeedsBadges, TrendingBadge } from "./post-badges";
 import { Small } from "./small";
 import { TechnologyIcon } from "./technology-icon";
 
-type ProjectCardProps = {
-  id: Project["id"];
-  title: Project["title"];
-  description: Project["description"];
-  createdDate: Project["createdDate"];
+type PostCardProps = {
+  id: Post["id"];
+  title: Post["title"];
+  description: Post["description"];
+  createdDate: Post["createdDate"];
   technologies: Technology[];
   rating: number;
-  githubRepo: Project["githubRepo"];
-  projectType: ProjectType;
+  allowRatings: boolean;
+  githubRepo: Post["githubRepo"];
+  postNeeds: PostNeed[];
   user: {
     username: User["username"];
     avatar: User["avatar"];
@@ -42,20 +43,21 @@ type ProjectCardProps = {
   comments: number;
 };
 
-export function ProjectCard({
+export function PostCard({
   id,
   title,
   description,
   createdDate,
   technologies,
   rating,
+  allowRatings,
   githubRepo,
-  projectType,
+  postNeeds,
   user,
   trendingScore,
   watchers,
   comments,
-}: ProjectCardProps) {
+}: PostCardProps) {
   const displayTechnologies = technologies.slice(0, 4);
   const hasMoreTechnologies = technologies.length > 4;
   const isTrending = trendingScore > 0.5;
@@ -71,14 +73,20 @@ export function ProjectCard({
         />
       </div>
       <CardHeader className="flex flex-col gap-4 pb-4 flex-shrink-0">
-        <div className="flex flex-col xs:flex-row gap-2 xs:justify-between xs:items-center">
-          <Badge variant="rating" className="py-0.5 xs:py-1 px-1.5 xs:px-2 text-xs">
-            <Small noMargin className="flex items-center gap-1">
-              <Star className="w-3.5 h-3.5 xs:w-4 xs:h-4 fill-yellow-400 stroke-black stroke-[1.5px]" />
-              {rating > 0 ? rating.toFixed(1) : "Not rated"}
-            </Small>
-          </Badge>
-          <ProjectTypeBadge type={projectType} className="py-0.5 xs:py-1 px-1.5 xs:px-2 text-xs" />
+        <div className="flex flex-col gap-2">
+          {allowRatings && (
+            <div className="flex">
+              <Badge variant="rating" className="py-0.5 xs:py-1 px-1.5 xs:px-2 text-xs">
+                <Small noMargin className="flex items-center gap-1">
+                  <Star className="w-3.5 h-3.5 xs:w-4 xs:h-4 fill-yellow-400 stroke-black stroke-[1.5px]" />
+                  {rating > 0 ? rating.toFixed(1) : "No ratings yet"}
+                </Small>
+              </Badge>
+            </div>
+          )}
+          {postNeeds.length > 0 && (
+            <PostNeedsBadges needs={postNeeds} className="justify-start" size="sm" />
+          )}
         </div>
         <Link href={`/p/${id}`} className="group/link flex items-center gap-2">
           <Large noMargin className="truncate underline-offset-4 underline">
@@ -121,26 +129,28 @@ export function ProjectCard({
           <P>Description:</P>
           <Muted className="line-clamp-3 overflow-ellipsis">{description}</Muted>
         </div>
-        <div className="flex flex-col gap-2 mb-10">
-          <P>Technologies:</P>
-          <div className="flex flex-wrap gap-2">
-            {displayTechnologies.map(tech => (
-              <Badge key={tech.id} variant="glossy">
-                <TechnologyIcon name={tech.name} colored />
-                <span className="truncate">{tech.name}</span>
-              </Badge>
-            ))}
-            {hasMoreTechnologies && (
-              <Badge variant="glossy">
-                and
-                {" "}
-                {technologies.length - 4}
-                {" "}
-                more
-              </Badge>
-            )}
+        {technologies.length > 0 && (
+          <div className="flex flex-col gap-2 mb-6">
+            <P>Technologies:</P>
+            <div className="flex flex-wrap gap-2">
+              {displayTechnologies.map(tech => (
+                <Badge key={tech.id} variant="glossy">
+                  <TechnologyIcon name={tech.name} colored />
+                  <span className="truncate">{tech.name}</span>
+                </Badge>
+              ))}
+              {hasMoreTechnologies && (
+                <Badge variant="glossy">
+                  and
+                  {" "}
+                  {technologies.length - 4}
+                  {" "}
+                  more
+                </Badge>
+              )}
+            </div>
           </div>
-        </div>
+        )}
         <div className="mt-auto flex flex-col gap-3 flex-shrink-0 pt-4">
           <div className="flex justify-between items-center w-full">
             <div className="flex items-center gap-2">
