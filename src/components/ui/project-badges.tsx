@@ -57,16 +57,18 @@ export function RatingBadge({ value, className, ...props }: BadgeProps) {
 export function ProjectTypeBadge({ type, className, ...props }: BadgeProps & { type: ProjectType }) {
   if (type === ProjectType.CONTRIBUTION) {
     return (
-      <ContributionBadge className={className} {...props}>
-        Seeking Contribution
-      </ContributionBadge>
+      <Badge variant="contribution" className={`inline-flex items-center ${className}`} {...props}>
+        <GitPullRequest className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+        <span>Seeking Contribution</span>
+      </Badge>
     );
   }
   if (type === ProjectType.FEEDBACK) {
     return (
-      <FeedbackBadge className={className} {...props}>
-        Seeking Feedback
-      </FeedbackBadge>
+      <Badge variant="feedback" className={`inline-flex items-center ${className}`} {...props}>
+        <MessageSquare className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+        <span>Seeking Feedback</span>
+      </Badge>
     );
   }
   return null;

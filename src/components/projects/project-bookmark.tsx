@@ -2,7 +2,7 @@
 
 import type { Project } from "@prisma/client";
 
-import { Bookmark, BookmarkCheck } from "lucide-react";
+import { BookmarkCheck, BookmarkPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -66,12 +66,12 @@ export function ProjectBookmark({ projectId, initialBookmarked, className = "" }
         ? (
             <>
               <ActionButton
-                icon={<BookmarkCheck className="w-5 h-5 text-yellow-500" />}
+                variant="ghost"
+                icon={<BookmarkCheck className="text-yellow-500 h-5 w-5" />}
                 onClick={() => setShowUnbookmarkConfirm(true)}
                 disabled={isLoading}
-                className="flex items-center gap-2 hover:text-foreground transition-colors duration-200"
               >
-                <span className="text-sm">Bookmarked</span>
+                Bookmarked
               </ActionButton>
               <ConfirmDialog
                 open={showUnbookmarkConfirm}
@@ -89,12 +89,12 @@ export function ProjectBookmark({ projectId, initialBookmarked, className = "" }
           )
         : (
             <ActionButton
-              icon={<Bookmark className="w-5 h-5" />}
+              variant="ghost"
+              icon={<BookmarkPlus className="h-5 w-5" />}
               onClick={handleBookmark}
               disabled={isLoading}
-              className="flex items-center gap-2 hover:text-foreground transition-colors duration-200"
             >
-              <span className="text-sm">Bookmark</span>
+              Bookmark
             </ActionButton>
           )}
     </div>

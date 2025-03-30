@@ -71,14 +71,14 @@ export function ProjectCard({
         />
       </div>
       <CardHeader className="flex flex-col gap-4 pb-4 flex-shrink-0">
-        <div className="flex justify-between items-center">
-          <Badge variant="rating" className="py-1 px-2">
+        <div className="flex flex-col xs:flex-row gap-2 xs:justify-between xs:items-center">
+          <Badge variant="rating" className="py-0.5 xs:py-1 px-1.5 xs:px-2 text-xs">
             <Small noMargin className="flex items-center gap-1">
-              <Star className="w-4 h-4 fill-yellow-400 stroke-black stroke-[1.5px]" />
-              {rating > 0 ? rating.toFixed(1) : "Not yet rated"}
+              <Star className="w-3.5 h-3.5 xs:w-4 xs:h-4 fill-yellow-400 stroke-black stroke-[1.5px]" />
+              {rating > 0 ? rating.toFixed(1) : "Not rated"}
             </Small>
           </Badge>
-          <ProjectTypeBadge type={projectType} className="py-1 px-2" />
+          <ProjectTypeBadge type={projectType} className="py-0.5 xs:py-1 px-1.5 xs:px-2 text-xs" />
         </div>
         <Link href={`/p/${id}`} className="group/link flex items-center gap-2">
           <Large noMargin className="truncate underline-offset-4 underline">
@@ -146,11 +146,13 @@ export function ProjectCard({
             <div className="flex items-center gap-2">
               {watchers.length > 0 && (
                 <>
-                  <ChartNoAxesColumn className="w-4 h-4" />
-                  <Small noMargin>
+                  <ChartNoAxesColumn className="w-3.5 h-3.5 xs:w-4 xs:h-4" />
+                  <Small noMargin className="text-xs xs:text-sm">
                     {watchers.length}
-                    {" "}
-                    {watchers.length === 1 ? "watcher" : "watchers"}
+                    <span className="hidden xs:inline">
+                      {" "}
+                      {watchers.length === 1 ? "watcher" : "watchers"}
+                    </span>
                   </Small>
                   <AvatarCircles
                     avatarUrls={watchers.map(w => ({
@@ -164,14 +166,16 @@ export function ProjectCard({
               )}
             </div>
             <div className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" />
-              <Small noMargin>
+              <MessageSquare className="w-3.5 h-3.5 xs:w-4 xs:h-4" />
+              <Small noMargin className="text-xs xs:text-sm">
                 {comments}
-                {" "}
-                {comments === 1 ? "comment" : "comments"}
+                <span className="hidden xs:inline">
+                  {" "}
+                  {comments === 1 ? "comment" : "comments"}
+                </span>
               </Small>
               {isTrending && (
-                <TrendingBadge className="py-1 px-2 ml-2" />
+                <TrendingBadge className="py-0.5 xs:py-1 px-1.5 xs:px-2 ml-2 text-xs" />
               )}
             </div>
           </div>
