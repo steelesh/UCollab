@@ -103,8 +103,14 @@ export async function getBookmarkedProjects() {
     throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
 
   try {
-    const bookmarkedProjects = await ProjectService.getUserWatchedProjects(session.user.id, session.user.id);
-    return { success: true, projects: bookmarkedProjects };
+    const bookmarkedProjects = await ProjectService.getUserWatchedProjects(
+      session.user.id,
+      session.user.id,
+    );
+    const filteredProjects = bookmarkedProjects.filter(
+      project => project.createdBy.username !== session.user.username,
+    );
+    return { success: true, projects: filteredProjects };
   } catch (error) {
     return handleServerActionError(error);
   }
@@ -159,7 +165,6 @@ export async function checkProjectsCount(filters: { query?: string; projectType?
     const where: Prisma.ProjectWhereInput = {};
 
     if (query) {
-      // Always use full-text search (even for partial queries)
       where.OR = [{ title: { search: query } }, { description: { search: query } }];
     }
 
