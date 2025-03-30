@@ -23,7 +23,7 @@ export function ProfileCommentsList({ comments }: ProfileCommentsListProps) {
               {comments.map(comment => (
                 <li key={comment.id} className="group bg-muted rounded-lg">
                   <Link
-                    href={`/p/${comment.projectId}#comment-${comment.id}`}
+                    href={`/p/${comment.postId}#comment-${comment.id}`}
                     className="block rounded-lg p-4 transition-colors"
                   >
                     <CommentContent content={comment.content} className="hover:underline" />
@@ -31,7 +31,7 @@ export function ProfileCommentsList({ comments }: ProfileCommentsListProps) {
                       <span>
                         on
                         {" "}
-                        {comment.project.title}
+                        {comment.post.title}
                       </span>
                       <span>•</span>
                       <time>

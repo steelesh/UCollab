@@ -5,8 +5,8 @@ import { Container } from "~/components/ui/container";
 import { Header } from "~/components/ui/header";
 import { H1 } from "~/components/ui/heading";
 import { Pagination } from "~/components/ui/pagination";
-import { ProjectCard } from "~/components/ui/project-card";
-import { getTrendingProjects } from "~/features/projects/project.queries";
+import { PostCard } from "~/components/ui/post-card";
+import { getTrendingPosts } from "~/features/posts/post.queries";
 import { withAuth } from "~/security/protected";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +22,7 @@ type PageProps = {
 
 async function Page({ searchParams, userId }: PageProps) {
   const { page = "1", limit = "12" } = await searchParams;
-  const { projects, totalCount, currentPage, totalPages, limit: itemsPerPage } = await getTrendingProjects(
+  const { posts, totalCount, currentPage, totalPages, limit: itemsPerPage } = await getTrendingPosts(
     userId,
     Number(page),
     Number(limit),
@@ -32,31 +32,32 @@ async function Page({ searchParams, userId }: PageProps) {
     <Container>
       <PageBreadcrumb
         items={[
-          { label: "Trending Projects", isCurrent: true },
+          { label: "Trending Posts", isCurrent: true },
         ]}
       />
       <Header>
-        <H1>Trending Projects</H1>
+        <H1>Trending Posts</H1>
       </Header>
       <div className="mx-auto grid grid-cols-1 gap-8 lg:grid-cols-2">
-        {projects.map(project => (
-          <ProjectCard
-            key={project.id}
-            id={project.id}
-            title={project.title}
-            description={project.description}
-            githubRepo={project.githubRepo}
-            createdDate={project.createdDate}
-            technologies={project.technologies}
-            rating={project.rating}
-            projectType={project.projectType}
+        {posts.map(post => (
+          <PostCard
+            key={post.id}
+            id={post.id}
+            title={post.title}
+            description={post.description}
+            githubRepo={post.githubRepo}
+            createdDate={post.createdDate}
+            technologies={post.technologies}
+            rating={post.rating}
+            allowRatings={post.allowRatings}
+            postNeeds={post.postNeeds}
             user={{
-              username: project.createdBy.username,
-              avatar: project.createdBy.avatar,
+              username: post.createdBy.username,
+              avatar: post.createdBy.avatar,
             }}
-            trendingScore={project.trendingScore}
-            watchers={project.watchers}
-            comments={project.comments.length}
+            trendingScore={post.trendingScore}
+            watchers={post.watchers}
+            comments={post.comments.length}
           />
         ))}
       </div>
@@ -67,7 +68,7 @@ async function Page({ searchParams, userId }: PageProps) {
           totalCount={totalCount}
           limit={itemsPerPage}
           basePath="/p/trending"
-          itemName="projects"
+          itemName="posts"
           itemsPerPageOptions={[12, 24, 36]}
         />
       )}

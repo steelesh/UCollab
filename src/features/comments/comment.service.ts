@@ -1,4 +1,4 @@
-import type { Comment, Project, User } from "@prisma/client";
+import type { Comment, Post, User } from "@prisma/client";
 
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -9,14 +9,14 @@ import { ErrorMessage, Utils } from "~/lib/utils";
 import { withServiceAuth } from "~/security/protected-service";
 
 export const CommentService = {
-  async createComment(data: { content: Comment["content"]; projectId: Project["id"] }, requestUserId: User["id"]) {
+  async createComment(data: { content: Comment["content"]; postId: Post["id"] }, requestUserId: User["id"]) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         const comment = await prisma.comment.create({
           data: {
             content: data.content,
             createdById: requestUserId,
-            projectId: data.projectId,
+            postId: data.postId,
           },
           select: {
             id: true,
@@ -30,7 +30,7 @@ export const CommentService = {
                 avatar: true,
               },
             },
-            project: {
+            post: {
               select: {
                 title: true,
                 createdById: true,
@@ -40,10 +40,10 @@ export const CommentService = {
         });
 
         await NotificationService.sendCommentNotifications({
-          projectId: data.projectId,
-          projectTitle: comment.project.title,
+          postId: data.postId,
+          postTitle: comment.post.title,
           commentId: comment.id,
-          projectAuthorId: comment.project.createdById,
+          postAuthorId: comment.post.createdById,
           commentAuthorId: requestUserId,
           commentAuthorName: comment.createdBy.username,
           content: data.content,
@@ -65,7 +65,7 @@ export const CommentService = {
     try {
       const comment = await prisma.comment.findUnique({
         where: { id: data.id },
-        select: { id: true, createdById: true, projectId: true },
+        select: { id: true, createdById: true, postId: true },
       });
 
       if (!comment)
@@ -135,7 +135,7 @@ export const CommentService = {
   async createReply(
     data: {
       content: Comment["content"];
-      projectId: Project["id"];
+      postId: Post["id"];
       parentId: Comment["id"];
     },
     requestUserId: User["id"],
@@ -146,7 +146,7 @@ export const CommentService = {
           data: {
             content: data.content,
             createdById: requestUserId,
-            projectId: data.projectId,
+            postId: data.postId,
             parentId: data.parentId,
           },
           select: {
@@ -162,7 +162,7 @@ export const CommentService = {
                 avatar: true,
               },
             },
-            project: {
+            post: {
               select: {
                 title: true,
                 createdById: true,
@@ -182,10 +182,10 @@ export const CommentService = {
         });
 
         await NotificationService.sendCommentNotifications({
-          projectId: data.projectId,
-          projectTitle: comment.project.title,
+          postId: data.postId,
+          postTitle: comment.post.title,
           commentId: comment.id,
-          projectAuthorId: comment.project.createdById,
+          postAuthorId: comment.post.createdById,
           commentAuthorId: requestUserId,
           commentAuthorName: comment.createdBy.username,
           content: data.content,
@@ -204,12 +204,12 @@ export const CommentService = {
     });
   },
 
-  async getPaginatedComments(projectId: Project["id"], requestUserId: User["id"], page = 1, limit = 20) {
+  async getPaginatedComments(postId: Post["id"], requestUserId: User["id"], page = 1, limit = 20) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         return await prisma.comment.findMany({
           where: {
-            projectId,
+            postId,
             parentId: null,
           },
           select: {

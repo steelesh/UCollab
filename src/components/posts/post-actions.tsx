@@ -2,48 +2,46 @@
 
 import { Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { ProjectBookmark } from "~/components/projects/project-bookmark";
+import { PostBookmark } from "~/components/posts/post-bookmark";
 import { ActionButton } from "~/components/ui/action-button";
 import { ConfirmDialog } from "~/components/ui/confirm-dialog";
-import { deleteProject } from "~/features/projects/project.actions";
-import { toastError, toastSuccess } from "~/lib/toast";
+import { deletePost } from "~/features/posts/post.actions";
+import { toastError } from "~/lib/toast";
 
-type ProjectActionsProps = {
-  projectId: string;
-  isOwnProject: boolean;
+type PostActionsProps = {
+  postId: string;
+  isOwnPost: boolean;
   isBookmarked: boolean;
 };
 
-export function ProjectActions({ projectId, isOwnProject, isBookmarked }: ProjectActionsProps) {
+export function PostActions({ postId, isOwnPost, isBookmarked }: PostActionsProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const router = useRouter();
 
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await deleteProject(projectId);
-      toastSuccess("Project Deleted", {
-        description: "Your project has been permanently deleted",
+      await deletePost(postId);
+    } catch (error) {
+      if (error instanceof Error && error.message === "NEXT_REDIRECT") {
+        return;
+      }
+      toastError("Failed to Delete Post", {
+        description: "An error occurred while deleting your post. Please try again.",
       });
-      router.push("/p");
-    } catch {
-      toastError("Failed to Delete Project", {
-        description: "An error occurred while deleting your project. Please try again.",
-      });
+
       setIsDeleting(false);
       setShowDeleteConfirm(false);
     }
   };
 
-  if (isOwnProject) {
+  if (isOwnPost) {
     return (
       <>
         <div className="flex gap-2">
-          <Link href={`/p/${projectId}/edit`}>
+          <Link href={`/p/${postId}/edit`}>
             <ActionButton icon={<Edit />}>
               Edit
             </ActionButton>
@@ -60,9 +58,9 @@ export function ProjectActions({ projectId, isOwnProject, isBookmarked }: Projec
         <ConfirmDialog
           open={showDeleteConfirm}
           onOpenChange={setShowDeleteConfirm}
-          title="Delete Project"
-          description="Are you sure you want to delete this project? This action cannot be undone and will delete all comments and ratings."
-          confirmText="Delete Project"
+          title="Delete Post"
+          description="Are you sure you want to delete this post? This action cannot be undone and will delete all comments and ratings."
+          confirmText="Delete Post"
           cancelText="Cancel"
           onConfirm={handleDelete}
         />
@@ -71,8 +69,8 @@ export function ProjectActions({ projectId, isOwnProject, isBookmarked }: Projec
   }
 
   return (
-    <ProjectBookmark
-      projectId={projectId}
+    <PostBookmark
+      postId={postId}
       initialBookmarked={isBookmarked}
     />
   );

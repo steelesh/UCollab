@@ -45,100 +45,102 @@ model User {
   triggeredNotifications  Notification[]           @relation("NotificationTrigger")
   sessions                Session[]
   comments                Comment[]
-  projects                Project[]
-  projectRatings          ProjectRating[]
+  posts                   Post[]
+  postRatings             PostRating[]
   bio                     String?                  @prisma.Text
   technologies            Technology[]             @relation("UserTechnologies")
   gradYear                Int?
   githubProfile           String?
   mentorship              MentorshipStatus         @default(NONE)
-  watchedProjects         ProjectWatcher[]
+  watchedPosts            PostWatcher[]
 }
 
-model Project {
-  id               String           @id @default(cuid())
-  createdDate      DateTime         @default(now())
-  lastModifiedDate DateTime         @updatedAt
-  title            String           @prisma.Text
-  description      String           @prisma.Text
-  projectType      ProjectType
-  rating           Float            @default(0)
-  technologies     Technology[]     @relation("ProjectTechnologies")
+model Post {
+  id               String         @id @default(cuid())
+  createdDate      DateTime       @default(now())
+  lastModifiedDate DateTime       @updatedAt
+  title            String         @prisma.Text
+  description      String         @prisma.Text
+  rating           Float          @default(0)
+  allowRatings     Boolean        @default(false)
+  allowComments    Boolean        @default(true)
+  technologies     Technology[]   @relation("PostTechnologies")
   githubRepo       String?
   comments         Comment[]
-  watchers         ProjectWatcher[]
-  ratings          ProjectRating[]
+  watchers         PostWatcher[]
+  ratings          PostRating[]
   createdById      String
-  createdBy        User             @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  notifications    Notification[]   @relation("ProjectNotifications")
+  createdBy        User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  notifications    Notification[] @relation("PostNotifications")
+  postNeeds        PostNeed[]     @relation("PostNeeds")
 
   @@index([createdById])
   @@fulltext([title, description])
 }
 
-model ProjectRating {
+model PostRating {
   id          String   @id @default(cuid())
-  projectId   String
+  postId      String
   userId      String
   rating      Int
   createdDate DateTime @default(now())
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([projectId, userId])
+  @@unique([postId, userId])
   @@index([userId])
 }
 
-model ProjectWatcher {
+model PostWatcher {
   id          String   @id @default(cuid())
-  projectId   String
+  postId      String
   userId      String
   createdDate DateTime @default(now())
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([projectId, userId])
-  @@index([projectId])
+  @@unique([postId, userId])
+  @@index([postId])
   @@index([userId])
 }
 
 model Technology {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  verified    Boolean   @default(false)
-  createdDate DateTime  @default(now())
-  User        User[]    @relation("UserTechnologies")
-  Project     Project[] @relation("ProjectTechnologies")
+  id          String   @id @default(cuid())
+  name        String   @unique
+  verified    Boolean  @default(false)
+  createdDate DateTime @default(now())
+  User        User[]   @relation("UserTechnologies")
+  Post        Post[]   @relation("PostTechnologies")
 }
 
 model Comment {
   id               String         @id @default(cuid())
-  projectId        String
+  postId           String
   createdById      String
   createdDate      DateTime       @default(now())
   lastModifiedDate DateTime       @updatedAt
   content          String         @prisma.Text
   createdBy        User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  project          Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  post             Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
   notifications    Notification[] @relation("CommentNotifications")
   parentId         String?
   parent           Comment?       @relation("Replies", fields: [parentId], references: [id])
   replies          Comment[]      @relation("Replies")
 
-  @@index([projectId])
+  @@index([postId])
   @@index([createdById])
 }
 
 model NotificationPreferences {
-  id                  String  @id @default(cuid())
-  userId              String  @unique
-  enabled             Boolean @default(true)
-  allowComments       Boolean @default(true)
-  allowMentions       Boolean @default(true)
-  allowProjectUpdates Boolean @default(true)
-  allowSystem         Boolean @default(true)
-  allowRatings        Boolean @default(true)
-  user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id               String  @id @default(cuid())
+  userId           String  @unique
+  enabled          Boolean @default(true)
+  allowComments    Boolean @default(true)
+  allowMentions    Boolean @default(true)
+  allowPostUpdates Boolean @default(true)
+  allowSystem      Boolean @default(true)
+  allowRatings     Boolean @default(true)
+  user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
@@ -149,8 +151,8 @@ model Notification {
   isRead      Boolean          @default(false)
   type        NotificationType
 
-  project   Project? @relation("ProjectNotifications", fields: [projectId], references: [id])
-  projectId String?
+  post      Post?    @relation("PostNotifications", fields: [postId], references: [id])
+  postId    String?
   comment   Comment? @relation("CommentNotifications", fields: [commentId], references: [id])
   commentId String?
 
@@ -159,7 +161,7 @@ model Notification {
   user          User    @relation("NotificationReceiver", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([projectId])
+  @@index([postId])
   @@index([commentId])
   @@index([triggeredById])
 }
@@ -174,27 +176,33 @@ model Session {
   @@index([userId])
 }
 
+model PostNeed {
+  id          String   @id @default(cuid())
+  needType    NeedType
+  createdDate DateTime @default(now())
+  isPrimary   Boolean  @default(false)
+  posts       Post[]   @relation("PostNeeds")
+}
+
 enum AvatarSource {
   MICROSOFT
   UPLOAD
   DEFAULT
 }
 
-enum ProjectType {
-  CONTRIBUTION
+enum NeedType {
   FEEDBACK
-}
-
-enum PostType {
-  COMMUNITY
-  QA
-  MENTORSHIP
+  CONTRIBUTION
+  DEVELOPER_AVAILABLE
+  SEEKING_MENTOR
+  MENTOR_AVAILABLE
+  TEAM_FORMATION
 }
 
 enum NotificationType {
   COMMENT
   MENTION
-  PROJECT_UPDATE
+  POST_UPDATE
   SYSTEM
   RATING
 }

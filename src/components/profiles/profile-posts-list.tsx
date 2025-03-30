@@ -1,29 +1,29 @@
-import type { Project } from "@prisma/client";
+import type { Post } from "@prisma/client";
 import type { Route } from "next";
 
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 
-type ProfileProjectsListProps = {
-  projects: Project[];
+type ProfilePostsListProps = {
+  posts: Post[];
 };
 
-export function ProfileProjectsList({ projects }: ProfileProjectsListProps) {
+export function ProfilePostsList({ posts }: ProfilePostsListProps) {
   return (
     <>
-      {projects.length === 0
+      {posts.length === 0
         ? (
             <p className="text-accent-content pt-2 text-sm">No posts available.</p>
           )
         : (
             <ul className="space-y-4 py-4">
-              {projects.map(project => (
-                <li key={project.id} className="group bg-muted rounded-lg">
-                  <Link href={`/p/${project.id}` as Route} className="block rounded-lg p-4 transition-colors">
-                    <p className="line-clamp-2 text-sm font-medium hover:underline">{project.title}</p>
+              {posts.map(post => (
+                <li key={post.id} className="group bg-muted rounded-lg">
+                  <Link href={`/p/${post.id}` as Route} className="block rounded-lg p-4 transition-colors">
+                    <p className="line-clamp-2 text-sm font-medium hover:underline">{post.title}</p>
                     <div className="text-muted-foreground flex items-center gap-2 text-xs">
                       <time>
-                        {formatDistanceToNow(new Date(project.createdDate))}
+                        {formatDistanceToNow(new Date(post.createdDate))}
                         {" "}
                         ago
                       </time>

@@ -2,7 +2,7 @@
 
 import type { User } from "@prisma/client";
 
-import type { Technology } from "~/features/projects/project.types";
+import type { Technology } from "~/features/posts/post.types";
 
 import { Badge } from "../ui/badge";
 import { TechnologyIcon } from "../ui/technology-icon";

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 import { ProfileCommentsList } from "~/components/profiles/profile-comments-list";
 import { ProfileHeader } from "~/components/profiles/profile-header";
-import { ProfileProjectsList } from "~/components/profiles/profile-projects-list";
+import { ProfilePostsList } from "~/components/profiles/profile-posts-list";
 import { ProfileUserInfo } from "~/components/profiles/profile-user-info";
 import { getUserProfile } from "~/features/users/user.queries";
 import { withAuth } from "~/security/protected";
@@ -51,7 +51,7 @@ async function Page({ params, userId }: PageProps) {
           />
           <section className="mt-8 border-t pt-4">
             <h2 className="text-md italic">Latest posts...</h2>
-            <ProfileProjectsList projects={userProfile.projects} />
+            <ProfilePostsList posts={userProfile.posts} />
           </section>
           <section className="pt-4">
             <h2 className="text-md italic">Latest comments...</h2>

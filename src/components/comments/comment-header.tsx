@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-import type { Comment } from "~/features/projects/project.types";
+import type { Comment } from "~/features/posts/post.types";
 
 import { ActionButton } from "~/components/ui/action-button";
 import { ConfirmDialog } from "~/components/ui/confirm-dialog";

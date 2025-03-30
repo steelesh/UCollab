@@ -1,6 +1,6 @@
 "use client";
 
-import type { Project } from "@prisma/client";
+import type { Post } from "@prisma/client";
 
 import { Trash2, User as UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -9,17 +9,17 @@ import { useState } from "react";
 import { ActionButton } from "~/components/ui/action-button";
 import { ConfirmDialog } from "~/components/ui/confirm-dialog";
 import { StarRating } from "~/components/ui/star-rating";
-import { deleteRating, rateProject } from "~/features/projects/project.actions";
+import { deleteRating, ratePost } from "~/features/posts/post.actions";
 import { toastError, toastSuccess } from "~/lib/toast";
 
-type ProjectRatingProps = {
-  projectId: Project["id"];
+type PostRatingProps = {
+  postId: Post["id"];
   initialRating?: number | null;
   userRating?: number | null;
   className?: string;
 };
 
-export function ProjectRating({ projectId, initialRating: _initialRating = 0, userRating = null, className = "" }: ProjectRatingProps) {
+export function PostRating({ postId, initialRating: _initialRating = 0, userRating = null, className = "" }: PostRatingProps) {
   const [userCurrentRating, setUserCurrentRating] = useState<number | null>(userRating);
   const [isLoading, setIsLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -30,15 +30,15 @@ export function ProjectRating({ projectId, initialRating: _initialRating = 0, us
   const handleApplyRating = async (rating: number) => {
     setIsLoading(true);
     try {
-      await rateProject(projectId, rating);
+      await ratePost(postId, rating);
       setUserCurrentRating(rating);
       router.refresh();
 
-      toastSuccess("Project Rated", {
-        description: `You rated this project ${rating} ${rating === 1 ? "star" : "stars"}`,
+      toastSuccess("Post Rated", {
+        description: `You rated this post ${rating} ${rating === 1 ? "star" : "stars"}`,
       });
     } catch {
-      toastError("Unable to Rate Project", {
+      toastError("Unable to Rate Post", {
         description: "Please try again",
       });
     } finally {
@@ -58,7 +58,7 @@ export function ProjectRating({ projectId, initialRating: _initialRating = 0, us
   const handleDeleteRating = async () => {
     setIsLoading(true);
     try {
-      await deleteRating(projectId);
+      await deleteRating(postId);
       setUserCurrentRating(null);
       router.refresh();
       toastSuccess("Rating Deleted", {
@@ -88,7 +88,7 @@ export function ProjectRating({ projectId, initialRating: _initialRating = 0, us
           ? (
               <div className="flex items-center gap-2">
                 <span>
-                  You rated this project
+                  You rated this post
                   {" "}
                   {userCurrentRating}
                   {" "}
@@ -105,14 +105,14 @@ export function ProjectRating({ projectId, initialRating: _initialRating = 0, us
               </div>
             )
           : (
-              <span>You haven't rated this project yet</span>
+              <span>You haven't rated this post yet</span>
             )}
       </div>
       <ConfirmDialog
         open={showDeleteConfirm}
         onOpenChange={setShowDeleteConfirm}
         title="Delete Rating"
-        description="Are you sure you want to delete your rating for this project? This action cannot be undone."
+        description="Are you sure you want to delete your rating for this post? This action cannot be undone."
         confirmText="Delete Rating"
         cancelText="Cancel"
         onConfirm={() => {

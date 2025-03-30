@@ -7,25 +7,25 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
-import type { Project } from "~/features/projects/project.types";
+import type { Post } from "~/features/posts/post.types";
 
 import { Button } from "~/components/ui/button";
-import { deleteProject } from "~/features/projects/project.actions";
+import { deletePost } from "~/features/posts/post.actions";
 
-type ProjectHeaderProps = {
-  title: Project["title"];
-  projectId: Project["id"];
-  isOwnProject: boolean;
+type PostHeaderProps = {
+  title: Post["title"];
+  postId: Post["id"];
+  isOwnPost: boolean;
 };
 
-export function ProjectHeader({ title, projectId, isOwnProject }: ProjectHeaderProps) {
+export function PostHeader({ title, postId, isOwnPost }: PostHeaderProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      await deleteProject(projectId);
+      await deletePost(postId);
       router.push("/");
       router.refresh();
     } catch {
@@ -41,10 +41,10 @@ export function ProjectHeader({ title, projectId, isOwnProject }: ProjectHeaderP
       <div className="absolute -bottom-12 left-8">
         <h1 className="text-2xl font-bold">{title}</h1>
       </div>
-      {isOwnProject && (
+      {isOwnPost && (
         <div className="absolute right-1 -bottom-12 flex space-x-2">
-          <Link href={`/p/${projectId}/edit` as Route}>
-            <Button className="cursor-pointer" variant="outline" aria-label="Edit Project">
+          <Link href={`/p/${postId}/edit` as Route}>
+            <Button className="cursor-pointer" variant="outline" aria-label="Edit Post">
               <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
                 <path
                   fill="none"
@@ -57,7 +57,7 @@ export function ProjectHeader({ title, projectId, isOwnProject }: ProjectHeaderP
               </svg>
             </Button>
           </Link>
-          <Button className="cursor-pointer" aria-label="Delete Project" onClick={handleDelete} disabled={isDeleting}>
+          <Button className="cursor-pointer" aria-label="Delete Post" onClick={handleDelete} disabled={isDeleting}>
             {isDeleting
               ? (
                   <span className="loading loading-spinner loading-sm" />

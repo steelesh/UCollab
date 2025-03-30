@@ -1,9 +1,9 @@
 import type {
   Comment,
   NotificationType,
+  Post,
   Notification as PrismaNotification,
   NotificationPreferences as PrismaNotificationPreferences,
-  Project,
   User,
 } from "@prisma/client";
 
@@ -14,7 +14,7 @@ export type Notification = {
   createdDate: PrismaNotification["createdDate"];
   isRead: PrismaNotification["isRead"];
   type: PrismaNotification["type"];
-  projectId: PrismaNotification["projectId"];
+  postId: PrismaNotification["postId"];
   commentId: PrismaNotification["commentId"];
   triggeredById: PrismaNotification["triggeredById"];
   triggeredBy?: {
@@ -30,7 +30,7 @@ export type NotificationPreferences = {
   enabled: PrismaNotificationPreferences["enabled"];
   allowComments: PrismaNotificationPreferences["allowComments"];
   allowMentions: PrismaNotificationPreferences["allowMentions"];
-  allowProjectUpdates: PrismaNotificationPreferences["allowProjectUpdates"];
+  allowPostUpdates: PrismaNotificationPreferences["allowPostUpdates"];
   allowSystem: PrismaNotificationPreferences["allowSystem"];
 };
 
@@ -46,7 +46,7 @@ export type CreateNotificationData = {
   userId: User["id"];
   type: NotificationType;
   message: PrismaNotification["message"];
-  projectId?: Project["id"];
+  postId?: Post["id"];
   commentId?: Comment["id"];
   triggeredById?: User["id"];
 };

@@ -35,7 +35,7 @@ export const UserService = {
           technologies: {
             select: { name: true },
           },
-          projects: {
+          posts: {
             take: 3,
             orderBy: { createdDate: "desc" },
             select: {
@@ -51,8 +51,8 @@ export const UserService = {
               id: true,
               content: true,
               createdDate: true,
-              projectId: true,
-              project: {
+              postId: true,
+              post: {
                 select: {
                   title: true,
                 },

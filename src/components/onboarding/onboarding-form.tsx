@@ -136,6 +136,9 @@ export function OnboardingForm() {
         )}
       />
       <div className="form-control">
+        <Label className="label my-2" htmlFor="technologies">
+          <span className="label-text">Technologies</span>
+        </Label>
         <Controller
           control={control}
           name="technologies"

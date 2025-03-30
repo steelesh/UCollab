@@ -1,28 +1,33 @@
-import type { Project, Technology, User } from "@prisma/client";
+import type { Post, Technology, User } from "@prisma/client";
 
 import { Prisma } from "@prisma/client";
 import { notFound } from "next/navigation";
 
 import { NotificationService } from "~/features/notifications/notification.service";
 import { prisma } from "~/lib/prisma";
-import { ErrorMessage, Utils } from "~/lib/utils";
+import { ErrorMessage, isProjectNeedType, Utils } from "~/lib/utils";
 import { withServiceAuth } from "~/security/protected-service";
 
-import type { CreateProjectInput } from "./project.schema";
-import type { ExplorePageData, ExploreProject, ProjectDetails } from "./project.types";
+import type { CreatePostInput } from "./post.schema";
+import type { ExplorePageData, ExplorePost, PostDetails } from "./post.types";
 
-export const ProjectService = {
-  async getAllProjects(requestUserId: string) {
+export const PostService = {
+  async getAllPosts(requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        return await prisma.project.findMany({
+        return await prisma.post.findMany({
           select: {
             id: true,
             title: true,
             description: true,
             createdDate: true,
-            projectType: true,
-            githubRepo: true,
+            postNeeds: {
+              select: {
+                id: true,
+                needType: true,
+                isPrimary: true,
+              },
+            },
           },
           orderBy: { createdDate: "desc" },
         });
@@ -34,10 +39,10 @@ export const ProjectService = {
     });
   },
 
-  async getProjectById(id: Project["id"], requestUserId: string): Promise<ProjectDetails> {
+  async getPostById(id: Post["id"], requestUserId: string): Promise<PostDetails> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        const project = await prisma.project.findUnique({
+        const post = await prisma.post.findUnique({
           where: { id },
           select: {
             id: true,
@@ -45,11 +50,19 @@ export const ProjectService = {
             description: true,
             createdDate: true,
             lastModifiedDate: true,
-            projectType: true,
             githubRepo: true,
             createdById: true,
             technologies: true,
             rating: true,
+            allowRatings: true,
+            allowComments: true,
+            postNeeds: {
+              select: {
+                id: true,
+                needType: true,
+                isPrimary: true,
+              },
+            },
             createdBy: {
               select: {
                 username: true,
@@ -106,33 +119,33 @@ export const ProjectService = {
           },
         });
 
-        if (!project)
+        if (!post)
           notFound();
 
-        const ageInHours = (Date.now() - new Date(project.createdDate).getTime()) / (1000 * 3600);
+        const ageInHours = (Date.now() - new Date(post.createdDate).getTime()) / (1000 * 3600);
         const timeDecay = (1 / (ageInHours + 48) ** 1.1) * 100;
 
         const ratingWeight = 0.7;
         const watcherWeight = 0.2;
         const commentWeight = 0.1;
 
-        const ratingScore = project.rating / 5;
-        const nonOwnerWatchers = project.watchers.filter(w => w.userId !== project.createdById);
+        const ratingScore = post.rating / 5;
+        const nonOwnerWatchers = post.watchers.filter(w => w.userId !== post.createdById);
         const watcherScore = Math.min((nonOwnerWatchers.length) / 10, 1);
-        const commentScore = Math.min(project.comments.length / 20, 1);
+        const commentScore = Math.min(post.comments.length / 20, 1);
 
         const engagementScore
           = (ratingScore * ratingWeight)
             + (watcherScore * watcherWeight)
             + (commentScore * commentWeight);
 
-        const projectWithScore = {
-          ...project,
+        const postWithScore = {
+          ...post,
           trendingScore: engagementScore * timeDecay,
           watchers: nonOwnerWatchers,
         };
 
-        return projectWithScore satisfies ProjectDetails;
+        return postWithScore satisfies PostDetails;
       } catch (error) {
         if (error instanceof Utils)
           throw error;
@@ -141,31 +154,54 @@ export const ProjectService = {
     });
   },
 
-  async getProjectTitle(id: Project["id"]): Promise<Project["title"]> {
-    const project = await prisma.project.findUnique({ where: { id }, select: { title: true } });
-    if (!project)
+  async getPostTitle(id: Post["id"]): Promise<Post["title"]> {
+    const post = await prisma.post.findUnique({ where: { id }, select: { title: true } });
+    if (!post)
       notFound();
-    return project.title;
+    return post.title;
   },
 
-  async createProject(data: CreateProjectInput, requestUserId: User["id"]) {
+  async createPost(data: CreatePostInput, requestUserId: User["id"]) {
     return withServiceAuth(requestUserId, { ownerId: requestUserId }, async () => {
       try {
-        const project = await prisma.$transaction(async (tx) => {
-          const techNames = data.technologies.map(tech => tech.toLowerCase().trim());
+        const isProjectPost = isProjectNeedType(data.needType) || isProjectNeedType(data.secondaryNeedType);
 
-          const newProject = await tx.project.create({
+        const post = await prisma.$transaction(async (tx) => {
+          let technologiesConnect = {};
+          if (isProjectPost && data.technologies && data.technologies.length > 0) {
+            const techNames = data.technologies.map(tech => tech.toLowerCase().trim());
+            technologiesConnect = {
+              connectOrCreate: techNames.map(name => ({
+                where: { name },
+                create: { name },
+              })),
+            };
+          }
+
+          const allowRatings = !!data.allowRatings;
+
+          const postNeeds = [
+            { needType: data.needType, isPrimary: true },
+          ];
+
+          if (data.secondaryNeedType) {
+            postNeeds.push({
+              needType: data.secondaryNeedType,
+              isPrimary: false,
+            });
+          }
+
+          const newPost = await tx.post.create({
             data: {
               title: data.title,
               description: data.description,
-              projectType: data.projectType,
-              githubRepo: data.githubRepo || null,
+              githubRepo: isProjectPost ? data.githubRepo : null,
+              allowRatings,
+              allowComments: data.allowComments,
               createdBy: { connect: { id: requestUserId } },
-              technologies: {
-                connectOrCreate: techNames.map(name => ({
-                  where: { name },
-                  create: { name },
-                })),
+              technologies: technologiesConnect,
+              postNeeds: {
+                create: postNeeds,
               },
             },
             select: {
@@ -173,30 +209,32 @@ export const ProjectService = {
               title: true,
               description: true,
               createdDate: true,
-              projectType: true,
               githubRepo: true,
               technologies: true,
+              allowRatings: true,
+              allowComments: true,
+              postNeeds: true,
             },
           });
 
-          await tx.projectWatcher.create({
+          await tx.postWatcher.create({
             data: {
-              projectId: newProject.id,
+              postId: newPost.id,
               userId: requestUserId,
             },
           });
-          return newProject;
+          return newPost;
         });
 
         await NotificationService.queueBatchNotifications({
           userIds: [requestUserId],
-          type: "PROJECT_UPDATE",
-          message: `project "${project.title}" has been created`,
-          projectId: project.id,
+          type: "POST_UPDATE",
+          message: `post "${post.title}" has been created`,
+          postId: post.id,
           triggeredById: requestUserId,
         });
 
-        return project;
+        return post;
       } catch (error) {
         if (error instanceof Utils)
           throw error;
@@ -205,12 +243,12 @@ export const ProjectService = {
     });
   },
 
-  async deleteProject(id: Project["id"], requestUserId: string) {
-    const project = await this.getProjectById(id, requestUserId);
-    return withServiceAuth(requestUserId, { ownerId: project.createdById }, async () => {
+  async deletePost(id: Post["id"], requestUserId: string) {
+    const post = await this.getPostById(id, requestUserId);
+    return withServiceAuth(requestUserId, { ownerId: post.createdById }, async () => {
       try {
-        await this.sendProjectUpdateNotification(id, "deleted", requestUserId);
-        await prisma.project.delete({ where: { id } });
+        await this.sendPostUpdateNotification(id, "deleted", requestUserId);
+        await prisma.post.delete({ where: { id } });
       } catch (error) {
         if (error instanceof Utils)
           throw error;
@@ -223,10 +261,10 @@ export const ProjectService = {
     });
   },
 
-  async searchProjects(query: string, requestUserId: string, page = 1, limit = 20) {
+  async searchPosts(query: string, requestUserId: string, page = 1, limit = 20) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        return await prisma.project.findMany({
+        return await prisma.post.findMany({
           where: {
             OR: [{ title: { contains: query } }, { description: { contains: query } }],
           },
@@ -235,8 +273,14 @@ export const ProjectService = {
             title: true,
             description: true,
             createdDate: true,
-            projectType: true,
             githubRepo: true,
+            postNeeds: {
+              select: {
+                id: true,
+                needType: true,
+                isPrimary: true,
+              },
+            },
           },
           skip: (page - 1) * limit,
           take: limit,
@@ -249,10 +293,10 @@ export const ProjectService = {
     });
   },
 
-  async getProjectsByUser(userId: string, requestUserId: string) {
+  async getPostsByUser(userId: string, requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        return await prisma.project.findMany({
+        return await prisma.post.findMany({
           where: { createdById: userId },
           select: {
             id: true,
@@ -260,8 +304,8 @@ export const ProjectService = {
             description: true,
             createdDate: true,
             lastModifiedDate: true,
-            projectType: true,
             githubRepo: true,
+            createdById: true,
             createdBy: {
               select: {
                 username: true,
@@ -270,8 +314,27 @@ export const ProjectService = {
             },
             technologies: true,
             rating: true,
-            watchers: true,
-            comments: true,
+            allowRatings: true,
+            allowComments: true,
+            postNeeds: {
+              select: {
+                id: true,
+                needType: true,
+                isPrimary: true,
+              },
+            },
+            watchers: {
+              select: {
+                id: true,
+                userId: true,
+                user: {
+                  select: {
+                    username: true,
+                    avatar: true,
+                  },
+                },
+              },
+            },
           },
           orderBy: {
             createdDate: "desc",
@@ -285,10 +348,10 @@ export const ProjectService = {
     });
   },
 
-  async getProjectsByTechnology(techName: string, requestUserId: string) {
+  async getPostsByTechnology(techName: string, requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        return await prisma.project.findMany({
+        return await prisma.post.findMany({
           where: {
             technologies: {
               some: { name: techName.toLowerCase().trim() },
@@ -299,8 +362,14 @@ export const ProjectService = {
             title: true,
             description: true,
             createdDate: true,
-            projectType: true,
             githubRepo: true,
+            postNeeds: {
+              select: {
+                id: true,
+                needType: true,
+                isPrimary: true,
+              },
+            },
           },
           orderBy: { createdDate: "desc" },
         });
@@ -312,10 +381,10 @@ export const ProjectService = {
     });
   },
 
-  async getProjectsByTechnologies(techNames: Technology["name"][], matchAll = false, requestUserId: string) {
+  async getPostsByTechnologies(techNames: Technology["name"][], matchAll = false, requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        return await prisma.project.findMany({
+        return await prisma.post.findMany({
           where: {
             technologies: matchAll
               ? {
@@ -334,8 +403,14 @@ export const ProjectService = {
             title: true,
             description: true,
             createdDate: true,
-            projectType: true,
             githubRepo: true,
+            postNeeds: {
+              select: {
+                id: true,
+                needType: true,
+                isPrimary: true,
+              },
+            },
           },
           orderBy: { createdDate: "desc" },
         });
@@ -347,11 +422,11 @@ export const ProjectService = {
     });
   },
 
-  async getPaginatedProjects(page = 1, limit = 12, requestUserId: User["id"]): Promise<{ projects: ExploreProject[]; totalCount: number }> {
+  async getPaginatedPosts(page = 1, limit = 12, requestUserId: User["id"]): Promise<{ posts: ExplorePost[]; totalCount: number }> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        const [projects, totalCount] = await Promise.all([
-          prisma.project.findMany({
+        const [posts, totalCount] = await Promise.all([
+          prisma.post.findMany({
             orderBy: {
               createdDate: "desc",
             },
@@ -363,9 +438,17 @@ export const ProjectService = {
               createdDate: true,
               description: true,
               githubRepo: true,
-              projectType: true,
               rating: true,
               createdById: true,
+              allowRatings: true,
+              allowComments: true,
+              postNeeds: {
+                select: {
+                  id: true,
+                  needType: true,
+                  isPrimary: true,
+                },
+              },
               technologies: {
                 select: {
                   id: true,
@@ -397,21 +480,21 @@ export const ProjectService = {
               },
             },
           }),
-          prisma.project.count(),
+          prisma.post.count(),
         ]);
 
-        const projectsWithScores = projects.map((project) => {
-          const ageInHours = (Date.now() - new Date(project.createdDate).getTime()) / (1000 * 3600);
+        const postsWithScores = posts.map((post) => {
+          const ageInHours = (Date.now() - new Date(post.createdDate).getTime()) / (1000 * 3600);
           const timeDecay = (1 / (ageInHours + 48) ** 1.1) * 100;
 
           const ratingWeight = 0.7;
           const watcherWeight = 0.2;
           const commentWeight = 0.1;
 
-          const ratingScore = project.rating / 5;
-          const nonOwnerWatchers = project.watchers.filter(w => w.userId !== project.createdById);
+          const ratingScore = post.rating / 5;
+          const nonOwnerWatchers = post.watchers.filter(w => w.userId !== post.createdById);
           const watcherScore = Math.min((nonOwnerWatchers.length) / 10, 1);
-          const commentScore = Math.min(project.comments.length / 20, 1);
+          const commentScore = Math.min(post.comments.length / 20, 1);
 
           const engagementScore
             = (ratingScore * ratingWeight)
@@ -420,13 +503,13 @@ export const ProjectService = {
 
           const trendingScore = engagementScore * timeDecay;
           return {
-            ...project,
+            ...post,
             trendingScore,
             watchers: nonOwnerWatchers,
           };
         });
 
-        return { projects: projectsWithScores satisfies ExploreProject[], totalCount };
+        return { posts: postsWithScores satisfies ExplorePost[], totalCount };
       } catch (error) {
         if (error instanceof Utils)
           throw error;
@@ -435,10 +518,10 @@ export const ProjectService = {
     });
   },
 
-  async getProjectCount(requestUserId: User["id"]): Promise<number> {
+  async getPostCount(requestUserId: User["id"]): Promise<number> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        return await prisma.project.count();
+        return await prisma.post.count();
       } catch (error) {
         if (error instanceof Utils)
           throw error;
@@ -472,15 +555,17 @@ export const ProjectService = {
     });
   },
 
-  async updateProject(id: Project["id"], data: CreateProjectInput, requestUserId: string) {
-    const project = await this.getProjectById(id, requestUserId);
+  async updatePost(id: Post["id"], data: CreatePostInput, requestUserId: string) {
+    const post = await this.getPostById(id, requestUserId);
 
-    return withServiceAuth(requestUserId, { ownerId: project.createdById }, async () => {
+    return withServiceAuth(requestUserId, { ownerId: post.createdById }, async () => {
       try {
-        const updatedProject = await prisma.$transaction(async (tx) => {
-          const techNames = data.technologies.map(tech => tech.toLowerCase().trim());
+        const isProjectPost = isProjectNeedType(data.needType) || isProjectNeedType(data.secondaryNeedType);
 
-          const existingTechs = await tx.project.findUnique({
+        const updatedPost = await prisma.$transaction(async (tx) => {
+          let techUpdate = {};
+
+          const existingTechs = await tx.post.findUnique({
             where: { id },
             select: {
               technologies: {
@@ -488,24 +573,58 @@ export const ProjectService = {
               },
             },
           });
-
           const existingTechNames = existingTechs?.technologies.map(t => t.name) || [];
-          const techsToDisconnect = existingTechNames.filter(name => !techNames.includes(name));
-          const techsToAdd = techNames.filter(name => !existingTechNames.includes(name));
 
-          const updatedProject = await tx.project.update({
+          if (isProjectPost) {
+            const techNames = data.technologies?.map(tech => tech.toLowerCase().trim()) || [];
+            const techsToDisconnect = existingTechNames.filter(name => !techNames.includes(name));
+            const techsToAdd = techNames.filter(name => !existingTechNames.includes(name));
+
+            techUpdate = {
+              disconnect: techsToDisconnect.map(name => ({ name })),
+              connectOrCreate: techsToAdd.map(name => ({
+                where: { name },
+                create: { name },
+              })),
+            };
+          } else {
+            if (existingTechNames.length > 0) {
+              techUpdate = {
+                disconnect: existingTechNames.map(name => ({ name })),
+              };
+            }
+          }
+
+          await tx.postNeed.deleteMany({
+            where: {
+              posts: {
+                some: { id },
+              },
+            },
+          });
+
+          const postNeeds = [
+            { needType: data.needType, isPrimary: true },
+          ];
+
+          if (data.secondaryNeedType) {
+            postNeeds.push({
+              needType: data.secondaryNeedType,
+              isPrimary: false,
+            });
+          }
+
+          const updatedPost = await tx.post.update({
             where: { id },
             data: {
               title: data.title,
               description: data.description,
-              projectType: data.projectType,
-              githubRepo: data.githubRepo,
-              technologies: {
-                disconnect: techsToDisconnect.map(name => ({ name })),
-                connectOrCreate: techsToAdd.map(name => ({
-                  where: { name },
-                  create: { name },
-                })),
+              githubRepo: isProjectPost ? data.githubRepo : null,
+              allowRatings: data.allowRatings,
+              allowComments: data.allowComments,
+              technologies: techUpdate,
+              postNeeds: {
+                create: postNeeds,
               },
             },
             select: {
@@ -513,20 +632,21 @@ export const ProjectService = {
               title: true,
               description: true,
               createdDate: true,
-              projectType: true,
               githubRepo: true,
               technologies: true,
+              allowRatings: true,
+              allowComments: true,
+              postNeeds: true,
             },
           });
 
-          await this.sendProjectUpdateNotification(id, "updated", requestUserId);
+          await this.sendPostUpdateNotification(id, "updated", requestUserId);
 
-          return updatedProject;
+          return updatedPost;
         });
 
-        return updatedProject;
+        return updatedPost;
       } catch (error) {
-        console.error("Project update error:", error);
         if (error instanceof Utils)
           throw error;
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
@@ -537,16 +657,16 @@ export const ProjectService = {
     });
   },
 
-  async watchProject(projectId: string, userId: string) {
+  async watchPost(postId: string, userId: string) {
     return withServiceAuth(userId, null, async () => {
       try {
-        const watcher = await prisma.projectWatcher.create({
+        const watcher = await prisma.postWatcher.create({
           data: {
-            projectId,
+            postId,
             userId,
           },
           include: {
-            project: {
+            post: {
               select: {
                 title: true,
                 createdById: true,
@@ -560,12 +680,12 @@ export const ProjectService = {
           },
         });
 
-        if (watcher.project.createdById !== userId) {
+        if (watcher.post.createdById !== userId) {
           await NotificationService.queueBatchNotifications({
-            userIds: [watcher.project.createdById],
-            type: "PROJECT_UPDATE",
-            message: `${watcher.user.username} is now watching "${watcher.project.title}"`,
-            projectId,
+            userIds: [watcher.post.createdById],
+            type: "POST_UPDATE",
+            message: `${watcher.user.username} is now watching "${watcher.post.title}"`,
+            postId,
             triggeredById: userId,
           });
         }
@@ -580,13 +700,13 @@ export const ProjectService = {
     });
   },
 
-  async unwatchProject(projectId: string, userId: string) {
+  async unwatchPost(postId: string, userId: string) {
     return withServiceAuth(userId, null, async () => {
       try {
-        return await prisma.projectWatcher.delete({
+        return await prisma.postWatcher.delete({
           where: {
-            projectId_userId: {
-              projectId,
+            postId_userId: {
+              postId,
               userId,
             },
           },
@@ -600,10 +720,10 @@ export const ProjectService = {
     });
   },
 
-  async getProjectWatchers(projectId: string) {
+  async getPostWatchers(postId: string) {
     try {
-      return await prisma.projectWatcher.findMany({
-        where: { projectId },
+      return await prisma.postWatcher.findMany({
+        where: { postId },
         select: {
           userId: true,
           user: {
@@ -621,10 +741,10 @@ export const ProjectService = {
     }
   },
 
-  async sendProjectUpdateNotification(projectId: string, action: "updated" | "deleted", requestUserId: string) {
+  async sendPostUpdateNotification(postId: string, action: "updated" | "deleted", requestUserId: string) {
     try {
-      const project = await this.getProjectById(projectId, requestUserId);
-      const watchers = await this.getProjectWatchers(projectId);
+      const post = await this.getPostById(postId, requestUserId);
+      const watchers = await this.getPostWatchers(postId);
       const user = await prisma.user.findUnique({
         where: { id: requestUserId },
         select: { username: true },
@@ -634,7 +754,7 @@ export const ProjectService = {
         .filter(
           w =>
             w.user.notificationPreferences?.enabled
-            && w.user.notificationPreferences?.allowProjectUpdates
+            && w.user.notificationPreferences?.allowPostUpdates
             && w.userId !== requestUserId,
         )
         .map(w => w.userId);
@@ -642,9 +762,9 @@ export const ProjectService = {
       if (watcherIds.length > 0 && user) {
         await NotificationService.queueBatchNotifications({
           userIds: watcherIds,
-          type: "PROJECT_UPDATE",
-          message: `${user.username} has ${action} project "${project.title}"`,
-          projectId: project.id,
+          type: "POST_UPDATE",
+          message: `${user.username} has ${action} post "${post.title}"`,
+          postId: post.id,
           triggeredById: requestUserId,
         });
       }
@@ -655,31 +775,36 @@ export const ProjectService = {
     }
   },
 
-  async rateProject(projectId: Project["id"], rating: number, requestUserId: User["id"]) {
+  async ratePost(postId: Post["id"], rating: number, requestUserId: User["id"]) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        const project = await prisma.project.findUnique({
-          where: { id: projectId },
+        const post = await prisma.post.findUnique({
+          where: { id: postId },
           select: {
             id: true,
             title: true,
             createdById: true,
+            allowRatings: true,
           },
         });
 
-        if (!project) {
+        if (!post) {
           notFound();
         }
 
-        if (project.createdById === requestUserId) {
+        if (post.createdById === requestUserId) {
           throw new Utils(ErrorMessage.INSUFFICIENT_PERMISSIONS);
         }
 
+        if (!post.allowRatings) {
+          throw new Utils(ErrorMessage.OPERATION_FAILED);
+        }
+
         const userRating = await prisma.$transaction(async (tx) => {
-          const userRating = await tx.projectRating.upsert({
+          const userRating = await tx.postRating.upsert({
             where: {
-              projectId_userId: {
-                projectId,
+              postId_userId: {
+                postId,
                 userId: requestUserId,
               },
             },
@@ -687,14 +812,14 @@ export const ProjectService = {
               rating,
             },
             create: {
-              projectId,
+              postId,
               userId: requestUserId,
               rating,
             },
           });
 
-          const ratings = await tx.projectRating.findMany({
-            where: { projectId },
+          const ratings = await tx.postRating.findMany({
+            where: { postId },
             select: { rating: true },
           });
 
@@ -703,26 +828,26 @@ export const ProjectService = {
               ? Number((ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length).toFixed(1))
               : 0;
 
-          await tx.project.update({
-            where: { id: projectId },
+          await tx.post.update({
+            where: { id: postId },
             data: { rating: averageRating },
           });
 
           return userRating;
         });
 
-        if (project.createdById !== requestUserId) {
+        if (post.createdById !== requestUserId) {
           const user = await prisma.user.findUnique({
             where: { id: requestUserId },
             select: { username: true },
           });
 
-          if (user && project.createdById) {
+          if (user && post.createdById) {
             await NotificationService.queueBatchNotifications({
-              userIds: [project.createdById],
+              userIds: [post.createdById],
               type: "RATING",
-              message: `${user.username} rated your project "${project.title}" with ${rating} stars`,
-              projectId,
+              message: `${user.username} rated your post "${post.title}" with ${rating} stars`,
+              postId,
               triggeredById: requestUserId,
             });
           }
@@ -737,13 +862,13 @@ export const ProjectService = {
     });
   },
 
-  async getUserProjectRating(projectId: Project["id"], userId: User["id"]) {
+  async getUserPostRating(postId: Post["id"], userId: User["id"]) {
     return withServiceAuth(userId, null, async () => {
       try {
-        const rating = await prisma.projectRating.findUnique({
+        const rating = await prisma.postRating.findUnique({
           where: {
-            projectId_userId: {
-              projectId,
+            postId_userId: {
+              postId,
               userId,
             },
           },
@@ -759,30 +884,30 @@ export const ProjectService = {
     });
   },
 
-  async deleteRating(projectId: Project["id"], userId: User["id"]) {
+  async deleteRating(postId: Post["id"], userId: User["id"]) {
     return withServiceAuth(userId, null, async () => {
       try {
-        const project = await prisma.project.findUnique({
-          where: { id: projectId },
+        const post = await prisma.post.findUnique({
+          where: { id: postId },
           select: { id: true },
         });
 
-        if (!project) {
+        if (!post) {
           notFound();
         }
 
         const result = await prisma.$transaction(async (tx) => {
-          const deleteResult = await tx.projectRating.delete({
+          const deleteResult = await tx.postRating.delete({
             where: {
-              projectId_userId: {
-                projectId,
+              postId_userId: {
+                postId,
                 userId,
               },
             },
           }).catch(() => null);
 
-          const ratings = await tx.projectRating.findMany({
-            where: { projectId },
+          const ratings = await tx.postRating.findMany({
+            where: { postId },
             select: { rating: true },
           });
 
@@ -790,8 +915,8 @@ export const ProjectService = {
             ? Number((ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length).toFixed(1))
             : 0;
 
-          await tx.project.update({
-            where: { id: projectId },
+          await tx.post.update({
+            where: { id: postId },
             data: { rating: averageRating },
           });
 
@@ -807,21 +932,21 @@ export const ProjectService = {
     });
   },
 
-  async getUserWatchedProjects(userId: string, requestUserId: string) {
+  async getUserWatchedPosts(userId: string, requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        const watchedProjects = await prisma.projectWatcher.findMany({
+        const watchedPosts = await prisma.postWatcher.findMany({
           where: { userId },
           select: {
-            project: {
+            post: {
               select: {
                 id: true,
                 title: true,
                 description: true,
                 createdDate: true,
                 lastModifiedDate: true,
-                projectType: true,
                 githubRepo: true,
+                createdById: true,
                 createdBy: {
                   select: {
                     username: true,
@@ -830,19 +955,38 @@ export const ProjectService = {
                 },
                 technologies: true,
                 rating: true,
-                watchers: true,
-                comments: true,
+                allowRatings: true,
+                allowComments: true,
+                postNeeds: {
+                  select: {
+                    id: true,
+                    needType: true,
+                    isPrimary: true,
+                  },
+                },
+                watchers: {
+                  select: {
+                    id: true,
+                    userId: true,
+                    user: {
+                      select: {
+                        username: true,
+                        avatar: true,
+                      },
+                    },
+                  },
+                },
               },
             },
           },
           orderBy: {
-            project: {
+            post: {
               createdDate: "desc",
             },
           },
         });
 
-        return watchedProjects.map(watcher => watcher.project);
+        return watchedPosts.map(watcher => watcher.post);
       } catch (error) {
         if (error instanceof Utils)
           throw error;
@@ -851,13 +995,13 @@ export const ProjectService = {
     });
   },
 
-  async isProjectBookmarked(projectId: Project["id"], userId: User["id"]) {
+  async isPostBookmarked(postId: Post["id"], userId: User["id"]) {
     return withServiceAuth(userId, null, async () => {
       try {
-        const bookmark = await prisma.projectWatcher.findUnique({
+        const bookmark = await prisma.postWatcher.findUnique({
           where: {
-            projectId_userId: {
-              projectId,
+            postId_userId: {
+              postId,
               userId,
             },
           },
@@ -872,17 +1016,14 @@ export const ProjectService = {
     });
   },
 
-  async getTrendingProjects(requestUserId: User["id"], page = 1, limit = 12): Promise<ExplorePageData> {
+  async getTrendingPosts(requestUserId: User["id"], page = 1, limit = 12): Promise<ExplorePageData> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-        const projects = await prisma.project.findMany({
+        const posts = await prisma.post.findMany({
           where: {
-            rating: {
-              gt: 0,
-            },
             createdDate: {
               gte: thirtyDaysAgo,
             },
@@ -893,9 +1034,17 @@ export const ProjectService = {
             createdDate: true,
             description: true,
             githubRepo: true,
-            projectType: true,
             rating: true,
             createdById: true,
+            allowRatings: true,
+            allowComments: true,
+            postNeeds: {
+              select: {
+                id: true,
+                needType: true,
+                isPrimary: true,
+              },
+            },
             technologies: {
               select: {
                 id: true,
@@ -930,19 +1079,19 @@ export const ProjectService = {
           take: limit,
         });
 
-        const projectsWithScores = projects
-          .map((project) => {
-            const ageInHours = (Date.now() - new Date(project.createdDate).getTime()) / (1000 * 3600);
+        const postsWithScores = posts
+          .map((post) => {
+            const ageInHours = (Date.now() - new Date(post.createdDate).getTime()) / (1000 * 3600);
             const timeDecay = (1 / (ageInHours + 48) ** 1.1) * 100;
 
             const ratingWeight = 0.7;
             const watcherWeight = 0.2;
             const commentWeight = 0.1;
 
-            const ratingScore = project.rating / 5;
-            const nonOwnerWatchers = project.watchers.filter(w => w.userId !== project.createdById);
+            const ratingScore = post.rating / 5;
+            const nonOwnerWatchers = post.watchers.filter(w => w.userId !== post.createdById);
             const watcherScore = Math.min((nonOwnerWatchers.length) / 10, 1);
-            const commentScore = Math.min(project.comments.length / 20, 1);
+            const commentScore = Math.min(post.comments.length / 20, 1);
 
             const engagementScore
               = (ratingScore * ratingWeight)
@@ -951,19 +1100,21 @@ export const ProjectService = {
 
             const trendingScore = engagementScore * timeDecay;
             return {
-              ...project,
+              ...post,
               trendingScore,
               watchers: nonOwnerWatchers,
             };
           })
-          .filter(project => project.trendingScore > 0.5)
+          .filter(post => post.trendingScore > 0.5)
           .sort((a, b) => b.trendingScore - a.trendingScore);
 
+        const totalFilteredCount = postsWithScores.length;
+
         return {
-          projects: projectsWithScores satisfies ExploreProject[],
-          totalCount: projectsWithScores.length,
+          posts: postsWithScores satisfies ExplorePost[],
+          totalCount: totalFilteredCount,
           currentPage: page,
-          totalPages: Math.ceil(projectsWithScores.length / limit),
+          totalPages: Math.ceil(totalFilteredCount / limit),
           limit,
         };
       } catch (error) {

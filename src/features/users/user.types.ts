@@ -1,10 +1,10 @@
-import type { Comment as PrismaComment, Project, User } from "@prisma/client";
+import type { Post, Comment as PrismaComment, User } from "@prisma/client";
 
 export type Comment = {
-  project: {
+  post: {
     title: string;
   };
-} & Pick<PrismaComment, "id" | "content" | "projectId" | "createdDate">;
+} & Pick<PrismaComment, "id" | "content" | "postId" | "createdDate">;
 
 export type Technology = {
   id: string;
@@ -25,7 +25,7 @@ export type UserProfile = {
   bio: User["bio"];
   mentorship: User["mentorship"];
   technologies: Technology[];
-  projects: Project[];
+  posts: Post[];
   comments: Comment[];
 };
 

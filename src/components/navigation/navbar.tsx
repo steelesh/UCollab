@@ -22,15 +22,15 @@ const routes: NavSection[] = [
     title: "Explore",
     items: [
       {
-        title: "All Projects",
+        title: "All Posts",
         href: "/p" as Route,
-        description: "Browse all projects across categories",
+        description: "Browse all posts across categories",
         requiresAuth: true,
       },
       {
         title: "Project Feedback",
         href: "/p/feedback" as Route,
-        description: "Get feedback on your code and projects",
+        description: "Get feedback on your projects",
         requiresAuth: true,
       },
       {

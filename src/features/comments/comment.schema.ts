@@ -15,7 +15,7 @@ export const commentSchema = z.object({
         message: "Comment cannot be empty",
       },
     ),
-  projectId: z.string().min(1, "Project ID is required"),
+  postId: z.string().min(1, "Post ID is required"),
 });
 
 export type CommentFormData = z.infer<typeof commentSchema>;

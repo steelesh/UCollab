@@ -9,10 +9,10 @@ describe("profileCommentsList", () => {
       content: "Test comment 1",
       createdDate: new Date(),
       lastModifiedDate: new Date(),
-      projectId: "1",
+      postId: "1",
       createdById: "user1",
-      project: {
-        title: "Test Project 1",
+      post: {
+        title: "Test Post 1",
       },
     },
     {
@@ -20,10 +20,10 @@ describe("profileCommentsList", () => {
       content: "Test comment 2",
       createdDate: new Date(),
       lastModifiedDate: new Date(),
-      projectId: "1",
+      postId: "1",
       createdById: "user1",
-      project: {
-        title: "Test Project 2",
+      post: {
+        title: "Test Post 2",
       },
     },
   ];

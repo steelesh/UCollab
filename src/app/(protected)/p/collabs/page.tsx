@@ -1,5 +1,6 @@
 import type { Route } from "next";
 
+import { NeedType } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -19,9 +20,13 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 async function Page() {
-  const projectsWithUser = await prisma.project.findMany({
+  const postsWithUser = await prisma.post.findMany({
     where: {
-      projectType: "CONTRIBUTION",
+      postNeeds: {
+        some: {
+          needType: NeedType.CONTRIBUTION,
+        },
+      },
     },
     orderBy: {
       createdDate: "desc",
@@ -32,7 +37,6 @@ async function Page() {
       createdDate: true,
       description: true,
       githubRepo: true,
-      projectType: true,
       rating: true,
       technologies: true,
     },
@@ -42,39 +46,39 @@ async function Page() {
     <Container>
       <PageBreadcrumb
         items={[
-          { label: "All Projects", isCurrent: true },
+          { label: "All Posts", isCurrent: true },
         ]}
       />
       <Header>
         <H1>Collaborations</H1>
       </Header>
       <div className="mx-auto grid grid-cols-1 gap-20 sm:mx-8 md:grid-cols-2 md:gap-14 lg:grid-cols-3 xl:grid-cols-4">
-        {projectsWithUser.map(project => (
+        {postsWithUser.map(post => (
           <Card
-            key={project.id}
+            key={post.id}
             className="bg-muted shadow-xl transition duration-200 ease-in-out hover:-translate-y-1 hover:scale-110"
           >
             <Image
               src="/images/banner-placeholder.png"
-              alt="Project"
+              alt="Post"
               className="h-20 w-full object-cover"
               width={400}
               height={80}
             />
             <CardHeader className="px-4 py-2">
               <div>
-                <Link href={`/p/${project.id}` as Route} className="font-bold hover:underline">
-                  <CardTitle className="truncate text-lg font-bold">{project.title}</CardTitle>
+                <Link href={`/p/${post.id}` as Route} className="font-bold hover:underline">
+                  <CardTitle className="truncate text-lg font-bold">{post.title}</CardTitle>
                 </Link>
                 <CardDescription className="text-muted-foreground text-sm">
-                  {new Date(project.createdDate).toLocaleDateString("en-US", {
+                  {new Date(post.createdDate).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                     year: "numeric",
                   })}
                   <br />
                   <a
-                    href={project.githubRepo ?? ""}
+                    href={post.githubRepo ?? ""}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="link link-accent font-bold tracking-wider text-white hover:underline"
@@ -82,7 +86,7 @@ async function Page() {
                     GitHub Repo
                   </a>
                   <div className="flex flex-wrap gap-2">
-                    {project.technologies.map(tech => (
+                    {post.technologies.map(tech => (
                       <Badge key={tech.id} className="px-2 py-1">
                         {tech.name}
                       </Badge>
@@ -91,9 +95,9 @@ async function Page() {
                   <div className="mt-2 flex">
                     {[1, 2, 3, 4, 5].map((star) => {
                       let fillType: "full" | "half" | "empty" = "empty";
-                      if (project.rating >= star) {
+                      if (post.rating >= star) {
                         fillType = "full";
-                      } else if (project.rating >= star - 0.5) {
+                      } else if (post.rating >= star - 0.5) {
                         fillType = "half";
                       }
                       return (
@@ -136,7 +140,7 @@ async function Page() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-white">{project.description}</p>
+              <p className="text-white">{post.description}</p>
             </CardContent>
           </Card>
         ))}

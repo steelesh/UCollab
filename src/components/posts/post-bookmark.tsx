@@ -1,24 +1,24 @@
 "use client";
 
-import type { Project } from "@prisma/client";
+import type { Post } from "@prisma/client";
 
 import { BookmarkCheck, BookmarkPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { bookmarkProject, unbookmarkProject } from "~/features/projects/project.actions";
+import { bookmarkPost, unbookmarkPost } from "~/features/posts/post.actions";
 import { toastError, toastSuccess } from "~/lib/toast";
 
 import { ActionButton } from "../ui/action-button";
 import { ConfirmDialog } from "../ui/confirm-dialog";
 
-type ProjectBookmarkProps = {
-  projectId: Project["id"];
+type PostBookmarkProps = {
+  postId: Post["id"];
   initialBookmarked: boolean;
   className?: string;
 };
 
-export function ProjectBookmark({ projectId, initialBookmarked, className = "" }: ProjectBookmarkProps) {
+export function PostBookmark({ postId, initialBookmarked, className = "" }: PostBookmarkProps) {
   const [isBookmarked, setIsBookmarked] = useState(initialBookmarked);
   const [isLoading, setIsLoading] = useState(false);
   const [showUnbookmarkConfirm, setShowUnbookmarkConfirm] = useState(false);
@@ -27,14 +27,14 @@ export function ProjectBookmark({ projectId, initialBookmarked, className = "" }
   const handleBookmark = async () => {
     setIsLoading(true);
     try {
-      await bookmarkProject(projectId);
+      await bookmarkPost(postId);
       setIsBookmarked(true);
       router.refresh();
-      toastSuccess("Project Bookmarked", {
-        description: "Project has been added to your bookmarks",
+      toastSuccess("Post Bookmarked", {
+        description: "Post has been added to your bookmarks",
       });
     } catch {
-      toastError("Unable to Bookmark Project", {
+      toastError("Unable to Bookmark Post", {
         description: "Please try again",
       });
     } finally {
@@ -45,11 +45,11 @@ export function ProjectBookmark({ projectId, initialBookmarked, className = "" }
   const handleUnbookmark = async () => {
     setIsLoading(true);
     try {
-      await unbookmarkProject(projectId);
+      await unbookmarkPost(postId);
       setIsBookmarked(false);
       router.refresh();
       toastSuccess("Bookmark Removed", {
-        description: "Project has been removed from your bookmarks",
+        description: "Post has been removed from your bookmarks",
       });
     } catch {
       toastError("Unable to Remove Bookmark", {
@@ -77,7 +77,7 @@ export function ProjectBookmark({ projectId, initialBookmarked, className = "" }
                 open={showUnbookmarkConfirm}
                 onOpenChange={setShowUnbookmarkConfirm}
                 title="Remove Bookmark"
-                description="Are you sure you want to remove this project from your bookmarks?"
+                description="Are you sure you want to remove this post from your bookmarks?"
                 confirmText="Remove"
                 cancelText="Cancel"
                 onConfirm={() => {
