@@ -1,5 +1,6 @@
 import type { ClassValue } from "clsx";
 
+import { NeedType } from "@prisma/client";
 import { clsx } from "clsx";
 import { StatusCodes } from "http-status-codes";
 import { twMerge } from "tailwind-merge";
@@ -88,4 +89,8 @@ export function emitNotificationCountChanged() {
   if (typeof window !== "undefined") {
     window.dispatchEvent(new CustomEvent(NOTIFICATION_COUNT_CHANGED));
   }
+}
+
+export function isProjectNeedType(type: NeedType | string | null | undefined): boolean {
+  return type === NeedType.FEEDBACK || type === NeedType.CONTRIBUTION;
 }
