@@ -20,7 +20,7 @@ export function ItemsPerPageSelector({
   startIndex,
   endIndex,
   basePath = "/p",
-  itemName = "projects",
+  itemName = "posts",
   onValueChange,
 }: ItemsPerPageSelectorProps) {
   return (
