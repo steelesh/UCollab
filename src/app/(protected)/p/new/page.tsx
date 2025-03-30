@@ -1,18 +1,21 @@
-import { ProjectForm } from "~/components/projects/project-form";
+import { PostForm } from "~/components/posts/post-form";
+import { Card } from "~/components/ui/card";
+import { Container } from "~/components/ui/container";
 import { withAuth } from "~/security/protected";
 
 export const metadata = {
-  title: "UCollab — New Project",
+  title: "UCollab — New Post",
 };
 
 export const dynamic = "force-dynamic";
 
 async function Page() {
   return (
-    <div className="mx-auto w-full max-w-5xl rounded-lg shadow-lg">
-      <h2 className="mb-3 text-center text-3xl font-bold">New Project</h2>
-      <ProjectForm />
-    </div>
+    <Container className="max-w-5xl">
+      <Card variant="glossy" className="p-4 sm:p-8">
+        <PostForm />
+      </Card>
+    </Container>
   );
 }
 
