@@ -97,6 +97,10 @@ export default function SearchBar() {
             <option value="">All</option>
             <option value="FEEDBACK">Feedback</option>
             <option value="CONTRIBUTION">Contribution</option>
+            <option value="DEVELOPER_AVAILABLEK">Developer Available</option>
+            <option value="SEEKING_MENTOR">Seeking Mentor</option>
+            <option value="MENTOR_AVAILABLE">Mentor Available</option>
+            <option value="TEAM_FORMATION">Team Formation</option>
           </select>
         </div>
         <div>
@@ -129,6 +133,8 @@ export default function SearchBar() {
           >
             <option value="createdDate">Creation Date</option>
             <option value="lastModifiedDate">Last Updated Date</option>
+            <option value="rating">Rating</option>
+            <option value="title">Title</option>
           </select>
         </div>
         <div className="sm:col-span-2 lg:col-span-1">

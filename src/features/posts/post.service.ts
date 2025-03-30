@@ -1,6 +1,6 @@
 import type { Post, Technology, User } from "@prisma/client";
 
-import { Prisma } from "@prisma/client";
+import { NeedType, Prisma } from "@prisma/client";
 import { notFound } from "next/navigation";
 
 import { NotificationService } from "~/features/notifications/notification.service";
@@ -422,13 +422,46 @@ export const PostService = {
     });
   },
 
-  async getPaginatedPosts(page = 1, limit = 12, requestUserId: User["id"]): Promise<{ posts: ExplorePost[]; totalCount: number }> {
+  async getPaginatedPosts(
+    page = 1,
+    limit = 12,
+    requestUserId: User["id"],
+    query: string = "",
+    postNeeds: string = "",
+    minRating: string = "",
+    sortBy: string = "createdDate",
+    sortOrder: string = "desc",
+  ): Promise<{ posts: ExplorePost[]; totalCount: number }> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
+        const validNeedTypes = new Set(Object.values(NeedType));
+        const where: Prisma.PostWhereInput = {
+          ...(query && {
+            OR: [
+              { title: { contains: query } },
+              { description: { contains: query } },
+            ],
+          }),
+          ...(postNeeds && validNeedTypes.has(postNeeds as NeedType)
+            ? { postNeeds: { some: { needType: postNeeds as NeedType } } }
+            : {}),
+          ...(minRating && {
+            rating: { gte: Number(minRating) },
+          }),
+        };
+
+        const effectiveSortOrder
+        = sortBy === "title" && sortOrder === "desc"
+          ? "asc"
+          : sortBy === "title" && sortOrder === "asc"
+            ? "desc"
+            : sortOrder;
+
         const [posts, totalCount] = await Promise.all([
           prisma.post.findMany({
+            where,
             orderBy: {
-              createdDate: "desc",
+              [sortBy]: effectiveSortOrder,
             },
             skip: (page - 1) * limit,
             take: limit,
@@ -480,11 +513,13 @@ export const PostService = {
               },
             },
           }),
-          prisma.post.count(),
+          prisma.post.count({ where }),
         ]);
 
         const postsWithScores = posts.map((post) => {
-          const ageInHours = (Date.now() - new Date(post.createdDate).getTime()) / (1000 * 3600);
+          const ageInHours
+            = (Date.now() - new Date(post.createdDate).getTime())
+              / (1000 * 3600);
           const timeDecay = (1 / (ageInHours + 48) ** 1.1) * 100;
 
           const ratingWeight = 0.7;
@@ -492,14 +527,16 @@ export const PostService = {
           const commentWeight = 0.1;
 
           const ratingScore = post.rating / 5;
-          const nonOwnerWatchers = post.watchers.filter(w => w.userId !== post.createdById);
-          const watcherScore = Math.min((nonOwnerWatchers.length) / 10, 1);
+          const nonOwnerWatchers = post.watchers.filter(
+            w => w.userId !== post.createdById,
+          );
+          const watcherScore = Math.min(nonOwnerWatchers.length / 10, 1);
           const commentScore = Math.min(post.comments.length / 20, 1);
 
           const engagementScore
-            = (ratingScore * ratingWeight)
-              + (watcherScore * watcherWeight)
-              + (commentScore * commentWeight);
+            = ratingScore * ratingWeight
+              + watcherScore * watcherWeight
+              + commentScore * commentWeight;
 
           const trendingScore = engagementScore * timeDecay;
           return {
@@ -1075,8 +1112,6 @@ export const PostService = {
               },
             },
           },
-          skip: (page - 1) * limit,
-          take: limit,
         });
 
         const postsWithScores = posts
@@ -1107,14 +1142,15 @@ export const PostService = {
           })
           .filter(post => post.trendingScore > 0.5)
           .sort((a, b) => b.trendingScore - a.trendingScore);
-
         const totalFilteredCount = postsWithScores.length;
+        const totalPages = Math.ceil(totalFilteredCount / limit);
+        const paginatedPosts = postsWithScores.slice((page - 1) * limit, page * limit);
 
         return {
-          posts: postsWithScores satisfies ExplorePost[],
+          posts: paginatedPosts satisfies ExplorePost[],
           totalCount: totalFilteredCount,
           currentPage: page,
-          totalPages: Math.ceil(totalFilteredCount / limit),
+          totalPages,
           limit,
         };
       } catch (error) {

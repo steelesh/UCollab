@@ -22,8 +22,30 @@ type PageProps = {
 };
 
 async function Page({ searchParams, userId }: PageProps) {
-  const { page = "1", limit = "8" } = await searchParams;
-  const { posts, totalCount } = await getPosts(Number(page), Number(limit), userId);
+  const {
+    page = "1",
+    limit = "8",
+    query: queryParam = "",
+    postNeeds: postNeedsParam = "",
+    minRating: minRatingParam = "",
+    sortBy: sortByParam = "createdDate",
+    sortOrder: sortOrderParam = "desc",
+  } = await searchParams;
+  const query = Array.isArray(queryParam) ? queryParam[0] : queryParam;
+  const postNeeds = Array.isArray(postNeedsParam) ? postNeedsParam[0] : postNeedsParam;
+  const minRating = Array.isArray(minRatingParam) ? minRatingParam[0] : minRatingParam;
+  const sortBy = Array.isArray(sortByParam) ? sortByParam[0] : sortByParam;
+  const sortOrder = Array.isArray(sortOrderParam) ? sortOrderParam[0] : sortOrderParam;
+  const { posts, totalCount } = await getPosts(
+    Number(page),
+    Number(limit),
+    userId,
+    query,
+    postNeeds,
+    minRating,
+    sortBy,
+    sortOrder,
+  );
 
   return (
     <Container>

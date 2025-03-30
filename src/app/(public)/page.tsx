@@ -18,6 +18,7 @@ export default async function Page() {
   if (session?.user?.id) {
     const trendingData = await getTrendingPosts(session.user.id);
     const trendingPosts = trendingData?.success ? trendingData.posts : [];
+    const trendingPostsToShow = trendingPosts.slice(0, 6);
 
     return (
       <>
@@ -36,10 +37,10 @@ export default async function Page() {
             !
           </H1>
           <H3 className="mt-8">Trending Posts</H3>
-          {trendingPosts.length > 0
+          {trendingPostsToShow.length > 0
             ? (
-                <div className="grid gap-4 lg:grid-cols-2 mt-4">
-                  {trendingPosts.map(post => (
+                <div className="grid gap-4 grid-cols-3 mt-4">
+                  {trendingPostsToShow.map(post => (
                     <PostCardXs
                       key={post.id}
                       id={post.id}

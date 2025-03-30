@@ -149,7 +149,6 @@ export async function checkPostsCount(filters: { query?: string; needType?: stri
     const where: Prisma.PostWhereInput = {};
 
     if (query) {
-      // Always use full-text search (even for partial queries)
       where.OR = [{ title: { search: query } }, { description: { search: query } }];
     }
 

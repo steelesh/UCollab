@@ -12,8 +12,26 @@ export async function getRealTimePost(postId: Post["id"], userId: User["id"]): P
   return PostService.getPostById(postId, userId);
 }
 
-export async function getPosts(page: number, limit: number, userId: User["id"]): Promise<ExplorePageData> {
-  const { posts, totalCount } = await PostService.getPaginatedPosts(page, limit, userId);
+export async function getPosts(
+  page: number,
+  limit: number,
+  userId: User["id"],
+  query: string = "",
+  postNeeds: string = "",
+  minRating: string = "",
+  sortBy: string = "createdDate",
+  sortOrder: string = "desc",
+): Promise<ExplorePageData> {
+  const { posts, totalCount } = await PostService.getPaginatedPosts(
+    page,
+    limit,
+    userId,
+    query,
+    postNeeds,
+    minRating,
+    sortBy,
+    sortOrder,
+  );
 
   return {
     posts,
