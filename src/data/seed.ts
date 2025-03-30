@@ -69,7 +69,7 @@ async function createTestUsers(initialTechnologies: Technology[]) {
     return;
   }
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 60; i++) {
     const azureId = faker.string.uuid();
     const technologyIds = (await prisma.technology.findMany({ select: { id: true } })).map(tech => tech.id);
     const userTechConnect: { id: string }[] = [];
@@ -77,9 +77,9 @@ async function createTestUsers(initialTechnologies: Technology[]) {
     if (technologyIds.length > 0) {
       const guaranteedTechId = faker.helpers.arrayElement(technologyIds);
       userTechConnect.push({ id: guaranteedTechId });
-      const numAdditionalTechs = faker.number.int({ min: 0, max: 1 });
+      const numAdditionalTechs = faker.number.int({ min: 2, max: 8 });
       const availableTechIds = faker.helpers.shuffle(technologyIds.filter(id => id !== guaranteedTechId));
-      for (let j = 0; j < numAdditionalTechs; j++) {
+      for (let j = 0; j < numAdditionalTechs && j < availableTechIds.length; j++) {
         const additionalTechId = availableTechIds[j];
         if (additionalTechId) {
           userTechConnect.push({ id: additionalTechId });
@@ -111,12 +111,16 @@ async function createPostsAndNotifications() {
     where: { onboardingStep: OnboardingStep.COMPLETE },
   });
 
-  for (const user of completedUsers) {
-    const postCount = faker.number.int({ min: 1, max: 2 });
-    for (let i = 0; i < postCount; i++) {
-      await createPost(user, completedUsers);
+  const CHUNK_SIZE = 10;
+  for (let i = 0; i < completedUsers.length; i += CHUNK_SIZE) {
+    const userChunk = completedUsers.slice(i, i + CHUNK_SIZE);
+
+    for (const user of userChunk) {
+      const postCount = faker.number.int({ min: 2, max: 8 });
+      for (let j = 0; j < postCount; j++) {
+        await createPost(user, completedUsers);
+      }
     }
-    await createSystemNotifications(user);
   }
 }
 
@@ -283,17 +287,19 @@ async function createCommentsAndNotifications(
     return;
   }
 
+  const defaultCommentCount = faker.number.int({ min: 5, max: 15 });
   const commentsToCreate = conversation.comments.length > 0
-    ? conversation.comments
-    : generateDefaultComments(needType, post.title);
+    ? [...conversation.comments, ...generateDefaultComments(needType, post.title, 3)]
+    : generateDefaultComments(needType, post.title, defaultCommentCount);
 
-  const commenters = faker.helpers
+  const potentialCommenters = faker.helpers
     .shuffle([...allUsers])
-    .filter(u => u.id !== postCreator.id)
-    .slice(0, commentsToCreate.length);
+    .filter(u => u.id !== postCreator.id);
 
-  for (let i = 0; i < commenters.length; i++) {
-    const commenter = commenters[i];
+  const commentCount = Math.min(commentsToCreate.length, potentialCommenters.length);
+
+  for (let i = 0; i < commentCount; i++) {
+    const commenter = potentialCommenters[i];
     if (!commenter)
       continue;
 
@@ -319,11 +325,10 @@ async function createCommentsAndNotifications(
   }
 }
 
-function generateDefaultComments(needType: NeedType, postTitle: string): string[] {
-  const defaultCommentCount = faker.number.int({ min: 1, max: 3 });
+function generateDefaultComments(needType: NeedType, postTitle: string, count = 3): string[] {
   const comments: string[] = [];
 
-  for (let i = 0; i < defaultCommentCount; i++) {
+  for (let i = 0; i < count; i++) {
     let comment = "";
 
     switch (needType) {
@@ -334,6 +339,13 @@ function generateDefaultComments(needType: NeedType, postTitle: string): string[
           "I like what you've done here. Maybe add some error handling?",
           "Great project! What testing framework are you using?",
           "Have you considered making this accessible for screen readers?",
+          "The architecture looks solid! Have you thought about scalability?",
+          "This is a really innovative approach. I'm impressed!",
+          "The code quality is high, but you might want to add more tests.",
+          "How does this perform with large datasets?",
+          "Have you considered adding a caching layer?",
+          "Really clean implementation. Documentation could be more detailed though.",
+          "The API design is elegant. Have you considered versioning?",
         ]);
         break;
       case NeedType.CONTRIBUTION:
@@ -343,6 +355,13 @@ function generateDefaultComments(needType: NeedType, postTitle: string): string[
           "I have experience with this technology stack. How can I join?",
           "What's the development environment setup like?",
           "Is there a contribution guide or coding standards document?",
+          "I'd like to contribute to the frontend. Are there any specific UI guidelines?",
+          "Could I help with tests? That's my specialty.",
+          "I'm interested in helping with performance optimization.",
+          "Do you have a roadmap for future features?",
+          "I'd like to contribute to the internationalization efforts.",
+          "Are you open to architecture suggestions? I have some ideas.",
+          "Is there a backlog of issues I can look at?",
         ]);
         break;
       case NeedType.DEVELOPER_AVAILABLE:
@@ -382,27 +401,13 @@ function generateDefaultComments(needType: NeedType, postTitle: string): string[
         ]);
         break;
       default:
-        comment = `Interesting post about "${postTitle}"!`;
+        comment = `Interesting post about "${postTitle}"! ${faker.lorem.sentence()}`;
     }
 
     comments.push(comment);
   }
 
   return comments;
-}
-
-async function createSystemNotifications(user: User) {
-  const notificationCount = faker.number.int({ min: 1, max: 3 });
-  for (let i = 0; i < notificationCount; i++) {
-    await prisma.notification.create({
-      data: {
-        userId: user.id,
-        message: faker.helpers.arrayElement(SYSTEM_MESSAGES),
-        type: NotificationType.SYSTEM,
-        isRead: faker.datatype.boolean(),
-      },
-    });
-  }
 }
 
 async function clearDatabase() {
@@ -646,14 +651,6 @@ export const DEFAULT_TECHNOLOGIES = [
   { name: "yarn" },
 ];
 
-const SYSTEM_MESSAGES = [
-  "Welcome to UCollab! Complete your profile to get started.",
-  "New feature alert: You can now follow other users!",
-  "Don't forget to check out the trending posts.",
-  "Your profile is gaining attention! Consider adding more skills.",
-  "Weekly digest: Check out the most active discussions.",
-];
-
 type PostConversation = {
   title: string;
   description: string;
@@ -766,6 +763,78 @@ const POST_CONTENT: Record<NeedType, PostConversation[]> = {
         "Consider implementing custom metrics for business KPIs.",
       ],
       githubProject: "campus-service-mesh",
+    },
+    {
+      title: "Review My Mobile App UI Design",
+      description:
+        "I've designed a mobile app for campus navigation with accessibility features. Looking for feedback on the UI/UX design and accessibility compliance.",
+      comments: [
+        "Your color contrast is excellent for accessibility!",
+        "Consider adding voice guidance for visually impaired users.",
+        "The navigation flow could be simplified in a few places.",
+        "Have you user-tested with actual accessibility users?",
+      ],
+      githubProject: "campus-navigator",
+    },
+    {
+      title: "Feedback on AI Recommendation Engine",
+      description:
+        "Built a recommendation engine for student resources using collaborative filtering and content-based approaches. Looking for feedback on the algorithm and performance.",
+      comments: [
+        "Your cold start strategy is interesting! Have you thought about using knowledge graphs?",
+        "Consider adding explainability features to show why recommendations are made.",
+        "The latency seems high - have you profiled the bottlenecks?",
+        "Great approach to the hybrid model!",
+      ],
+      githubProject: "student-recommender",
+    },
+    {
+      title: "Review My Progressive Web App",
+      description:
+        "Created a PWA for student event management with offline capabilities. Looking for feedback on the service worker implementation and caching strategies.",
+      comments: [
+        "Your cache-first strategy works well, but consider network-first for dynamic content.",
+        "The offline experience is seamless - great job!",
+        "Consider implementing background sync for submissions made offline.",
+        "Have you tested with slow network connections?",
+      ],
+      githubProject: "events-pwa",
+    },
+    {
+      title: "Seeking Feedback on Data Visualization Dashboard",
+      description:
+        "Designed a dashboard for visualizing research data with interactive charts and filters. Looking for feedback on UX and performance with large datasets.",
+      comments: [
+        "The visualizations are beautiful, but consider adding export options.",
+        "For large datasets, virtualized rendering would improve performance.",
+        "Your filtering UI is intuitive, but could use keyboard shortcuts.",
+        "Consider adding annotation capabilities for researchers.",
+      ],
+      githubProject: "research-dashboard",
+    },
+    {
+      title: "Review My AR Campus Tour App",
+      description:
+        "Developed an AR app for campus tours using ARKit/ARCore. Looking for feedback on performance, battery usage, and UX.",
+      comments: [
+        "The AR markers are well-placed, but consider adding geolocation fallback.",
+        "Battery consumption is high - consider lowering the camera resolution.",
+        "The historical information overlays are fantastic!",
+        "Have you considered adding audio narration options?",
+      ],
+      githubProject: "ar-campus-tour",
+    },
+    {
+      title: "Feedback on Distributed System Design",
+      description:
+        "Designing a distributed system for processing student submission data. Looking for feedback on the architecture, data consistency approach, and failure handling.",
+      comments: [
+        "Your eventual consistency model makes sense, but critical operations might need stronger guarantees.",
+        "Consider using a saga pattern for the multi-step workflows.",
+        "The failure recovery looks solid, but add more telemetry for debugging.",
+        "Have you load tested the coordination service?",
+      ],
+      githubProject: "distributed-submissions",
     },
   ],
   CONTRIBUTION: [
@@ -886,6 +955,66 @@ const POST_CONTENT: Record<NeedType, PostConversation[]> = {
       ],
       githubProject: "lms-cache-layer",
     },
+    {
+      title: "Open Source Library for Academic Scheduling",
+      description:
+        "Building a Python library for optimizing academic course scheduling using constraint satisfaction algorithms. Handles room assignments, instructor preferences, and student needs.",
+      comments: [
+        "Your constraint model is elegant! Would love to help expand the preference types.",
+        "Have you considered using genetic algorithms for optimization?",
+        "I'd like to contribute visualization tools for the schedules.",
+        "The conflict resolution strategy is impressive!",
+      ],
+      githubProject: "academic-scheduler",
+    },
+    {
+      title: "Accessibility Toolkit for Educational Websites",
+      description:
+        "Created a JavaScript toolkit for improving accessibility in educational web applications. Includes screen reader support, keyboard navigation, and automated WCAG compliance checking.",
+      comments: [
+        "This is fantastic! I'd love to help add support for more complex interactions.",
+        "Have you considered adding dyslexia-friendly font options?",
+        "I can contribute to the documentation and examples section.",
+        "The automated testing tools are incredibly useful!",
+      ],
+      githubProject: "edu-a11y-toolkit",
+    },
+    {
+      title: "Real-time Collaborative Note Taking App",
+      description:
+        "Building a collaborative note-taking application with real-time synchronization using CRDTs. Supports rich text, code blocks, and embedded media.",
+      comments: [
+        "The CRDT implementation is impressive! I'd like to contribute conflict resolution improvements.",
+        "Have you considered adding LaTeX support for math notes?",
+        "I can help implement the offline synchronization features.",
+        "The performance with large documents is surprising - what optimizations are you using?",
+      ],
+      githubProject: "collab-notes",
+    },
+    {
+      title: "Campus IoT Platform",
+      description:
+        "Developing an IoT platform for campus environmental monitoring and smart building controls. Uses MQTT, time-series databases, and provides a dashboard for visualization.",
+      comments: [
+        "The MQTT topic structure is well-designed! I can help with the edge computing layer.",
+        "Have you considered adding anomaly detection for the sensor data?",
+        "I'd like to contribute to the energy optimization algorithms.",
+        "The dashboard looks great - would love to help add more interactive visualizations.",
+      ],
+      githubProject: "campus-iot",
+    },
+    {
+      title: "Federated Learning Framework for Research Collaboration",
+      description:
+        "Building a framework for privacy-preserving machine learning across multiple research institutions. Allows model training without sharing sensitive data.",
+      comments: [
+        "The differential privacy implementation is solid! I can help with the secure aggregation protocol.",
+        "Have you evaluated the accuracy impact of the privacy mechanisms?",
+        "I'd like to contribute adapters for more ML frameworks.",
+        "The attack mitigation strategies are well thought out!",
+      ],
+      githubProject: "federated-research",
+    },
   ],
   DEVELOPER_AVAILABLE: [
     {
@@ -910,6 +1039,50 @@ const POST_CONTENT: Record<NeedType, PostConversation[]> = {
       ],
       githubProject: "api-portfolio",
     },
+    {
+      title: "Full-Stack Developer Available for Collaboration",
+      description:
+        "Full-stack developer proficient in React, Node.js, and PostgreSQL. Experienced in building complete web applications from database design to frontend implementation. Looking for interesting projects to contribute to.",
+      comments: [
+        "We're working on a student collaboration platform and could use your full-stack skills.",
+        "Do you have experience with authentication systems?",
+        "How comfortable are you with real-time features?",
+      ],
+      githubProject: "fullstack-portfolio",
+    },
+    {
+      title: "Mobile Developer Available (React Native)",
+      description:
+        "Mobile developer with expertise in React Native and TypeScript. Have published multiple apps on both App Store and Play Store. Looking for challenging mobile projects.",
+      comments: [
+        "We're building a campus navigation app and need your React Native expertise.",
+        "Have you worked with offline-first mobile applications?",
+        "What's your approach to cross-platform UI consistency?",
+      ],
+      githubProject: "mobile-portfolio",
+    },
+    {
+      title: "Data Engineer Available for Projects",
+      description:
+        "Data engineer with experience in ETL pipelines, data warehousing, and analytics. Skilled in Python, SQL, and cloud data solutions. Looking for data-intensive projects.",
+      comments: [
+        "Our research lab needs help setting up data pipelines for our experiments.",
+        "Have you worked with real-time streaming data?",
+        "What experience do you have with data visualization?",
+      ],
+      githubProject: "data-engineering-samples",
+    },
+    {
+      title: "DevOps Engineer Seeking Collaboration",
+      description:
+        "DevOps engineer with expertise in CI/CD, containerization, and cloud infrastructure (AWS/Azure). Looking to help projects improve their deployment practices and infrastructure.",
+      comments: [
+        "We need help setting up a proper CI/CD pipeline for our student project.",
+        "Have you worked with Kubernetes in production?",
+        "What monitoring solutions do you typically implement?",
+      ],
+      githubProject: "devops-toolkit",
+    },
   ],
   SEEKING_MENTOR: [
     {
@@ -930,6 +1103,46 @@ const POST_CONTENT: Record<NeedType, PostConversation[]> = {
         "I can help you with React and modern frontend practices. DM me to set up a time.",
         "Do you have any specific areas of web dev you're most interested in?",
         "I recommend building a simple project first. Would be happy to review your code.",
+      ],
+    },
+    {
+      title: "Seeking Mentor for Cloud Architecture",
+      description:
+        "Computing student interested in cloud technologies and distributed systems. Looking for a mentor to guide me through building scalable applications on AWS or Azure.",
+      comments: [
+        "I work as a cloud architect and would be happy to mentor you. Let's connect!",
+        "Have you built anything on cloud platforms yet?",
+        "I recommend starting with a simple serverless project. Would be glad to guide you.",
+      ],
+    },
+    {
+      title: "Looking for Mobile Development Mentor",
+      description:
+        "CS sophomore interested in mobile app development. Have basic knowledge of Java but want guidance on building professional-quality Android apps.",
+      comments: [
+        "I've been developing Android apps for 5 years and would be happy to mentor you.",
+        "Have you tried building any simple apps yet?",
+        "Let's start with a small project to get you familiar with the Android lifecycle.",
+      ],
+    },
+    {
+      title: "Seeking Data Science Mentor",
+      description:
+        "Statistics major interested in transitioning to data science. Familiar with R and statistics but need guidance on applying these skills to real-world data problems.",
+      comments: [
+        "I work as a data scientist and would be happy to mentor you in applying statistical knowledge.",
+        "Have you worked on any data analysis projects yet?",
+        "Let's connect and discuss how to build your first predictive model.",
+      ],
+    },
+    {
+      title: "Need Cybersecurity Mentorship",
+      description:
+        "IT student passionate about cybersecurity. Looking for a mentor to guide me through security concepts, ethical hacking practices, and security certifications.",
+      comments: [
+        "I work in cybersecurity and would be happy to mentor you. What specific area interests you most?",
+        "Have you set up any home labs for security practice?",
+        "Let's start with some CTF challenges to build your skills.",
       ],
     },
   ],
@@ -954,6 +1167,46 @@ const POST_CONTENT: Record<NeedType, PostConversation[]> = {
         "Would love to learn more about Kubernetes networking from you.",
       ],
     },
+    {
+      title: "Frontend Development Mentor Available",
+      description:
+        "Senior frontend developer with expertise in React, Vue, and modern JavaScript. Offering mentorship for students looking to level up their frontend skills, focusing on performance, accessibility, and clean code.",
+      comments: [
+        "I'd love to learn more about state management patterns in React!",
+        "Could you help me understand frontend testing best practices?",
+        "I'm struggling with CSS layout techniques. Would appreciate your guidance.",
+      ],
+    },
+    {
+      title: "Database Design Mentor Available",
+      description:
+        "Database architect with experience in SQL and NoSQL systems. Offering mentorship in database design, optimization, and scaling strategies. Can help with projects involving complex data relationships.",
+      comments: [
+        "I'm designing my first normalized database and could use some guidance.",
+        "Could you help me understand when to use NoSQL vs SQL databases?",
+        "I'd appreciate advice on optimizing queries for my project.",
+      ],
+    },
+    {
+      title: "ML/AI Mentor Offering Guidance",
+      description:
+        "Machine learning researcher offering mentorship in AI/ML concepts and applications. Can help with deep learning, natural language processing, and computer vision projects. Python/PyTorch expertise.",
+      comments: [
+        "I'm trying to implement my first neural network and getting confused about architecture choices.",
+        "Could you recommend resources for understanding transformer models?",
+        "Would love your guidance on my computer vision project for class.",
+      ],
+    },
+    {
+      title: "Backend Systems Mentor Available",
+      description:
+        "Backend engineer specializing in distributed systems and high-performance APIs. Offering mentorship in designing robust backend architectures, scaling strategies, and API design patterns.",
+      comments: [
+        "I'm building my first microservice system and need guidance on service boundaries.",
+        "Could you help me understand caching strategies for my API?",
+        "Would appreciate advice on handling concurrency in my backend application.",
+      ],
+    },
   ],
   TEAM_FORMATION: [
     {
@@ -974,6 +1227,66 @@ const POST_CONTENT: Record<NeedType, PostConversation[]> = {
         "I've worked on accessibility projects before and would like to contribute.",
         "I can help with frontend development and UX design.",
         "Is this going to be open source? I'd love to contribute.",
+      ],
+    },
+    {
+      title: "Building a Team for AR Campus Tour App",
+      description:
+        "Assembling a team to build an augmented reality campus tour application. Looking for developers with AR experience (ARKit/ARCore), 3D modelers, and UX designers.",
+      comments: [
+        "I have experience with ARKit and would love to join this project!",
+        "I can help with the 3D modeling aspect. What kind of assets are you thinking?",
+        "This sounds fascinating. What's your timeline for the project?",
+      ],
+    },
+    {
+      title: "Team Needed for Educational Game Development",
+      description:
+        "Forming a team to create an educational game for teaching programming concepts. Need game developers, artists, educational content writers, and sound designers.",
+      comments: [
+        "I'm a game developer with Unity experience and would love to join!",
+        "I'm studying education and can help design the learning progression.",
+        "What programming concepts are you planning to teach through the game?",
+      ],
+    },
+    {
+      title: "Seeking Teammates for AI Research Project",
+      description:
+        "Looking for team members to work on a research project exploring AI applications in personalized learning. Need ML engineers, data scientists, and education specialists.",
+      comments: [
+        "I have experience with recommendation systems and would like to join.",
+        "I'm an education major with experience in personalized curriculum design.",
+        "This sounds like an impactful project! What datasets are you planning to use?",
+      ],
+    },
+    {
+      title: "Building Team for Campus Marketplace App",
+      description:
+        "Assembling a team to build a marketplace app for campus communities. Looking for full-stack developers, UI/UX designers, and mobile developers.",
+      comments: [
+        "I'm a full-stack developer and would love to help build this!",
+        "I can handle the UI/UX design. Do you have any specific design direction in mind?",
+        "Have you considered the payment processing aspects of the marketplace?",
+      ],
+    },
+    {
+      title: "Forming Robotics Competition Team",
+      description:
+        "Building a team for the upcoming robotics competition. Need members with experience in embedded systems, mechanical design, computer vision, and control systems.",
+      comments: [
+        "I have experience with ROS and computer vision. Would love to join!",
+        "I can help with the mechanical design aspects. What kind of robot are you planning?",
+        "What's the competition challenge this year?",
+      ],
+    },
+    {
+      title: "Team for Open Source Library Development",
+      description:
+        "Forming a team to create an open source library for scientific data visualization. Looking for developers with experience in D3.js, WebGL, and scientific computing.",
+      comments: [
+        "I've worked extensively with D3 and would love to contribute!",
+        "I have experience with scientific visualization in my research lab.",
+        "Have you established the scope of features for the initial release?",
       ],
     },
   ],
