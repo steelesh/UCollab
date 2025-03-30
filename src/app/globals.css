@@ -37,6 +37,9 @@
   --color-chart-4: hsl(var(--chart-4));
   --color-chart-5: hsl(var(--chart-5));
 
+  --color-uc-red: hsl(var(--uc-red));
+  --color-uc-red-dark: hsl(var(--uc-red-dark));
+
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -157,6 +160,18 @@
     --inverse-muted-foreground: 0 0% 45.1%;
     --inverse-accent: 0 0% 96.1%;
     --inverse-accent-foreground: 0 0% 9%;
+
+    --uc-red: 350 99% 44%;
+    --uc-red-dark: 350 99% 36%;
+    --uc-red-darker: 350 93% 28%;
+    --uc-black: 0 0% 0%;
+    --uc-black-light: 0 0% 20%;
+    --uc-white: 0 0% 100%;
+    --uc-grey: 0 0% 95%;
+    --uc-grey-silver: 260 3% 66%;
+    --uc-grey-mist: 260 7% 88%;
+    --uc-gold: 35 47% 64%;
+    --uc-tan: 35 47% 84%;
   }
 
   * {

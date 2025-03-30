@@ -32,7 +32,7 @@ export function AuthSection() {
     { title: "My Settings", route: `/u/${session?.user.username}/settings` },
     { title: "My Projects", route: `/u/${session?.user.username}/projects` },
     { title: "My Bookmarks", route: `/u/${session?.user.username}/bookmarks` },
-    { title: "My Connections", route: "/my-connection" },
+    { title: "My Connections", route: `/u/${session?.user.username}/connections` },
     { title: "Sign out", action: signOut },
   ];
 
@@ -50,7 +50,7 @@ export function AuthSection() {
                 <>
                   <Avatar
                     onClick={handleToggle}
-                    className="border-primary h-8 w-8 cursor-pointer rounded-full border hover:border-[2px]"
+                    className="border-uc-red h-8 w-8 cursor-pointer rounded-full border hover:border-[2px]"
                   >
                     {session.user.avatar
                       ? (
