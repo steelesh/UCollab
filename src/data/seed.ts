@@ -203,6 +203,7 @@ async function createPost(user: User, allUsers: User[]) {
           ...(secondaryNeed ? [{ id: secondaryNeed.id }] : []),
         ],
       },
+      createdDate: generateRandomDate(),
     },
   });
 
@@ -1291,6 +1292,12 @@ const POST_CONTENT: Record<NeedType, PostConversation[]> = {
     },
   ],
 };
+
+function generateRandomDate() {
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  return faker.date.between({ from: oneYearAgo, to: new Date() });
+}
 
 seedDatabase().catch((e) => {
   console.error("Error during seeding:", e);
