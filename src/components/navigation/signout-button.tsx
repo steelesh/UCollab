@@ -19,7 +19,7 @@ export function SignOutButton() {
   };
 
   return (
-    <Button className="cursor-pointer" onClick={handleSignOut} disabled={isPending}>
+    <Button variant="destructive" onClick={handleSignOut} disabled={isPending}>
       {isPending
         ? (
             <>
