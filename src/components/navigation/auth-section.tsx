@@ -21,8 +21,10 @@ export function AuthSection() {
   const handleToggle = () => setIsOpen(prev => !prev);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
-    setIsOpen(false);
+    const timer = setTimeout(() => {
+      setIsOpen(false);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [pathname]);
 
   const links = [
@@ -59,60 +61,62 @@ export function AuthSection() {
                         )}
                   </Avatar>
                   {isOpen && (
-                    <>
-                      <div
-                        className="fixed inset-0 z-40"
-                        role="button"
-                        tabIndex={0}
-                        aria-label="Close overlay"
-                        onClick={handleToggle}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            handleToggle();
-                          }
-                        }}
-                      />
-                      <div className="bg-background fixed top-0 right-0 z-50 h-full w-62">
-                        <div className="p-4 py-18">
-                          <div className="mb-4 flex items-center gap-2">
-                            <Avatar className="h-10 w-10 rounded-full border">
-                              {session.user.avatar
-                                ? (
-                                    <Image src={session.user.avatar} alt="avatar image" width={40} height={40} />
-                                  )
-                                : (
-                                    <Skeleton className="h-10 w-10 rounded-full" />
-                                  )}
-                            </Avatar>
-                            <div>
-                              <p className="font-medium">{session.user.username}</p>
-                              <p className="text-muted-foreground text-sm">{session.user.email}</p>
-                            </div>
-                          </div>
-                          <hr className="my-4" />
-                          {links.map(link => (
-                            <div key={link.title} className="mb-2">
-                              <Button
-                                variant="ghost"
-                                className="flex w-full cursor-pointer justify-start font-thin tracking-wide"
-                                onClick={() => {
-                                  setIsOpen(false);
-                                  if (link.action) {
-                                    link.action();
-                                  } else {
-                                    router.push(link.route as Route);
-                                  }
-                                }}
-                              >
-                                {link.title}
-                              </Button>
-                              <hr className="from-accent ml-4 h-0.25 w-2/3 border-0 bg-gradient-to-r to-transparent" />
-                            </div>
-                          ))}
+                    <div
+                      className="fixed inset-0 -z-10"
+                      role="button"
+                      tabIndex={0}
+                      aria-label="Close overlay"
+                      onClick={handleToggle}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          handleToggle();
+                        }
+                      }}
+                    />
+                  )}
+                  <div
+                    className={`bg-background fixed top-0 right-0 -z-10 h-full w-62 transform transition-transform ${
+                      isOpen ? "translate-x-0" : "translate-x-full"
+                    }`}
+                  >
+                    <div className="p-4 py-18">
+                      <div className="mb-4 flex items-center gap-2">
+                        <Avatar className="h-10 w-10 rounded-full border">
+                          {session.user.avatar
+                            ? (
+                                <Image src={session.user.avatar} alt="avatar image" width={40} height={40} />
+                              )
+                            : (
+                                <Skeleton className="h-10 w-10 rounded-full" />
+                              )}
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{session.user.username}</p>
+                          <p className="text-muted-foreground text-sm">{session.user.email}</p>
                         </div>
                       </div>
-                    </>
-                  )}
+                      <hr className="my-4" />
+                      {links.map(link => (
+                        <div key={link.title} className="mb-2">
+                          <Button
+                            variant="ghost"
+                            className="flex w-full cursor-pointer justify-start font-thin tracking-wide"
+                            onClick={() => {
+                              setIsOpen(false);
+                              if (link.action) {
+                                link.action();
+                              } else {
+                                router.push(link.route as Route);
+                              }
+                            }}
+                          >
+                            {link.title}
+                          </Button>
+                          <hr className="from-accent ml-4 h-0.25 w-2/3 border-0 bg-gradient-to-r to-transparent" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </>
               )}
     </>
