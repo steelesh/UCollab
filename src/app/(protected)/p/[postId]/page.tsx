@@ -19,11 +19,13 @@ import { Muted } from "~/components/ui/muted";
 import { PostNeedsBadges } from "~/components/ui/post-badges";
 import { Section } from "~/components/ui/section";
 import { TechnologyIcon } from "~/components/ui/technology-icon";
+import { getComments } from "~/features/comments/comment.queries";
 import { getPostTitle, getRealTimePost, getUserPostRating, isPostBookmarked } from "~/features/posts/post.queries";
 import { withAuth } from "~/security/protected";
 
 type PageProps = {
   params: Promise<{ postId: Post["id"] }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
   userId: User["id"];
 };
 
@@ -41,12 +43,19 @@ export async function generateMetadata({ params }: { params: Promise<{ postId: P
   }
 }
 
-async function Page({ params, userId }: PageProps) {
+async function Page({ params, searchParams, userId }: PageProps) {
   const { postId } = await params;
+  const { page = "1", limit = "30" } = await searchParams;
   const post = await getRealTimePost(postId, userId);
   const userPostRating = await getUserPostRating(postId, userId);
   const isBookmarked = await isPostBookmarked(postId, userId);
   const isTrending = post.trendingScore > 0.5;
+  const { comments, totalPages, currentPage, totalCount, limit: commentLimit } = await getComments(
+    postId,
+    userId,
+    Number(page),
+    Number(limit),
+  );
 
   return (
     <Container className="max-w-3xl">
@@ -178,11 +187,19 @@ async function Page({ params, userId }: PageProps) {
               Comments
               <span className="text-sm md:text-base font-normal text-muted-foreground">
                 (
-                {post.comments.length}
+                {totalCount}
                 )
               </span>
             </H2>
-            <PostComments comments={post.comments} currentUserId={userId} postId={postId} />
+            <PostComments
+              comments={comments}
+              currentUserId={userId}
+              postId={postId}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalCount={totalCount}
+              limit={commentLimit}
+            />
           </Section>
         )}
       </div>

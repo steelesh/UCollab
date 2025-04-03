@@ -6,6 +6,8 @@ import { useState } from "react";
 
 import type { Comment } from "~/features/posts/post.types";
 
+import { Pagination } from "~/components/ui/pagination";
+
 import { CommentContent } from "./comment-content";
 import { CommentForm } from "./comment-form";
 import { CommentHeader } from "./comment-header";
@@ -14,12 +16,27 @@ type CommentListProps = {
   comments: Comment[];
   currentUserId: User["id"];
   postId: Post["id"];
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  limit: number;
   onUpdate: (commentId: Comment["id"], content: Comment["content"]) => Promise<void>;
   onDelete: (commentId: Comment["id"]) => Promise<void>;
   onReply: (parentId: Comment["id"], content: Comment["content"]) => Promise<void>;
 };
 
-export function CommentList({ comments, currentUserId, postId, onUpdate, onDelete, onReply }: CommentListProps) {
+export function CommentList({
+  comments,
+  currentUserId,
+  postId,
+  currentPage,
+  totalPages,
+  totalCount,
+  limit,
+  onUpdate,
+  onDelete,
+  onReply,
+}: CommentListProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
 
@@ -112,6 +129,17 @@ export function CommentList({ comments, currentUserId, postId, onUpdate, onDelet
           )}
         </div>
       ))}
+      {totalCount > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalCount={totalCount}
+          limit={limit}
+          basePath={`/p/${postId}`}
+          itemName="comments"
+          itemsPerPageOptions={[30, 50, 75]}
+        />
+      )}
     </div>
   );
 }
