@@ -136,25 +136,6 @@ export const UserService = {
     });
   },
 
-  async getHomePageUser(userId: string, requestUserId: string) {
-    return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
-      try {
-        const user = await prisma.user.findUnique({
-          where: { id: userId },
-          select: userSelect,
-        });
-
-        if (!user)
-          notFound();
-        return user;
-      } catch (error) {
-        if (error instanceof Utils)
-          throw error;
-        throw new Utils(ErrorMessage.OPERATION_FAILED);
-      }
-    });
-  },
-
   async searchUsers(query: string, currentUserId: User["id"]) {
     try {
       return await prisma.user.findMany({
