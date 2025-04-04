@@ -8,6 +8,28 @@ import { AvatarSource, NeedType, NotificationType, OnboardingStep } from "@prism
 import { UserService } from "~/features/users/user.service";
 import { prisma } from "~/lib/prisma";
 
+const BANNER_BASE_URL = "https://ucollab.blob.core.windows.net/ucollab-files/post-banners/";
+const BANNER_IMAGES = [
+  "sample-banner-1.jpg",
+  "sample-banner-2.jpg",
+  "sample-banner-3.jpg",
+  "sample-banner-4.jpg",
+  "sample-banner-5.jpg",
+  "sample-banner-6.jpg",
+  "sample-banner-7.jpg",
+  "sample-banner-8.jpg",
+];
+const DEFAULT_BANNER = "default-banner.jpg";
+
+function generateBannerImageUrl(): string {
+  if (faker.datatype.boolean({ probability: 0.2 })) {
+    return `${BANNER_BASE_URL}${DEFAULT_BANNER}`;
+  }
+
+  const randomImage = faker.helpers.arrayElement(BANNER_IMAGES);
+  return `${BANNER_BASE_URL}${randomImage}`;
+}
+
 export async function seedDatabase() {
   try {
     await clearDatabase();
@@ -194,6 +216,7 @@ async function createPost(user: User, allUsers: User[]) {
       rating: 0,
       allowRatings: shouldAllowRatings,
       allowComments: faker.datatype.boolean({ probability: 0.9 }),
+      bannerImage: generateBannerImageUrl(),
       technologies: {
         connect: postTechConnect,
       },
