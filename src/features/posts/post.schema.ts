@@ -3,6 +3,33 @@ import { z } from "zod";
 
 import { isProjectNeedType } from "~/lib/utils";
 
+const bannerImageSchema = z.union([
+  z.instanceof(File)
+    .superRefine((file, ctx) => {
+      if (file.size > 5 * 1024 * 1024) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Banner image must be less than 5MB",
+          path: [],
+        });
+        return z.NEVER;
+      }
+
+      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Only JPEG, PNG, and WebP images are allowed for banners",
+          path: [],
+        });
+        return z.NEVER;
+      }
+
+      return true;
+    }),
+  z.string().url("Invalid image URL"),
+  z.null(),
+]).optional().nullable();
+
 export const postSchema = z.object({
   title: z.string().min(1, "Title is required").max(200),
   description: z.string().min(1, "Description is required").max(1000),
@@ -36,6 +63,7 @@ export const postSchema = z.object({
     val => typeof val === "string" ? val === "true" : val !== undefined ? Boolean(val) : true,
     z.boolean(),
   ),
+  bannerImage: bannerImageSchema,
 }).superRefine((data, ctx) => {
   const isPrimaryProject = isProjectNeedType(data.needType);
 
