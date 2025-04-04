@@ -200,6 +200,10 @@ export function PostForm({ post }: PostFormProps) {
       payload.append("allowRatings", String(Boolean(formData.allowRatings)));
       payload.append("allowComments", String(Boolean(formData.allowComments)));
 
+      if (formData.bannerImage) {
+        payload.append("bannerImage", formData.bannerImage);
+      }
+
       if (isEditMode && post) {
         await updatePost(post.id, payload);
       } else {
