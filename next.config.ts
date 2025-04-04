@@ -20,6 +20,11 @@ const cspHeader = `
 const nextConfig: NextConfig = {
   distDir: "build",
   output: "standalone",
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "5mb",
+    },
+  },
   images: {
     remotePatterns: [
       {
