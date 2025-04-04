@@ -281,4 +281,21 @@ export const CommentService = {
       throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
   },
+
+  async getCommentCount(postId: Post["id"], requestUserId?: User["id"]): Promise<number> {
+    return withServiceAuth(requestUserId, null, async () => {
+      try {
+        return await prisma.comment.count({
+          where: {
+            postId,
+            parentId: null,
+          },
+        });
+      } catch (error) {
+        if (error instanceof Utils)
+          throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
 };

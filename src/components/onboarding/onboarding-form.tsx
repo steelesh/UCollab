@@ -66,7 +66,7 @@ function GraduationYearControl({ field, currentYear }: { field: any; currentYear
               )}
               {selected === year && (
                 <motion.div
-                  className="bg-primary absolute right-0 bottom-[-10px] left-0 z-0 h-[4px] rounded-md"
+                  className="bg-uc-red absolute right-0 bottom-[-10px] left-0 z-0 h-[4px] rounded-md"
                   layoutId="underline"
                 />
               )}

@@ -15,10 +15,22 @@ type PostCommentsProps = {
   comments: Comment[];
   currentUserId: User["id"];
   postId: Post["id"];
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  limit: number;
 };
 
-export function PostComments({ comments: initialComments, currentUserId, postId }: PostCommentsProps) {
-  const [comments, setComments] = useState<Comment[]>(initialComments);
+export function PostComments({
+  comments,
+  currentUserId,
+  postId,
+  currentPage,
+  totalPages,
+  totalCount,
+  limit,
+}: PostCommentsProps) {
+  const [commentsState, setComments] = useState<Comment[]>(comments);
 
   const handleCreate = async (content: Comment["content"]) => {
     try {
@@ -103,9 +115,13 @@ export function PostComments({ comments: initialComments, currentUserId, postId 
         <CommentForm postId={postId} currentUserId={currentUserId} onSubmit={handleCreate} />
       </div>
       <CommentList
-        comments={comments}
+        comments={commentsState}
         currentUserId={currentUserId}
         postId={postId}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalCount={totalCount}
+        limit={limit}
         onUpdate={handleUpdate}
         onDelete={handleDelete}
         onReply={handleReply}
