@@ -1,18 +1,21 @@
 import { OnboardingForm } from "~/components/onboarding/onboarding-form";
+import { Card } from "~/components/ui/card";
+import { Container } from "~/components/ui/container";
 import { withOnboarding } from "~/security/protected";
 
 export const metadata = {
   title: "UCollab — Onboarding",
 };
 
+export const dynamic = "force-dynamic";
+
 async function Page() {
   return (
-    <div className="flex flex-col items-center">
-      <div className="mx-auto w-full max-w-5xl rounded-lg p-4 shadow-lg">
-        <h2 className="mb-6 text-center text-3xl font-bold">Onboarding</h2>
+    <Container className="max-w-5xl">
+      <Card variant="glossy" className="p-4 sm:p-8">
         <OnboardingForm />
-      </div>
-    </div>
+      </Card>
+    </Container>
   );
 }
 
