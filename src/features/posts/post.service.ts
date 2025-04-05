@@ -2,8 +2,11 @@ import type { Post, Technology, User } from "@prisma/client";
 
 import { Prisma } from "@prisma/client";
 import { notFound } from "next/navigation";
+import { Buffer } from "node:buffer";
+import crypto from "node:crypto";
 
 import { NotificationService } from "~/features/notifications/notification.service";
+import { blobStorage } from "~/lib/blob-storage";
 import { prisma } from "~/lib/prisma";
 import { ErrorMessage, isProjectNeedType, Utils } from "~/lib/utils";
 import { withServiceAuth } from "~/security/protected-service";
@@ -56,6 +59,7 @@ export const PostService = {
             rating: true,
             allowRatings: true,
             allowComments: true,
+            bannerImage: true,
             postNeeds: {
               select: {
                 id: true,
@@ -166,6 +170,15 @@ export const PostService = {
       try {
         const isProjectPost = isProjectNeedType(data.needType) || isProjectNeedType(data.secondaryNeedType);
 
+        let bannerImageUrl: string | null = null;
+        if (data.bannerImage instanceof File) {
+          bannerImageUrl = await this.uploadPostBannerImage(data.bannerImage, requestUserId);
+        } else if (typeof data.bannerImage === "string") {
+          bannerImageUrl = data.bannerImage;
+        } else if (data.bannerImage === null) {
+          bannerImageUrl = null;
+        }
+
         const post = await prisma.$transaction(async (tx) => {
           let technologiesConnect = {};
           if (isProjectPost && data.technologies && data.technologies.length > 0) {
@@ -198,6 +211,7 @@ export const PostService = {
               githubRepo: isProjectPost ? data.githubRepo : null,
               allowRatings,
               allowComments: data.allowComments,
+              bannerImage: bannerImageUrl,
               createdBy: { connect: { id: requestUserId } },
               technologies: technologiesConnect,
               postNeeds: {
@@ -210,6 +224,7 @@ export const PostService = {
               description: true,
               createdDate: true,
               githubRepo: true,
+              bannerImage: true,
               technologies: true,
               allowRatings: true,
               allowComments: true,
@@ -442,6 +457,7 @@ export const PostService = {
               createdById: true,
               allowRatings: true,
               allowComments: true,
+              bannerImage: true,
               postNeeds: {
                 select: {
                   id: true,
@@ -562,6 +578,15 @@ export const PostService = {
       try {
         const isProjectPost = isProjectNeedType(data.needType) || isProjectNeedType(data.secondaryNeedType);
 
+        let bannerImageUrl = post.bannerImage;
+        if (data.bannerImage instanceof File) {
+          bannerImageUrl = await this.uploadPostBannerImage(data.bannerImage, requestUserId);
+        } else if (typeof data.bannerImage === "string") {
+          bannerImageUrl = data.bannerImage;
+        } else if (data.bannerImage === null) {
+          bannerImageUrl = null;
+        }
+
         const updatedPost = await prisma.$transaction(async (tx) => {
           let techUpdate = {};
 
@@ -622,6 +647,7 @@ export const PostService = {
               githubRepo: isProjectPost ? data.githubRepo : null,
               allowRatings: data.allowRatings,
               allowComments: data.allowComments,
+              bannerImage: bannerImageUrl,
               technologies: techUpdate,
               postNeeds: {
                 create: postNeeds,
@@ -633,6 +659,7 @@ export const PostService = {
               description: true,
               createdDate: true,
               githubRepo: true,
+              bannerImage: true,
               technologies: true,
               allowRatings: true,
               allowComments: true,
@@ -995,6 +1022,25 @@ export const PostService = {
     });
   },
 
+  async uploadPostBannerImage(file: File, requestUserId: User["id"]) {
+    return withServiceAuth(requestUserId, null, async () => {
+      try {
+        const buffer = Buffer.from(await file.arrayBuffer());
+
+        const uniqueId = crypto.randomBytes(16).toString("hex");
+        const extension = file.name.split(".").pop() ?? "jpg";
+        const fileName = `banner_${uniqueId}.${extension}`;
+
+        return blobStorage.uploadBannerImage(buffer, fileName, file.type);
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new Utils(error.message);
+        }
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
   async isPostBookmarked(postId: Post["id"], userId: User["id"]) {
     return withServiceAuth(userId, null, async () => {
       try {
@@ -1038,6 +1084,7 @@ export const PostService = {
             createdById: true,
             allowRatings: true,
             allowComments: true,
+            bannerImage: true,
             postNeeds: {
               select: {
                 id: true,

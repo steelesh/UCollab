@@ -7,6 +7,8 @@ import Link from "next/link";
 
 import type { PostNeed, Technology } from "~/features/posts/post.types";
 
+import { DEFAULT_POST_BANNER_IMAGE } from "~/lib/utils";
+
 import { AvatarCircles } from "../magicui/avatar-circles";
 import { Avatar, AvatarImage } from "./avatar";
 import { Badge } from "./badge";
@@ -26,6 +28,7 @@ type PostCardProps = {
   technologies: Technology[];
   rating: number;
   allowRatings: boolean;
+  bannerImage: Post["bannerImage"];
   githubRepo: Post["githubRepo"];
   postNeeds: PostNeed[];
   user: {
@@ -51,6 +54,7 @@ export function PostCard({
   technologies,
   rating,
   allowRatings,
+  bannerImage,
   githubRepo,
   postNeeds,
   user,
@@ -66,7 +70,7 @@ export function PostCard({
     <Card variant="glossy" className="group w-full pt-0 flex flex-col">
       <div className="relative h-48 w-full overflow-hidden rounded-t-lg flex-shrink-0">
         <Image
-          src="/images/banner-placeholder.png"
+          src={bannerImage ?? DEFAULT_POST_BANNER_IMAGE}
           alt={title}
           fill
           className="object-cover transition-transform duration-300 group-hover:scale-105"

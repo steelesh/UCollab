@@ -10,6 +10,7 @@ import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { updateUser } from "~/features/users/user.actions";
 import { prisma } from "~/lib/prisma";
+import { DEFAULT_POST_BANNER_IMAGE } from "~/lib/utils";
 import { withAuth } from "~/security/protected";
 
 async function Page({ userId }: { userId: User["id"] }) {
@@ -48,7 +49,7 @@ async function Page({ userId }: { userId: User["id"] }) {
       <input type="hidden" name="userId" value={userId} />
       <div className="w-full max-w-3xl rounded shadow">
         <div className="relative h-42">
-          <Image src="/images/banner-placeholder.png" alt="Banner" fill className="rounded-t object-cover" />
+          <Image src={DEFAULT_POST_BANNER_IMAGE} alt="Banner" fill className="rounded-t object-cover" />
           <div className="absolute -bottom-12 left-8">
             <Image
               src={user.avatar}

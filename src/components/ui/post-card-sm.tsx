@@ -6,6 +6,8 @@ import Link from "next/link";
 
 import type { PostNeed, Technology } from "~/features/posts/post.types";
 
+import { DEFAULT_POST_BANNER_IMAGE } from "~/lib/utils";
+
 import { Avatar, AvatarImage } from "./avatar";
 import { Badge } from "./badge";
 import { Card, CardContent, CardHeader } from "./card";
@@ -23,6 +25,7 @@ type PostCardSmallProps = {
   postNeeds: PostNeed[];
   rating: number;
   allowRatings: boolean;
+  bannerImage: Post["bannerImage"];
   user: {
     username: User["username"];
     avatar: User["avatar"];
@@ -45,6 +48,7 @@ export function PostCardSmall({
   user,
   rating,
   allowRatings,
+  bannerImage,
 }: PostCardSmallProps) {
   const displayTechnologies = technologies.slice(0, 4);
   const hasMoreTechnologies = technologies.length > 4;
@@ -53,7 +57,7 @@ export function PostCardSmall({
     <Card variant="glossy" className="group w-full min-h-[200px] pt-0">
       <CardHeader className="flex flex-row items-start gap-4 p-6">
         <Avatar className="h-18 w-18">
-          <AvatarImage src="/images/banner-placeholder.png" alt={title} />
+          <AvatarImage src={bannerImage ?? DEFAULT_POST_BANNER_IMAGE} alt={title} />
         </Avatar>
         <div className="flex flex-col gap-1 flex-1">
           <Link

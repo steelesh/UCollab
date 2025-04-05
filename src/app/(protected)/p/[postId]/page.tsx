@@ -21,6 +21,7 @@ import { Section } from "~/components/ui/section";
 import { TechnologyIcon } from "~/components/ui/technology-icon";
 import { getComments } from "~/features/comments/comment.queries";
 import { getPostTitle, getRealTimePost, getUserPostRating, isPostBookmarked } from "~/features/posts/post.queries";
+import { DEFAULT_POST_BANNER_IMAGE } from "~/lib/utils";
 import { withAuth } from "~/security/protected";
 
 type PageProps = {
@@ -134,7 +135,7 @@ async function Page({ params, searchParams, userId }: PageProps) {
       </Header>
       <div className="relative w-full h-48 sm:h-64 md:h-80 rounded-xl overflow-hidden mb-6 md:mb-10">
         <Image
-          src="/images/banner-placeholder.png"
+          src={post.bannerImage ?? DEFAULT_POST_BANNER_IMAGE}
           alt={post.title}
           fill
           className="object-cover"

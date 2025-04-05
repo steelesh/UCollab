@@ -2,7 +2,8 @@
 
 import { NeedType } from "@prisma/client";
 import { Github } from "lucide-react";
-import { memo } from "react";
+import Image from "next/image";
+import { memo, useEffect, useState } from "react";
 
 import type { CreatePostInput } from "~/features/posts/post.schema";
 import type { PostNeed } from "~/features/posts/post.types";
@@ -16,6 +17,7 @@ type PreviewSectionProps = {
 };
 
 export const PreviewSection = memo(({ data }: PreviewSectionProps) => {
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const canHaveRatings = data.needType === NeedType.FEEDBACK || data.secondaryNeedType === NeedType.FEEDBACK;
   const effectiveAllowRatings = canHaveRatings && data.allowRatings;
 
@@ -29,8 +31,25 @@ export const PreviewSection = memo(({ data }: PreviewSectionProps) => {
 
   const isProjectPost = needs.some(need => need.needType === NeedType.FEEDBACK || need.needType === NeedType.CONTRIBUTION);
 
-  // Create a dummy onRemove function that does nothing since this is just a preview
-  const dummyOnRemove = () => {};
+  useEffect(() => {
+    if (data.bannerImage instanceof File) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewUrl(e.target?.result as string);
+      };
+      reader.readAsDataURL(data.bannerImage);
+
+      return () => {
+        setPreviewUrl(null);
+      };
+    } else if (typeof data.bannerImage === "string") {
+      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
+      setPreviewUrl(data.bannerImage);
+    } else {
+      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
+      setPreviewUrl(null);
+    }
+  }, [data.bannerImage]);
 
   return (
     <Section>
@@ -44,6 +63,32 @@ export const PreviewSection = memo(({ data }: PreviewSectionProps) => {
               {needs.length > 0 ? <PostNeedsBadges needs={needs} /> : null}
             </div>
           </div>
+
+          {data.bannerImage && (
+            <div>
+              <h4 className="text-xs md:text-sm font-medium text-muted-foreground mb-1">Banner Image</h4>
+              {previewUrl && (
+                <div className="relative aspect-video rounded-md overflow-hidden max-h-48 bg-muted flex items-center justify-center">
+                  <Image
+                    src={previewUrl}
+                    fill
+                    alt="Banner preview"
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+              )}
+              {data.bannerImage instanceof File && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {data.bannerImage.name}
+                  {" "}
+                  (
+                  {(data.bannerImage.size / 1024 / 1024).toFixed(2)}
+                  {" "}
+                  MB)
+                </p>
+              )}
+            </div>
+          )}
 
           <div>
             <h4 className="text-xs md:text-sm font-medium text-muted-foreground mb-1">Title</h4>
@@ -65,7 +110,6 @@ export const PreviewSection = memo(({ data }: PreviewSectionProps) => {
                         <TechBadge
                           key={tech}
                           tech={tech}
-                          onRemove={dummyOnRemove}
                         />
                       ))}
                     </div>

@@ -11,6 +11,19 @@ import { auth } from "~/security/auth";
 import { postRatingSchema, postSchema } from "./post.schema";
 import { PostService } from "./post.service";
 
+export async function uploadBannerImage(file: File) {
+  const session = await auth();
+  if (!session?.user?.id)
+    throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
+
+  try {
+    const imageUrl = await PostService.uploadPostBannerImage(file, session.user.id);
+    return { success: true, imageUrl };
+  } catch (error) {
+    return handleServerActionError(error);
+  }
+}
+
 export async function createPost(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id)

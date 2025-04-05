@@ -8,7 +8,7 @@ import type {
 
 export type Post = Pick<
   PrismaPost,
-  "id" | "title" | "description" | "createdDate" | "lastModifiedDate" | "githubRepo" | "createdById" | "allowRatings" | "allowComments"
+  "id" | "title" | "description" | "createdDate" | "lastModifiedDate" | "githubRepo" | "createdById" | "allowRatings" | "allowComments" | "bannerImage"
 > & {
   postNeeds: PostNeed[];
 };
@@ -47,6 +47,7 @@ export type PostDetails = Pick<
   | "rating"
   | "allowRatings"
   | "allowComments"
+  | "bannerImage"
 > & {
   postNeeds: PostNeed[];
   comments: (Pick<PrismaComment, "id" | "content" | "createdDate" | "lastModifiedDate"> & {
@@ -75,6 +76,7 @@ export type ExplorePost = {
   description: string;
   createdDate: Date;
   githubRepo: string | null;
+  bannerImage: string | null;
   postNeeds: PostNeed[];
   rating: number;
   allowRatings: boolean;

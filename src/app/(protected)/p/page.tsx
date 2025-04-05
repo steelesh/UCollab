@@ -48,6 +48,7 @@ async function Page({ searchParams, userId }: PageProps) {
             technologies={post.technologies}
             rating={post.rating}
             allowRatings={post.allowRatings}
+            bannerImage={post.bannerImage}
             postNeeds={post.postNeeds}
             user={{
               username: post.createdBy.username,

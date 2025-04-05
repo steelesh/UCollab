@@ -11,6 +11,7 @@ import { Container } from "~/components/ui/container";
 import { Header } from "~/components/ui/header";
 import { H1 } from "~/components/ui/heading";
 import { prisma } from "~/lib/prisma";
+import { DEFAULT_POST_BANNER_IMAGE } from "~/lib/utils";
 import { withAuth } from "~/security/protected";
 
 export const metadata = {
@@ -39,6 +40,7 @@ async function Page() {
       githubRepo: true,
       rating: true,
       technologies: true,
+      bannerImage: true,
     },
   });
 
@@ -59,11 +61,10 @@ async function Page() {
             className="bg-muted shadow-xl transition duration-200 ease-in-out hover:-translate-y-1 hover:scale-110"
           >
             <Image
-              src="/images/banner-placeholder.png"
+              src={post.bannerImage ?? DEFAULT_POST_BANNER_IMAGE}
               alt="Post"
               className="h-20 w-full object-cover"
-              width={400}
-              height={80}
+              fill
             />
             <CardHeader className="px-4 py-2">
               <div>

@@ -66,6 +66,7 @@ model Post {
   allowComments    Boolean        @default(true)
   technologies     Technology[]   @relation("PostTechnologies")
   githubRepo       String?
+  bannerImage      String?        @prisma.Text
   comments         Comment[]
   watchers         PostWatcher[]
   ratings          PostRating[]
