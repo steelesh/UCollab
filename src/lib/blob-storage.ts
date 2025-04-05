@@ -17,6 +17,15 @@ export const blobStorage = {
     });
   },
 
+  async uploadBannerImage(buffer: Buffer, fileName: string, contentType: string): Promise<string> {
+    return this.uploadFile({
+      buffer,
+      fileName,
+      contentType,
+      folder: "post-banners",
+    });
+  },
+
   async uploadFile({
     buffer,
     fileName,

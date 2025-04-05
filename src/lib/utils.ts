@@ -16,6 +16,7 @@ export const ACCEPTED_IMAGE_TYPES = {
   PNG: "image/png",
   WEBP: "image/webp",
 };
+export const DEFAULT_POST_BANNER_IMAGE = "https://ucollab.blob.core.windows.net/ucollab-files/post-banners/default-banner.jpg";
 
 export const ErrorCode = {
   AUTHENTICATION: StatusCodes.UNAUTHORIZED,
