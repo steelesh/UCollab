@@ -17,8 +17,8 @@ export type BreadcrumbItemType = {
 };
 
 export type PageBreadcrumbProps = {
-  items: BreadcrumbItemType[];
-  className?: string;
+  readonly items: BreadcrumbItemType[];
+  readonly className?: string;
 };
 
 export function PageBreadcrumb({ items, className = "mb-10" }: PageBreadcrumbProps) {
@@ -39,7 +39,7 @@ export function PageBreadcrumb({ items, className = "mb-10" }: PageBreadcrumbPro
                   )
                 : (
                     <BreadcrumbLink asChild>
-                      <Link href={item.href || "#"}>{item.label}</Link>
+                      <Link href={item.href ?? "#"}>{item.label}</Link>
                     </BreadcrumbLink>
                   )}
             </BreadcrumbItem>

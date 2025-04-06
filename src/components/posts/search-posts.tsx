@@ -12,11 +12,11 @@ export default function SearchBar() {
   const router = useRouter();
   const sp = useSearchParams();
 
-  const [query, setQuery] = useState(sp.get("query") || "");
-  const [postNeeds, setPostNeeds] = useState(sp.get("postNeeds") || "");
-  const [minRating, setMinRating] = useState(sp.get("minRating") || "");
-  const [sortBy, setSortBy] = useState(sp.get("sortBy") || "createdDate");
-  const [sortOrder, setSortOrder] = useState(sp.get("sortOrder") || "desc");
+  const [query, setQuery] = useState(sp.get("query") ?? "");
+  const [postNeeds, setPostNeeds] = useState(sp.get("postNeeds") ?? "");
+  const [minRating, setMinRating] = useState(sp.get("minRating") ?? "");
+  const [sortBy, setSortBy] = useState(sp.get("sortBy") ?? "createdDate");
+  const [sortOrder, setSortOrder] = useState(sp.get("sortOrder") ?? "desc");
 
   const updateSearch = useCallback(async () => {
     const params = new URLSearchParams();
@@ -31,15 +31,15 @@ export default function SearchBar() {
     if (sortOrder)
       params.set("sortOrder", sortOrder);
 
-    const currentLimit = sp.get("limit") || "8";
+    const currentLimit = sp.get("limit") ?? "8";
     params.set("limit", currentLimit);
 
     const currentFilter = {
-      query: sp.get("query") || "",
-      postNeeds: sp.get("postNeeds") || "",
-      minRating: sp.get("minRating") || "",
-      sortBy: sp.get("sortBy") || "createdDate",
-      sortOrder: sp.get("sortOrder") || "desc",
+      query: sp.get("query") ?? "",
+      postNeeds: sp.get("postNeeds") ?? "",
+      minRating: sp.get("minRating") ?? "",
+      sortBy: sp.get("sortBy") ?? "createdDate",
+      sortOrder: sp.get("sortOrder") ?? "desc",
     };
 
     const filtersChanged

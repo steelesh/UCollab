@@ -11,11 +11,11 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { ConfirmDialog } from "~/components/ui/confirm-dialog";
 
 type NotificationItemProps = {
-  notification: Notification;
-  isSelected: boolean;
-  onSelect: () => void;
-  onMarkAsRead: () => Promise<void>;
-  onDelete: () => Promise<void>;
+  readonly notification: Notification;
+  readonly isSelected: boolean;
+  readonly onSelect: () => void;
+  readonly onMarkAsRead: () => Promise<void>;
+  readonly onDelete: () => Promise<void>;
 };
 
 export function NotificationItem({

@@ -23,9 +23,9 @@ import { Section } from "~/components/ui/section";
 import { Textarea } from "~/components/ui/textarea";
 
 type PostDetailsSectionProps = {
-  control: Control<CreatePostInput>;
-  needType: NeedType;
-  isSubmitting: boolean;
+  readonly control: Control<CreatePostInput>;
+  readonly needType: NeedType;
+  readonly isSubmitting: boolean;
 };
 
 export function PostDetailsSection({

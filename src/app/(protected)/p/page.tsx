@@ -17,8 +17,8 @@ export const metadata = {
 };
 
 type PageProps = {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-  userId: User["id"];
+  readonly searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  readonly userId: User["id"];
 };
 
 async function Page({ searchParams, userId }: PageProps) {

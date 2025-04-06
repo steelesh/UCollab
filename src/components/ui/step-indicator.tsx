@@ -35,10 +35,10 @@ export function StepIndicator({
   onStepChange,
   className,
 }: {
-  currentStep: number;
-  totalSteps: number;
-  onStepChange?: (step: number) => void;
-  className?: string;
+  readonly currentStep: number;
+  readonly totalSteps: number;
+  readonly onStepChange?: (step: number) => void;
+  readonly className?: string;
 }) {
   const steps = Array.from({ length: totalSteps }, (_, i) => i + 1);
 

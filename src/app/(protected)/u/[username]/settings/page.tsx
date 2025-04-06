@@ -13,7 +13,7 @@ import { prisma } from "~/lib/prisma";
 import { DEFAULT_POST_BANNER_IMAGE } from "~/lib/utils";
 import { withAuth } from "~/security/protected";
 
-async function Page({ userId }: { userId: User["id"] }) {
+async function Page({ userId }: { readonly userId: User["id"] }) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
@@ -103,7 +103,7 @@ async function Page({ userId }: { userId: User["id"] }) {
                 name="bio"
                 className="textarea h-24"
                 placeholder="Tell everyone a little bit about yourself!"
-                defaultValue={user.bio || ""}
+                defaultValue={user.bio ?? ""}
               >
               </Textarea>
             </fieldset>

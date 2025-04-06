@@ -11,9 +11,9 @@ import { deletePost } from "~/features/posts/post.actions";
 import { toastError } from "~/lib/toast";
 
 type PostActionsProps = {
-  postId: string;
-  isOwnPost: boolean;
-  isBookmarked: boolean;
+  readonly postId: string;
+  readonly isOwnPost: boolean;
+  readonly isBookmarked: boolean;
 };
 
 export function PostActions({ postId, isOwnPost, isBookmarked }: PostActionsProps) {

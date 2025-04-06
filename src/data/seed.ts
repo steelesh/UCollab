@@ -329,7 +329,7 @@ async function createCommentsAndNotifications(
 
     const comment = await prisma.comment.create({
       data: {
-        content: commentsToCreate[i] || "",
+        content: commentsToCreate[i] ?? "",
         createdById: commenter.id,
         postId: post.id,
       },

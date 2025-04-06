@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 
 type GraduationYearControlProps = {
-  initialYear?: string;
-  currentYear: number;
+  readonly initialYear?: string;
+  readonly currentYear: number;
 };
 
 export default function GraduationYearControl({ initialYear, currentYear }: GraduationYearControlProps) {

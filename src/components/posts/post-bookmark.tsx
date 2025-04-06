@@ -13,9 +13,9 @@ import { ActionButton } from "../ui/action-button";
 import { ConfirmDialog } from "../ui/confirm-dialog";
 
 type PostBookmarkProps = {
-  postId: Post["id"];
-  initialBookmarked: boolean;
-  className?: string;
+  readonly postId: Post["id"];
+  readonly initialBookmarked: boolean;
+  readonly className?: string;
 };
 
 export function PostBookmark({ postId, initialBookmarked, className = "" }: PostBookmarkProps) {

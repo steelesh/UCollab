@@ -4,11 +4,11 @@ import React from "react";
 import { cn } from "~/lib/utils";
 
 type StarDisplayProps = {
-  rating: number | null;
-  size?: "sm" | "md" | "lg";
-  className?: string;
-  showValue?: boolean;
-  maxStars?: number;
+  readonly rating: number | null;
+  readonly size?: "sm" | "md" | "lg";
+  readonly className?: string;
+  readonly showValue?: boolean;
+  readonly maxStars?: number;
 };
 
 export function StarDisplay({ rating, size = "md", className, showValue = false, maxStars = 5 }: StarDisplayProps) {
@@ -68,12 +68,12 @@ export function StarDisplay({ rating, size = "md", className, showValue = false,
 }
 
 type StarRatingProps = {
-  rating: number | null;
-  onChange?: (rating: number) => void;
-  size?: "sm" | "md" | "lg" | "xl";
-  disabled?: boolean;
-  className?: string;
-  maxStars?: number;
+  readonly rating: number | null;
+  readonly onChange?: (rating: number) => void;
+  readonly size?: "sm" | "md" | "lg" | "xl";
+  readonly disabled?: boolean;
+  readonly className?: string;
+  readonly maxStars?: number;
 };
 
 export function StarRating({

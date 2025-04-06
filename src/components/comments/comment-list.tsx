@@ -13,16 +13,16 @@ import { CommentForm } from "./comment-form";
 import { CommentHeader } from "./comment-header";
 
 type CommentListProps = {
-  comments: Comment[];
-  currentUserId: User["id"];
-  postId: Post["id"];
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
-  limit: number;
-  onUpdate: (commentId: Comment["id"], content: Comment["content"]) => Promise<void>;
-  onDelete: (commentId: Comment["id"]) => Promise<void>;
-  onReply: (parentId: Comment["id"], content: Comment["content"]) => Promise<void>;
+  readonly comments: Comment[];
+  readonly currentUserId: User["id"];
+  readonly postId: Post["id"];
+  readonly currentPage: number;
+  readonly totalPages: number;
+  readonly totalCount: number;
+  readonly limit: number;
+  readonly onUpdate: (commentId: Comment["id"], content: Comment["content"]) => Promise<void>;
+  readonly onDelete: (commentId: Comment["id"]) => Promise<void>;
+  readonly onReply: (parentId: Comment["id"], content: Comment["content"]) => Promise<void>;
 };
 
 export function CommentList({

@@ -6,13 +6,13 @@ import { Badge } from "~/components/ui/badge";
 import { cn } from "~/lib/utils";
 
 export type NavLinkProps = {
-  title: string;
-  href: Route;
-  description?: string;
-  badge?: string;
-  className?: string;
-  onClick?: () => void;
-  requiresAuth: boolean;
+  readonly title: string;
+  readonly href: Route;
+  readonly description?: string;
+  readonly badge?: string;
+  readonly className?: string;
+  readonly onClick?: () => void;
+  readonly requiresAuth: boolean;
 };
 
 export function NavLink({ title, href, description, badge, className, onClick }: NavLinkProps) {

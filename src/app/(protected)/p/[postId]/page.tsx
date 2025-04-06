@@ -25,9 +25,9 @@ import { DEFAULT_POST_BANNER_IMAGE } from "~/lib/utils";
 import { withAuth } from "~/security/protected";
 
 type PageProps = {
-  params: Promise<{ postId: Post["id"] }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-  userId: User["id"];
+  readonly params: Promise<{ postId: Post["id"] }>;
+  readonly searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  readonly userId: User["id"];
 };
 
 export async function generateMetadata({ params }: { params: Promise<{ postId: Post["id"] }> }): Promise<Metadata> {

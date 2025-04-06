@@ -3,14 +3,14 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 
 type ItemsPerPageSelectorProps = {
-  currentLimit: number;
-  options: number[];
-  totalCount: number;
-  startIndex: number;
-  endIndex: number;
-  basePath: string;
-  itemName: string;
-  onValueChange?: (value: string) => void;
+  readonly currentLimit: number;
+  readonly options: number[];
+  readonly totalCount: number;
+  readonly startIndex: number;
+  readonly endIndex: number;
+  readonly basePath: string;
+  readonly itemName: string;
+  readonly onValueChange?: (value: string) => void;
 };
 
 export function ItemsPerPageSelector({

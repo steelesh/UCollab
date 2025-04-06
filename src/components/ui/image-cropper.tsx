@@ -24,11 +24,11 @@ import {
 } from "~/components/ui/dialog";
 
 type ImageCropperProps = {
-  dialogOpen: boolean;
-  setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedFile: File | null;
-  onFileChange: (file: File | null) => void;
-  aspect?: number;
+  readonly dialogOpen: boolean;
+  readonly setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  readonly selectedFile: File | null;
+  readonly onFileChange: (file: File | null) => void;
+  readonly aspect?: number;
 };
 
 export function ImageCropper({

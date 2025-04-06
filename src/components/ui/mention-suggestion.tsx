@@ -9,28 +9,29 @@ import { ReactRenderer } from "@tiptap/react";
 import Image from "next/image";
 import tippy from "tippy.js";
 
+import { Button } from "~/components/ui/button";
 import { searchUsers } from "~/features/users/user.actions";
 
 type MentionUser = {
-  id: User["id"];
-  username: User["username"];
-  avatar?: User["avatar"];
+  readonly id: User["id"];
+  readonly username: User["username"];
+  readonly avatar?: User["avatar"];
 };
 
 type MentionListProps = {
-  items: MentionUser[];
-  command: (item: { id: User["id"]; label: User["username"] }) => void;
-  selectedIndex: number;
+  readonly items: MentionUser[];
+  readonly command: (item: { id: User["id"]; label: User["username"] }) => void;
+  readonly selectedIndex: number;
 };
 
 type MentionListRef = {
-  onKeyDown: (props: { event: KeyboardEvent }) => boolean;
+  readonly onKeyDown: (props: { event: KeyboardEvent }) => boolean;
 };
 
 type SuggestionItem = {
-  query: string;
-  editor: Editor | null;
-  currentUserId: string;
+  readonly query: string;
+  readonly editor: Editor | null;
+  readonly currentUserId: string;
 };
 
 function MentionList({ items, command, selectedIndex }: MentionListProps) {
@@ -47,7 +48,7 @@ function MentionList({ items, command, selectedIndex }: MentionListProps) {
   return (
     <div className="bg-popover rounded-md border shadow-md max-h-[200px] w-[200px] overflow-y-auto" role="listbox" aria-label="Mention suggestions">
       {items.map((item, index) => (
-        <button
+        <Button
           type="button"
           key={item.id}
           onClick={() => command({ id: item.username, label: item.username })}
@@ -69,7 +70,7 @@ function MentionList({ items, command, selectedIndex }: MentionListProps) {
             )}
             <span>{item.username}</span>
           </div>
-        </button>
+        </Button>
       ))}
     </div>
   );

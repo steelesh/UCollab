@@ -6,13 +6,13 @@ import { Input } from "~/components/ui/input";
 import TechBadge from "~/components/ui/tech-badge";
 
 type TechnologiesControlProps = {
-  field: {
-    value: string[];
-    onChange: (val: string[]) => void;
+  readonly field: {
+    readonly value: string[];
+    readonly onChange: (val: string[]) => void;
   };
-  isSubmitting: boolean;
-  suggestions: string[];
-  handleTechSearch: (value: string) => void;
+  readonly isSubmitting: boolean;
+  readonly suggestions: string[];
+  readonly handleTechSearch: (value: string) => void;
 };
 
 export default function TechnologiesControl({

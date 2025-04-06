@@ -14,13 +14,13 @@ import { searchTechnologies, updateOnboarding } from "~/features/users/user.acti
 import { onboardingSchema } from "~/features/users/user.schema";
 
 export type OnboardingInput = {
-  gradYear: string;
-  technologies: string[];
-  githubProfile: string;
-  mentorshipStatus: "MENTOR" | "MENTEE" | "NONE";
+  readonly gradYear: string;
+  readonly technologies: string[];
+  readonly githubProfile: string;
+  readonly mentorshipStatus: "MENTOR" | "MENTEE" | "NONE";
 };
 
-function GraduationYearControl({ field, currentYear }: { field: any; currentYear: number }) {
+function GraduationYearControl({ field, currentYear }: { readonly field: any; readonly currentYear: number }) {
   const years = Array.from({ length: 5 }, (_, i) => currentYear + i);
   const initialSelected = field.value ? Number(field.value) : currentYear;
   const [focused, setFocused] = useState<number | null>(null);

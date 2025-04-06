@@ -9,11 +9,11 @@ import { TechnologyIcon } from "../ui/technology-icon";
 import { MENTORSHIP_CONFIG } from "./profile-mentorship-config";
 
 type ProfileUserInfoProps = {
-  createdDate: User["createdDate"];
-  gradYear: User["gradYear"];
-  mentorship: User["mentorship"];
-  technologies: Technology[];
-  bio: User["bio"];
+  readonly createdDate: User["createdDate"];
+  readonly gradYear: User["gradYear"];
+  readonly mentorship: User["mentorship"];
+  readonly technologies: Technology[];
+  readonly bio: User["bio"];
 };
 
 export function ProfileUserInfo({ createdDate, gradYear, mentorship, bio, technologies }: ProfileUserInfoProps) {

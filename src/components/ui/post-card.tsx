@@ -21,29 +21,29 @@ import { Small } from "./small";
 import { TechnologyIcon } from "./technology-icon";
 
 type PostCardProps = {
-  id: Post["id"];
-  title: Post["title"];
-  description: Post["description"];
-  createdDate: Post["createdDate"];
-  technologies: Technology[];
-  rating: number;
-  allowRatings: boolean;
-  bannerImage: Post["bannerImage"];
-  githubRepo: Post["githubRepo"];
-  postNeeds: PostNeed[];
-  user: {
-    username: User["username"];
-    avatar: User["avatar"];
+  readonly id: Post["id"];
+  readonly title: Post["title"];
+  readonly description: Post["description"];
+  readonly createdDate: Post["createdDate"];
+  readonly technologies: Technology[];
+  readonly rating: number;
+  readonly allowRatings: boolean;
+  readonly bannerImage: Post["bannerImage"];
+  readonly githubRepo: Post["githubRepo"];
+  readonly postNeeds: PostNeed[];
+  readonly user: {
+    readonly username: User["username"];
+    readonly avatar: User["avatar"];
   };
-  trendingScore: number;
-  watchers: {
-    id: User["id"];
-    user: {
-      username: User["username"];
-      avatar: User["avatar"];
+  readonly trendingScore: number;
+  readonly watchers: {
+    readonly id: User["id"];
+    readonly user: {
+      readonly username: User["username"];
+      readonly avatar: User["avatar"];
     };
   }[];
-  comments: number;
+  readonly comments: number;
 };
 
 export function PostCard({

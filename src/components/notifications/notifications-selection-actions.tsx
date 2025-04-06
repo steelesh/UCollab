@@ -15,11 +15,11 @@ import { emitNotificationCountChanged } from "~/lib/utils";
 import { NotificationActionButton } from "./notification-action-button";
 
 type NotificationsSelectionActionsProps = {
-  notifications: Notification[];
-  selectedNotifications: Notification[];
-  setSelectedNotifications: Dispatch<SetStateAction<Notification[]>>;
-  setNotifications: Dispatch<SetStateAction<Notification[]>>;
-  userId: User["id"];
+  readonly notifications: Notification[];
+  readonly selectedNotifications: Notification[];
+  readonly setSelectedNotifications: Dispatch<SetStateAction<Notification[]>>;
+  readonly setNotifications: Dispatch<SetStateAction<Notification[]>>;
+  readonly userId: User["id"];
 };
 
 export function NotificationsSelectionActions({

@@ -17,26 +17,18 @@ import { Small } from "./small";
 import { TechnologyIcon } from "./technology-icon";
 
 type PostCardSmallProps = {
-  id: Post["id"];
-  title: Post["title"];
-  createdDate: Post["createdDate"];
-  technologies: Technology[];
-  githubRepo: Post["githubRepo"];
-  postNeeds: PostNeed[];
-  rating: number;
-  allowRatings: boolean;
-  bannerImage: Post["bannerImage"];
-  user: {
-    username: User["username"];
-    avatar: User["avatar"];
+  readonly id: Post["id"];
+  readonly title: Post["title"];
+  readonly createdDate: Post["createdDate"];
+  readonly technologies: Technology[];
+  readonly postNeeds: PostNeed[];
+  readonly rating: number;
+  readonly allowRatings: boolean;
+  readonly bannerImage: Post["bannerImage"];
+  readonly user: {
+    readonly username: User["username"];
+    readonly avatar: User["avatar"];
   };
-  watchers: {
-    id: User["id"];
-    user: {
-      username: User["username"];
-      avatar: User["avatar"];
-    };
-  }[];
 };
 
 export function PostCardSmall({

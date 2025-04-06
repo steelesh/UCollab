@@ -21,12 +21,12 @@ export function CommentHeader({
   onReply,
   isReply = false,
 }: {
-  comment: Comment;
-  currentUserId: User["id"];
-  onEdit: () => void;
-  onDelete: () => void;
-  onReply?: () => void;
-  isReply?: boolean;
+  readonly comment: Comment;
+  readonly currentUserId: User["id"];
+  readonly onEdit: () => void;
+  readonly onDelete: () => void;
+  readonly onReply?: () => void;
+  readonly isReply?: boolean;
 }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const isOwnComment = comment.createdBy.id === currentUserId;

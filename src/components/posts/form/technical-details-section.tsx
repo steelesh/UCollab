@@ -20,13 +20,13 @@ import TechnologiesControl from "~/components/ui/technologies-control";
 import { isProjectNeedType } from "~/lib/utils";
 
 type TechnicalDetailsSectionProps = {
-  control: Control<CreatePostInput>;
-  isSubmitting: boolean;
-  needType: NeedType;
-  secondaryNeedType: NeedType | null | undefined;
-  canHaveRatings: boolean;
-  suggestions: string[];
-  handleTechSearch: (value: string) => void;
+  readonly control: Control<CreatePostInput>;
+  readonly isSubmitting: boolean;
+  readonly needType: NeedType;
+  readonly secondaryNeedType: NeedType | null | undefined;
+  readonly canHaveRatings: boolean;
+  readonly suggestions: string[];
+  readonly handleTechSearch: (value: string) => void;
 };
 
 export function TechnicalDetailsSection({
@@ -82,7 +82,7 @@ export function TechnicalDetailsSection({
                   <FormControl>
                     <Input
                       {...field}
-                      value={field.value || ""}
+                      value={field.value ?? ""}
                       placeholder="https://github.com/username/repo"
                       disabled={isSubmitting}
                       className="text-sm md:text-base"

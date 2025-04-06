@@ -12,13 +12,13 @@ import { CommentForm } from "../comments/comment-form";
 import { CommentList } from "../comments/comment-list";
 
 type PostCommentsProps = {
-  comments: Comment[];
-  currentUserId: User["id"];
-  postId: Post["id"];
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
-  limit: number;
+  readonly comments: Comment[];
+  readonly currentUserId: User["id"];
+  readonly postId: Post["id"];
+  readonly currentPage: number;
+  readonly totalPages: number;
+  readonly totalCount: number;
+  readonly limit: number;
 };
 
 export function PostComments({
@@ -30,12 +30,12 @@ export function PostComments({
   totalCount,
   limit,
 }: PostCommentsProps) {
-  const [commentsState, setComments] = useState<Comment[]>(comments);
+  const [commentsState, setCommentsState] = useState<Comment[]>(comments);
 
   const handleCreate = async (content: Comment["content"]) => {
     try {
       const newComment = await createComment(postId, content);
-      setComments(prev => [newComment, ...prev]);
+      setCommentsState(prev => [newComment, ...prev]);
     } catch {
       // TODO: handle error, show toast or something
     }
@@ -44,7 +44,7 @@ export function PostComments({
   const handleUpdate = async (commentId: Comment["id"], content: Comment["content"]) => {
     try {
       await updateComment(commentId, content, postId);
-      setComments(prev =>
+      setCommentsState(prev =>
         prev.map((comment) => {
           if (comment.id === commentId) {
             return {
@@ -78,7 +78,7 @@ export function PostComments({
   const handleDelete = async (commentId: Comment["id"]) => {
     try {
       await deleteComment(commentId, postId);
-      setComments(prev =>
+      setCommentsState(prev =>
         prev
           .map(comment => ({
             ...comment,
@@ -94,7 +94,7 @@ export function PostComments({
   const handleReply = async (parentId: string, content: string) => {
     try {
       const newReply = await createReply(postId, parentId, content);
-      setComments(prev =>
+      setCommentsState(prev =>
         prev.map(comment =>
           comment.id === parentId
             ? {

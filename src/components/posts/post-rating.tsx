@@ -13,10 +13,10 @@ import { deleteRating, ratePost } from "~/features/posts/post.actions";
 import { toastError, toastSuccess } from "~/lib/toast";
 
 type PostRatingProps = {
-  postId: Post["id"];
-  initialRating?: number | null;
-  userRating?: number | null;
-  className?: string;
+  readonly postId: Post["id"];
+  readonly initialRating?: number | null;
+  readonly userRating?: number | null;
+  readonly className?: string;
 };
 
 export function PostRating({ postId, initialRating: _initialRating = 0, userRating = null, className = "" }: PostRatingProps) {

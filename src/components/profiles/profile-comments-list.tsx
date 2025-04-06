@@ -8,7 +8,7 @@ import type { Comment } from "~/features/users/user.types";
 import { CommentContent } from "~/components/comments/comment-content";
 
 type ProfileCommentsListProps = {
-  comments: Comment[];
+  readonly comments: Comment[];
 };
 
 export function ProfileCommentsList({ comments }: ProfileCommentsListProps) {

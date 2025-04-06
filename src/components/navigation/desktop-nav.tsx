@@ -14,7 +14,7 @@ import type { NavSection } from "../navigation/navbar";
 import { NavLink } from "../navigation/nav-link";
 import { CreateButton } from "./create-button";
 
-export function DesktopNav({ items }: { items: NavSection[] }) {
+export function DesktopNav({ items }: { readonly items: NavSection[] }) {
   const { data: session } = useSession();
   return (
     <NavigationMenu className="mr-4 hidden md:flex">

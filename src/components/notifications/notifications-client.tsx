@@ -10,13 +10,13 @@ import { Pagination } from "../ui/pagination";
 import { NotificationsList } from "./notifications-list";
 
 type NotificationsClientProps = {
-  initialNotifications: Notification[];
-  userId: User["id"];
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    totalCount: number;
-    limit: number;
+  readonly initialNotifications: Notification[];
+  readonly userId: User["id"];
+  readonly pagination: {
+    readonly currentPage: number;
+    readonly totalPages: number;
+    readonly totalCount: number;
+    readonly limit: number;
   };
 };
 

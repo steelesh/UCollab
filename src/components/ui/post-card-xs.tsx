@@ -12,22 +12,14 @@ import { Small } from "./small";
 import { TechnologyIcon } from "./technology-icon";
 
 type PostCardXsProps = {
-  id: string;
-  title: string;
-  technologies: Technology[];
-  githubRepo: string | null;
-  postNeeds: PostNeed[];
-  user: {
-    username: User["username"];
-    avatar: User["avatar"];
+  readonly id: string;
+  readonly title: string;
+  readonly technologies: Technology[];
+  readonly postNeeds: PostNeed[];
+  readonly user: {
+    readonly username: User["username"];
+    readonly avatar: User["avatar"];
   };
-  watchers: {
-    id: User["id"];
-    user: {
-      username: User["username"];
-      avatar: User["avatar"];
-    };
-  }[];
 };
 
 export function PostCardXs({

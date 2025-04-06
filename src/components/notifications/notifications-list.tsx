@@ -13,11 +13,11 @@ import { NotificationItem } from "./notification-item";
 import { NotificationsSelectionActions } from "./notifications-selection-actions";
 
 type NotificationsListProps = {
-  notifications: Notification[];
-  selectedNotifications: Notification[];
-  setSelectedNotifications: Dispatch<SetStateAction<Notification[]>>;
-  setNotifications: Dispatch<SetStateAction<Notification[]>>;
-  userId: User["id"];
+  readonly notifications: Notification[];
+  readonly selectedNotifications: Notification[];
+  readonly setSelectedNotifications: Dispatch<SetStateAction<Notification[]>>;
+  readonly setNotifications: Dispatch<SetStateAction<Notification[]>>;
+  readonly userId: User["id"];
 };
 
 export function NotificationsList({

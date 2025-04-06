@@ -1,4 +1,4 @@
-import type { Post, Technology, User } from "@prisma/client";
+import type { Post, User } from "@prisma/client";
 
 import { Prisma } from "@prisma/client";
 import { notFound } from "next/navigation";
@@ -15,33 +15,6 @@ import type { CreatePostInput } from "./post.schema";
 import type { ExplorePageData, ExplorePost, PostDetails } from "./post.types";
 
 export const PostService = {
-  async getAllPosts(requestUserId: string) {
-    return withServiceAuth(requestUserId, null, async () => {
-      try {
-        return await prisma.post.findMany({
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            createdDate: true,
-            postNeeds: {
-              select: {
-                id: true,
-                needType: true,
-                isPrimary: true,
-              },
-            },
-          },
-          orderBy: { createdDate: "desc" },
-        });
-      } catch (error) {
-        if (error instanceof Utils)
-          throw error;
-        throw new Utils(ErrorMessage.OPERATION_FAILED);
-      }
-    });
-  },
-
   async getPostById(id: Post["id"], requestUserId: string): Promise<PostDetails> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
@@ -191,7 +164,7 @@ export const PostService = {
             };
           }
 
-          const allowRatings = !!data.allowRatings;
+          const allowRatings = data.allowRatings;
 
           const postNeeds = [
             { needType: data.needType, isPrimary: true },
@@ -275,39 +248,6 @@ export const PostService = {
       }
     });
   },
-
-  async searchPosts(query: string, requestUserId: string, page = 1, limit = 20) {
-    return withServiceAuth(requestUserId, null, async () => {
-      try {
-        return await prisma.post.findMany({
-          where: {
-            OR: [{ title: { contains: query } }, { description: { contains: query } }],
-          },
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            createdDate: true,
-            githubRepo: true,
-            postNeeds: {
-              select: {
-                id: true,
-                needType: true,
-                isPrimary: true,
-              },
-            },
-          },
-          skip: (page - 1) * limit,
-          take: limit,
-        });
-      } catch (error) {
-        if (error instanceof Utils)
-          throw error;
-        throw new Utils(ErrorMessage.OPERATION_FAILED);
-      }
-    });
-  },
-
   async getPostsByUser(userId: string, requestUserId: string) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
@@ -362,86 +302,11 @@ export const PostService = {
       }
     });
   },
-
-  async getPostsByTechnology(techName: string, requestUserId: string) {
-    return withServiceAuth(requestUserId, null, async () => {
-      try {
-        return await prisma.post.findMany({
-          where: {
-            technologies: {
-              some: { name: techName.toLowerCase().trim() },
-            },
-          },
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            createdDate: true,
-            githubRepo: true,
-            postNeeds: {
-              select: {
-                id: true,
-                needType: true,
-                isPrimary: true,
-              },
-            },
-          },
-          orderBy: { createdDate: "desc" },
-        });
-      } catch (error) {
-        if (error instanceof Utils)
-          throw error;
-        throw new Utils(ErrorMessage.OPERATION_FAILED);
-      }
-    });
-  },
-
-  async getPostsByTechnologies(techNames: Technology["name"][], matchAll = false, requestUserId: string) {
-    return withServiceAuth(requestUserId, null, async () => {
-      try {
-        return await prisma.post.findMany({
-          where: {
-            technologies: matchAll
-              ? {
-                  every: {
-                    name: { in: techNames.map(t => t.toLowerCase().trim()) },
-                  },
-                }
-              : {
-                  some: {
-                    name: { in: techNames.map(t => t.toLowerCase().trim()) },
-                  },
-                },
-          },
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            createdDate: true,
-            githubRepo: true,
-            postNeeds: {
-              select: {
-                id: true,
-                needType: true,
-                isPrimary: true,
-              },
-            },
-          },
-          orderBy: { createdDate: "desc" },
-        });
-      } catch (error) {
-        if (error instanceof Utils)
-          throw error;
-        throw new Utils(ErrorMessage.OPERATION_FAILED);
-      }
-    });
-  },
-
   async getPaginatedPosts(
-    page = 1,
-    limit = 12,
     requestUserId: User["id"],
     filters: { query?: string; postNeeds?: string; minRating?: string; sortBy?: string; sortOrder?: string },
+    page = 1,
+    limit = 12,
   ): Promise<{ posts: ExplorePost[]; totalCount: number }> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
@@ -559,19 +424,6 @@ export const PostService = {
       }
     });
   },
-
-  async getPostCount(requestUserId: User["id"]): Promise<number> {
-    return withServiceAuth(requestUserId, null, async () => {
-      try {
-        return await prisma.post.count();
-      } catch (error) {
-        if (error instanceof Utils)
-          throw error;
-        throw new Utils(ErrorMessage.OPERATION_FAILED);
-      }
-    });
-  },
-
   async searchTechnologies(query: string, requestUserId: User["id"], limit = 5) {
     return withServiceAuth(requestUserId, null, async () => {
       try {
@@ -613,7 +465,7 @@ export const PostService = {
           bannerImageUrl = null;
         }
 
-        const updatedPost = await prisma.$transaction(async (tx) => {
+        return await prisma.$transaction(async (tx) => {
           let techUpdate = {};
 
           const existingTechs = await tx.post.findUnique({
@@ -697,8 +549,6 @@ export const PostService = {
 
           return updatedPost;
         });
-
-        return updatedPost;
       } catch (error) {
         if (error instanceof Utils)
           throw error;
@@ -928,7 +778,7 @@ export const PostService = {
           select: { rating: true },
         });
 
-        return rating?.rating || 0;
+        return rating?.rating ?? 0;
       } catch (error) {
         if (error instanceof Utils)
           throw error;
@@ -949,7 +799,7 @@ export const PostService = {
           notFound();
         }
 
-        const result = await prisma.$transaction(async (tx) => {
+        return await prisma.$transaction(async (tx) => {
           const deleteResult = await tx.postRating.delete({
             where: {
               postId_userId: {
@@ -975,8 +825,6 @@ export const PostService = {
 
           return deleteResult;
         });
-
-        return result;
       } catch (error) {
         if (error instanceof Utils)
           throw error;

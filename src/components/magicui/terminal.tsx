@@ -99,10 +99,10 @@ export function TypingAnimation({
 }
 
 type TerminalProps = {
-  children: React.ReactNode;
-  className?: string;
-  prompt?: string;
-  delay?: number;
+  readonly children: React.ReactNode;
+  readonly className?: string;
+  readonly prompt?: string;
+  readonly delay?: number;
 };
 
 export function Terminal({ children, className, prompt = "$" }: TerminalProps) {

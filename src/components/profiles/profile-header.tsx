@@ -12,9 +12,9 @@ import { Button } from "~/components/ui/button";
 import { DEFAULT_POST_BANNER_IMAGE } from "~/lib/utils";
 
 type ProfileHeaderProps = {
-  avatar: User["avatar"];
-  username: User["username"];
-  isOwnProfile: boolean;
+  readonly avatar: User["avatar"];
+  readonly username: User["username"];
+  readonly isOwnProfile: boolean;
 };
 
 export function ProfileHeader({ avatar, username, isOwnProfile }: ProfileHeaderProps) {

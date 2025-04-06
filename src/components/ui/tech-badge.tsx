@@ -4,8 +4,8 @@ import { Badge } from "~/components/ui/badge";
 import { TechnologyIcon } from "~/components/ui/technology-icon";
 
 type TechBadgeProps = {
-  tech: string;
-  onRemove?: () => void;
+  readonly tech: string;
+  readonly onRemove?: () => void;
 };
 
 function TechBadge({ tech, onRemove }: TechBadgeProps) {
