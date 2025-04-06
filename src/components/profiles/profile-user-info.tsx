@@ -50,7 +50,7 @@ export function ProfileUserInfo({ createdDate, gradYear, mentorship, bio, techno
       <p className="text-sm font-semibold">Skills:</p>
       <div className="flex flex-wrap items-center gap-2 pt-2">
         {displayTechnologies.map(tech => (
-          <Badge key={tech.id || tech.name} variant="glossy" className="flex items-center gap-1">
+          <Badge key={tech.id ?? tech.name} variant="glossy" className="flex items-center gap-1">
             <TechnologyIcon name={tech.name} colored />
             <span className="truncate">{tech.name}</span>
           </Badge>

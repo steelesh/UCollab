@@ -29,7 +29,7 @@ export function FeedbackBadge({ children, className, ...props }: BadgeProps) {
     <Badge variant="feedback" className={className} {...props}>
       <Small noMargin className="flex items-center gap-1">
         <MessageSquare className="w-4 h-4" />
-        {children || "Looking for feedback"}
+        {children ?? "Looking for feedback"}
       </Small>
     </Badge>
   );

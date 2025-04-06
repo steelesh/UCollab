@@ -476,10 +476,10 @@ export const PostService = {
               },
             },
           });
-          const existingTechNames = existingTechs?.technologies.map(t => t.name) || [];
+          const existingTechNames = existingTechs?.technologies.map(t => t.name) ?? [];
 
           if (isProjectPost) {
-            const techNames = data.technologies?.map(tech => tech.toLowerCase().trim()) || [];
+            const techNames = data.technologies?.map(tech => tech.toLowerCase().trim()) ?? [];
             const techsToDisconnect = existingTechNames.filter(name => !techNames.includes(name));
             const techsToAdd = techNames.filter(name => !existingTechNames.includes(name));
 
