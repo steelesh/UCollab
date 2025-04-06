@@ -92,12 +92,12 @@ export const PreviewSection = memo(({ data }: PreviewSectionProps) => {
 
           <div>
             <h4 className="text-xs md:text-sm font-medium text-muted-foreground mb-1">Title</h4>
-            <p className="text-sm md:text-base">{data.title || "-"}</p>
+            <p className="text-sm md:text-base">{data.title ?? "-"}</p>
           </div>
 
           <div>
             <h4 className="text-xs md:text-sm font-medium text-muted-foreground mb-1">Description</h4>
-            <p className="text-sm md:text-base">{data.description || "-"}</p>
+            <p className="text-sm md:text-base">{data.description ?? "-"}</p>
           </div>
 
           {isProjectPost && (

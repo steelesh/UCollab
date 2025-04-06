@@ -102,7 +102,7 @@ export function OnboardingForm() {
     if (value.length >= 2) {
       try {
         const results = await searchTechnologies(value);
-        setSuggestions(results?.filter(tech => !technologies.includes(tech)) || []);
+        setSuggestions(results?.filter(tech => !technologies.includes(tech)) ?? []);
       } catch (error) {
         console.error("Failed to fetch suggestions:", error);
         setSuggestions([]);

@@ -141,7 +141,7 @@ export function PostForm({ post }: PostFormProps) {
       try {
         const results = await searchTechnologies(query);
         if (results) {
-          setSuggestions(results.filter(tech => !technologies?.includes(tech)) || []);
+          setSuggestions(results.filter(tech => !technologies?.includes(tech)) ?? []);
         } else {
           setSuggestions([]);
         }

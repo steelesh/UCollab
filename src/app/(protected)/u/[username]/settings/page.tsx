@@ -88,7 +88,7 @@ async function Page({ userId }: { readonly userId: User["id"] }) {
             <fieldset className="fieldset">
               <legend className="text-sm font-medium">Mentorship Status</legend>
               <div className="mt-2 flex gap-2 filter">
-                <select name="mentorship" defaultValue={user.mentorship || "NONE"} className="bg-background">
+                <select name="mentorship" defaultValue={user.mentorship ?? "NONE"} className="bg-background">
                   <option value="MENTOR">Mentor</option>
                   <option value="MENTEE">Mentee</option>
                   <option value="NONE">None</option>

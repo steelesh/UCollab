@@ -99,7 +99,7 @@ export function PostComments({
           comment.id === parentId
             ? {
                 ...comment,
-                replies: [...(comment.replies || []), newReply],
+                replies: [...(comment.replies ?? []), newReply],
               }
             : comment,
         ),
