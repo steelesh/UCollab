@@ -17,7 +17,7 @@ export default function GraduationYearControl({ initialYear, currentYear }: Grad
   return (
     <>
       <div className="form-control">
-        <div onMouseLeave={() => setFocused(null)} className="flex items-center">
+        <div onMouseLeave={() => setFocused(null)} className="flex items-center" role="button" tabIndex={0}>
           {years.map((year, index) => (
             <div key={year} className="flex items-center">
               <button

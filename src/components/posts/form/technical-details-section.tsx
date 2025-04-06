@@ -54,6 +54,7 @@ export function TechnicalDetailsSection({
                   <div>
                     <FormLabel className="text-sm md:text-base font-medium">
                       Technologies
+                      {/* */}
                       <span className="text-destructive ml-1">*</span>
                     </FormLabel>
                     <FormDescription className="text-xs md:text-sm">

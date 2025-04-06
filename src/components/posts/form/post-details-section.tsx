@@ -88,6 +88,7 @@ export function PostDetailsSection({
             <FormItem>
               <FormLabel>
                 Post Title
+                {/* */}
                 <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
@@ -110,6 +111,7 @@ export function PostDetailsSection({
             <FormItem>
               <FormLabel>
                 Description
+                {/* */}
                 <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
