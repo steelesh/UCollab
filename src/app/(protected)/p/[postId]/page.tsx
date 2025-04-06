@@ -186,6 +186,7 @@ async function Page({ params, searchParams, userId }: PageProps) {
           <Section className="border-t border-border/30 pt-6 md:pt-8">
             <H2 className="text-xl md:text-2xl mb-3 md:mb-4 flex items-center gap-2">
               Comments
+              {/* */}
               <span className="text-sm md:text-base font-normal text-muted-foreground">
                 (
                 {totalCount}

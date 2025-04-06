@@ -33,6 +33,7 @@ export default async function Page() {
             Welcome back,
             {" "}
             <span className="font-thin">{session.user.username}</span>
+            {/* */}
             !
           </H1>
           <H3 className="mt-8">Trending Posts</H3>

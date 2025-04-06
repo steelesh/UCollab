@@ -125,6 +125,7 @@ async function Page({ userId }: { userId: User["id"] }) {
                   className="toggle"
                 />
                 Comments
+                {/* */}
               </label>
               <label className="fieldset-label flex items-center gap-2">
                 <input
@@ -134,6 +135,7 @@ async function Page({ userId }: { userId: User["id"] }) {
                   className="toggle"
                 />
                 Mentions
+                {/* */}
               </label>
               <label className="fieldset-label flex items-center gap-2">
                 <input
@@ -143,6 +145,7 @@ async function Page({ userId }: { userId: User["id"] }) {
                   className="toggle"
                 />
                 Posts
+                {/* */}
               </label>
               <label className="fieldset-label flex items-center gap-2">
                 <input
@@ -152,6 +155,7 @@ async function Page({ userId }: { userId: User["id"] }) {
                   className="toggle"
                 />
                 System
+                {/* */}
               </label>
             </fieldset>
           </div>

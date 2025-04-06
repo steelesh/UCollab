@@ -214,10 +214,10 @@ export const UserService = {
   async processUserAvatar(avatar: File | null, userId: User["id"]) {
     try {
       if (avatar === null) {
-        return this.generateDefaultAvatar(userId);
+        return await this.generateDefaultAvatar(userId);
       }
       if (avatar instanceof File) {
-        return this.uploadUserAvatar(avatar, userId);
+        return await this.uploadUserAvatar(avatar, userId);
       }
       return undefined;
     } catch {

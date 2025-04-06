@@ -37,10 +37,10 @@ function GraduationYearControl({ field, currentYear }: { field: any; currentYear
       <Label htmlFor="gradYear" className="label">
         <span className="label-text">Graduation Year</span>
       </Label>
-      <div onMouseLeave={() => setFocused(null)} className="flex items-center">
+      <div onMouseLeave={() => setFocused(null)} className="flex items-center" role="button" tabIndex={0}>
         {years.map((year, index) => (
           <div key={year} className="flex items-center">
-            <button
+            <Button
               type="button"
               onMouseEnter={() => setFocused(year)}
               onFocus={() => setFocused(year)}
@@ -70,7 +70,7 @@ function GraduationYearControl({ field, currentYear }: { field: any; currentYear
                   layoutId="underline"
                 />
               )}
-            </button>
+            </Button>
             {index < years.length - 1 && <span className="mx-2 text-xs text-gray-500">|</span>}
           </div>
         ))}
