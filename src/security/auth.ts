@@ -53,7 +53,11 @@ const authConfig: NextAuthConfig = {
         return false;
 
       try {
-        await prisma.session.deleteMany({});
+        await prisma.session.deleteMany({
+          where: {
+            userId: user.id,
+          },
+        });
 
         const existingUser = await prisma.user.findFirst({
           where: { azureAdId: profile.sub },

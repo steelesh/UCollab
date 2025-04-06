@@ -2,6 +2,8 @@
 
 UCollab is a web platform created for University of Cincinnati students pursuing degrees in Information Technology (IT), Computer Science (CS), Information Systems (IS), and related fields. This platform facilitates project discovery, contributions, and peer feedback, enabling students to collaborate and share knowledge with others across various majors.
 
+You can learn more by checking out the [UCollab documentation page](https://steelesh.github.io/UCollab/).
+
 ## Class Diagram
 
 ```mermaid

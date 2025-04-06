@@ -31,6 +31,9 @@ export default function SearchBar() {
     if (sortOrder)
       params.set("sortOrder", sortOrder);
 
+    const currentLimit = sp.get("limit") || "8";
+    params.set("limit", currentLimit);
+
     const currentFilter = {
       query: sp.get("query") || "",
       postNeeds: sp.get("postNeeds") || "",
@@ -49,11 +52,13 @@ export default function SearchBar() {
     if (filtersChanged) {
       params.set("page", "1");
     } else {
-      params.set("page", sp.get("page") || "1");
+      const currentPage = sp.get("page");
+      if (currentPage) {
+        params.set("page", currentPage);
+      }
     }
 
     const newParamsString = params.toString();
-
     const currentParamsString = sp.toString();
 
     const result = await checkPostsCount({ query, needType: postNeeds as NeedType, minRating });
@@ -97,6 +102,10 @@ export default function SearchBar() {
             <option value="">All</option>
             <option value="FEEDBACK">Feedback</option>
             <option value="CONTRIBUTION">Contribution</option>
+            <option value="DEVELOPER_AVAILABLE">Developer Available</option>
+            <option value="SEEKING_MENTOR">Seeking Mentor</option>
+            <option value="MENTOR_AVAILABLE">Mentor Available</option>
+            <option value="TEAM_FORMATION">Team Formation</option>
           </select>
         </div>
         <div>

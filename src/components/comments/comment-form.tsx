@@ -103,7 +103,7 @@ export function CommentForm({
             type="button"
             variant="outline"
             onClick={onCancel}
-            className="hover:bg-primary cursor-pointer"
+            className="cursor-pointer"
             disabled={isSubmitting}
           >
             Cancel

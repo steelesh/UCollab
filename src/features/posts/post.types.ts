@@ -106,4 +106,11 @@ export type ExplorePageData = {
   currentPage: number;
   limit: number;
   totalCount: number;
+  filters?: {
+    query?: string;
+    postNeeds?: string;
+    minRating?: string;
+    sortBy?: string;
+    sortOrder?: string;
+  };
 };
