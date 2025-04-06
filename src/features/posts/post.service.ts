@@ -437,14 +437,40 @@ export const PostService = {
     });
   },
 
-  async getPaginatedPosts(page = 1, limit = 12, requestUserId: User["id"]): Promise<{ posts: ExplorePost[]; totalCount: number }> {
+  async getPaginatedPosts(
+    page = 1,
+    limit = 12,
+    requestUserId: User["id"],
+    filters: { query?: string; postNeeds?: string; minRating?: string; sortBy?: string; sortOrder?: string },
+  ): Promise<{ posts: ExplorePost[]; totalCount: number }> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
+        const { query, postNeeds, minRating, sortBy = "createdDate", sortOrder = "desc" } = filters;
+        const where: any = {};
+
+        if (query) {
+          where.OR = [
+            { title: { search: query } },
+            { description: { search: query } },
+          ];
+        }
+
+        if (postNeeds) {
+          where.postNeeds = {
+            some: { needType: postNeeds },
+          };
+        }
+
+        if (minRating) {
+          where.rating = { gte: Number(minRating) };
+        }
+
+        const orderBy = { [sortBy]: sortOrder };
+
         const [posts, totalCount] = await Promise.all([
           prisma.post.findMany({
-            orderBy: {
-              createdDate: "desc",
-            },
+            where,
+            orderBy,
             skip: (page - 1) * limit,
             take: limit,
             select: {
@@ -496,7 +522,7 @@ export const PostService = {
               },
             },
           }),
-          prisma.post.count(),
+          prisma.post.count({ where }),
         ]);
 
         const postsWithScores = posts.map((post) => {

@@ -7,9 +7,6 @@ These instructions outline how to build the UCollab site from source for develop
 
 ## Build Instructions
 
-> [!Important]  
-> Building this project from source requires installing [Git](https://git-scm.com/), [NodeJS](https://nodejs.org/en), and [Docker](https://www.docker.com/products/docker-desktop/).
-
 1. Clone the repository and change into the directory
    ```
    git clone https://github.com/steelesh/UCollab.git && cd UCollab

@@ -1,5 +1,7 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+
 import { ItemsPerPageSelector } from "~/components/ui/items-per-page-selector";
 import {
   ShadcnPagination,
@@ -35,6 +37,7 @@ export function Pagination({
   onPageChange,
   onLimitChange,
 }: DataPaginationProps) {
+  const searchParams = useSearchParams();
   const startIndex = (currentPage - 1) * limit + 1;
   const endIndex = Math.min(startIndex + limit - 1, totalCount);
 
@@ -46,7 +49,10 @@ export function Pagination({
     if (onPageChange) {
       return "#";
     }
-    return `${basePath}?page=${page}&limit=${limit}`;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    params.set("limit", limit.toString());
+    return `${basePath}?${params.toString()}`;
   };
 
   const handlePageClick = (page: number) => {
@@ -59,7 +65,10 @@ export function Pagination({
     if (onLimitChange) {
       onLimitChange(Number(newLimit));
     } else {
-      window.location.href = `${basePath}?page=1&limit=${newLimit}`;
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("page", "1");
+      params.set("limit", newLimit);
+      window.location.href = `${basePath}?${params.toString()}`;
     }
   };
 

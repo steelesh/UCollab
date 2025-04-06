@@ -22,16 +22,32 @@ type PageProps = {
 };
 
 async function Page({ searchParams, userId }: PageProps) {
-  const { page = "1", limit = "8" } = await searchParams;
-  const { posts, totalCount } = await getPosts(Number(page), Number(limit), userId);
+  const {
+    page = "1",
+    limit = "8",
+    query: rawQuery = "",
+    postNeeds: rawPostNeeds = "",
+    minRating: rawMinRating = "",
+    sortBy: rawSortBy = "createdDate",
+    sortOrder: rawSortOrder = "desc",
+  } = await searchParams;
+
+  const query = Array.isArray(rawQuery) ? rawQuery[0] : rawQuery;
+  const postNeeds = Array.isArray(rawPostNeeds) ? rawPostNeeds[0] : rawPostNeeds;
+  const minRating = Array.isArray(rawMinRating) ? rawMinRating[0] : rawMinRating;
+  const sortBy = Array.isArray(rawSortBy) ? rawSortBy[0] : rawSortBy;
+  const sortOrder = Array.isArray(rawSortOrder) ? rawSortOrder[0] : rawSortOrder;
+
+  const { posts, totalCount } = await getPosts(
+    Number(page),
+    Number(limit),
+    userId,
+    { query, postNeeds, minRating, sortBy, sortOrder },
+  );
 
   return (
     <Container>
-      <PageBreadcrumb
-        items={[
-          { label: "All Posts", isCurrent: true },
-        ]}
-      />
+      <PageBreadcrumb items={[{ label: "All Posts", isCurrent: true }]} />
       <Header>
         <H1>All Posts</H1>
       </Header>
