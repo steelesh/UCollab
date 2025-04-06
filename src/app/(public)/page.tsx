@@ -45,14 +45,12 @@ export default async function Page() {
                       key={post.id}
                       id={post.id}
                       title={post.title}
-                      githubRepo={post.githubRepo}
                       technologies={post.technologies}
                       postNeeds={post.postNeeds}
                       user={{
                         username: post.createdBy.username,
                         avatar: post.createdBy.avatar,
                       }}
-                      watchers={post.watchers}
                     />
                   ))}
                 </div>

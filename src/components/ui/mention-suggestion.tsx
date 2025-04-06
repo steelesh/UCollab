@@ -3,10 +3,11 @@
 import type { User } from "@prisma/client";
 import type { Editor } from "@tiptap/core";
 import type { SuggestionKeyDownProps, SuggestionProps } from "@tiptap/suggestion";
-import type { GetReferenceClientRect, Instance, Props } from "tippy.js";
+import type { GetReferenceClientRect, Instance } from "tippy.js";
 
 import { ReactRenderer } from "@tiptap/react";
 import Image from "next/image";
+import React from "react";
 import tippy from "tippy.js";
 
 import { Button } from "~/components/ui/button";
@@ -80,13 +81,12 @@ const suggestion = {
   char: "@",
 
   items: async ({ query, currentUserId }: SuggestionItem) => {
-    const users = await searchUsers(query || "", currentUserId);
-    return users;
+    return await searchUsers(query || "", currentUserId);
   },
 
   render: () => {
     let component: ReactRenderer<MentionListRef, MentionListProps>;
-    let popup: Instance<Props>[];
+    let popup: Instance[];
     let lastQuery = "";
     let lastItems: MentionUser[] = [];
     let commandFn: ((item: { id: string; label: string }) => void) | null = null;

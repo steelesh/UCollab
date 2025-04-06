@@ -75,12 +75,12 @@ export function PostBookmark({ postId, initialBookmarked, className = "" }: Post
               </ActionButton>
               <ConfirmDialog
                 open={showUnbookmarkConfirm}
-                onOpenChange={setShowUnbookmarkConfirm}
+                onOpenChangeAction={setShowUnbookmarkConfirm}
                 title="Remove Bookmark"
                 description="Are you sure you want to remove this post from your bookmarks?"
                 confirmText="Remove"
                 cancelText="Cancel"
-                onConfirm={() => {
+                onConfirmAction={() => {
                   setShowUnbookmarkConfirm(false);
                   handleUnbookmark();
                 }}

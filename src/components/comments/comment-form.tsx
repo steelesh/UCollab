@@ -16,7 +16,7 @@ import { commentSchema } from "~/features/comments/comment.schema";
 type CommentFormProps = {
   readonly postId: Post["id"];
   readonly currentUserId: User["id"];
-  readonly onSubmit: (content: Comment["content"], hasChanged: boolean) => Promise<void>;
+  readonly onSubmitAction: (content: Comment["content"], hasChanged: boolean) => Promise<void>;
   readonly initialContent?: Comment["content"];
   readonly isEditing?: boolean;
   readonly onCancel?: () => void;
@@ -33,7 +33,7 @@ function normalizeHtml(html: string): string {
 export function CommentForm({
   postId,
   currentUserId,
-  onSubmit,
+  onSubmitAction,
   initialContent = "",
   isEditing = false,
   onCancel,
@@ -68,7 +68,7 @@ export function CommentForm({
     }
 
     try {
-      await onSubmit(data.content, hasChanged);
+      await onSubmitAction(data.content, hasChanged);
       if (!isEditing) {
         reset({ content: "", postId }, { keepErrors: false, keepDirty: false });
         editorRef.current?.clearContent();

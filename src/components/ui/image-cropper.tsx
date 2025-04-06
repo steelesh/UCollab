@@ -25,17 +25,17 @@ import {
 
 type ImageCropperProps = {
   readonly dialogOpen: boolean;
-  readonly setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  readonly setDialogOpenAction: React.Dispatch<React.SetStateAction<boolean>>;
   readonly selectedFile: File | null;
-  readonly onFileChange: (file: File | null) => void;
+  readonly onFileChangeAction: (file: File | null) => void;
   readonly aspect?: number;
 };
 
 export function ImageCropper({
   dialogOpen,
-  setDialogOpen,
+  setDialogOpenAction,
   selectedFile,
-  onFileChange,
+  onFileChangeAction,
   aspect = 16 / 9,
 }: ImageCropperProps) {
   const imgRef = React.useRef<HTMLImageElement | null>(null);
@@ -113,9 +113,9 @@ export function ImageCropper({
     try {
       if (selectedFile && croppedImageUrl) {
         const file = dataURLtoFile(croppedImageUrl, selectedFile.name);
-        onFileChange(file);
+        onFileChangeAction(file);
       }
-      setDialogOpen(false);
+      setDialogOpenAction(false);
     } catch (error) {
       console.error("Error cropping image:", error);
     }
@@ -126,7 +126,7 @@ export function ImageCropper({
   }
 
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpenAction}>
       <DialogContent className="p-0 gap-0 max-w-3xl">
         <DialogTitle className="sr-only">Crop Image</DialogTitle>
         <div className="p-6 size-full">

@@ -48,7 +48,6 @@ async function Page({ params, searchParams }: PageProps) {
             key={post.id}
             id={post.id}
             title={post.title}
-            githubRepo={post.githubRepo}
             createdDate={post.createdDate}
             technologies={post.technologies}
             rating={post.rating}
@@ -59,7 +58,6 @@ async function Page({ params, searchParams }: PageProps) {
               username: post.createdBy.username,
               avatar: post.createdBy.avatar,
             }}
-            watchers={post.watchers}
           />
         ))}
       </div>

@@ -211,20 +211,20 @@ export function PostDetailsSection({
         {control._formValues.bannerImage instanceof File && !fileError && (
           <ImageCropper
             dialogOpen={dialogOpen}
-            setDialogOpen={setDialogOpen}
+            setDialogOpenAction={setDialogOpen}
             selectedFile={control._formValues.bannerImage}
-            onFileChange={handleFileChange}
+            onFileChangeAction={handleFileChange}
           />
         )}
 
         <ConfirmDialog
           open={deleteDialogOpen}
-          onOpenChange={setDeleteDialogOpen}
+          onOpenChangeAction={setDeleteDialogOpen}
           title="Remove Banner Image"
           description="Are you sure you want to remove the banner image? This action cannot be undone."
           confirmText="Remove"
           cancelText="Cancel"
-          onConfirm={() => {
+          onConfirmAction={() => {
             const fileInput = document.getElementById("bannerImage") as HTMLInputElement;
             if (fileInput) {
               fileInput.value = "";

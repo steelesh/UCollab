@@ -266,7 +266,7 @@ export function PostForm({ post }: PostFormProps) {
               secondaryNeedType={secondaryNeedType}
               canHaveRatings={canHaveRatings}
               suggestions={suggestions}
-              handleTechSearch={handleTechSearch}
+              handleTechSearchAction={handleTechSearch}
             />
           )}
           {currentStep === 4 && <PreviewSection data={formData} />}

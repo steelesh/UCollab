@@ -147,7 +147,7 @@ export function OnboardingForm() {
               field={field}
               isSubmitting={isSubmitting}
               suggestions={suggestions}
-              handleTechSearch={handleTechSearch}
+              handleTechSearchAction={handleTechSearch}
             />
           )}
         />

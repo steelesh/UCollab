@@ -15,17 +15,16 @@ import { emitNotificationCountChanged } from "~/lib/utils";
 import { NotificationActionButton } from "./notification-action-button";
 
 type NotificationsSelectionActionsProps = {
-  readonly notifications: Notification[];
   readonly selectedNotifications: Notification[];
-  readonly setSelectedNotifications: Dispatch<SetStateAction<Notification[]>>;
-  readonly setNotifications: Dispatch<SetStateAction<Notification[]>>;
+  readonly setSelectedNotificationsAction: Dispatch<SetStateAction<Notification[]>>;
+  readonly setNotificationsAction: Dispatch<SetStateAction<Notification[]>>;
   readonly userId: User["id"];
 };
 
 export function NotificationsSelectionActions({
   selectedNotifications,
-  setSelectedNotifications,
-  setNotifications,
+  setSelectedNotificationsAction,
+  setNotificationsAction,
   userId,
 }: NotificationsSelectionActionsProps) {
   const [isMarkingMultiple, setIsMarkingMultiple] = useState(false);
@@ -44,12 +43,12 @@ export function NotificationsSelectionActions({
     setIsMarkingMultiple(true);
     try {
       await markMultipleAsRead(selectedNotifications.map(notification => notification.id), userId);
-      setNotifications(prev =>
+      setNotificationsAction(prev =>
         prev.map(notification =>
           selectedNotifications.includes(notification) ? { ...notification, isRead: true } : notification,
         ),
       );
-      setSelectedNotifications([]);
+      setSelectedNotificationsAction([]);
       emitNotificationCountChanged();
     } catch {
       // handle error, show toast or something
@@ -69,8 +68,8 @@ export function NotificationsSelectionActions({
       for (const notification of selectedNotifications) {
         await deleteNotification(notification.id, userId);
       }
-      setNotifications(prev => prev.filter(notification => !selectedNotifications.includes(notification)));
-      setSelectedNotifications([]);
+      setNotificationsAction(prev => prev.filter(notification => !selectedNotifications.includes(notification)));
+      setSelectedNotificationsAction([]);
       emitNotificationCountChanged();
     } catch {
       // handle error, show toast or something
@@ -81,7 +80,7 @@ export function NotificationsSelectionActions({
   };
 
   const clearSelection = () => {
-    setSelectedNotifications([]);
+    setSelectedNotificationsAction([]);
   };
 
   return (
@@ -116,21 +115,21 @@ export function NotificationsSelectionActions({
       </div>
       <ConfirmDialog
         open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
+        onOpenChangeAction={setShowDeleteDialog}
         title="Delete Notifications"
         description={`Are you sure you want to delete ${selectedNotifications.length} selected notification${selectedNotifications.length === 1 ? "" : "s"}? This action cannot be undone.`}
         confirmText="Delete"
         cancelText="Cancel"
-        onConfirm={confirmDeleteMultiple}
+        onConfirmAction={confirmDeleteMultiple}
       />
       <ConfirmDialog
         open={showMarkReadDialog}
-        onOpenChange={setShowMarkReadDialog}
+        onOpenChangeAction={setShowMarkReadDialog}
         title="Mark Selected as Read"
         description={`Are you sure you want to mark ${unreadSelectedCount} notification${unreadSelectedCount === 1 ? "" : "s"} as read?`}
         confirmText="Mark Selected as Read"
         cancelText="Cancel"
-        onConfirm={confirmMarkMultipleAsRead}
+        onConfirmAction={confirmMarkMultipleAsRead}
       />
     </>
   );

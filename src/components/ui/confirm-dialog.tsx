@@ -12,35 +12,35 @@ import {
 
 type ConfirmDialogProps = {
   readonly open: boolean;
-  readonly onOpenChange: (open: boolean) => void;
+  readonly onOpenChangeAction: (open: boolean) => void;
   readonly title: string;
   readonly description: string;
   readonly confirmText: string;
   readonly cancelText: string;
-  readonly onConfirm: () => void;
+  readonly onConfirmAction: () => void;
 };
 
 export function ConfirmDialog({
   open,
-  onOpenChange,
+  onOpenChangeAction,
   title,
   description,
   confirmText,
   cancelText,
-  onConfirm,
+  onConfirmAction,
 }: ConfirmDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
+    <Dialog open={open} onOpenChange={onOpenChangeAction} modal={false}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChangeAction(false)}>
             {cancelText}
           </Button>
-          <Button variant="destructive" onClick={onConfirm}>
+          <Button variant="destructive" onClick={onConfirmAction}>
             {confirmText}
           </Button>
         </DialogFooter>

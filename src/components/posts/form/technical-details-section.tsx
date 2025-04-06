@@ -26,7 +26,7 @@ type TechnicalDetailsSectionProps = {
   readonly secondaryNeedType: NeedType | null | undefined;
   readonly canHaveRatings: boolean;
   readonly suggestions: string[];
-  readonly handleTechSearch: (value: string) => void;
+  readonly handleTechSearchAction: (value: string) => void;
 };
 
 export function TechnicalDetailsSection({
@@ -36,7 +36,7 @@ export function TechnicalDetailsSection({
   secondaryNeedType,
   canHaveRatings,
   suggestions,
-  handleTechSearch,
+  handleTechSearchAction,
 }: TechnicalDetailsSectionProps) {
   const isProjectPost = isProjectNeedType(needType) || (secondaryNeedType && isProjectNeedType(secondaryNeedType));
 
@@ -66,7 +66,7 @@ export function TechnicalDetailsSection({
                       field={field}
                       isSubmitting={isSubmitting}
                       suggestions={suggestions}
-                      handleTechSearch={handleTechSearch}
+                      handleTechSearchAction={handleTechSearchAction}
                     />
                   </FormControl>
                   <FormMessage className="text-xs md:text-sm" />

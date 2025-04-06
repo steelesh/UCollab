@@ -81,12 +81,12 @@ export function CommentHeader({
       </div>
       <ConfirmDialog
         open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
+        onOpenChangeAction={setShowDeleteDialog}
         title={`Delete ${isReply ? "Reply" : "Comment"}`}
         description={message}
         confirmText="Delete"
         cancelText="Cancel"
-        onConfirm={() => {
+        onConfirmAction={() => {
           onDelete();
           setShowDeleteDialog(false);
         }}

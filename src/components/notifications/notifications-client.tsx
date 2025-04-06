@@ -29,8 +29,8 @@ export function NotificationsClient({ initialNotifications, userId, pagination }
       <NotificationsList
         notifications={notifications}
         selectedNotifications={selectedNotifications}
-        setSelectedNotifications={setSelectedNotifications}
-        setNotifications={setNotifications}
+        setSelectedNotificationsAction={setSelectedNotifications}
+        setNotificationsAction={setNotifications}
         userId={userId}
       />
       <Pagination

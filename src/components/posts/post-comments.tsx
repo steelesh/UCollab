@@ -112,7 +112,7 @@ export function PostComments({
   return (
     <div className="mt-8 space-y-8">
       <div className="border-b pb-6">
-        <CommentForm postId={postId} currentUserId={currentUserId} onSubmit={handleCreate} />
+        <CommentForm postId={postId} currentUserId={currentUserId} onSubmitAction={handleCreate} />
       </div>
       <CommentList
         comments={commentsState}
@@ -122,9 +122,9 @@ export function PostComments({
         totalPages={totalPages}
         totalCount={totalCount}
         limit={limit}
-        onUpdate={handleUpdate}
-        onDelete={handleDelete}
-        onReply={handleReply}
+        onUpdateAction={handleUpdate}
+        onDeleteAction={handleDelete}
+        onReplyAction={handleReply}
       />
     </div>
   );

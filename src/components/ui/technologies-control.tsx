@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { Input } from "~/components/ui/input";
 import TechBadge from "~/components/ui/tech-badge";
@@ -12,14 +12,14 @@ type TechnologiesControlProps = {
   };
   readonly isSubmitting: boolean;
   readonly suggestions: string[];
-  readonly handleTechSearch: (value: string) => void;
+  readonly handleTechSearchAction: (value: string) => void;
 };
 
 export default function TechnologiesControl({
   field,
   isSubmitting,
   suggestions,
-  handleTechSearch,
+  handleTechSearchAction,
 }: TechnologiesControlProps) {
   const [techInputValue, setTechInputValue] = useState("");
   const mirrorRef = useRef<HTMLSpanElement>(null);
@@ -34,7 +34,7 @@ export default function TechnologiesControl({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setTechInputValue(val);
-    handleTechSearch(val);
+    handleTechSearchAction(val);
   };
 
   const bestMatch = suggestions.find(

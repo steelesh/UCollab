@@ -13,17 +13,17 @@ import { ConfirmDialog } from "~/components/ui/confirm-dialog";
 type NotificationItemProps = {
   readonly notification: Notification;
   readonly isSelected: boolean;
-  readonly onSelect: () => void;
-  readonly onMarkAsRead: () => Promise<void>;
-  readonly onDelete: () => Promise<void>;
+  readonly onSelectAction: () => void;
+  readonly onMarkAsReadAction: () => Promise<void>;
+  readonly onDeleteAction: () => Promise<void>;
 };
 
 export function NotificationItem({
   notification,
   isSelected,
-  onSelect,
-  onMarkAsRead,
-  onDelete,
+  onSelectAction,
+  onMarkAsReadAction,
+  onDeleteAction,
 }: NotificationItemProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -37,7 +37,7 @@ export function NotificationItem({
         <div className="flex items-start">
           <Checkbox
             checked={isSelected}
-            onCheckedChange={onSelect}
+            onCheckedChange={onSelectAction}
             id={`select-${notification.id}`}
             className="mt-1 mr-3"
           />
@@ -55,7 +55,7 @@ export function NotificationItem({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={onMarkAsRead}
+                  onClick={onMarkAsReadAction}
                   title="Mark as read"
                 >
                   <Check />
@@ -78,12 +78,12 @@ export function NotificationItem({
       </li>
       <ConfirmDialog
         open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
+        onOpenChangeAction={setShowDeleteDialog}
         title="Delete Notification"
         description="Are you sure you want to delete this notification? This action cannot be undone."
         cancelText="Cancel"
         confirmText="Delete"
-        onConfirm={onDelete}
+        onConfirmAction={onDeleteAction}
       />
     </>
   );
