@@ -192,7 +192,7 @@ export function PostForm({ post }: PostFormProps) {
       payload.append("secondaryNeedType", formData.secondaryNeedType || "");
 
       const techData = Array.isArray(formData.technologies)
-        ? formData.technologies.filter(tech => typeof tech === "string" && tech.trim() !== "")
+        ? formData.technologies.filter(tech => tech.trim() !== "")
         : [];
 
       payload.append("technologies", JSON.stringify(techData));
