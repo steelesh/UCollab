@@ -13,7 +13,7 @@ import { prisma } from "~/lib/prisma";
 import { DEFAULT_POST_BANNER_IMAGE } from "~/lib/utils";
 import { withAuth } from "~/security/protected";
 
-async function Page({ userId }: { userId: User["id"] }) {
+async function Page({ userId }: { readonly userId: User["id"] }) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
@@ -56,6 +56,7 @@ async function Page({ userId }: { userId: User["id"] }) {
               alt={user.username}
               width={100}
               height={100}
+              loading="lazy"
               className="border-base-100 rounded-full border-5"
             />
           </div>
@@ -88,7 +89,7 @@ async function Page({ userId }: { userId: User["id"] }) {
             <fieldset className="fieldset">
               <legend className="text-sm font-medium">Mentorship Status</legend>
               <div className="mt-2 flex gap-2 filter">
-                <select name="mentorship" defaultValue={user.mentorship || "NONE"} className="bg-background">
+                <select name="mentorship" defaultValue={user.mentorship ?? "NONE"} className="bg-background">
                   <option value="MENTOR">Mentor</option>
                   <option value="MENTEE">Mentee</option>
                   <option value="NONE">None</option>
@@ -103,7 +104,7 @@ async function Page({ userId }: { userId: User["id"] }) {
                 name="bio"
                 className="textarea h-24"
                 placeholder="Tell everyone a little bit about yourself!"
-                defaultValue={user.bio || ""}
+                defaultValue={user.bio ?? ""}
               >
               </Textarea>
             </fieldset>
@@ -125,6 +126,7 @@ async function Page({ userId }: { userId: User["id"] }) {
                   className="toggle"
                 />
                 Comments
+                {/* */}
               </label>
               <label className="fieldset-label flex items-center gap-2">
                 <input
@@ -134,6 +136,7 @@ async function Page({ userId }: { userId: User["id"] }) {
                   className="toggle"
                 />
                 Mentions
+                {/* */}
               </label>
               <label className="fieldset-label flex items-center gap-2">
                 <input
@@ -143,6 +146,7 @@ async function Page({ userId }: { userId: User["id"] }) {
                   className="toggle"
                 />
                 Posts
+                {/* */}
               </label>
               <label className="fieldset-label flex items-center gap-2">
                 <input
@@ -152,6 +156,7 @@ async function Page({ userId }: { userId: User["id"] }) {
                   className="toggle"
                 />
                 System
+                {/* */}
               </label>
             </fieldset>
           </div>

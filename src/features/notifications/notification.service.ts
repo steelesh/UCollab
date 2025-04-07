@@ -56,9 +56,9 @@ export const NotificationService = {
 
   async getPaginatedNotifications(
     userId: User["id"],
+    requestUserId: User["id"],
     page = 1,
     limit = 20,
-    requestUserId: User["id"],
   ): Promise<PrismaNotification[]> {
     return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {

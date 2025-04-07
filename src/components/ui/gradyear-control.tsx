@@ -1,11 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { useState } from "react";
 
 type GraduationYearControlProps = {
-  initialYear?: string;
-  currentYear: number;
+  readonly initialYear?: string;
+  readonly currentYear: number;
 };
 
 export default function GraduationYearControl({ initialYear, currentYear }: GraduationYearControlProps) {
@@ -17,7 +17,7 @@ export default function GraduationYearControl({ initialYear, currentYear }: Grad
   return (
     <>
       <div className="form-control">
-        <div onMouseLeave={() => setFocused(null)} className="flex items-center">
+        <div onMouseLeave={() => setFocused(null)} className="flex items-center" role="button" tabIndex={0}>
           {years.map((year, index) => (
             <div key={year} className="flex items-center">
               <button

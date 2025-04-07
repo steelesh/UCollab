@@ -12,14 +12,15 @@ import type { CommentFormData } from "~/features/comments/comment.schema";
 import { Button } from "~/components/ui/button";
 import Tiptap from "~/components/ui/tiptap";
 import { commentSchema } from "~/features/comments/comment.schema";
+import { toastError } from "~/lib/toast";
 
 type CommentFormProps = {
-  postId: Post["id"];
-  currentUserId: User["id"];
-  onSubmit: (content: Comment["content"], hasChanged: boolean) => Promise<void>;
-  initialContent?: Comment["content"];
-  isEditing?: boolean;
-  onCancel?: () => void;
+  readonly postId: Post["id"];
+  readonly currentUserId: User["id"];
+  readonly onSubmitAction: (content: Comment["content"], hasChanged: boolean) => Promise<void>;
+  readonly initialContent?: Comment["content"];
+  readonly isEditing?: boolean;
+  readonly onCancel?: () => void;
 };
 
 function normalizeHtml(html: string): string {
@@ -27,13 +28,13 @@ function normalizeHtml(html: string): string {
     return html;
   const temp = document.createElement("div");
   temp.innerHTML = html;
-  return temp.textContent?.trim().replace(/\s+/g, " ") || "";
+  return temp.textContent?.trim().replace(/\s+/g, " ") ?? "";
 }
 
 export function CommentForm({
   postId,
   currentUserId,
-  onSubmit,
+  onSubmitAction,
   initialContent = "",
   isEditing = false,
   onCancel,
@@ -68,14 +69,16 @@ export function CommentForm({
     }
 
     try {
-      await onSubmit(data.content, hasChanged);
+      await onSubmitAction(data.content, hasChanged);
       if (!isEditing) {
         reset({ content: "", postId }, { keepErrors: false, keepDirty: false });
         editorRef.current?.clearContent();
         clearErrors();
       }
     } catch {
-      // TODO: handle error, show toast or something
+      toastError("Failed to Submit Comment", {
+        description: "An error occurred while submitting your comment. Please try again.",
+      });
     }
   };
 

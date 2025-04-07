@@ -158,4 +158,4 @@ const authConfig: NextAuthConfig = {
   },
 };
 
-export const { auth, handlers, signIn, signOut } = NextAuth(authConfig);
+export const { auth, handlers } = NextAuth(authConfig);

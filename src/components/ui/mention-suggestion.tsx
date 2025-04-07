@@ -3,34 +3,36 @@
 import type { User } from "@prisma/client";
 import type { Editor } from "@tiptap/core";
 import type { SuggestionKeyDownProps, SuggestionProps } from "@tiptap/suggestion";
-import type { GetReferenceClientRect, Instance, Props } from "tippy.js";
+import type { GetReferenceClientRect, Instance } from "tippy.js";
 
 import { ReactRenderer } from "@tiptap/react";
 import Image from "next/image";
+import React from "react";
 import tippy from "tippy.js";
 
+import { Button } from "~/components/ui/button";
 import { searchUsers } from "~/features/users/user.actions";
 
 type MentionUser = {
-  id: User["id"];
-  username: User["username"];
-  avatar?: User["avatar"];
+  readonly id: User["id"];
+  readonly username: User["username"];
+  readonly avatar?: User["avatar"];
 };
 
 type MentionListProps = {
-  items: MentionUser[];
-  command: (item: { id: User["id"]; label: User["username"] }) => void;
-  selectedIndex: number;
+  readonly items: MentionUser[];
+  readonly command: (item: { id: User["id"]; label: User["username"] }) => void;
+  readonly selectedIndex: number;
 };
 
 type MentionListRef = {
-  onKeyDown: (props: { event: KeyboardEvent }) => boolean;
+  readonly onKeyDown: (props: { event: KeyboardEvent }) => boolean;
 };
 
 type SuggestionItem = {
-  query: string;
-  editor: Editor | null;
-  currentUserId: string;
+  readonly query: string;
+  readonly editor: Editor | null;
+  readonly currentUserId: string;
 };
 
 function MentionList({ items, command, selectedIndex }: MentionListProps) {
@@ -47,7 +49,7 @@ function MentionList({ items, command, selectedIndex }: MentionListProps) {
   return (
     <div className="bg-popover rounded-md border shadow-md max-h-[200px] w-[200px] overflow-y-auto" role="listbox" aria-label="Mention suggestions">
       {items.map((item, index) => (
-        <button
+        <Button
           type="button"
           key={item.id}
           onClick={() => command({ id: item.username, label: item.username })}
@@ -69,7 +71,7 @@ function MentionList({ items, command, selectedIndex }: MentionListProps) {
             )}
             <span>{item.username}</span>
           </div>
-        </button>
+        </Button>
       ))}
     </div>
   );
@@ -79,13 +81,12 @@ const suggestion = {
   char: "@",
 
   items: async ({ query, currentUserId }: SuggestionItem) => {
-    const users = await searchUsers(query || "", currentUserId);
-    return users;
+    return await searchUsers(query || "", currentUserId);
   },
 
   render: () => {
     let component: ReactRenderer<MentionListRef, MentionListProps>;
-    let popup: Instance<Props>[];
+    let popup: Instance[];
     let lastQuery = "";
     let lastItems: MentionUser[] = [];
     let commandFn: ((item: { id: string; label: string }) => void) | null = null;
@@ -127,7 +128,7 @@ const suggestion = {
       },
 
       onUpdate: (props: SuggestionProps) => {
-        lastQuery = props.query || "";
+        lastQuery = props.query ?? "";
         lastItems = props.items as MentionUser[];
         commandFn = props.command;
 

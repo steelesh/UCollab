@@ -6,23 +6,23 @@ import { useState } from "react";
 
 import type { Comment } from "~/features/posts/post.types";
 
-import { Pagination } from "~/components/ui/pagination";
+import { Pagination } from "~/components/navigation/pagination";
 
 import { CommentContent } from "./comment-content";
 import { CommentForm } from "./comment-form";
 import { CommentHeader } from "./comment-header";
 
 type CommentListProps = {
-  comments: Comment[];
-  currentUserId: User["id"];
-  postId: Post["id"];
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
-  limit: number;
-  onUpdate: (commentId: Comment["id"], content: Comment["content"]) => Promise<void>;
-  onDelete: (commentId: Comment["id"]) => Promise<void>;
-  onReply: (parentId: Comment["id"], content: Comment["content"]) => Promise<void>;
+  readonly comments: Comment[];
+  readonly currentUserId: User["id"];
+  readonly postId: Post["id"];
+  readonly currentPage: number;
+  readonly totalPages: number;
+  readonly totalCount: number;
+  readonly limit: number;
+  readonly onUpdateAction: (commentId: Comment["id"], content: Comment["content"]) => Promise<void>;
+  readonly onDeleteAction: (commentId: Comment["id"]) => Promise<void>;
+  readonly onReplyAction: (parentId: Comment["id"], content: Comment["content"]) => Promise<void>;
 };
 
 export function CommentList({
@@ -33,16 +33,16 @@ export function CommentList({
   totalPages,
   totalCount,
   limit,
-  onUpdate,
-  onDelete,
-  onReply,
+  onUpdateAction,
+  onDeleteAction,
+  onReplyAction,
 }: CommentListProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
 
   const handleUpdate = async (comment: Comment, newContent: string, hasChanged: boolean) => {
     if (hasChanged) {
-      await onUpdate(comment.id, newContent);
+      await onUpdateAction(comment.id, newContent);
     }
     setEditingId(null);
   };
@@ -56,7 +56,7 @@ export function CommentList({
               comment={comment}
               currentUserId={currentUserId}
               onEdit={() => setEditingId(comment.id)}
-              onDelete={() => onDelete(comment.id)}
+              onDelete={() => onDeleteAction(comment.id)}
               onReply={() => setReplyingToId(comment.id)}
             />
 
@@ -67,7 +67,7 @@ export function CommentList({
                     currentUserId={currentUserId}
                     initialContent={comment.content}
                     isEditing={true}
-                    onSubmit={async (content, hasChanged) => {
+                    onSubmitAction={async (content, hasChanged) => {
                       await handleUpdate(comment, content, hasChanged);
                     }}
                     onCancel={() => setEditingId(null)}
@@ -85,8 +85,8 @@ export function CommentList({
               <CommentForm
                 postId={postId}
                 currentUserId={currentUserId}
-                onSubmit={async (content) => {
-                  await onReply(comment.id, content);
+                onSubmitAction={async (content) => {
+                  await onReplyAction(comment.id, content);
                   setReplyingToId(null);
                 }}
                 onCancel={() => setReplyingToId(null)}
@@ -102,7 +102,7 @@ export function CommentList({
                     comment={reply}
                     currentUserId={currentUserId}
                     onEdit={() => setEditingId(reply.id)}
-                    onDelete={() => onDelete(reply.id)}
+                    onDelete={() => onDeleteAction(reply.id)}
                     isReply={true}
                   />
                   {editingId === reply.id
@@ -112,7 +112,7 @@ export function CommentList({
                           currentUserId={currentUserId}
                           initialContent={reply.content}
                           isEditing={true}
-                          onSubmit={async (content, hasChanged) => {
+                          onSubmitAction={async (content, hasChanged) => {
                             await handleUpdate(reply, content, hasChanged);
                           }}
                           onCancel={() => setEditingId(null)}

@@ -93,5 +93,5 @@ export function emitNotificationCountChanged() {
 }
 
 export function isProjectNeedType(type: NeedType | string | null | undefined): boolean {
-  return type === NeedType.FEEDBACK || type === NeedType.CONTRIBUTION;
+  return type === NeedType.FEEDBACK || type === NeedType.CONTRIBUTION || type === NeedType.DEVELOPER_AVAILABLE || type === NeedType.SEEKING_MENTOR || type === NeedType.MENTOR_AVAILABLE || type === NeedType.TEAM_FORMATION;
 }

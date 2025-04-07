@@ -11,36 +11,36 @@ import {
 } from "~/components/ui/dialog";
 
 type ConfirmDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  title: string;
-  description: string;
-  confirmText: string;
-  cancelText: string;
-  onConfirm: () => void;
+  readonly open: boolean;
+  readonly onOpenChangeAction: (open: boolean) => void;
+  readonly title: string;
+  readonly description: string;
+  readonly confirmText: string;
+  readonly cancelText: string;
+  readonly onConfirmAction: () => void;
 };
 
 export function ConfirmDialog({
   open,
-  onOpenChange,
+  onOpenChangeAction,
   title,
   description,
   confirmText,
   cancelText,
-  onConfirm,
+  onConfirmAction,
 }: ConfirmDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
+    <Dialog open={open} onOpenChange={onOpenChangeAction} modal={false}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChangeAction(false)}>
             {cancelText}
           </Button>
-          <Button variant="destructive" onClick={onConfirm}>
+          <Button variant="destructive" onClick={onConfirmAction}>
             {confirmText}
           </Button>
         </DialogFooter>

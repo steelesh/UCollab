@@ -9,8 +9,8 @@ import { getUserProfile } from "~/features/users/user.queries";
 import { withAuth } from "~/security/protected";
 
 type PageProps = {
-  params: Promise<{ username: User["username"] }>;
-  userId: User["id"];
+  readonly params: Promise<{ username: User["username"] }>;
+  readonly userId: User["id"];
 };
 
 export async function generateMetadata({ params }: { params: Promise<{ username: User["username"] }> }): Promise<Metadata> {

@@ -3,10 +3,10 @@ import Link from "next/link";
 import { cn } from "~/lib/utils";
 
 type TypographyLinkProps = {
-  href: string;
-  children: React.ReactNode;
-  className?: string;
-  isExternal?: boolean;
+  readonly href: string;
+  readonly children: React.ReactNode;
+  readonly className?: string;
+  readonly isExternal?: boolean;
 };
 
 export function TypographyLink({ href, children, className, isExternal = false }: TypographyLinkProps) {

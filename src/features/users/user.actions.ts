@@ -54,7 +54,7 @@ export async function updateUser(formData: FormData) {
     = mentorshipValue === "MENTOR" || mentorshipValue === "MENTEE" || mentorshipValue === "NONE"
       ? (mentorshipValue as "MENTOR" | "MENTEE" | "NONE")
       : undefined;
-  const bio = formData.get("bio")?.toString() || undefined;
+  const bio = formData.get("bio")?.toString() ?? undefined;
   const avatarValue = formData.get("avatar");
   const avatar = avatarValue instanceof File && avatarValue.size > 0 ? avatarValue : undefined;
   const allowComments = formData.get("allowComments") === "on";

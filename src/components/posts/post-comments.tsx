@@ -7,18 +7,19 @@ import { useState } from "react";
 import type { Comment } from "~/features/posts/post.types";
 
 import { createComment, createReply, deleteComment, updateComment } from "~/features/comments/comment.actions";
+import { toastError } from "~/lib/toast";
 
 import { CommentForm } from "../comments/comment-form";
 import { CommentList } from "../comments/comment-list";
 
 type PostCommentsProps = {
-  comments: Comment[];
-  currentUserId: User["id"];
-  postId: Post["id"];
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
-  limit: number;
+  readonly comments: Comment[];
+  readonly currentUserId: User["id"];
+  readonly postId: Post["id"];
+  readonly currentPage: number;
+  readonly totalPages: number;
+  readonly totalCount: number;
+  readonly limit: number;
 };
 
 export function PostComments({
@@ -30,21 +31,23 @@ export function PostComments({
   totalCount,
   limit,
 }: PostCommentsProps) {
-  const [commentsState, setComments] = useState<Comment[]>(comments);
+  const [commentsState, setCommentsState] = useState<Comment[]>(comments);
 
   const handleCreate = async (content: Comment["content"]) => {
     try {
       const newComment = await createComment(postId, content);
-      setComments(prev => [newComment, ...prev]);
+      setCommentsState(prev => [newComment, ...prev]);
     } catch {
-      // TODO: handle error, show toast or something
+      toastError("Failed to Create Comment", {
+        description: "An error occurred while creating your comment. Please try again.",
+      });
     }
   };
 
   const handleUpdate = async (commentId: Comment["id"], content: Comment["content"]) => {
     try {
       await updateComment(commentId, content, postId);
-      setComments(prev =>
+      setCommentsState(prev =>
         prev.map((comment) => {
           if (comment.id === commentId) {
             return {
@@ -71,14 +74,16 @@ export function PostComments({
         }),
       );
     } catch {
-      // TODO: handle error, show toast or something
+      toastError("Failed to Update Comment", {
+        description: "An error occurred while updating your comment. Please try again.",
+      });
     }
   };
 
   const handleDelete = async (commentId: Comment["id"]) => {
     try {
       await deleteComment(commentId, postId);
-      setComments(prev =>
+      setCommentsState(prev =>
         prev
           .map(comment => ({
             ...comment,
@@ -87,32 +92,36 @@ export function PostComments({
           .filter(comment => comment.id !== commentId),
       );
     } catch {
-      // TODO: handle error, show toast or something
+      toastError("Failed to Delete Comment", {
+        description: "An error occurred while deleting your comment. Please try again.",
+      });
     }
   };
 
   const handleReply = async (parentId: string, content: string) => {
     try {
       const newReply = await createReply(postId, parentId, content);
-      setComments(prev =>
+      setCommentsState(prev =>
         prev.map(comment =>
           comment.id === parentId
             ? {
                 ...comment,
-                replies: [...(comment.replies || []), newReply],
+                replies: [...(comment.replies ?? []), newReply],
               }
             : comment,
         ),
       );
     } catch {
-      // TODO: handle error, show toast or something
+      toastError("Failed to Create Comment", {
+        description: "An error occurred while creating your comment. Please try again.",
+      });
     }
   };
 
   return (
     <div className="mt-8 space-y-8">
       <div className="border-b pb-6">
-        <CommentForm postId={postId} currentUserId={currentUserId} onSubmit={handleCreate} />
+        <CommentForm postId={postId} currentUserId={currentUserId} onSubmitAction={handleCreate} />
       </div>
       <CommentList
         comments={commentsState}
@@ -122,9 +131,9 @@ export function PostComments({
         totalPages={totalPages}
         totalCount={totalCount}
         limit={limit}
-        onUpdate={handleUpdate}
-        onDelete={handleDelete}
-        onReply={handleReply}
+        onUpdateAction={handleUpdate}
+        onDeleteAction={handleDelete}
+        onReplyAction={handleReply}
       />
     </div>
   );

@@ -4,8 +4,8 @@ import React from "react";
 
 import type { PostNeed } from "~/features/posts/post.types";
 
-import { Badge } from "./badge";
-import { Small } from "./small";
+import { Badge } from "../ui/badge";
+import { Small } from "../ui/small";
 
 type BadgeProps = React.ComponentProps<typeof Badge> & {
   children?: React.ReactNode;
@@ -29,7 +29,7 @@ export function FeedbackBadge({ children, className, ...props }: BadgeProps) {
     <Badge variant="feedback" className={className} {...props}>
       <Small noMargin className="flex items-center gap-1">
         <MessageSquare className="w-4 h-4" />
-        {children || "Looking for feedback"}
+        {children ?? "Looking for feedback"}
       </Small>
     </Badge>
   );
@@ -51,7 +51,7 @@ export function RatingBadge({ value, className, ...props }: BadgeProps) {
     <Badge variant="rating" className={className} {...props}>
       <Small noMargin className="flex items-center gap-1">
         <Star className="w-4 h-4 fill-yellow-400 stroke-background stroke-[1.5px]" />
-        {value || "0.0"}
+        {value ?? "0.0"}
       </Small>
     </Badge>
   );
@@ -138,7 +138,7 @@ export function PostTypeBadge({ type, className, size = "md", ...props }: BadgeP
   return null;
 }
 
-export function PostNeedsBadges({ needs, className, size = "md" }: { needs: PostNeed[]; className?: string; size?: "sm" | "md" | "lg" }) {
+export function PostNeedsBadges({ needs, className, size = "md" }: { readonly needs: PostNeed[]; readonly className?: string; readonly size?: "sm" | "md" | "lg" }) {
   if (!needs.length)
     return null;
 

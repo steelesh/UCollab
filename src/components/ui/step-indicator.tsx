@@ -35,10 +35,10 @@ export function StepIndicator({
   onStepChange,
   className,
 }: {
-  currentStep: number;
-  totalSteps: number;
-  onStepChange?: (step: number) => void;
-  className?: string;
+  readonly currentStep: number;
+  readonly totalSteps: number;
+  readonly onStepChange?: (step: number) => void;
+  readonly className?: string;
 }) {
   const steps = Array.from({ length: totalSteps }, (_, i) => i + 1);
 
@@ -69,10 +69,16 @@ export function StepIndicator({
               disabled={!onStepChange}
             >
               {step < currentStep
-                ? <Check className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                ? (
+                    <Check className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                  )
                 : step === currentStep
-                  ? <CircleDot className="w-2.5 h-2.5 md:w-3 md:h-3" />
-                  : getStepIcon(step)}
+                  ? (
+                      <CircleDot className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                    )
+                  : (
+                      getStepIcon(step)
+                    )}
             </button>
             <span
               className={cn(

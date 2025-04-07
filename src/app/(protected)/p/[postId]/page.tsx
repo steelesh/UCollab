@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { PostActions } from "~/components/posts/post-actions";
+import { PostNeedsBadges } from "~/components/posts/post-badges";
 import { PostBookmark } from "~/components/posts/post-bookmark";
 import { PostComments } from "~/components/posts/post-comments";
 import { PostRating } from "~/components/posts/post-rating";
@@ -16,7 +17,6 @@ import { Container } from "~/components/ui/container";
 import { Header } from "~/components/ui/header";
 import { H1, H2 } from "~/components/ui/heading";
 import { Muted } from "~/components/ui/muted";
-import { PostNeedsBadges } from "~/components/ui/post-badges";
 import { Section } from "~/components/ui/section";
 import { TechnologyIcon } from "~/components/ui/technology-icon";
 import { getComments } from "~/features/comments/comment.queries";
@@ -25,9 +25,9 @@ import { DEFAULT_POST_BANNER_IMAGE } from "~/lib/utils";
 import { withAuth } from "~/security/protected";
 
 type PageProps = {
-  params: Promise<{ postId: Post["id"] }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-  userId: User["id"];
+  readonly params: Promise<{ postId: Post["id"] }>;
+  readonly searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  readonly userId: User["id"];
 };
 
 export async function generateMetadata({ params }: { params: Promise<{ postId: Post["id"] }> }): Promise<Metadata> {
@@ -62,7 +62,7 @@ async function Page({ params, searchParams, userId }: PageProps) {
     <Container className="max-w-3xl">
       <div className="mb-4 md:mb-6">
         <Link
-          href="/p"
+          href="/p?sortBy=createdDate&sortOrder=desc&limit=8"
           className="group flex items-center gap-1 md:gap-1.5 text-sm md:text-base text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 w-fit"
         >
           <ArrowUpRight className="w-3.5 h-3.5 md:w-4 md:h-4 -rotate-135 mr-0.5" />
@@ -138,6 +138,8 @@ async function Page({ params, searchParams, userId }: PageProps) {
           src={post.bannerImage ?? DEFAULT_POST_BANNER_IMAGE}
           alt={post.title}
           fill
+          priority
+          sizes="(max-width: 768px) 100vw, 768px"
           className="object-cover"
         />
       </div>
@@ -186,6 +188,7 @@ async function Page({ params, searchParams, userId }: PageProps) {
           <Section className="border-t border-border/30 pt-6 md:pt-8">
             <H2 className="text-xl md:text-2xl mb-3 md:mb-4 flex items-center gap-2">
               Comments
+              {/* */}
               <span className="text-sm md:text-base font-normal text-muted-foreground">
                 (
                 {totalCount}

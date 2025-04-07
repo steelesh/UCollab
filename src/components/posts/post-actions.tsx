@@ -11,9 +11,9 @@ import { deletePost } from "~/features/posts/post.actions";
 import { toastError } from "~/lib/toast";
 
 type PostActionsProps = {
-  postId: string;
-  isOwnPost: boolean;
-  isBookmarked: boolean;
+  readonly postId: string;
+  readonly isOwnPost: boolean;
+  readonly isBookmarked: boolean;
 };
 
 export function PostActions({ postId, isOwnPost, isBookmarked }: PostActionsProps) {
@@ -57,12 +57,12 @@ export function PostActions({ postId, isOwnPost, isBookmarked }: PostActionsProp
         </div>
         <ConfirmDialog
           open={showDeleteConfirm}
-          onOpenChange={setShowDeleteConfirm}
+          onOpenChangeAction={setShowDeleteConfirm}
           title="Delete Post"
           description="Are you sure you want to delete this post? This action cannot be undone and will delete all comments and ratings."
           confirmText="Delete Post"
           cancelText="Cancel"
-          onConfirm={handleDelete}
+          onConfirmAction={handleDelete}
         />
       </>
     );

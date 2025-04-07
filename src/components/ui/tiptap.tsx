@@ -7,24 +7,24 @@ import Mention from "@tiptap/extension-mention";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Bold, Code, Italic, List, ListOrdered, Quote, Strikethrough } from "lucide-react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 
 import mentionSuggestion from "./mention-suggestion";
 
 type TiptapProps = {
-  content: Comment["content"];
-  onChange: (content: Comment["content"]) => void;
-  disabled?: boolean;
-  currentUserId: User["id"];
+  readonly content: Comment["content"];
+  readonly onChange: (content: Comment["content"]) => void;
+  readonly disabled?: boolean;
+  readonly currentUserId: User["id"];
 };
 
 export type TiptapRef = {
-  clearContent: () => void;
+  readonly clearContent: () => void;
 };
 
-function MenuBar({ editor }: { editor: Editor }) {
+function MenuBar({ editor }: { readonly editor: Editor }) {
   if (!editor)
     return null;
 
@@ -162,7 +162,7 @@ function Tiptap({ ref, content, onChange, disabled = false, currentUserId }: Tip
       }),
       Mention.configure({
         HTMLAttributes: { class: "bg-accent/10 text-primary rounded px-1.5 py-0.5 font-semibold" },
-        renderLabel: ({ node }) => `@${node.attrs.label ?? node.attrs.id}`,
+        renderText: ({ node }) => `@${node.attrs.label ?? node.attrs.id}`,
         suggestion: {
           char: "@",
           allowSpaces: true,

@@ -14,13 +14,13 @@ import { searchTechnologies, updateOnboarding } from "~/features/users/user.acti
 import { onboardingSchema } from "~/features/users/user.schema";
 
 export type OnboardingInput = {
-  gradYear: string;
-  technologies: string[];
-  githubProfile: string;
-  mentorshipStatus: "MENTOR" | "MENTEE" | "NONE";
+  readonly gradYear: string;
+  readonly technologies: string[];
+  readonly githubProfile: string;
+  readonly mentorshipStatus: "MENTOR" | "MENTEE" | "NONE";
 };
 
-function GraduationYearControl({ field, currentYear }: { field: any; currentYear: number }) {
+function GraduationYearControl({ field, currentYear }: { readonly field: any; readonly currentYear: number }) {
   const years = Array.from({ length: 5 }, (_, i) => currentYear + i);
   const initialSelected = field.value ? Number(field.value) : currentYear;
   const [focused, setFocused] = useState<number | null>(null);
@@ -37,10 +37,10 @@ function GraduationYearControl({ field, currentYear }: { field: any; currentYear
       <Label htmlFor="gradYear" className="label">
         <span className="label-text">Graduation Year</span>
       </Label>
-      <div onMouseLeave={() => setFocused(null)} className="flex items-center">
+      <div onMouseLeave={() => setFocused(null)} className="flex items-center" role="button" tabIndex={0}>
         {years.map((year, index) => (
           <div key={year} className="flex items-center">
-            <button
+            <Button
               type="button"
               onMouseEnter={() => setFocused(year)}
               onFocus={() => setFocused(year)}
@@ -70,7 +70,7 @@ function GraduationYearControl({ field, currentYear }: { field: any; currentYear
                   layoutId="underline"
                 />
               )}
-            </button>
+            </Button>
             {index < years.length - 1 && <span className="mx-2 text-xs text-gray-500">|</span>}
           </div>
         ))}
@@ -102,7 +102,7 @@ export function OnboardingForm() {
     if (value.length >= 2) {
       try {
         const results = await searchTechnologies(value);
-        setSuggestions(results?.filter(tech => !technologies.includes(tech)) || []);
+        setSuggestions(results?.filter(tech => !technologies.includes(tech)) ?? []);
       } catch (error) {
         console.error("Failed to fetch suggestions:", error);
         setSuggestions([]);
@@ -147,7 +147,7 @@ export function OnboardingForm() {
               field={field}
               isSubmitting={isSubmitting}
               suggestions={suggestions}
-              handleTechSearch={handleTechSearch}
+              handleTechSearchAction={handleTechSearch}
             />
           )}
         />

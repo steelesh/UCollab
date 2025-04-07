@@ -28,10 +28,10 @@ export async function getPosts(
   } = {},
 ): Promise<ExplorePageData> {
   const { posts, totalCount } = await PostService.getPaginatedPosts(
-    page,
-    limit,
     userId,
     filters,
+    page,
+    limit,
   );
 
   return {

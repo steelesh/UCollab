@@ -2,7 +2,6 @@
 
 import { useSearchParams } from "next/navigation";
 
-import { ItemsPerPageSelector } from "~/components/ui/items-per-page-selector";
 import {
   ShadcnPagination,
   ShadcnPaginationContent,
@@ -11,19 +10,20 @@ import {
   ShadcnPaginationLink,
   ShadcnPaginationNext,
   ShadcnPaginationPrevious,
-} from "~/components/ui/shadcn-pagination";
+} from "@components/ui/shadcn-pagination";
+import { ItemsPerPageSelector } from "~/components/navigation/items-per-page-selector";
 import { cn } from "~/lib/utils";
 
 type DataPaginationProps = {
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
-  limit: number;
-  itemsPerPageOptions: number[];
-  basePath: string;
-  itemName?: string;
-  onPageChange?: (page: number) => void;
-  onLimitChange?: (limit: number) => void;
+  readonly currentPage: number;
+  readonly totalPages: number;
+  readonly totalCount: number;
+  readonly limit: number;
+  readonly itemsPerPageOptions: number[];
+  readonly basePath: string;
+  readonly itemName?: string;
+  readonly onPageChange?: (page: number) => void;
+  readonly onLimitChange?: (limit: number) => void;
 };
 
 export function Pagination({
