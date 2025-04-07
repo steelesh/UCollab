@@ -67,7 +67,7 @@ export type PostDetails = Pick<
       avatar: User["avatar"];
     };
   }[];
-  trendingScore: number;
+  isTrending: boolean;
 };
 
 export type ExplorePost = {
@@ -97,7 +97,7 @@ export type ExplorePost = {
     };
   }[];
   comments: { id: string }[];
-  trendingScore: number;
+  isTrending: boolean;
 };
 
 export type ExplorePageData = {
