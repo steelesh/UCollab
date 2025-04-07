@@ -60,7 +60,14 @@ export const postSchema = z.object({
     z.boolean(),
   ),
   allowComments: z.preprocess(
-    val => typeof val === "string" ? val === "true" : val !== undefined ? Boolean(val) : true,
+    val => typeof val === "string"
+      ? val === "true"
+      : (val: string | undefined) => {
+          if (typeof val === "string") {
+            return val === "true";
+          }
+          return val !== undefined ? Boolean(val) : true;
+        },
     z.boolean(),
   ),
   bannerImage: bannerImageSchema,

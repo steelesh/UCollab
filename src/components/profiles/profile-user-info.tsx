@@ -44,8 +44,8 @@ export function ProfileUserInfo({ createdDate, gradYear, mentorship, bio, techno
         <span>{MENTORSHIP_CONFIG[mentorship].label}</span>
       </p>
       <p className="text-sm font-semibold pt-4">About me:</p>
-      <p className={`text-sm whitespace-pre-wrap py-2 ${!bio || !bio.trim() ? "text-muted-foreground italic" : ""}`}>
-        {bio && bio.trim() ? bio : "This user hasn't set a bio yet."}
+      <p className={`text-sm whitespace-pre-wrap py-2 ${!bio?.trim() ? "text-muted-foreground italic" : ""}`}>
+        {bio?.trim() ? bio : "This user hasn't set a bio yet."}
       </p>
       <p className="text-sm font-semibold">Skills:</p>
       <div className="flex flex-wrap items-center gap-2 pt-2">

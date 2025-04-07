@@ -182,9 +182,7 @@ export const MentorshipService = {
         );
         const primaryTech = userPrimaryTech[user.id] ?? commonTechs[0];
         if (primaryTech) {
-          if (!techBranches[primaryTech]) {
-            techBranches[primaryTech] ??= [];
-          }
+          techBranches[primaryTech] ??= [];
           techBranches[primaryTech].push({ user, matchScore });
         }
       }

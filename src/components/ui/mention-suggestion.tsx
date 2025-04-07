@@ -128,7 +128,7 @@ const suggestion = {
       },
 
       onUpdate: (props: SuggestionProps) => {
-        lastQuery = props.query || "";
+        lastQuery = props.query ?? "";
         lastItems = props.items as MentionUser[];
         commandFn = props.command;
 
