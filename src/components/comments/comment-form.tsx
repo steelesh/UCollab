@@ -12,6 +12,7 @@ import type { CommentFormData } from "~/features/comments/comment.schema";
 import { Button } from "~/components/ui/button";
 import Tiptap from "~/components/ui/tiptap";
 import { commentSchema } from "~/features/comments/comment.schema";
+import { toastError } from "~/lib/toast";
 
 type CommentFormProps = {
   readonly postId: Post["id"];
@@ -75,7 +76,9 @@ export function CommentForm({
         clearErrors();
       }
     } catch {
-      // TODO: handle error, show toast or something
+      toastError("Failed to Submit Comment", {
+        description: "An error occurred while submitting your comment. Please try again.",
+      });
     }
   };
 

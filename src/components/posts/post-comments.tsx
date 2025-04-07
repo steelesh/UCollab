@@ -7,6 +7,7 @@ import { useState } from "react";
 import type { Comment } from "~/features/posts/post.types";
 
 import { createComment, createReply, deleteComment, updateComment } from "~/features/comments/comment.actions";
+import { toastError } from "~/lib/toast";
 
 import { CommentForm } from "../comments/comment-form";
 import { CommentList } from "../comments/comment-list";
@@ -37,7 +38,9 @@ export function PostComments({
       const newComment = await createComment(postId, content);
       setCommentsState(prev => [newComment, ...prev]);
     } catch {
-      // TODO: handle error, show toast or something
+      toastError("Failed to Create Comment", {
+        description: "An error occurred while creating your comment. Please try again.",
+      });
     }
   };
 
@@ -71,7 +74,9 @@ export function PostComments({
         }),
       );
     } catch {
-      // TODO: handle error, show toast or something
+      toastError("Failed to Update Comment", {
+        description: "An error occurred while updating your comment. Please try again.",
+      });
     }
   };
 
@@ -87,7 +92,9 @@ export function PostComments({
           .filter(comment => comment.id !== commentId),
       );
     } catch {
-      // TODO: handle error, show toast or something
+      toastError("Failed to Delete Comment", {
+        description: "An error occurred while deleting your comment. Please try again.",
+      });
     }
   };
 
@@ -105,7 +112,9 @@ export function PostComments({
         ),
       );
     } catch {
-      // TODO: handle error, show toast or something
+      toastError("Failed to Create Comment", {
+        description: "An error occurred while creating your comment. Please try again.",
+      });
     }
   };
 

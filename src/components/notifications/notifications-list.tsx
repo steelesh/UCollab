@@ -7,6 +7,7 @@ import type { Notification } from "~/features/notifications/notification.types";
 
 import { Button } from "~/components/ui/button";
 import { deleteNotification, markNotificationAsRead } from "~/features/notifications/notification.actions";
+import { toastError } from "~/lib/toast";
 import { emitNotificationCountChanged } from "~/lib/utils";
 
 import { NotificationItem } from "./notification-item";
@@ -52,7 +53,9 @@ export function NotificationsList({
       });
       emitNotificationCountChanged();
     } catch {
-      // TODO: handle error, show toast or something
+      toastError("Failed to Mark Notifications as Read", {
+        description: "An error occurred while marking your notifications as read. Please try again.",
+      });
     }
   };
 
@@ -67,7 +70,9 @@ export function NotificationsList({
       });
       emitNotificationCountChanged();
     } catch {
-      // TODO: handle error, show toast or something
+      toastError("Failed to Delete Notification", {
+        description: "An error occurred while deleting your notification. Please try again.",
+      });
     }
   };
 

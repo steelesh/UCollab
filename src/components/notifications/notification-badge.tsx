@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { getUnreadNotificationsCount } from "~/features/notifications/notification.queries";
+import { toastError } from "~/lib/toast";
 import { NOTIFICATION_COUNT_CHANGED } from "~/lib/utils";
 
 export function NotificationBadge() {
@@ -24,7 +25,9 @@ export function NotificationBadge() {
         const unreadCount = await getUnreadNotificationsCount(userId, userId);
         setCount(unreadCount);
       } catch {
-        // TODO: handle error, show toast or something
+        toastError("Failed to Fetch Notifications", {
+          description: "An error occurred while fetching your notifications.",
+        });
       }
     };
     // initial fetch
