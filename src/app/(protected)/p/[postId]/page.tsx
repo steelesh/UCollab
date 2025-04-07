@@ -62,7 +62,7 @@ async function Page({ params, searchParams, userId }: PageProps) {
     <Container className="max-w-3xl">
       <div className="mb-4 md:mb-6">
         <Link
-          href="/p"
+          href="/p?sortBy=createdDate&sortOrder=desc&limit=8"
           className="group flex items-center gap-1 md:gap-1.5 text-sm md:text-base text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 w-fit"
         >
           <ArrowUpRight className="w-3.5 h-3.5 md:w-4 md:h-4 -rotate-135 mr-0.5" />

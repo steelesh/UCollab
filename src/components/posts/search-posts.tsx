@@ -2,7 +2,7 @@
 
 import type { NeedType } from "@prisma/client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import * as R from "remeda";
 
@@ -11,9 +11,25 @@ import { checkPostsCount } from "~/features/posts/post.actions";
 export default function SearchBar() {
   const router = useRouter();
   const sp = useSearchParams();
+  const pathname = usePathname();
+
+  const basePath = useMemo(() => {
+    if (pathname.startsWith("/p/feedback"))
+      return "/p/feedback";
+    if (pathname.startsWith("/p/collabs"))
+      return "/p/collabs";
+    return "/p";
+  }, [pathname]);
+
+  const defaultPostNeeds
+    = basePath === "/p/feedback"
+      ? "FEEDBACK"
+      : basePath === "/p/collabs"
+        ? "CONTRIBUTION"
+        : sp.get("postNeeds") ?? "";
 
   const [query, setQuery] = useState(sp.get("query") ?? "");
-  const [postNeeds, setPostNeeds] = useState(sp.get("postNeeds") ?? "");
+  const [postNeeds, _setPostNeeds] = useState(defaultPostNeeds);
   const [minRating, setMinRating] = useState(sp.get("minRating") ?? "");
   const [sortBy, setSortBy] = useState(sp.get("sortBy") ?? "createdDate");
   const [sortOrder, setSortOrder] = useState(sp.get("sortOrder") ?? "desc");
@@ -63,9 +79,9 @@ export default function SearchBar() {
 
     const result = await checkPostsCount({ query, needType: postNeeds as NeedType, minRating });
     if (result && result.success && result.totalCount > 0 && currentParamsString !== newParamsString) {
-      router.replace(`/p?${newParamsString}`);
+      router.replace(`${basePath}?${newParamsString}`);
     }
-  }, [query, postNeeds, minRating, sortBy, sortOrder, router, sp]);
+  }, [query, postNeeds, minRating, sortBy, sortOrder, router, sp, basePath]);
 
   const funnel = useMemo(() => R.funnel(updateSearch, { minQuietPeriodMs: 500 }), [updateSearch]);
 
@@ -88,25 +104,6 @@ export default function SearchBar() {
             placeholder="Search posts..."
             className="bg-background mt-1 block w-full rounded-md border border-input p-2 text-foreground placeholder:text-muted-foreground"
           />
-        </div>
-        <div>
-          <label htmlFor="postNeeds" className="block text-sm font-medium text-foreground">
-            Post Needs
-          </label>
-          <select
-            id="postNeeds"
-            value={postNeeds}
-            onChange={e => setPostNeeds(e.target.value)}
-            className="bg-background mt-1 block w-full rounded-md border border-input p-2 text-foreground"
-          >
-            <option value="">All</option>
-            <option value="FEEDBACK">Feedback</option>
-            <option value="CONTRIBUTION">Contribution</option>
-            <option value="DEVELOPER_AVAILABLE">Developer Available</option>
-            <option value="SEEKING_MENTOR">Seeking Mentor</option>
-            <option value="MENTOR_AVAILABLE">Mentor Available</option>
-            <option value="TEAM_FORMATION">Team Formation</option>
-          </select>
         </div>
         <div>
           <label htmlFor="minRating" className="block text-sm font-medium text-foreground">

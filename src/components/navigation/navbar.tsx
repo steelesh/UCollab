@@ -23,19 +23,19 @@ const routes: NavSection[] = [
     items: [
       {
         title: "All Posts",
-        href: "/p" as Route,
+        href: "/p?sortBy=createdDate&sortOrder=desc&limit=8" as Route,
         description: "Browse all posts across categories",
         requiresAuth: true,
       },
       {
         title: "Project Feedback",
-        href: "/p/feedback" as Route,
+        href: "/p/feedback?postNeeds=FEEDBACK&sortBy=createdDate&sortOrder=desc&limit=8&page=1" as Route,
         description: "Get feedback on your projects",
         requiresAuth: true,
       },
       {
         title: "Collaborations",
-        href: "/p/collabs" as Route,
+        href: "/p/collabs?postNeeds=CONTRIBUTION&sortBy=createdDate&sortOrder=desc&limit=8&page=1" as Route,
         description: "Find teammates for your projects",
         requiresAuth: true,
       },
