@@ -1,10 +1,10 @@
 import type { User } from "@prisma/client";
 
 import { PageBreadcrumb } from "~/components/navigation/page-breadcrumb";
+import { Pagination } from "~/components/navigation/pagination";
 import { Container } from "~/components/ui/container";
 import { Header } from "~/components/ui/header";
 import { H1 } from "~/components/ui/heading";
-import { Pagination } from "~/components/ui/pagination";
 import { UserCard } from "~/components/ui/user-card";
 import { getUserDirectory } from "~/features/users/user.queries";
 import { withAuth } from "~/security/protected";

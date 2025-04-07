@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import type { Comment } from "~/features/posts/post.types";
 
-import { Pagination } from "~/components/ui/pagination";
+import { Pagination } from "~/components/navigation/pagination";
 
 import { CommentContent } from "./comment-content";
 import { CommentForm } from "./comment-form";

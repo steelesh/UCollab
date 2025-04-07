@@ -4,8 +4,8 @@ import React from "react";
 
 import type { PostNeed } from "~/features/posts/post.types";
 
-import { Badge } from "./badge";
-import { Small } from "./small";
+import { Badge } from "../ui/badge";
+import { Small } from "../ui/small";
 
 type BadgeProps = React.ComponentProps<typeof Badge> & {
   children?: React.ReactNode;

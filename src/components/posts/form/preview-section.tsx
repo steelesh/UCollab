@@ -8,7 +8,7 @@ import { memo, useEffect, useState } from "react";
 import type { CreatePostInput } from "~/features/posts/post.schema";
 import type { PostNeed } from "~/features/posts/post.types";
 
-import { PostNeedsBadges } from "~/components/ui/post-badges";
+import { PostNeedsBadges } from "~/components/posts/post-badges";
 import { Section } from "~/components/ui/section";
 import TechBadge from "~/components/ui/tech-badge";
 

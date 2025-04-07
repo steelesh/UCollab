@@ -10,15 +10,15 @@ import type { PostNeed, Technology } from "~/features/posts/post.types";
 import { DEFAULT_POST_BANNER_IMAGE } from "~/lib/utils";
 
 import { AvatarCircles } from "../magicui/avatar-circles";
-import { Avatar, AvatarImage } from "./avatar";
-import { Badge } from "./badge";
-import { Card, CardContent, CardHeader } from "./card";
-import { Large } from "./large";
-import { Muted } from "./muted";
-import { P } from "./p";
+import { Avatar, AvatarImage } from "../ui/avatar";
+import { Badge } from "../ui/badge";
+import { Card, CardContent, CardHeader } from "../ui/card";
+import { Large } from "../ui/large";
+import { Muted } from "../ui/muted";
+import { P } from "../ui/p";
+import { Small } from "../ui/small";
+import { TechnologyIcon } from "../ui/technology-icon";
 import { PostNeedsBadges, TrendingBadge } from "./post-badges";
-import { Small } from "./small";
-import { TechnologyIcon } from "./technology-icon";
 
 type PostCardProps = {
   readonly id: Post["id"];

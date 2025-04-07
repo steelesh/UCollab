@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 import { DotPattern } from "~/components/magicui/dot-pattern";
 import { SignInWrapper } from "~/components/navigation/signin-wrapper";
+import { PostCardXs } from "~/components/posts/post-card-xs";
 import { H1, H3 } from "~/components/ui/heading";
-import { PostCardXs } from "~/components/ui/post-card-xs";
 import { getTrendingPosts } from "~/features/posts/post.actions";
 import { cn } from "~/lib/utils";
 import { auth } from "~/security/auth";

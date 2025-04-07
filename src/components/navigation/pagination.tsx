@@ -2,7 +2,6 @@
 
 import { useSearchParams } from "next/navigation";
 
-import { ItemsPerPageSelector } from "~/components/ui/items-per-page-selector";
 import {
   ShadcnPagination,
   ShadcnPaginationContent,
@@ -11,7 +10,8 @@ import {
   ShadcnPaginationLink,
   ShadcnPaginationNext,
   ShadcnPaginationPrevious,
-} from "~/components/ui/shadcn-pagination";
+} from "@components/ui/shadcn-pagination";
+import { ItemsPerPageSelector } from "~/components/navigation/items-per-page-selector";
 import { cn } from "~/lib/utils";
 
 type DataPaginationProps = {

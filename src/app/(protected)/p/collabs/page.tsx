@@ -1,12 +1,12 @@
 import type { User } from "@prisma/client";
 
 import { PageBreadcrumb } from "~/components/navigation/page-breadcrumb";
+import { Pagination } from "~/components/navigation/pagination";
+import { PostCard } from "~/components/posts/post-card";
 import SearchBar from "~/components/posts/search-posts";
 import { Container } from "~/components/ui/container";
 import { Header } from "~/components/ui/header";
 import { H1 } from "~/components/ui/heading";
-import { Pagination } from "~/components/ui/pagination";
-import { PostCard } from "~/components/ui/post-card";
 import { getPosts } from "~/features/posts/post.queries";
 import { withAuth } from "~/security/protected";
 

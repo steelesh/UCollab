@@ -14,6 +14,7 @@ import {
 
 import type { CreatePostInput } from "~/features/posts/post.schema";
 
+import { PostTypeBadge } from "~/components/posts/post-badges";
 import { Card, CardContent } from "~/components/ui/card";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
@@ -25,7 +26,6 @@ import {
 } from "~/components/ui/form";
 import { Muted } from "~/components/ui/muted";
 import { P } from "~/components/ui/p";
-import { PostTypeBadge } from "~/components/ui/post-badges";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Section } from "~/components/ui/section";
 

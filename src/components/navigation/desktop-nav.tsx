@@ -6,7 +6,7 @@ import {
   NavigationMenuItem,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "~/components/ui/navigation-menu";
+} from "~/components/navigation/navigation-menu";
 
 import type { NavLinkProps } from "../navigation/nav-link";
 import type { NavSection } from "../navigation/navbar";

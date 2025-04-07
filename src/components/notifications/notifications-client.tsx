@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import type { Notification } from "~/features/notifications/notification.types";
 
-import { Pagination } from "../ui/pagination";
+import { Pagination } from "../navigation/pagination";
 import { NotificationsList } from "./notifications-list";
 
 type NotificationsClientProps = {

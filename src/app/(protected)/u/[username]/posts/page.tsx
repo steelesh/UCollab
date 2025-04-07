@@ -3,11 +3,11 @@ import type { User } from "@prisma/client";
 import type { PostDetails } from "~/features/posts/post.types";
 
 import { PageBreadcrumb } from "~/components/navigation/page-breadcrumb";
+import { Pagination } from "~/components/navigation/pagination";
+import { PostCardSmall } from "~/components/posts/post-card-sm";
 import { Container } from "~/components/ui/container";
 import { Header } from "~/components/ui/header";
 import { H1 } from "~/components/ui/heading";
-import { Pagination } from "~/components/ui/pagination";
-import { PostCardSmall } from "~/components/ui/post-card-sm";
 import { getCreatedPosts } from "~/features/posts/post.actions";
 import { withAuth } from "~/security/protected";
 

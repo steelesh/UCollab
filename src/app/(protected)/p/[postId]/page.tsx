@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { PostActions } from "~/components/posts/post-actions";
+import { PostNeedsBadges } from "~/components/posts/post-badges";
 import { PostBookmark } from "~/components/posts/post-bookmark";
 import { PostComments } from "~/components/posts/post-comments";
 import { PostRating } from "~/components/posts/post-rating";
@@ -16,7 +17,6 @@ import { Container } from "~/components/ui/container";
 import { Header } from "~/components/ui/header";
 import { H1, H2 } from "~/components/ui/heading";
 import { Muted } from "~/components/ui/muted";
-import { PostNeedsBadges } from "~/components/ui/post-badges";
 import { Section } from "~/components/ui/section";
 import { TechnologyIcon } from "~/components/ui/technology-icon";
 import { getComments } from "~/features/comments/comment.queries";
@@ -138,6 +138,7 @@ async function Page({ params, searchParams, userId }: PageProps) {
           src={post.bannerImage ?? DEFAULT_POST_BANNER_IMAGE}
           alt={post.title}
           fill
+          priority
           sizes="(max-width: 768px) 100vw, 768px"
           className="object-cover"
         />
