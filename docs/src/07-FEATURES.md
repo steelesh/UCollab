@@ -5,36 +5,66 @@ This page outlines the current features that UCollab has to offer!
 
 ---
 
-### Project Creation
-1.  Students can create project posts with defined types such as "Looking for Feedback," "Looking for Collaboration," "Seeking Mentorship," and "Discussion."
-2.  Each post type will include relevant details, such as the project’s technologies used, linked GitHub repository, feature list, contact methods, and build/run instructions.
+## Project Creation
+1.  Students can create project posts with the following defined types:
+- Project Feedback
+- Project Contribution 
+- Developer Available
+- Seeking Mentor
+- Mentor Available
+- Team formation
 
-![image](https://github.com/user-attachments/assets/54d9a6b1-454c-4074-8bb9-ef3edfaa2e8c)
+For project-related posts, there's flexibility in their purpose. For example, a Project Feedback post can also indicate that the project is seeking contributors, while a Project Contribution post can simultaneously request feedback on the project. This allows users to address multiple needs with a single post.
 
-### Project Discovery
+![image](https://ucollab.blob.core.windows.net/ucollab-files/docs/create-post.png)
+
+2. Each post type will include relevant details, such as basic information (title, description, creation date, author details), engagement features (ratings, comments, bookmarks, trending status), technical specifications (GitHub repository, technology stack, project requirements), and elements for user engagement (comments, ratings, and bookmarking functionality). Most fields are conditional and should only be included if relevant to your specific post type.
+
+![image](https://ucollab.blob.core.windows.net/ucollab-files/docs/post-details.png)
+
+## Project Discovery
 1. Students can find projects based on filters such as skills, interests, and technologies used, making it easy to connect with others who share similar goals.
 
-### Project Following
-1. Students will be able to follow specific projects to receive notifications on progress, discussions, and new contributions, ensuring they stay informed and never miss important updates on projects they are interested in.
-   
-### Peer Feedback
-1. UCollab provides a built-in comment system, encouraging students to offer and receive constructive critiques on their work.
-2. For feedback-focused posts, the functionality is extended to allow users to leave ratings alongside comments, adding an extra layer of evaluation to provide useful feedback for the project. 
+## Project Bookmarks
+1. Students will be able to bookmark specific projects to receive notifications on progress and discussions, ensuring they stay informed and never miss important updates on projects they are interested in.
 
-### Mentorship
-1. UCollab connects students with senior students or experienced peers, providing a space for mentorship
-2. Students can seek guidance on complex projects, receive advice on improving their work, and learn from those who have more experience in the field. 
+![image](https://ucollab.blob.core.windows.net/ucollab-files/docs/bookmark.png)
 
-### Profiles
-1. Each user on UCollab will have a customizable profile, showcasing their skills, project contributions, and areas of interest.
-2. This helps users connect with others who share similar academic and professional goals.
+## Peer Feedback
+1. UCollab provides a built-in comment system for all post types, encouraging students to offer and receive constructive critiques on their work.
+2. Rating functionality is exclusively available for Project Feedback posts, and only when enabled by the post owner. This adds an extra layer of evaluation to provide useful feedback.
+3. All post types (Project Contribution, Developer Available, Seeking Mentor, Mentor Available, Team Formation) have comments enabled by default, though post owners can disable comments if desired.
+4. Users can reply to existing comments and mention other users with the @ symbol to notify them of relevant discussions.
 
-![image](https://github.com/user-attachments/assets/202285fa-9f9c-4c1a-8054-ec7442d1e480)
+![image](https://ucollab.blob.core.windows.net/ucollab-files/docs/comments.png)
 
-### Notification System
-1. UCollab offers a real-time notification system to alert students when there is new activity on posts they follow, such as feedback received or updates made, ensuring they stay up to date on all relevant updates. 
+## Mentorship
+UCollab facilitates mentorship connections through dedicated post types:
 
-### OAuth
+- "Seeking Mentor" - for students who need guidance
+- "Mentor Available" - for experienced students offering support
+
+UCollab automatically matches mentors with mentees based on shared technology interests and skills, making it easy to find relevant guidance. Students can seek guidance on complex projects, receive advice on improving their work, and learn from those with more experience in the field.
+
+## Profiles
+1. Each user on UCollab will have a customizable profile, showcasing their personal information, academic background, and technical expertise.
+2. The profile also displays their latest posts and comments, helping users connect with others who share similar academic and professional goals.
+
+![image](https://ucollab.blob.core.windows.net/ucollab-files/docs/profile-page.png)
+
+## Notification System
+1. UCollab's notification system keeps users informed about activity related to their posts, bookmarked content, comment mentions, replies, and other relevant updates.
+2. Users can customize which notification types they receive through their account settings.
+3. The bell icon in the navbar displays unread notifications for quick access.
+4. The /notifications route allows users to view all notifications and manage them (delete, mark as read, etc.).
+
+![image](https://ucollab.blob.core.windows.net/ucollab-files/docs/notifications-page.png)
+
+## OAuth
 1. UCollab uses OAuth to authenticate users securely with their University of Cincinnati Microsoft credentials, ensuring a familiar login process for students within the UC tenant.
 
-![image](https://github.com/user-attachments/assets/1289f86b-58a6-4729-8652-9f0629763bd6)
+![image](https://ucollab.blob.core.windows.net/ucollab-files/docs/oauth.png)
+
+<hr />
+
+UCollab creates a comprehensive ecosystem for student collaboration at the University of Cincinnati. By combining structured post types, intuitive project discovery, personalized notifications, and secure authentication, the platform empowers students to share work, receive feedback, find mentors, and build their technical portfolios—all within a university-specific environment designed to foster meaningful academic and professional connections.
