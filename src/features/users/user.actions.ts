@@ -102,3 +102,29 @@ export async function searchTechnologies(query: string) {
     handleServerActionError(error);
   }
 }
+
+export async function connectUser(targetUsername: string) {
+  const session = await auth();
+  if (!session?.user?.id)
+    throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
+
+  try {
+    await UserService.connectUser(targetUsername, session.user.id);
+    return { success: true };
+  } catch (error) {
+    return handleServerActionError(error);
+  }
+}
+
+export async function disconnectUser(targetUsername: string) {
+  const session = await auth();
+  if (!session?.user?.id)
+    throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
+
+  try {
+    await UserService.disconnectUser(targetUsername, session.user.id);
+    return { success: true };
+  } catch (error) {
+    return handleServerActionError(error);
+  }
+}
