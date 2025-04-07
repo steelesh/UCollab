@@ -45,6 +45,7 @@ export function CommentHeader({
               src={comment.createdBy.avatar}
               alt={comment.createdBy.username}
               className="h-8 w-8 rounded-full object-cover"
+              loading="lazy"
               width={32}
               height={32}
             />

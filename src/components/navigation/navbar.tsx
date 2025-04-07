@@ -97,9 +97,7 @@ export default function Navbar() {
     .map(section => ({
       ...section,
       items: section.items.filter((item) => {
-        if (item.requiresAuth && !session)
-          return false;
-        return true;
+        return !(item.requiresAuth && !session);
       }),
     }))
     .filter(section => section.items.length > 0);

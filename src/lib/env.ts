@@ -13,6 +13,7 @@ export const env = createEnv({
     AUTH_MICROSOFT_ENTRA_ID_ID: z.string().min(1),
     AUTH_MICROSOFT_ENTRA_ID_SECRET: z.string().min(1),
     AUTH_MICROSOFT_ENTRA_ID_ISSUER: z.string().url(),
+    OPTIMIZE_API_KEY: z.string(),
   },
   runtimeEnv: {
     AUTH_SECRET: process.env.AUTH_SECRET,
@@ -24,6 +25,7 @@ export const env = createEnv({
     AUTH_MICROSOFT_ENTRA_ID_ID: process.env.AUTH_MICROSOFT_ENTRA_ID_ID,
     AUTH_MICROSOFT_ENTRA_ID_SECRET: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
     AUTH_MICROSOFT_ENTRA_ID_ISSUER: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
+    OPTIMIZE_API_KEY: process.env.OPTIMIZE_API_KEY,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,

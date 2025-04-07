@@ -72,8 +72,10 @@ export function PostCard({
         <Image
           src={bannerImage ?? DEFAULT_POST_BANNER_IMAGE}
           alt={title}
+          priority
           fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          sizes="(max-width: 256px) 100vw, (max-width: 512px) 50vw, 33vw"
+          className="object-cover"
         />
       </div>
       <CardHeader className="flex flex-col gap-4 pb-4 flex-shrink-0">

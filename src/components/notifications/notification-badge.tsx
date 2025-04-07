@@ -24,20 +24,17 @@ export function NotificationBadge() {
         const unreadCount = await getUnreadNotificationsCount(userId, userId);
         setCount(unreadCount);
       } catch {
-        // handle error, show toast or something
+        // TODO: handle error, show toast or something
       }
     };
     // initial fetch
     fetchCount();
 
-    // poll every 15 seconds
     const interval = setInterval(fetchCount, 15000);
 
-    // listen for notification count changes
     const handleNotificationCountChanged = () => fetchCount();
     window.addEventListener(NOTIFICATION_COUNT_CHANGED, handleNotificationCountChanged);
 
-    // clean up
     return () => {
       clearInterval(interval);
       window.removeEventListener(NOTIFICATION_COUNT_CHANGED, handleNotificationCountChanged);

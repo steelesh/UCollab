@@ -76,6 +76,8 @@ model Post {
   postNeeds        PostNeed[]     @relation("PostNeeds")
 
   @@index([createdById])
+  @@index([createdDate])
+  @@index([rating])
   @@fulltext([title, description])
 }
 
@@ -101,7 +103,6 @@ model PostWatcher {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId])
-  @@index([postId])
   @@index([userId])
 }
 
@@ -129,6 +130,7 @@ model Comment {
   replies          Comment[]      @relation("Replies")
 
   @@index([postId])
+  @@index([parentId])
   @@index([createdById])
 }
 
@@ -165,6 +167,7 @@ model Notification {
   @@index([postId])
   @@index([commentId])
   @@index([triggeredById])
+  @@index([isRead])
 }
 
 model Session {
@@ -183,6 +186,8 @@ model PostNeed {
   createdDate DateTime @default(now())
   isPrimary   Boolean  @default(false)
   posts       Post[]   @relation("PostNeeds")
+
+  @@index([needType])
 }
 
 enum AvatarSource {

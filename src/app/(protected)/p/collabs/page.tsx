@@ -63,6 +63,9 @@ async function Page() {
             <Image
               src={post.bannerImage ?? DEFAULT_POST_BANNER_IMAGE}
               alt="Post"
+              loading="lazy"
+              width={100}
+              height={100}
               className="h-20 w-full object-cover"
               fill
             />

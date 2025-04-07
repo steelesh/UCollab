@@ -138,6 +138,7 @@ async function Page({ params, searchParams, userId }: PageProps) {
           src={post.bannerImage ?? DEFAULT_POST_BANNER_IMAGE}
           alt={post.title}
           fill
+          sizes="(max-width: 768px) 100vw, 768px"
           className="object-cover"
         />
       </div>

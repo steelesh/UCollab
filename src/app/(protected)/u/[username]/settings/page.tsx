@@ -56,6 +56,7 @@ async function Page({ userId }: { readonly userId: User["id"] }) {
               alt={user.username}
               width={100}
               height={100}
+              loading="lazy"
               className="border-base-100 rounded-full border-5"
             />
           </div>

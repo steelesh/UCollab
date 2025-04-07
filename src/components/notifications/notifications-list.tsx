@@ -83,7 +83,6 @@ export function NotificationsList({
             )}
             {selectedNotifications.length > 0 && (
               <NotificationsSelectionActions
-                notifications={notifications}
                 selectedNotifications={selectedNotifications}
                 setSelectedNotificationsAction={setSelectedNotificationsAction}
                 setNotificationsAction={setNotificationsAction}

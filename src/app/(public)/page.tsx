@@ -56,10 +56,10 @@ export default async function Page() {
                 </div>
               )
             : (
-                <p className="mt-4">No trending posts to display.</p>
+                <p className="mt-2">No trending posts to display.</p>
               )}
           <H3 className="mt-12">Recent Activity</H3>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-sm">
             Recent activity on your posts will appear here.
           </p>
         </div>
