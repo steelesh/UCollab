@@ -209,8 +209,8 @@ async function createPost(user: User, allUsers: User[]) {
 
   const post = await prisma.post.create({
     data: {
-      title: conversation?.title || "Sample Post",
-      description: conversation?.description || "A sample post description.",
+      title: conversation?.title ?? "Sample Post",
+      description: conversation?.description ?? "A sample post description.",
       createdById: user.id,
       githubRepo,
       rating: 0,
@@ -254,7 +254,7 @@ async function createPost(user: User, allUsers: User[]) {
     await createPostRatings(post, allUsers, user);
     await createCommentsAndNotifications(
       post,
-      conversation || { title: "", description: "", comments: [], githubProject: undefined },
+      conversation ?? { title: "", description: "", comments: [], githubProject: undefined },
       allUsers,
       user,
       needType,
@@ -329,7 +329,7 @@ async function createCommentsAndNotifications(
 
     const comment = await prisma.comment.create({
       data: {
-        content: commentsToCreate[i] || "",
+        content: commentsToCreate[i] ?? "",
         createdById: commenter.id,
         postId: post.id,
       },

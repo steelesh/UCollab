@@ -16,7 +16,7 @@ export function Container<T extends React.ElementType = "div">({
   as,
   ...props
 }: ContainerProps<T>) {
-  const Component = as || "div";
+  const Component = as ?? "div";
 
   const sizeClasses = {
     "sm": "max-w-sm",

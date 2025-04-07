@@ -13,8 +13,8 @@ import { prisma } from "~/lib/prisma";
 import { withAuth } from "~/security/protected";
 
 type PageProps = {
-  params: Promise<{ postId: string }>;
-  userId: User["id"];
+  readonly params: Promise<{ postId: string }>;
+  readonly userId: User["id"];
 };
 
 export async function generateMetadata({ params }: { params: Promise<{ postId: string }> }): Promise<Metadata> {
@@ -53,8 +53,8 @@ async function Page({ userId, params }: PageProps) {
 
   const formattedPost = {
     id: post.id,
-    needType: post.postNeeds[0]?.needType || NeedType.FEEDBACK,
-    secondaryNeedType: post.postNeeds[1]?.needType || null,
+    needType: post.postNeeds[0]?.needType ?? NeedType.FEEDBACK,
+    secondaryNeedType: post.postNeeds[1]?.needType ?? null,
     title: post.title,
     description: post.description,
     technologies: post.technologies.map(tech => tech.name),

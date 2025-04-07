@@ -9,11 +9,11 @@ import { TechnologyIcon } from "../ui/technology-icon";
 import { MENTORSHIP_CONFIG } from "./profile-mentorship-config";
 
 type ProfileUserInfoProps = {
-  createdDate: User["createdDate"];
-  gradYear: User["gradYear"];
-  mentorship: User["mentorship"];
-  technologies: Technology[];
-  bio: User["bio"];
+  readonly createdDate: User["createdDate"];
+  readonly gradYear: User["gradYear"];
+  readonly mentorship: User["mentorship"];
+  readonly technologies: Technology[];
+  readonly bio: User["bio"];
 };
 
 export function ProfileUserInfo({ createdDate, gradYear, mentorship, bio, technologies }: ProfileUserInfoProps) {
@@ -44,13 +44,13 @@ export function ProfileUserInfo({ createdDate, gradYear, mentorship, bio, techno
         <span>{MENTORSHIP_CONFIG[mentorship].label}</span>
       </p>
       <p className="text-sm font-semibold pt-4">About me:</p>
-      <p className={`text-sm whitespace-pre-wrap py-2 ${!bio || !bio.trim() ? "text-muted-foreground italic" : ""}`}>
-        {bio && bio.trim() ? bio : "This user hasn't set a bio yet."}
+      <p className={`text-sm whitespace-pre-wrap py-2 ${!bio?.trim() ? "text-muted-foreground italic" : ""}`}>
+        {bio?.trim() ? bio : "This user hasn't set a bio yet."}
       </p>
       <p className="text-sm font-semibold">Skills:</p>
       <div className="flex flex-wrap items-center gap-2 pt-2">
         {displayTechnologies.map(tech => (
-          <Badge key={tech.id || tech.name} variant="glossy" className="flex items-center gap-1">
+          <Badge key={tech.id ?? tech.name} variant="glossy" className="flex items-center gap-1">
             <TechnologyIcon name={tech.name} colored />
             <span className="truncate">{tech.name}</span>
           </Badge>

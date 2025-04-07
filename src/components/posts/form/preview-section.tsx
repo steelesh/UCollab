@@ -8,7 +8,7 @@ import { memo, useEffect, useState } from "react";
 import type { CreatePostInput } from "~/features/posts/post.schema";
 import type { PostNeed } from "~/features/posts/post.types";
 
-import { PostNeedsBadges } from "~/components/ui/post-badges";
+import { PostNeedsBadges } from "~/components/posts/post-badges";
 import { Section } from "~/components/ui/section";
 import TechBadge from "~/components/ui/tech-badge";
 
@@ -92,12 +92,12 @@ export const PreviewSection = memo(({ data }: PreviewSectionProps) => {
 
           <div>
             <h4 className="text-xs md:text-sm font-medium text-muted-foreground mb-1">Title</h4>
-            <p className="text-sm md:text-base">{data.title || "-"}</p>
+            <p className="text-sm md:text-base">{data.title ?? "-"}</p>
           </div>
 
           <div>
             <h4 className="text-xs md:text-sm font-medium text-muted-foreground mb-1">Description</h4>
-            <p className="text-sm md:text-base">{data.description || "-"}</p>
+            <p className="text-sm md:text-base">{data.description ?? "-"}</p>
           </div>
 
           {isProjectPost && (

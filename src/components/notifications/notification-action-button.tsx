@@ -11,13 +11,13 @@ export function NotificationActionButton({
   className,
   children,
 }: {
-  icon: typeof Trash | typeof CheckCheck;
-  loading?: boolean;
-  onClick: () => void;
-  disabled?: boolean;
-  variant?: "outline";
-  className?: string;
-  children: React.ReactNode;
+  readonly icon: typeof Trash | typeof CheckCheck;
+  readonly loading?: boolean;
+  readonly onClick: () => void;
+  readonly disabled?: boolean;
+  readonly variant?: "outline";
+  readonly className?: string;
+  readonly children: React.ReactNode;
 }) {
   return (
     <Button

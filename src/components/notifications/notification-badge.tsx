@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { getUnreadNotificationsCount } from "~/features/notifications/notification.queries";
+import { toastError } from "~/lib/toast";
 import { NOTIFICATION_COUNT_CHANGED } from "~/lib/utils";
 
 export function NotificationBadge() {
@@ -24,20 +25,19 @@ export function NotificationBadge() {
         const unreadCount = await getUnreadNotificationsCount(userId, userId);
         setCount(unreadCount);
       } catch {
-        // handle error, show toast or something
+        toastError("Failed to Fetch Notifications", {
+          description: "An error occurred while fetching your notifications.",
+        });
       }
     };
     // initial fetch
     fetchCount();
 
-    // poll every 15 seconds
     const interval = setInterval(fetchCount, 15000);
 
-    // listen for notification count changes
     const handleNotificationCountChanged = () => fetchCount();
     window.addEventListener(NOTIFICATION_COUNT_CHANGED, handleNotificationCountChanged);
 
-    // clean up
     return () => {
       clearInterval(interval);
       window.removeEventListener(NOTIFICATION_COUNT_CHANGED, handleNotificationCountChanged);

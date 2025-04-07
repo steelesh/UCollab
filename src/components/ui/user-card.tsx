@@ -15,14 +15,14 @@ import { Small } from "./small";
 import { TechnologyIcon } from "./technology-icon";
 
 type UserCardProps = {
-  username: User["username"];
-  avatar: User["avatar"];
-  firstName: User["firstName"];
-  lastName: User["lastName"];
-  email: User["email"];
-  gradYear: User["gradYear"];
-  technologies: Technology[];
-  mentorship: User["mentorship"];
+  readonly username: User["username"];
+  readonly avatar: User["avatar"];
+  readonly firstName: User["firstName"];
+  readonly lastName: User["lastName"];
+  readonly email: User["email"];
+  readonly gradYear: User["gradYear"];
+  readonly technologies: Technology[];
+  readonly mentorship: User["mentorship"];
 };
 
 export function UserCard({ username, firstName, lastName, avatar, email, gradYear, technologies, mentorship }: UserCardProps) {

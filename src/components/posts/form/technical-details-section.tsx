@@ -20,13 +20,13 @@ import TechnologiesControl from "~/components/ui/technologies-control";
 import { isProjectNeedType } from "~/lib/utils";
 
 type TechnicalDetailsSectionProps = {
-  control: Control<CreatePostInput>;
-  isSubmitting: boolean;
-  needType: NeedType;
-  secondaryNeedType: NeedType | null | undefined;
-  canHaveRatings: boolean;
-  suggestions: string[];
-  handleTechSearch: (value: string) => void;
+  readonly control: Control<CreatePostInput>;
+  readonly isSubmitting: boolean;
+  readonly needType: NeedType;
+  readonly secondaryNeedType: NeedType | null | undefined;
+  readonly canHaveRatings: boolean;
+  readonly suggestions: string[];
+  readonly handleTechSearchAction: (value: string) => void;
 };
 
 export function TechnicalDetailsSection({
@@ -36,7 +36,7 @@ export function TechnicalDetailsSection({
   secondaryNeedType,
   canHaveRatings,
   suggestions,
-  handleTechSearch,
+  handleTechSearchAction,
 }: TechnicalDetailsSectionProps) {
   const isProjectPost = isProjectNeedType(needType) || (secondaryNeedType && isProjectNeedType(secondaryNeedType));
 
@@ -54,6 +54,7 @@ export function TechnicalDetailsSection({
                   <div>
                     <FormLabel className="text-sm md:text-base font-medium">
                       Technologies
+                      {/* */}
                       <span className="text-destructive ml-1">*</span>
                     </FormLabel>
                     <FormDescription className="text-xs md:text-sm">
@@ -65,7 +66,7 @@ export function TechnicalDetailsSection({
                       field={field}
                       isSubmitting={isSubmitting}
                       suggestions={suggestions}
-                      handleTechSearch={handleTechSearch}
+                      handleTechSearchAction={handleTechSearchAction}
                     />
                   </FormControl>
                   <FormMessage className="text-xs md:text-sm" />
@@ -81,7 +82,7 @@ export function TechnicalDetailsSection({
                   <FormControl>
                     <Input
                       {...field}
-                      value={field.value || ""}
+                      value={field.value ?? ""}
                       placeholder="https://github.com/username/repo"
                       disabled={isSubmitting}
                       className="text-sm md:text-base"

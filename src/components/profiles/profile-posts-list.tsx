@@ -5,7 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 
 type ProfilePostsListProps = {
-  posts: Post[];
+  readonly posts: Post[];
 };
 
 export function ProfilePostsList({ posts }: ProfilePostsListProps) {

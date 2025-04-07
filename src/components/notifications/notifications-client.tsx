@@ -6,17 +6,17 @@ import { useState } from "react";
 
 import type { Notification } from "~/features/notifications/notification.types";
 
-import { Pagination } from "../ui/pagination";
+import { Pagination } from "../navigation/pagination";
 import { NotificationsList } from "./notifications-list";
 
 type NotificationsClientProps = {
-  initialNotifications: Notification[];
-  userId: User["id"];
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    totalCount: number;
-    limit: number;
+  readonly initialNotifications: Notification[];
+  readonly userId: User["id"];
+  readonly pagination: {
+    readonly currentPage: number;
+    readonly totalPages: number;
+    readonly totalCount: number;
+    readonly limit: number;
   };
 };
 
@@ -29,8 +29,8 @@ export function NotificationsClient({ initialNotifications, userId, pagination }
       <NotificationsList
         notifications={notifications}
         selectedNotifications={selectedNotifications}
-        setSelectedNotifications={setSelectedNotifications}
-        setNotifications={setNotifications}
+        setSelectedNotificationsAction={setSelectedNotifications}
+        setNotificationsAction={setNotifications}
         userId={userId}
       />
       <Pagination

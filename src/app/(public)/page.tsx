@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 import { DotPattern } from "~/components/magicui/dot-pattern";
 import { SignInWrapper } from "~/components/navigation/signin-wrapper";
+import { PostCardXs } from "~/components/posts/post-card-xs";
 import { H1, H3 } from "~/components/ui/heading";
-import { PostCardXs } from "~/components/ui/post-card-xs";
 import { getTrendingPosts } from "~/features/posts/post.actions";
 import { cn } from "~/lib/utils";
 import { auth } from "~/security/auth";
@@ -33,6 +33,7 @@ export default async function Page() {
             Welcome back,
             {" "}
             <span className="font-thin">{session.user.username}</span>
+            {/* */}
             !
           </H1>
           <H3 className="mt-8">Trending Posts</H3>
@@ -44,23 +45,21 @@ export default async function Page() {
                       key={post.id}
                       id={post.id}
                       title={post.title}
-                      githubRepo={post.githubRepo}
                       technologies={post.technologies}
                       postNeeds={post.postNeeds}
                       user={{
                         username: post.createdBy.username,
                         avatar: post.createdBy.avatar,
                       }}
-                      watchers={post.watchers}
                     />
                   ))}
                 </div>
               )
             : (
-                <p className="mt-4">No trending posts to display.</p>
+                <p className="mt-2">No trending posts to display.</p>
               )}
           <H3 className="mt-12">Recent Activity</H3>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-sm">
             Recent activity on your posts will appear here.
           </p>
         </div>

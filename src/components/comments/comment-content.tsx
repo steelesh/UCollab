@@ -1,6 +1,6 @@
 type CommentContentProps = {
-  content: string;
-  className?: string;
+  readonly content: string;
+  readonly className?: string;
 };
 
 export function CommentContent({ content, className = "" }: CommentContentProps) {

@@ -29,7 +29,7 @@ type GraphData = {
 };
 
 type MentorshipGraphProps = {
-  graphData: GraphData;
+  readonly graphData: GraphData;
 };
 
 export function MentorshipGraph({ graphData }: MentorshipGraphProps) {

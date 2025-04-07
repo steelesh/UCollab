@@ -13,7 +13,7 @@ import type { NavSection } from "./navbar";
 
 import { NavLink } from "./nav-link";
 
-export function MobileNav({ items }: { items: NavSection[] }) {
+export function MobileNav({ items }: { readonly items: NavSection[] }) {
   const [open, setOpen] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 

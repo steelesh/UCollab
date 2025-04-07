@@ -13,9 +13,9 @@ import { ActionButton } from "../ui/action-button";
 import { ConfirmDialog } from "../ui/confirm-dialog";
 
 type PostBookmarkProps = {
-  postId: Post["id"];
-  initialBookmarked: boolean;
-  className?: string;
+  readonly postId: Post["id"];
+  readonly initialBookmarked: boolean;
+  readonly className?: string;
 };
 
 export function PostBookmark({ postId, initialBookmarked, className = "" }: PostBookmarkProps) {
@@ -75,12 +75,12 @@ export function PostBookmark({ postId, initialBookmarked, className = "" }: Post
               </ActionButton>
               <ConfirmDialog
                 open={showUnbookmarkConfirm}
-                onOpenChange={setShowUnbookmarkConfirm}
+                onOpenChangeAction={setShowUnbookmarkConfirm}
                 title="Remove Bookmark"
                 description="Are you sure you want to remove this post from your bookmarks?"
                 confirmText="Remove"
                 cancelText="Cancel"
-                onConfirm={() => {
+                onConfirmAction={() => {
                   setShowUnbookmarkConfirm(false);
                   handleUnbookmark();
                 }}

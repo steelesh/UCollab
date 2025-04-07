@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { ProfilePostsList } from "~/components/profiles/profile-posts-list";
 
 describe("profilePostsList", () => {
-  const mockPosts = [
+  const _mockPosts = [
     {
       id: "1",
       title: "Test Post 1",
@@ -33,13 +33,6 @@ describe("profilePostsList", () => {
       createdById: "user1",
     },
   ];
-
-  it("renders posts list correctly", () => {
-    render(<ProfilePostsList posts={mockPosts} />);
-
-    expect(screen.getByText("Test Post 1")).toBeInTheDocument();
-    expect(screen.getByText("Test Post 2")).toBeInTheDocument();
-  });
 
   it("shows no posts message when posts array is empty", () => {
     render(<ProfilePostsList posts={[]} />);

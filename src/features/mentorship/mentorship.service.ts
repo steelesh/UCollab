@@ -111,7 +111,7 @@ export const MentorshipService = {
         _count: { id: true },
       });
       const countsMap = new Map<string, number>(commentCounts.map(item => [item.createdById, item._count.id]));
-      const currentUserCommentCount = countsMap.get(currentUserId) || 0;
+      const currentUserCommentCount = countsMap.get(currentUserId) ?? 0;
       const currentUserTechs = currentUser.technologies.map(tech => tech.name);
 
       const userIds = [currentUserId, ...users.map(u => u.id)];
@@ -142,13 +142,13 @@ export const MentorshipService = {
           const techCounts: Record<string, number> = {};
           for (const post of posts) {
             for (const tech of post.technologies) {
-              techCounts[tech.name] = (techCounts[tech.name] || 0) + 1;
+              techCounts[tech.name] = (techCounts[tech.name] ?? 0) + 1;
             }
           }
           let primaryTech = "";
           let maxCount = 0;
           for (const tech of currentUserTechs) {
-            const count = techCounts[tech] || 0;
+            const count = techCounts[tech] ?? 0;
             if (count > maxCount) {
               primaryTech = tech;
               maxCount = count;
@@ -170,7 +170,7 @@ export const MentorshipService = {
         const commonTechs = currentUserTechs.filter(tech => userTechs.includes(tech));
         if (commonTechs.length === 0)
           continue;
-        const otherCommentCount = countsMap.get(user.id) || 0;
+        const otherCommentCount = countsMap.get(user.id) ?? 0;
         const otherUserRatings = ratingsMap.get(user.id) || new Map();
         const matchScore = computeMatchScore(
           { gradYear: currentUser.gradYear, technologies: currentUserTechs },
@@ -180,11 +180,9 @@ export const MentorshipService = {
           currentUserRatings,
           otherUserRatings,
         );
-        const primaryTech = userPrimaryTech[user.id] || commonTechs[0];
+        const primaryTech = userPrimaryTech[user.id] ?? commonTechs[0];
         if (primaryTech) {
-          if (!techBranches[primaryTech]) {
-            techBranches[primaryTech] = [];
-          }
+          techBranches[primaryTech] ??= [];
           techBranches[primaryTech].push({ user, matchScore });
         }
       }

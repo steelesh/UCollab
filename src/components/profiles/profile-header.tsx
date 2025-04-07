@@ -12,15 +12,21 @@ import { Button } from "~/components/ui/button";
 import { DEFAULT_POST_BANNER_IMAGE } from "~/lib/utils";
 
 type ProfileHeaderProps = {
-  avatar: User["avatar"];
-  username: User["username"];
-  isOwnProfile: boolean;
+  readonly avatar: User["avatar"];
+  readonly username: User["username"];
+  readonly isOwnProfile: boolean;
 };
 
 export function ProfileHeader({ avatar, username, isOwnProfile }: ProfileHeaderProps) {
   return (
     <div className="relative h-42">
-      <Image src={DEFAULT_POST_BANNER_IMAGE} alt="Banner" fill className="rounded-t object-cover" />
+      <Image
+        src={DEFAULT_POST_BANNER_IMAGE}
+        alt="Banner"
+        fill
+        priority
+        className="rounded-t object-cover"
+      />
       <div className="absolute -bottom-12 left-8">
         <Image src={avatar} alt={username} width={100} height={100} className="rounded-full border-5" />
       </div>

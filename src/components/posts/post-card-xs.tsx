@@ -4,30 +4,22 @@ import Link from "next/link";
 
 import type { PostNeed, Technology } from "~/features/posts/post.types";
 
-import { Avatar, AvatarImage } from "./avatar";
-import { Badge } from "./badge";
-import { Card } from "./card";
+import { Avatar, AvatarImage } from "../ui/avatar";
+import { Badge } from "../ui/badge";
+import { Card } from "../ui/card";
+import { Small } from "../ui/small";
+import { TechnologyIcon } from "../ui/technology-icon";
 import { PostTypeBadge } from "./post-badges";
-import { Small } from "./small";
-import { TechnologyIcon } from "./technology-icon";
 
 type PostCardXsProps = {
-  id: string;
-  title: string;
-  technologies: Technology[];
-  githubRepo: string | null;
-  postNeeds: PostNeed[];
-  user: {
-    username: User["username"];
-    avatar: User["avatar"];
+  readonly id: string;
+  readonly title: string;
+  readonly technologies: Technology[];
+  readonly postNeeds: PostNeed[];
+  readonly user: {
+    readonly username: User["username"];
+    readonly avatar: User["avatar"];
   };
-  watchers: {
-    id: User["id"];
-    user: {
-      username: User["username"];
-      avatar: User["avatar"];
-    };
-  }[];
 };
 
 export function PostCardXs({

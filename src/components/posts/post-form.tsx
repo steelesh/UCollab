@@ -26,17 +26,17 @@ import { isProjectNeedType } from "~/lib/utils";
 type FormStep = 1 | 2 | 3 | 4;
 
 export type PostFormProps = {
-  post?: {
-    id: string;
-    needType: NeedType;
-    secondaryNeedType: NeedType | null;
-    title: string;
-    description: string;
-    technologies: string[];
-    githubRepo: string | null;
-    allowRatings: boolean;
-    allowComments: boolean;
-    hasComments?: boolean;
+  readonly post?: {
+    readonly id: string;
+    readonly needType: NeedType;
+    readonly secondaryNeedType: NeedType | null;
+    readonly title: string;
+    readonly description: string;
+    readonly technologies: string[];
+    readonly githubRepo: string | null;
+    readonly allowRatings: boolean;
+    readonly allowComments: boolean;
+    readonly hasComments?: boolean;
   };
 };
 
@@ -59,7 +59,7 @@ export function PostForm({ post }: PostFormProps) {
           technologies: post.technologies || [],
           title: post.title,
           description: post.description,
-          githubRepo: post.githubRepo || "",
+          githubRepo: post.githubRepo ?? "",
           allowRatings: post.allowRatings,
           allowComments: post.allowComments,
         }
@@ -141,7 +141,7 @@ export function PostForm({ post }: PostFormProps) {
       try {
         const results = await searchTechnologies(query);
         if (results) {
-          setSuggestions(results.filter(tech => !technologies?.includes(tech)) || []);
+          setSuggestions(results.filter(tech => !technologies?.includes(tech)) ?? []);
         } else {
           setSuggestions([]);
         }
@@ -189,10 +189,10 @@ export function PostForm({ post }: PostFormProps) {
       payload.append("title", formData.title.trim());
       payload.append("description", formData.description.trim());
       payload.append("needType", formData.needType);
-      payload.append("secondaryNeedType", formData.secondaryNeedType || "");
+      payload.append("secondaryNeedType", formData.secondaryNeedType ?? "");
 
       const techData = Array.isArray(formData.technologies)
-        ? formData.technologies.filter(tech => typeof tech === "string" && tech.trim() !== "")
+        ? formData.technologies.filter(tech => tech.trim() !== "")
         : [];
 
       payload.append("technologies", JSON.stringify(techData));
@@ -266,7 +266,7 @@ export function PostForm({ post }: PostFormProps) {
               secondaryNeedType={secondaryNeedType}
               canHaveRatings={canHaveRatings}
               suggestions={suggestions}
-              handleTechSearch={handleTechSearch}
+              handleTechSearchAction={handleTechSearch}
             />
           )}
           {currentStep === 4 && <PreviewSection data={formData} />}

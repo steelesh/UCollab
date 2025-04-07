@@ -13,10 +13,10 @@ import { deleteRating, ratePost } from "~/features/posts/post.actions";
 import { toastError, toastSuccess } from "~/lib/toast";
 
 type PostRatingProps = {
-  postId: Post["id"];
-  initialRating?: number | null;
-  userRating?: number | null;
-  className?: string;
+  readonly postId: Post["id"];
+  readonly initialRating?: number | null;
+  readonly userRating?: number | null;
+  readonly className?: string;
 };
 
 export function PostRating({ postId, initialRating: _initialRating = 0, userRating = null, className = "" }: PostRatingProps) {
@@ -110,24 +110,24 @@ export function PostRating({ postId, initialRating: _initialRating = 0, userRati
       </div>
       <ConfirmDialog
         open={showDeleteConfirm}
-        onOpenChange={setShowDeleteConfirm}
+        onOpenChangeAction={setShowDeleteConfirm}
         title="Delete Rating"
         description="Are you sure you want to delete your rating for this post? This action cannot be undone."
         confirmText="Delete Rating"
         cancelText="Cancel"
-        onConfirm={() => {
+        onConfirmAction={() => {
           setShowDeleteConfirm(false);
           handleDeleteRating();
         }}
       />
       <ConfirmDialog
         open={showEditConfirm}
-        onOpenChange={setShowEditConfirm}
+        onOpenChangeAction={setShowEditConfirm}
         title="Change Rating"
         description={`Are you sure you want to change your rating from ${userCurrentRating} to ${pendingRating} stars?`}
         confirmText="Change Rating"
         cancelText="Cancel"
-        onConfirm={() => {
+        onConfirmAction={() => {
           setShowEditConfirm(false);
           if (pendingRating !== null) {
             handleApplyRating(pendingRating);

@@ -20,6 +20,8 @@ const cspHeader = `
 const nextConfig: NextConfig = {
   distDir: "build",
   output: "standalone",
+  devIndicators: false,
+  reactStrictMode: true,
   experimental: {
     serverActions: {
       bodySizeLimit: "5mb",

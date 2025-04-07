@@ -24,7 +24,7 @@ export async function getCurrentUserNotifications(userId: User["id"], requestUse
 
 export async function getNotifications(page: number, limit: number, userId: User["id"]): Promise<NotificationsPageData> {
   const [notifications, totalCount] = await Promise.all([
-    NotificationService.getPaginatedNotifications(userId, page, limit, userId),
+    NotificationService.getPaginatedNotifications(userId, userId, page, limit),
     NotificationService.getNotificationsCount(userId, userId),
   ]);
 

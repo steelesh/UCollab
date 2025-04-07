@@ -10,40 +10,40 @@ import type { PostNeed, Technology } from "~/features/posts/post.types";
 import { DEFAULT_POST_BANNER_IMAGE } from "~/lib/utils";
 
 import { AvatarCircles } from "../magicui/avatar-circles";
-import { Avatar, AvatarImage } from "./avatar";
-import { Badge } from "./badge";
-import { Card, CardContent, CardHeader } from "./card";
-import { Large } from "./large";
-import { Muted } from "./muted";
-import { P } from "./p";
+import { Avatar, AvatarImage } from "../ui/avatar";
+import { Badge } from "../ui/badge";
+import { Card, CardContent, CardHeader } from "../ui/card";
+import { Large } from "../ui/large";
+import { Muted } from "../ui/muted";
+import { P } from "../ui/p";
+import { Small } from "../ui/small";
+import { TechnologyIcon } from "../ui/technology-icon";
 import { PostNeedsBadges, TrendingBadge } from "./post-badges";
-import { Small } from "./small";
-import { TechnologyIcon } from "./technology-icon";
 
 type PostCardProps = {
-  id: Post["id"];
-  title: Post["title"];
-  description: Post["description"];
-  createdDate: Post["createdDate"];
-  technologies: Technology[];
-  rating: number;
-  allowRatings: boolean;
-  bannerImage: Post["bannerImage"];
-  githubRepo: Post["githubRepo"];
-  postNeeds: PostNeed[];
-  user: {
-    username: User["username"];
-    avatar: User["avatar"];
+  readonly id: Post["id"];
+  readonly title: Post["title"];
+  readonly description: Post["description"];
+  readonly createdDate: Post["createdDate"];
+  readonly technologies: Technology[];
+  readonly rating: number;
+  readonly allowRatings: boolean;
+  readonly bannerImage: Post["bannerImage"];
+  readonly githubRepo: Post["githubRepo"];
+  readonly postNeeds: PostNeed[];
+  readonly user: {
+    readonly username: User["username"];
+    readonly avatar: User["avatar"];
   };
-  trendingScore: number;
-  watchers: {
-    id: User["id"];
-    user: {
-      username: User["username"];
-      avatar: User["avatar"];
+  readonly trendingScore: number;
+  readonly watchers: {
+    readonly id: User["id"];
+    readonly user: {
+      readonly username: User["username"];
+      readonly avatar: User["avatar"];
     };
   }[];
-  comments: number;
+  readonly comments: number;
 };
 
 export function PostCard({
@@ -72,8 +72,10 @@ export function PostCard({
         <Image
           src={bannerImage ?? DEFAULT_POST_BANNER_IMAGE}
           alt={title}
+          priority
           fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          sizes="(max-width: 256px) 100vw, (max-width: 512px) 50vw, 33vw"
+          className="object-cover"
         />
       </div>
       <CardHeader className="flex flex-col gap-4 pb-4 flex-shrink-0">

@@ -21,12 +21,12 @@ export function CommentHeader({
   onReply,
   isReply = false,
 }: {
-  comment: Comment;
-  currentUserId: User["id"];
-  onEdit: () => void;
-  onDelete: () => void;
-  onReply?: () => void;
-  isReply?: boolean;
+  readonly comment: Comment;
+  readonly currentUserId: User["id"];
+  readonly onEdit: () => void;
+  readonly onDelete: () => void;
+  readonly onReply?: () => void;
+  readonly isReply?: boolean;
 }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const isOwnComment = comment.createdBy.id === currentUserId;
@@ -45,6 +45,7 @@ export function CommentHeader({
               src={comment.createdBy.avatar}
               alt={comment.createdBy.username}
               className="h-8 w-8 rounded-full object-cover"
+              loading="lazy"
               width={32}
               height={32}
             />
@@ -81,12 +82,12 @@ export function CommentHeader({
       </div>
       <ConfirmDialog
         open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
+        onOpenChangeAction={setShowDeleteDialog}
         title={`Delete ${isReply ? "Reply" : "Comment"}`}
         description={message}
         confirmText="Delete"
         cancelText="Cancel"
-        onConfirm={() => {
+        onConfirmAction={() => {
           onDelete();
           setShowDeleteDialog(false);
         }}

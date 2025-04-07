@@ -23,9 +23,9 @@ import { Section } from "~/components/ui/section";
 import { Textarea } from "~/components/ui/textarea";
 
 type PostDetailsSectionProps = {
-  control: Control<CreatePostInput>;
-  needType: NeedType;
-  isSubmitting: boolean;
+  readonly control: Control<CreatePostInput>;
+  readonly needType: NeedType;
+  readonly isSubmitting: boolean;
 };
 
 export function PostDetailsSection({
@@ -88,6 +88,7 @@ export function PostDetailsSection({
             <FormItem>
               <FormLabel>
                 Post Title
+                {/* */}
                 <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
@@ -110,6 +111,7 @@ export function PostDetailsSection({
             <FormItem>
               <FormLabel>
                 Description
+                {/* */}
                 <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
@@ -174,6 +176,9 @@ export function PostDetailsSection({
                             src={previewUrl}
                             alt="Banner preview"
                             className="object-cover w-full h-full"
+                            width={50}
+                            height={50}
+                            loading="lazy"
                           />
                         </div>
                       </div>
@@ -209,20 +214,20 @@ export function PostDetailsSection({
         {control._formValues.bannerImage instanceof File && !fileError && (
           <ImageCropper
             dialogOpen={dialogOpen}
-            setDialogOpen={setDialogOpen}
+            setDialogOpenAction={setDialogOpen}
             selectedFile={control._formValues.bannerImage}
-            onFileChange={handleFileChange}
+            onFileChangeAction={handleFileChange}
           />
         )}
 
         <ConfirmDialog
           open={deleteDialogOpen}
-          onOpenChange={setDeleteDialogOpen}
+          onOpenChangeAction={setDeleteDialogOpen}
           title="Remove Banner Image"
           description="Are you sure you want to remove the banner image? This action cannot be undone."
           confirmText="Remove"
           cancelText="Cancel"
-          onConfirm={() => {
+          onConfirmAction={() => {
             const fileInput = document.getElementById("bannerImage") as HTMLInputElement;
             if (fileInput) {
               fileInput.value = "";

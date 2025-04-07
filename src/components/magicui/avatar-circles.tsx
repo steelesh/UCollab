@@ -5,13 +5,13 @@ import Image from "next/image";
 import { cn } from "~/lib/utils";
 
 type Avatar = {
-  imageUrl: string;
-  profileUrl: string;
+  readonly imageUrl: string;
+  readonly profileUrl: string;
 };
 type AvatarCirclesProps = {
-  className?: string;
-  numPeople?: number;
-  avatarUrls: Avatar[];
+  readonly className?: string;
+  readonly numPeople?: number;
+  readonly avatarUrls: Avatar[];
 };
 
 export function AvatarCircles({

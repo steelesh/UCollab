@@ -8,7 +8,7 @@ import type { Comment } from "~/features/users/user.types";
 import { CommentContent } from "~/components/comments/comment-content";
 
 type ProfileCommentsListProps = {
-  comments: Comment[];
+  readonly comments: Comment[];
 };
 
 export function ProfileCommentsList({ comments }: ProfileCommentsListProps) {
@@ -26,8 +26,8 @@ export function ProfileCommentsList({ comments }: ProfileCommentsListProps) {
                     href={`/p/${comment.postId}#comment-${comment.id}`}
                     className="block rounded-lg p-4 transition-colors"
                   >
-                    <CommentContent content={comment.content} className="hover:underline" />
-                    <div className="text-muted-foreground flex items-center gap-2 text-xs">
+                    <CommentContent content={comment.content} className="line-clamp-2 hover:underline text-sm font-medium" />
+                    <div className="text-muted-foreground flex items-center gap-2 text-xs -mt-0.5">
                       <span>
                         on
                         {" "}
