@@ -179,95 +179,147 @@
 <hr />
 <pre class="mermaid">classDiagram
     class Account {
-        +UUID id
-        +UUID userId
+        +String id
+        +String userId
         +String type
         +String provider
         +String providerAccountId
-        +String? refreshToken
-        +String? accessToken
-        +Int? expiresAt
-        +String? tokenType
+        +String? refresh_token
+        +String? access_token
+        +Int? expires_at
+        +String? token_type
         +String? scope
-        +String? idToken
-        +String? sessionState
-        +Int? refreshTokenExpiresIn
+        +String? id_token
+        +String? session_state
     }
- 
-    class Session {
-        +UUID id
-        +String sessionToken
-        +UUID userId
-        +Date expires
-    }
- 
+
     class User {
-        +UUID id
+        +String id
         +String username
         +String email
-        +Date createdDate
-        +boolean allowNotifications
-        +boolean verifiedEmail
-        +String? name
-        +String? image
-    }
- 
-    class VerificationToken {
-        +String identifier
-        +String token
-        +Date expires
-    }
- 
-    class Profile {
-        +UUID id
-        +UUID userId
-        +Date createdDate
-        +Date lastModifiedDate
-        +Json? skills
-        +Json? interests
-        +Int? gradYear
+        +DateTime createdDate
+        +DateTime lastLogin
+        +String fullName
+        +String firstName
+        +String lastName
+        +String avatar
+        +AvatarSource avatarSource
+        +String azureAdId
+        +OnboardingStep onboardingStep
         +String? bio
+        +Int? gradYear
+        +String? githubProfile
+        +MentorshipStatus mentorship
     }
- 
+
+    class Session {
+        +String id
+        +String sessionToken
+        +String userId
+        +DateTime expires
+    }
+
     class Post {
-        +UUID id
-        +UUID createdById
-        +Date createdDate
-        +Date lastModifiedDate
+        +String id
+        +DateTime createdDate
+        +DateTime lastModifiedDate
         +String title
         +String description
-        +PostType postType
-        +Json? technologies
+        +Float rating
+        +Boolean allowRatings
+        +Boolean allowComments
         +String? githubRepo
-        +Status status
+        +String? bannerImage
+        +String createdById
     }
- 
+
     class Comment {
-        +UUID id
-        +UUID postId
-        +UUID createdById
-        +Date createdDate
-        +Date lastModifiedDate
+        +String id
+        +String postId
+        +String createdById
+        +DateTime createdDate
+        +DateTime lastModifiedDate
         +String content
+        +String? parentId
     }
- 
+
     class Notification {
-        +UUID id
-        +UUID userId
+        +String id
+        +String userId
         +String message
-        +boolean disableNotifications
+        +DateTime createdDate
+        +Boolean isRead
+        +NotificationType type
+        +String? postId
+        +String? commentId
+        +String? triggeredById
     }
- 
+
+    class NotificationPreferences {
+        +String id
+        +String userId
+        +Boolean enabled
+        +Boolean allowComments
+        +Boolean allowMentions
+        +Boolean allowPostUpdates
+        +Boolean allowSystem
+        +Boolean allowRatings
+    }
+
+    class Technology {
+        +String id
+        +String name
+        +Boolean verified
+        +DateTime createdDate
+    }
+
+    class PostRating {
+        +String id
+        +String postId
+        +String userId
+        +Int rating
+        +DateTime createdDate
+    }
+
+    class PostWatcher {
+        +String id
+        +String postId
+        +String userId
+        +DateTime createdDate
+    }
+
+    class PostNeed {
+        +String id
+        +NeedType needType
+        +DateTime createdDate
+        +Boolean isPrimary
+    }
+
     User --&gt; Post : creates
     User --&gt; Comment : leaves
-    User --&gt; Profile : has
     User --&gt; Notification : receives
-    User --&gt; Account : owns
-    User --&gt; Session : has
-    User --&gt; VerificationToken : is sent
+    User --&gt; Account : has many
+    User --&gt; Session : has many
+    User --&gt; Technology : has many
+    User --&gt; PostRating : creates
+    User --&gt; PostWatcher : watches
+    User --&gt; NotificationPreferences : has one
+    User --&gt; Notification : triggers
     Post --&gt; Comment : has many
+    Post --&gt; Technology : has many
+    Post --&gt; PostRating : has many
+    Post --&gt; PostWatcher : has many
+    Post --&gt; User : created by
+    Post --&gt; Notification : generates
+    Post --&gt; PostNeed : has many
     Comment --&gt; Post : belongs to
+    Comment --&gt; User : created by
+    Comment --&gt; Comment : has replies
+    Comment --&gt; Notification : generates
     Notification --&gt; User : notifies
+    Notification --&gt; Post : references
+    Notification --&gt; Comment : references
+    Notification --&gt; User : triggered by
 </pre>
 
                     </main>
