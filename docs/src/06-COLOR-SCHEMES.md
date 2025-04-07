@@ -6,61 +6,92 @@ UCollab follows a **modern and accessible color scheme** optimized for both **li
 ---
 
 ## 🌞 Light Mode Colors
-| Color Name       | HEX Code  | Preview |
+| Color Name       | HSL Value  | Description |
 |-----------------|----------|---------|
-|  **Primary** | `#e00122` | <div style="width:50px; height:20px; background-color:#e00122; border:1px solid #000;"></div> |
-|  **Primary Focus** | `#ff4d4d` | <div style="width:50px; height:20px; background-color:#ff4d4d; border:1px solid #000;"></div> |
-|  **Primary Content** | `#e00122` | <div style="width:50px; height:20px; background-color:#e00122; border:1px solid #000;"></div> |
-|  **Secondary** | `#ffffff` | <div style="width:50px; height:20px; background-color:#ffffff; border:1px solid #000;"></div> |
-|  **Secondary Focus** | `#004b91` | <div style="width:50px; height:20px; background-color:#004b91; border:1px solid #000;"></div> |
-|  **Secondary Content** | `#ffffff` | <div style="width:50px; height:20px; background-color:#ffffff; border:1px solid #000;"></div> |
-|  **Accent** | `#333333` | <div style="width:50px; height:20px; background-color:#333333; border:1px solid #000;"></div> |
-|  **Accent Focus** | `#1a1a1a` | <div style="width:50px; height:20px; background-color:#1a1a1a; border:1px solid #000;"></div> |
-|  **Accent Content** | `#333333` | <div style="width:50px; height:20px; background-color:#333333; border:1px solid #000;"></div> |
+| **Background** | `0 0% 100%` | Main background color |
+| **Foreground** | `0 0% 3.9%` | Main text color |
+| **Primary** | `0 0% 9%` | Primary interactive elements |
+| **Primary Foreground** | `0 0% 98%` | Text on primary elements |
+| **Secondary** | `0 0% 96.1%` | Secondary interactive elements |
+| **Secondary Foreground** | `0 0% 9%` | Text on secondary elements |
+| **Accent** | `0 0% 96.1%` | Accent elements |
+| **Accent Foreground** | `0 0% 9%` | Text on accent elements |
+| **Muted** | `0 0% 96.1%` | Muted/subtle elements |
+| **Muted Foreground** | `0 0% 45.1%` | Text on muted elements |
+| **Destructive** | `350 99% 44%` | Error/destructive elements |
+| **Destructive Foreground** | `0 0% 98%` | Text on destructive elements |
+
+## 🎓 UC Brand Colors (Light & Dark Mode)
+| Color Name       | HSL Value  | Description |
+|-----------------|----------|---------|
+| **UC Red** | `350 99% 44%` | Main UC brand color |
+| **UC Red Dark** | `350 99% 36%` | Darker shade of UC red |
+| **UC Red Darker** | `350 93% 28%` | Even darker shade for hover states |
+| **UC Black** | `0 0% 0%` | Pure black |
+| **UC Black Light** | `0 0% 20%` | Lighter black |
+| **UC White** | `0 0% 100%` | Pure white |
+| **UC Grey** | `0 0% 95%` | Light grey |
+| **UC Grey Silver** | `260 3% 66%` | Silver grey |
+| **UC Grey Mist** | `260 7% 88%` | Misty grey |
+| **UC Gold** | `35 47% 64%` | UC gold accent |
+| **UC Tan** | `35 47% 84%` | Light tan accent |
 
 ---
 
 ## 🌙 Dark Mode Colors
-| Color Name       | HEX Code  | Preview |
+| Color Name       | HSL Value  | Description |
 |-----------------|----------|---------|
-|  **Primary** | `#e00122` | <div style="width:50px; height:20px; background-color:#e00122; border:1px solid #000;"></div> |
-|  **Primary Focus** | `#ff4d4d` | <div style="width:50px; height:20px; background-color:#ff4d4d; border:1px solid #000;"></div> |
-|  **Primary Content** | `#e00122` | <div style="width:50px; height:20px; background-color:#e00122; border:1px solid #000;"></div> |
-|  **Neutral** | `#666666` | <div style="width:50px; height:20px; background-color:#666666; border:1px solid #000;"></div> |
-|  **Neutral Focus** | `#4d4d4d` | <div style="width:50px; height:20px; background-color:#4d4d4d; border:1px solid #000;"></div> |
-|  **Neutral Content** | `#666666` | <div style="width:50px; height:20px; background-color:#666666; border:1px solid #000;"></div> |
-|  **Base 100** | `#ffffff` | <div style="width:50px; height:20px; background-color:#ffffff; border:1px solid #000;"></div> |
-|  **Base 200** | `#fafafa` | <div style="width:50px; height:20px; background-color:#fafafa; border:1px solid #000;"></div> |
-|  **Base 300** | `#f5f5f5` | <div style="width:50px; height:20px; background-color:#f5f5f5; border:1px solid #000;"></div> |
-|  **Base Content** | `#000000` | <div style="width:50px; height:20px; background-color:#000000; border:1px solid #000;"></div> |
+| **Background** | `0 0% 3.9%` | Main background color |
+| **Foreground** | `0 0% 98%` | Main text color |
+| **Primary** | `0 0% 98%` | Primary interactive elements |
+| **Primary Foreground** | `0 0% 9%` | Text on primary elements |
+| **Secondary** | `0 0% 15%` | Secondary interactive elements |
+| **Secondary Foreground** | `0 0% 98%` | Text on secondary elements |
+| **Accent** | `0 0% 15%` | Accent elements |
+| **Accent Foreground** | `0 0% 98%` | Text on accent elements |
+| **Muted** | `0 0% 15%` | Muted/subtle elements |
+| **Muted Foreground** | `0 0% 65%` | Text on muted elements |
+| **Destructive** | `350 99% 44%` | Error/destructive elements |
+| **Destructive Foreground** | `0 0% 98%` | Text on destructive elements |
 
 ---
 
-## ⚠️ Additional Colors
-| Color Name       | HEX Code  | Preview |
+## 📊 Chart Colors
+| Color Name       | HSL Value  | Description |
 |-----------------|----------|---------|
-|  **Info** | `#00b5fb` | <div style="width:50px; height:20px; background-color:#00b5fb; border:1px solid #000;"></div> |
-|  **Info Content** | `#000000` | <div style="width:50px; height:20px; background-color:#000000; border:1px solid #000;"></div> |
-|  **Success** | `#00a96e` | <div style="width:50px; height:20px; background-color:#00a96e; border:1px solid #000;"></div> |
-|  **Success Content** | `#000000` | <div style="width:50px; height:20px; background-color:#000000; border:1px solid #000;"></div> |
-|  **Warning** | `#ffbf00` | <div style="width:50px; height:20px; background-color:#ffbf00; border:1px solid #000;"></div> |
-|  **Warning Content** | `#000000` | <div style="width:50px; height:20px; background-color:#000000; border:1px solid #000;"></div> |
-|  **Error** | `#ff6368` | <div style="width:50px; height:20px; background-color:#ff6368; border:1px solid #000;"></div> |
-|  **Error Content** | `#000000` | <div style="width:50px; height:20px; background-color:#000000; border:1px solid #000;"></div> |
+| **Chart 1** | `12 76% 61%` | Primary chart color |
+| **Chart 2** | `173 58% 39%` | Secondary chart color |
+| **Chart 3** | `197 37% 24%` | Tertiary chart color |
+| **Chart 4** | `43 74% 66%` | Quaternary chart color |
+| **Chart 5** | `27 87% 67%` | Quinary chart color |
 
 ---
 
-## **🛠️ How to Use the Colors in Code**
+## 🛠️ How to Use the Colors in Code
+
 ### **Tailwind CSS Usage**
-Since Tailwind CSS is used, colors can be applied with:
 ```css
-.text-primary { color: var(--color-primary); }
-.bg-dark { background-color: var(--color-base-100); }
-.border-accent { border-color: var(--color-accent); }
+/* Using the HSL variables in Tailwind */
+.bg-primary { background-color: hsl(var(--primary)); }
+.text-accent-foreground { color: hsl(var(--accent-foreground)); }
+.border-uc-red { border-color: hsl(var(--uc-red)); }
+```
 
-If using CSS variables
+### **CSS Variables**
+All colors are defined as CSS variables:
+```css
 :root {
-  --primary-color: #e00122;
-  --secondary-color: #004b91;
-  --accent-color: #333333;
+  --background: 0 0% 100%;
+  --foreground: 0 0% 3.9%;
+  --primary: 0 0% 9%;
+  /* and so on */
 }
+
+.dark {
+  --background: 0 0% 3.9%;
+  --foreground: 0 0% 98%;
+  /* dark mode overrides */
+}
+```
+
+These colors create a cohesive design system that maintains accessibility while embracing the University of Cincinnati's brand identity.
