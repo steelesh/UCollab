@@ -70,7 +70,7 @@ async function Page({ searchParams, userId }: PageProps) {
               username: post.createdBy.username,
               avatar: post.createdBy.avatar,
             }}
-            trendingScore={post.trendingScore}
+            isTrending={post.isTrending}
             watchers={post.watchers}
             comments={post.comments.length}
           />
