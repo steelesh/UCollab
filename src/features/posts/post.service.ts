@@ -1,4 +1,4 @@
-import type { Post, User } from "@prisma/client";
+import type { Comment, Post, User } from "@prisma/client";
 
 import { Prisma } from "@prisma/client";
 import { notFound } from "next/navigation";
@@ -13,6 +13,35 @@ import { withServiceAuth } from "~/security/protected-service";
 
 import type { CreatePostInput } from "./post.schema";
 import type { ExplorePageData, ExplorePost, PostDetails } from "./post.types";
+
+const TRENDING_THRESHOLD = 0.05;
+
+function calculateTrendingScore(post: {
+  createdDate: Post["createdDate"];
+  rating: Post["rating"];
+  watchers: { userId: User["id"] }[];
+  comments: { id: Comment["id"] }[];
+  createdById: Post["createdById"];
+}) {
+  const ageInHours = (Date.now() - new Date(post.createdDate).getTime()) / (1000 * 3600);
+  const timeDecay = (1 / (ageInHours + 72) ** 0.9) * 100;
+
+  const ratingWeight = 0.7;
+  const watcherWeight = 0.2;
+  const commentWeight = 0.1;
+
+  const ratingScore = post.rating / 5;
+  const nonOwnerWatchers = post.watchers.filter(w => w.userId !== post.createdById);
+  const watcherScore = Math.min((nonOwnerWatchers.length) / 10, 1);
+  const commentScore = Math.min(post.comments.length / 20, 1);
+
+  const engagementScore
+    = (ratingScore * ratingWeight)
+      + (watcherScore * watcherWeight)
+      + (commentScore * commentWeight);
+
+  return engagementScore * timeDecay;
+}
 
 export const PostService = {
   async getPostById(id: Post["id"], requestUserId: string): Promise<PostDetails> {
@@ -99,26 +128,12 @@ export const PostService = {
         if (!post)
           notFound();
 
-        const ageInHours = (Date.now() - new Date(post.createdDate).getTime()) / (1000 * 3600);
-        const timeDecay = (1 / (ageInHours + 48) ** 1.1) * 100;
-
-        const ratingWeight = 0.7;
-        const watcherWeight = 0.2;
-        const commentWeight = 0.1;
-
-        const ratingScore = post.rating / 5;
         const nonOwnerWatchers = post.watchers.filter(w => w.userId !== post.createdById);
-        const watcherScore = Math.min((nonOwnerWatchers.length) / 10, 1);
-        const commentScore = Math.min(post.comments.length / 20, 1);
-
-        const engagementScore
-          = (ratingScore * ratingWeight)
-            + (watcherScore * watcherWeight)
-            + (commentScore * commentWeight);
+        const trendingScore = calculateTrendingScore(post);
 
         const postWithScore = {
           ...post,
-          trendingScore: engagementScore * timeDecay,
+          isTrending: trendingScore > TRENDING_THRESHOLD,
           watchers: nonOwnerWatchers,
         };
 
@@ -391,27 +406,12 @@ export const PostService = {
         ]);
 
         const postsWithScores = posts.map((post) => {
-          const ageInHours = (Date.now() - new Date(post.createdDate).getTime()) / (1000 * 3600);
-          const timeDecay = (1 / (ageInHours + 48) ** 1.1) * 100;
-
-          const ratingWeight = 0.7;
-          const watcherWeight = 0.2;
-          const commentWeight = 0.1;
-
-          const ratingScore = post.rating / 5;
           const nonOwnerWatchers = post.watchers.filter(w => w.userId !== post.createdById);
-          const watcherScore = Math.min((nonOwnerWatchers.length) / 10, 1);
-          const commentScore = Math.min(post.comments.length / 20, 1);
+          const trendingScore = calculateTrendingScore(post);
 
-          const engagementScore
-            = (ratingScore * ratingWeight)
-              + (watcherScore * watcherWeight)
-              + (commentScore * commentWeight);
-
-          const trendingScore = engagementScore * timeDecay;
           return {
             ...post,
-            trendingScore,
+            isTrending: trendingScore > TRENDING_THRESHOLD,
             watchers: nonOwnerWatchers,
           };
         });
@@ -996,38 +996,25 @@ export const PostService = {
               },
             },
           },
-          skip: (page - 1) * limit,
-          take: limit,
         });
 
         const postsWithScores = posts
           .map((post) => {
-            const ageInHours = (Date.now() - new Date(post.createdDate).getTime()) / (1000 * 3600);
-            const timeDecay = (1 / (ageInHours + 48) ** 1.1) * 100;
-
-            const ratingWeight = 0.7;
-            const watcherWeight = 0.2;
-            const commentWeight = 0.1;
-
-            const ratingScore = post.rating / 5;
             const nonOwnerWatchers = post.watchers.filter(w => w.userId !== post.createdById);
-            const watcherScore = Math.min((nonOwnerWatchers.length) / 10, 1);
-            const commentScore = Math.min(post.comments.length / 20, 1);
+            const trendingScore = calculateTrendingScore(post);
 
-            const engagementScore
-              = (ratingScore * ratingWeight)
-                + (watcherScore * watcherWeight)
-                + (commentScore * commentWeight);
-
-            const trendingScore = engagementScore * timeDecay;
             return {
-              ...post,
+              post: {
+                ...post,
+                isTrending: trendingScore > TRENDING_THRESHOLD,
+                watchers: nonOwnerWatchers,
+              },
               trendingScore,
-              watchers: nonOwnerWatchers,
             };
           })
-          .filter(post => post.trendingScore > 0.5)
-          .sort((a, b) => b.trendingScore - a.trendingScore);
+          .sort((a, b) => b.trendingScore - a.trendingScore)
+          .slice((page - 1) * limit, page * limit)
+          .map(item => item.post);
 
         const totalFilteredCount = postsWithScores.length;
 
@@ -1035,7 +1022,7 @@ export const PostService = {
           posts: postsWithScores satisfies ExplorePost[],
           totalCount: totalFilteredCount,
           currentPage: page,
-          totalPages: Math.ceil(totalFilteredCount / limit),
+          totalPages: Math.ceil(posts.length / limit),
           limit,
         };
       } catch (error) {

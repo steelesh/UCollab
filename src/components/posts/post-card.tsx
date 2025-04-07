@@ -35,7 +35,7 @@ type PostCardProps = {
     readonly username: User["username"];
     readonly avatar: User["avatar"];
   };
-  readonly trendingScore: number;
+  readonly isTrending: boolean;
   readonly watchers: {
     readonly id: User["id"];
     readonly user: {
@@ -58,13 +58,12 @@ export function PostCard({
   githubRepo,
   postNeeds,
   user,
-  trendingScore,
+  isTrending,
   watchers,
   comments,
 }: PostCardProps) {
   const displayTechnologies = technologies.slice(0, 4);
   const hasMoreTechnologies = technologies.length > 4;
-  const isTrending = trendingScore > 0.5;
 
   return (
     <Card variant="glossy" className="group w-full pt-0 flex flex-col">

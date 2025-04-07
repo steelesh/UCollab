@@ -50,7 +50,6 @@ async function Page({ params, searchParams, userId }: PageProps) {
   const post = await getRealTimePost(postId, userId);
   const userPostRating = await getUserPostRating(postId, userId);
   const isBookmarked = await isPostBookmarked(postId, userId);
-  const isTrending = post.trendingScore > 0.5;
   const { comments, totalPages, currentPage, totalCount, limit: commentLimit } = await getComments(
     postId,
     userId,
@@ -110,14 +109,14 @@ async function Page({ params, searchParams, userId }: PageProps) {
         <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-2 my-4 py-4 border-t border-b border-border/30 text-sm text-muted-foreground">
           {post.allowRatings && (
             <div className="flex items-center gap-1.5">
-              {isTrending && (
+              {post.isTrending && (
                 <TrendingUp className="w-3.5 h-3.5 md:w-4 md:h-4 text-green-500" />
               )}
               <Star className="w-3.5 h-3.5 md:w-4 md:h-4 fill-yellow-400 stroke-background stroke-[1.5px]" />
               <span className="text-xs md:text-sm">{post.rating > 0 ? post.rating.toFixed(1) : "Not rated"}</span>
             </div>
           )}
-          {!post.allowRatings && isTrending && (
+          {!post.allowRatings && post.isTrending && (
             <div className="flex items-center gap-1.5">
               <TrendingUp className="w-3.5 h-3.5 md:w-4 md:h-4 text-green-500" />
               <span className="text-xs md:text-sm">Trending</span>

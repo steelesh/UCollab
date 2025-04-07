@@ -19,7 +19,7 @@ export default async function Page() {
   const session = await auth();
   if (session?.user?.id) {
     const trendingData = await getTrendingPosts(session.user.id);
-    const trendingPosts = trendingData?.success ? trendingData.posts : [];
+    const trendingPosts = trendingData?.success ? trendingData.posts.slice(0, 6) : [];
 
     const activityData = await getUserRecentActivity(5);
     const activities = activityData?.success ? activityData.activities : [];
