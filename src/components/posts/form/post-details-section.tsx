@@ -176,8 +176,6 @@ export function PostDetailsSection({
                             src={previewUrl}
                             alt="Banner preview"
                             className="object-cover w-full h-full"
-                            width={50}
-                            height={50}
                             loading="lazy"
                           />
                         </div>

@@ -199,13 +199,23 @@ export async function deleteRating(postId: Post["id"]) {
 }
 
 export async function getTrendingPosts(_userId: string) {
+  try {
+    const result = await PostService.getTrendingPosts(_userId);
+    return { success: true, posts: result.posts };
+  } catch (error) {
+    return handleServerActionError(error);
+  }
+}
+
+export async function getUserRecentActivity(limit = 5) {
   const session = await auth();
-  if (!session?.user?.id)
-    throw new Error(ErrorMessage.AUTHENTICATION_REQUIRED);
+  if (!session?.user?.id) {
+    return { success: false, activities: [], hasActivity: false };
+  }
 
   try {
-    const result = await PostService.getTrendingPosts(session.user.id);
-    return { success: true, posts: result.posts };
+    const result = await PostService.getUserRecentActivity(session.user.id, session.user.id, limit);
+    return { success: true, ...result };
   } catch (error) {
     return handleServerActionError(error);
   }

@@ -1045,4 +1045,151 @@ export const PostService = {
       }
     });
   },
+
+  async getUserRecentActivity(userId: User["id"], requestUserId: User["id"], limit = 5) {
+    return withServiceAuth(requestUserId, null, async () => {
+      try {
+        const userPosts = await prisma.post.findMany({
+          where: { createdById: userId },
+          select: { id: true, title: true },
+        });
+
+        if (userPosts.length === 0) {
+          return { activities: [], hasActivity: false };
+        }
+
+        const postIds = userPosts.map(post => post.id);
+
+        const recentComments = await prisma.comment.findMany({
+          where: {
+            postId: { in: postIds },
+            createdById: { not: userId },
+          },
+          orderBy: { createdDate: "desc" },
+          take: limit,
+          select: {
+            id: true,
+            content: true,
+            createdDate: true,
+            postId: true,
+            createdBy: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+              },
+            },
+            post: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+          },
+        });
+
+        const recentRatings = await prisma.postRating.findMany({
+          where: {
+            postId: { in: postIds },
+            userId: { not: userId },
+          },
+          orderBy: { createdDate: "desc" },
+          take: limit,
+          select: {
+            id: true,
+            rating: true,
+            createdDate: true,
+            postId: true,
+            user: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+              },
+            },
+            post: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+          },
+        });
+
+        const recentWatchers = await prisma.postWatcher.findMany({
+          where: {
+            postId: { in: postIds },
+            userId: { not: userId },
+          },
+          orderBy: { createdDate: "desc" },
+          take: limit,
+          select: {
+            id: true,
+            createdDate: true,
+            postId: true,
+            user: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+              },
+            },
+            post: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+          },
+        });
+
+        const allActivities = [
+          ...recentComments.map(comment => ({
+            type: "comment" as const,
+            id: comment.id,
+            createdDate: comment.createdDate,
+            post: comment.post,
+            user: {
+              id: comment.createdBy.id,
+              username: comment.createdBy.username,
+              avatar: comment.createdBy.avatar,
+            },
+            content: comment.content,
+          })),
+          ...recentRatings.map(rating => ({
+            type: "rating" as const,
+            id: rating.id,
+            createdDate: rating.createdDate,
+            post: rating.post,
+            user: {
+              id: rating.user.id,
+              username: rating.user.username,
+              avatar: rating.user.avatar,
+            },
+            rating: rating.rating,
+          })),
+          ...recentWatchers.map(watcher => ({
+            type: "watch" as const,
+            id: watcher.id,
+            createdDate: watcher.createdDate,
+            post: watcher.post,
+            user: {
+              id: watcher.user.id,
+              username: watcher.user.username,
+              avatar: watcher.user.avatar,
+            },
+          })),
+        ].sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()).slice(0, limit);
+
+        return {
+          activities: allActivities,
+          hasActivity: allActivities.length > 0,
+        };
+      } catch (error) {
+        if (error instanceof Utils)
+          throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
 };

@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 
 import { DotPattern } from "~/components/magicui/dot-pattern";
 import { SignInWrapper } from "~/components/navigation/signin-wrapper";
+import { ActivityCard, NoActivityPlaceholder } from "~/components/posts/activity-card";
 import { PostCardXs } from "~/components/posts/post-card-xs";
+import { Container } from "~/components/ui/container";
 import { H1, H3 } from "~/components/ui/heading";
-import { getTrendingPosts } from "~/features/posts/post.actions";
+import { getTrendingPosts, getUserRecentActivity } from "~/features/posts/post.actions";
 import { cn } from "~/lib/utils";
 import { auth } from "~/security/auth";
 
@@ -18,6 +20,10 @@ export default async function Page() {
   if (session?.user?.id) {
     const trendingData = await getTrendingPosts(session.user.id);
     const trendingPosts = trendingData?.success ? trendingData.posts : [];
+
+    const activityData = await getUserRecentActivity(5);
+    const activities = activityData?.success ? activityData.activities : [];
+    const hasActivity = activityData?.hasActivity ?? false;
 
     return (
       <>
@@ -59,9 +65,17 @@ export default async function Page() {
                 <p className="mt-2">No trending posts to display.</p>
               )}
           <H3 className="mt-12">Recent Activity</H3>
-          <p className="mt-2 text-sm">
-            Recent activity on your posts will appear here.
-          </p>
+          {hasActivity
+            ? (
+                <Container size="xl" className="mt-4 space-y-3">
+                  {activities.map(activity => (
+                    <ActivityCard key={`${activity.type}-${activity.id}`} activity={activity} />
+                  ))}
+                </Container>
+              )
+            : (
+                <NoActivityPlaceholder />
+              )}
         </div>
       </>
     );
