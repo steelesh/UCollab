@@ -45,7 +45,7 @@ export default async function Page() {
           <H3 className="mt-8">Trending Posts</H3>
           {trendingPosts.length > 0
             ? (
-                <div className="grid gap-4 lg:grid-cols-2 mt-4">
+                <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 mt-4">
                   {trendingPosts.map(post => (
                     <PostCardXs
                       key={post.id}

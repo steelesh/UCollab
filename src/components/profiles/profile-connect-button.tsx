@@ -72,17 +72,17 @@ export function ProfileConnectButton({
         ? (
             <ActionButton
               variant="ghost"
-              icon={<UserRoundX className="h-5 w-5" />}
+              icon={<UserRoundX className="h-5 w-5 text-uc-red" />}
               onClick={handleDisconnect}
               disabled={isLoading}
             >
-              Connected
+              Disconnect
             </ActionButton>
           )
         : (
             <ActionButton
               variant="ghost"
-              icon={<UserPlus className="h-5 w-5" />}
+              icon={<UserPlus className="h-5 w-5 text-green-600" />}
               onClick={handleConnect}
               disabled={isLoading}
             >

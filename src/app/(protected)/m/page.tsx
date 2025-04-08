@@ -73,7 +73,9 @@ async function Page({ searchParams, userId }: PageProps) {
       <Header>
         <H1>Mentorship</H1>
       </Header>
-      <SearchBar showRatingFilter={false} />
+      {postNeeds !== "GRAPH"
+        ? <SearchBar showRatingFilter={false} />
+        : <div className="bg-muted mb-8 rounded-xl p-4" style={{ height: "98px" }} />}
       <NeedTypeFilter selectedValue={postNeeds} variant="mentorship" />
 
       {postNeeds === "GRAPH"
