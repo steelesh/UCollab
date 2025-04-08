@@ -36,6 +36,16 @@ export default function SearchBar({ showRatingFilter = true }: SearchBarProps) {
 
   const updateSearch = useCallback(async () => {
     const params = new URLSearchParams(sp.toString());
+    const currentQuery = sp.get("query") ?? "";
+    const currentMinRating = sp.get("minRating") ?? "";
+    const currentSortBy = sp.get("sortBy") ?? "createdDate";
+    const currentSortOrder = sp.get("sortOrder") ?? "desc";
+
+    const filtersChanged
+      = query !== currentQuery
+        || minRating !== currentMinRating
+        || sortBy !== currentSortBy
+        || sortOrder !== currentSortOrder;
 
     if (query)
       params.set("query", query);
@@ -58,7 +68,11 @@ export default function SearchBar({ showRatingFilter = true }: SearchBarProps) {
       params.set("limit", defaultLimit);
     }
 
-    params.set("page", "1");
+    if (filtersChanged) {
+      params.set("page", "1");
+    } else if (!params.has("page")) {
+      params.set("page", "1");
+    }
 
     const currentParamsString = sp.toString();
     const newParamsString = params.toString();
