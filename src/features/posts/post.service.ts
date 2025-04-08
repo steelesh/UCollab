@@ -1017,7 +1017,7 @@ export const PostService = {
           },
         });
 
-        const postsWithScores = posts
+        const scoredPosts = posts
           .map((post) => {
             const nonOwnerWatchers = post.watchers.filter(w => w.userId !== post.createdById);
             const trendingScore = calculateTrendingScore(post);
@@ -1028,11 +1028,14 @@ export const PostService = {
               watchers: nonOwnerWatchers,
               trendingScore,
             };
-          })
+          });
+
+        const trendingPosts = scoredPosts
+          .filter(post => post.isTrending)
           .sort((a, b) => b.trendingScore - a.trendingScore);
 
-        const totalCount = postsWithScores.length;
-        const paginatedPosts = postsWithScores.slice((page - 1) * limit, page * limit);
+        const totalCount = trendingPosts.length;
+        const paginatedPosts = trendingPosts.slice((page - 1) * limit, page * limit);
 
         return {
           posts: paginatedPosts satisfies ExplorePost[],
