@@ -99,6 +99,77 @@ export const UserService = {
     }
   },
 
+  async getUserConnections(
+    userId: string,
+    page = 1,
+    limit = 12,
+  ): Promise<{ users: MinimalUserForDirectory[]; totalCount: number }> {
+    try {
+      const [connections, totalCount] = await Promise.all([
+        prisma.connection.findMany({
+          where: { followerId: userId },
+          orderBy: { createdAt: "desc" },
+          skip: (page - 1) * limit,
+          take: limit,
+          select: {
+            following: {
+              select: {
+                id: true,
+                avatar: true,
+                firstName: true,
+                lastName: true,
+                username: true,
+                gradYear: true,
+                email: true,
+                technologies: true,
+                mentorship: true,
+              },
+            },
+          },
+        }),
+        prisma.connection.count({
+          where: { followerId: userId },
+        }),
+      ]);
+
+      const users = connections.map(conn => conn.following) satisfies MinimalUserForDirectory[];
+
+      return { users, totalCount };
+    } catch {
+      throw new Utils(ErrorMessage.OPERATION_FAILED);
+    }
+  },
+
+  async isUserConnected(
+    targetUsername: User["username"],
+    followerId: User["id"],
+  ) {
+    return withServiceAuth(followerId, null, async () => {
+      try {
+        const targetUser = await prisma.user.findUnique({
+          where: { username: targetUsername },
+          select: { id: true },
+        });
+        if (!targetUser)
+          return false;
+        const connection = await prisma.connection.findUnique({
+          where: {
+            followerId_followingId: {
+              followerId,
+              followingId: targetUser.id,
+            },
+          },
+        });
+
+        return !!connection;
+      } catch (error) {
+        if (error instanceof Utils)
+          throw error;
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
   async completeOnboarding(userId: User["id"], requestUserId: string, rawData: unknown) {
     return withServiceAuth(requestUserId, { ownerId: userId }, async () => {
       try {
@@ -159,6 +230,87 @@ export const UserService = {
         throw error;
       throw new Utils(ErrorMessage.OPERATION_FAILED);
     }
+  },
+
+  async connectUser(targetUsername: string, userId: string) {
+    return withServiceAuth(userId, null, async () => {
+      const targetUser = await prisma.user.findUnique({
+        where: { username: targetUsername },
+        select: { id: true, username: true },
+      });
+      if (!targetUser) {
+        throw new Error("Target user not found");
+      }
+
+      try {
+        const connection = await prisma.connection.create({
+          data: {
+            followerId: userId,
+            followingId: targetUser.id,
+          },
+          include: {
+            follower: {
+              select: { username: true },
+            },
+            following: {
+              select: { username: true },
+            },
+          },
+        });
+
+        // TODO: Queue a notification if you want to alert the target user.
+        //        if (targetUser.id !== userId) {
+        //          await NotificationService.queueBatchNotifications({
+        //            userIds: [targetUser.id],
+        //            type: "FOLLOW",
+        //            message: `${connection.follower.username} is now connected with you`,
+        //            triggeredById: userId,
+        //          });
+        //        }
+
+        return connection;
+      } catch (error) {
+        // If the connection already exists, this error code (P2002) might be raised.
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError
+          && error.code === "P2002"
+        ) {
+          return null;
+        }
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
+  },
+
+  async disconnectUser(targetUsername: string, userId: string) {
+    return withServiceAuth(userId, null, async () => {
+      const targetUser = await prisma.user.findUnique({
+        where: { username: targetUsername },
+        select: { id: true },
+      });
+      if (!targetUser) {
+        throw new Error("Target user not found");
+      }
+
+      try {
+        return await prisma.connection.delete({
+          where: {
+            followerId_followingId: {
+              followerId: userId,
+              followingId: targetUser.id,
+            },
+          },
+        });
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError
+          && error.code === "P2025"
+        ) {
+          return null;
+        }
+        throw new Utils(ErrorMessage.OPERATION_FAILED);
+      }
+    });
   },
 
   async deleteUser(userId: User["id"], requestUserId: string) {

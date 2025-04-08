@@ -5,7 +5,7 @@ import { ProfileCommentsList } from "~/components/profiles/profile-comments-list
 import { ProfileHeader } from "~/components/profiles/profile-header";
 import { ProfilePostsList } from "~/components/profiles/profile-posts-list";
 import { ProfileUserInfo } from "~/components/profiles/profile-user-info";
-import { getUserProfile } from "~/features/users/user.queries";
+import { getUserProfile, isUserConnected } from "~/features/users/user.queries";
 import { withAuth } from "~/security/protected";
 
 type PageProps = {
@@ -32,6 +32,11 @@ async function Page({ params, userId }: PageProps) {
   const { username } = await params;
   const userProfile = await getUserProfile(username);
 
+  let initialConnected = false;
+  if (userId !== userProfile.id) {
+    initialConnected = await isUserConnected(userProfile.username, userId);
+  }
+
   return (
     <div className="flex flex-col items-center">
       <article className="w-full max-w-3xl rounded shadow">
@@ -39,6 +44,7 @@ async function Page({ params, userId }: PageProps) {
           avatar={userProfile.avatar}
           username={userProfile.username}
           isOwnProfile={userId === userProfile.id}
+          initialConnected={initialConnected}
         />
         <div className="px-8 pt-14 pb-8">
           <h1 className="pb-2 text-2xl font-bold">{userProfile.fullName}</h1>
