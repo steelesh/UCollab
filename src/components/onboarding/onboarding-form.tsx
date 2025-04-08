@@ -56,7 +56,7 @@ function GraduationYearControl({ field, currentYear }: { readonly field: any; re
               }}
               className="relative cursor-pointer border-none bg-transparent px-2 py-1 focus:outline-none"
             >
-              <span className="relative z-10 text-xs">{year}</span>
+              <span className="relative z-10 text-xs text-foreground">{year}</span>
               {focused === year && (
                 <motion.div
                   transition={{ layout: { duration: 0.2, ease: "easeOut" } }}
@@ -71,7 +71,7 @@ function GraduationYearControl({ field, currentYear }: { readonly field: any; re
                 />
               )}
             </Button>
-            {index < years.length - 1 && <span className="mx-2 text-xs text-gray-500">|</span>}
+            {index < years.length - 1 && <span className="mx-2 text-xs text-muted-foreground">|</span>}
           </div>
         ))}
       </div>
