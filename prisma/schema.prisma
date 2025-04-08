@@ -146,6 +146,7 @@ model NotificationPreferences {
   allowPostUpdates Boolean @default(true)
   allowSystem      Boolean @default(true)
   allowRatings     Boolean @default(true)
+  allowFollows     Boolean @default(true)
   user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 

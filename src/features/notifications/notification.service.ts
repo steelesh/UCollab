@@ -361,6 +361,7 @@ export const NotificationService = {
       [NotificationType.POST_UPDATE]: preferences.allowPostUpdates,
       [NotificationType.SYSTEM]: preferences.allowSystem,
       [NotificationType.RATING]: preferences.allowRatings,
+      [NotificationType.FOLLOW]: preferences.allowFollows,
     };
 
     const shouldSend = preferencesMap[type] ?? false;
