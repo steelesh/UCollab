@@ -61,6 +61,7 @@ export async function updateUser(formData: FormData) {
   const allowMentions = formData.get("allowMentions") === "on";
   const allowPostUpdates = formData.get("allowPostUpdates") === "on";
   const allowSystem = formData.get("allowSystem") === "on";
+  const allowFollows = formData.get("allowFollows") === "on";
   const updateUserInput = {
     gradYear,
     mentorship,
@@ -71,6 +72,7 @@ export async function updateUser(formData: FormData) {
       allowMentions,
       allowPostUpdates,
       allowSystem,
+      allowFollows,
     },
   };
 

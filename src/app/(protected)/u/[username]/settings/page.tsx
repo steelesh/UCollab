@@ -31,6 +31,7 @@ async function Page({ userId }: { readonly userId: User["id"] }) {
           allowMentions: true,
           allowPostUpdates: true,
           allowSystem: true,
+          allowFollows: true,
         },
       },
     },
@@ -136,6 +137,16 @@ async function Page({ userId }: { readonly userId: User["id"] }) {
                   className="toggle"
                 />
                 Mentions
+                {/* */}
+              </label>
+              <label className="fieldset-label flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="allowFollows"
+                  defaultChecked={user.notificationPreferences?.allowFollows}
+                  className="toggle"
+                />
+                Follows
                 {/* */}
               </label>
               <label className="fieldset-label flex items-center gap-2">
