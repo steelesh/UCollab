@@ -198,15 +198,6 @@ export async function deleteRating(postId: Post["id"]) {
   }
 }
 
-export async function getTrendingPosts(_userId: string) {
-  try {
-    const result = await PostService.getTrendingPosts(_userId);
-    return { success: true, posts: result.posts };
-  } catch (error) {
-    return handleServerActionError(error);
-  }
-}
-
 export async function getUserRecentActivity(limit = 5) {
   const session = await auth();
   if (!session?.user?.id) {

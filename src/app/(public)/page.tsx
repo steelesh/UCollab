@@ -6,7 +6,8 @@ import { ActivityCard, NoActivityPlaceholder } from "~/components/posts/activity
 import { PostCardXs } from "~/components/posts/post-card-xs";
 import { Container } from "~/components/ui/container";
 import { H1, H3 } from "~/components/ui/heading";
-import { getTrendingPosts, getUserRecentActivity } from "~/features/posts/post.actions";
+import { getUserRecentActivity } from "~/features/posts/post.actions";
+import { getTopTrendingPosts } from "~/features/posts/post.queries";
 import { cn } from "~/lib/utils";
 import { auth } from "~/security/auth";
 
@@ -18,8 +19,7 @@ export const metadata: Metadata = {
 export default async function Page() {
   const session = await auth();
   if (session?.user?.id) {
-    const trendingData = await getTrendingPosts(session.user.id);
-    const trendingPosts = trendingData?.success ? trendingData.posts.slice(0, 6) : [];
+    const trendingPosts = await getTopTrendingPosts(session.user.id);
 
     const activityData = await getUserRecentActivity(5);
     const activities = activityData?.success ? activityData.activities : [];

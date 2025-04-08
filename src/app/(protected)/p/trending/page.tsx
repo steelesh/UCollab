@@ -3,6 +3,7 @@ import type { User } from "@prisma/client";
 import { PageBreadcrumb } from "~/components/navigation/page-breadcrumb";
 import { Pagination } from "~/components/navigation/pagination";
 import { PostCard } from "~/components/posts/post-card";
+import SearchBar from "~/components/posts/search-posts";
 import { Container } from "~/components/ui/container";
 import { Header } from "~/components/ui/header";
 import { H1 } from "~/components/ui/heading";
@@ -21,11 +22,25 @@ type PageProps = {
 };
 
 async function Page({ searchParams, userId }: PageProps) {
-  const { page = "1", limit = "12" } = await searchParams;
+  const {
+    page = "1",
+    limit = "12",
+    query: rawQuery = "",
+    minRating: rawMinRating = "",
+    sortBy: rawSortBy = "createdDate",
+    sortOrder: rawSortOrder = "desc",
+  } = await searchParams;
+
+  const query = Array.isArray(rawQuery) ? rawQuery[0] : rawQuery;
+  const minRating = Array.isArray(rawMinRating) ? rawMinRating[0] : rawMinRating;
+  const sortBy = Array.isArray(rawSortBy) ? rawSortBy[0] : rawSortBy;
+  const sortOrder = Array.isArray(rawSortOrder) ? rawSortOrder[0] : rawSortOrder;
+
   const { posts, totalCount, currentPage, totalPages, limit: itemsPerPage } = await getTrendingPosts(
     userId,
     Number(page),
     Number(limit),
+    { query, minRating, sortBy, sortOrder },
   );
 
   return (
@@ -38,6 +53,7 @@ async function Page({ searchParams, userId }: PageProps) {
       <Header>
         <H1>Trending Posts</H1>
       </Header>
+      <SearchBar />
       <div className="mx-auto grid grid-cols-1 gap-8 lg:grid-cols-2">
         {posts.map(post => (
           <PostCard

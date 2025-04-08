@@ -7,13 +7,13 @@ import SearchBar from "~/components/posts/search-posts";
 import { Container } from "~/components/ui/container";
 import { Header } from "~/components/ui/header";
 import { H1 } from "~/components/ui/heading";
-import { getAllPosts } from "~/features/posts/post.queries";
+import { getTeamFormationPosts } from "~/features/posts/post.queries";
 import { withAuth } from "~/security/protected";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "UCollab — Explore",
+  title: "UCollab — Team Formation",
 };
 
 type PageProps = {
@@ -26,30 +26,28 @@ async function Page({ searchParams, userId }: PageProps) {
     page = "1",
     limit = "8",
     query: rawQuery = "",
-    minRating: rawMinRating = "",
     sortBy: rawSortBy = "createdDate",
     sortOrder: rawSortOrder = "desc",
   } = await searchParams;
 
   const query = Array.isArray(rawQuery) ? rawQuery[0] : rawQuery;
-  const minRating = Array.isArray(rawMinRating) ? rawMinRating[0] : rawMinRating;
   const sortBy = Array.isArray(rawSortBy) ? rawSortBy[0] : rawSortBy;
   const sortOrder = Array.isArray(rawSortOrder) ? rawSortOrder[0] : rawSortOrder;
 
-  const { posts, totalCount } = await getAllPosts(
+  const { posts, totalCount } = await getTeamFormationPosts(
     Number(page),
     Number(limit),
     userId,
-    { query, minRating, sortBy, sortOrder },
+    { query, sortBy, sortOrder },
   );
 
   return (
     <Container>
-      <PageBreadcrumb items={[{ label: "All Posts", isCurrent: true }]} />
+      <PageBreadcrumb items={[{ label: "Team Formation", isCurrent: true }]} />
       <Header>
-        <H1>All Posts</H1>
+        <H1>Team Formation</H1>
       </Header>
-      <SearchBar />
+      <SearchBar showRatingFilter={false} />
       <div className="mx-auto grid grid-cols-1 gap-8 lg:grid-cols-2">
         {posts.map(post => (
           <PostCard
@@ -80,7 +78,7 @@ async function Page({ searchParams, userId }: PageProps) {
           totalPages={Math.ceil(totalCount / Number(limit))}
           totalCount={totalCount}
           limit={Number(limit)}
-          basePath="/p"
+          basePath="/p/teams"
           itemName="posts"
           itemsPerPageOptions={[8, 16, 24]}
         />

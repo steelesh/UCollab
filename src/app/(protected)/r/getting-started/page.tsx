@@ -47,7 +47,7 @@ export default function Page() {
         <Muted>
           Read our
           {" "}
-          <TypographyLink href="/c/community-guide">Community Guide</TypographyLink>
+          <TypographyLink href="/r/community-guide">Community Guide</TypographyLink>
           {" "}
           for best practices.
         </Muted>
@@ -57,7 +57,7 @@ export default function Page() {
         <Muted>
           Ready to contribute? Check out our
           {" "}
-          <TypographyLink href="/c/contribution-guide">Contribution Guide</TypographyLink>
+          <TypographyLink href="/r/contribution-guide">Contribution Guide</TypographyLink>
           {" "}
           for guidelines on submitting code, reporting issues, and reviewing pull requests.
         </Muted>
