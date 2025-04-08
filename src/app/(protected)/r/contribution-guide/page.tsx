@@ -165,7 +165,7 @@ export default function Page() {
             {" "}
             Follow the
             {" "}
-            <TypographyLink href="/c/code-of-conduct">Code of Conduct</TypographyLink>
+            <TypographyLink href="/r/code-of-conduct">Code of Conduct</TypographyLink>
             .
           </ListItem>
         </List>

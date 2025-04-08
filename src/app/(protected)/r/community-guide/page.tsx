@@ -66,13 +66,13 @@ export default function Page() {
         <Muted>Need help getting started? Check out these resources:</Muted>
         <List>
           <ListItem>
-            <TypographyLink href="/c/getting-started">Getting Started Guide</TypographyLink>
+            <TypographyLink href="/r/getting-started">Getting Started Guide</TypographyLink>
           </ListItem>
           <ListItem>
-            <TypographyLink href="/c/contribution-guide">Contribution Guidelines</TypographyLink>
+            <TypographyLink href="/r/contribution-guide">Contribution Guidelines</TypographyLink>
           </ListItem>
           <ListItem>
-            <TypographyLink href="/c/code-of-conduct">Code of Conduct</TypographyLink>
+            <TypographyLink href="/r/code-of-conduct">Code of Conduct</TypographyLink>
           </ListItem>
         </List>
       </Section>
