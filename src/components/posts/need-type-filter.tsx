@@ -14,7 +14,7 @@ type FilterOption = {
 const FILTER_OPTIONS: Record<FilterVariant, FilterOption[]> = {
   projects: [
     { value: "CONTRIBUTION", label: "Projects Seeking Contributors" },
-    { value: "DEVELOPER_AVAILABLE", label: "Find Developers" },
+    { value: "DEVELOPER_AVAILABLE", label: "Available Developers" },
   ],
   mentorship: [
     { value: "MENTOR_AVAILABLE", label: "Available Mentors" },
