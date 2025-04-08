@@ -24,6 +24,8 @@ export default function SearchBar({ showRatingFilter = true }: SearchBarProps) {
       return "/p/collabs";
     if (pathname.startsWith("/p/trending"))
       return "/p/trending";
+    if (pathname.startsWith("/p/teams"))
+      return "/p/teams";
     if (pathname.startsWith("/m"))
       return "/m";
     return "/p";
