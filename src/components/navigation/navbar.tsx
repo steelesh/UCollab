@@ -19,17 +19,17 @@ export type NavSection = {
 
 const routes: NavSection[] = [
   {
-    title: "Discover",
+    title: "Explore",
     items: [
       {
         title: "All Posts",
-        href: "/p?sortBy=createdDate&sortOrder=desc&limit=8" as Route,
+        href: "/p?sortBy=createdDate&sortOrder=desc&limit=8&page=1" as Route,
         description: "Browse all posts across categories",
         requiresAuth: true,
       },
       {
         title: "Trending",
-        href: "/p/trending" as Route,
+        href: "/p/trending?sortBy=createdDate&sortOrder=desc&limit=12&page=1" as Route,
         description: "See what's popular in the community",
         requiresAuth: true,
       },
