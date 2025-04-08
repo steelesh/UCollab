@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { ActionButton } from "~/components/ui/action-button";
+import { ConfirmDialog } from "~/components/ui/confirm-dialog";
 import { connectUser, disconnectUser } from "~/features/users/user.actions";
 import { toastError, toastSuccess } from "~/lib/toast";
 
@@ -21,6 +22,7 @@ export function ProfileConnectButton({
 }: ProfileConnectButtonProps) {
   const [isConnected, setIsConnected] = useState(initialConnected);
   const [isLoading, setIsLoading] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const router = useRouter();
 
   const handleConnect = async () => {
@@ -41,8 +43,13 @@ export function ProfileConnectButton({
     }
   };
 
-  const handleDisconnect = async () => {
+  const handleDisconnect = () => {
+    setConfirmDialogOpen(true);
+  };
+
+  const performDisconnect = async () => {
     setIsLoading(true);
+    setConfirmDialogOpen(false);
     try {
       await disconnectUser(targetUsername);
       setIsConnected(false);
@@ -82,6 +89,15 @@ export function ProfileConnectButton({
               Connect
             </ActionButton>
           )}
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        onOpenChangeAction={setConfirmDialogOpen}
+        title="Disconnect with User"
+        description={`Are you sure you want to disconnect from ${targetUsername}?`}
+        confirmText="Disconnect"
+        cancelText="Cancel"
+        onConfirmAction={performDisconnect}
+      />
     </div>
   );
 }
