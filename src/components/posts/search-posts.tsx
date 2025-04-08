@@ -8,7 +8,11 @@ import * as R from "remeda";
 
 import { checkPostsCount } from "~/features/posts/post.actions";
 
-export default function SearchBar() {
+type SearchBarProps = {
+  showRatingFilter?: boolean;
+};
+
+export default function SearchBar({ showRatingFilter = true }: SearchBarProps) {
   const router = useRouter();
   const sp = useSearchParams();
   const pathname = usePathname();
@@ -18,76 +22,71 @@ export default function SearchBar() {
       return "/p/feedback";
     if (pathname.startsWith("/p/collabs"))
       return "/p/collabs";
+    if (pathname.startsWith("/p/trending"))
+      return "/p/trending";
+    if (pathname.startsWith("/m"))
+      return "/m";
     return "/p";
   }, [pathname]);
 
-  const defaultPostNeeds
-    = basePath === "/p/feedback"
-      ? "FEEDBACK"
-      : basePath === "/p/collabs"
-        ? "CONTRIBUTION"
-        : sp.get("postNeeds") ?? "";
-
   const [query, setQuery] = useState(sp.get("query") ?? "");
-  const [postNeeds, _setPostNeeds] = useState(defaultPostNeeds);
   const [minRating, setMinRating] = useState(sp.get("minRating") ?? "");
   const [sortBy, setSortBy] = useState(sp.get("sortBy") ?? "createdDate");
   const [sortOrder, setSortOrder] = useState(sp.get("sortOrder") ?? "desc");
 
   const updateSearch = useCallback(async () => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(sp.toString());
+
     if (query)
       params.set("query", query);
-    if (postNeeds)
-      params.set("postNeeds", postNeeds);
-    if (minRating)
+    else params.delete("query");
+
+    if (showRatingFilter && minRating)
       params.set("minRating", minRating);
+    else params.delete("minRating");
+
     if (sortBy)
       params.set("sortBy", sortBy);
+    else params.delete("sortBy");
+
     if (sortOrder)
       params.set("sortOrder", sortOrder);
+    else params.delete("sortOrder");
 
-    const currentLimit = sp.get("limit") ?? "8";
-    params.set("limit", currentLimit);
-
-    const currentFilter = {
-      query: sp.get("query") ?? "",
-      postNeeds: sp.get("postNeeds") ?? "",
-      minRating: sp.get("minRating") ?? "",
-      sortBy: sp.get("sortBy") ?? "createdDate",
-      sortOrder: sp.get("sortOrder") ?? "desc",
-    };
-
-    const filtersChanged
-      = query !== currentFilter.query
-        || postNeeds !== currentFilter.postNeeds
-        || minRating !== currentFilter.minRating
-        || sortBy !== currentFilter.sortBy
-        || sortOrder !== currentFilter.sortOrder;
-
-    if (filtersChanged) {
-      params.set("page", "1");
-    } else {
-      const currentPage = sp.get("page");
-      if (currentPage) {
-        params.set("page", currentPage);
-      }
+    const defaultLimit = basePath === "/p/trending" ? "12" : "8";
+    if (!params.has("limit")) {
+      params.set("limit", defaultLimit);
     }
 
-    const newParamsString = params.toString();
-    const currentParamsString = sp.toString();
+    params.set("page", "1");
 
-    const result = await checkPostsCount({ query, needType: postNeeds as NeedType, minRating });
-    if (result && result.success && result.totalCount > 0 && currentParamsString !== newParamsString) {
+    const currentParamsString = sp.toString();
+    const newParamsString = params.toString();
+
+    if (currentParamsString === newParamsString)
+      return;
+
+    const postNeeds = params.get("postNeeds");
+
+    const result = await checkPostsCount({
+      query,
+      needType: postNeeds as NeedType,
+      minRating: showRatingFilter ? minRating : undefined,
+    });
+
+    if (result && result.success && result.totalCount > 0) {
       router.replace(`${basePath}?${newParamsString}`);
     }
-  }, [query, postNeeds, minRating, sortBy, sortOrder, router, sp, basePath]);
+  }, [query, minRating, sortBy, sortOrder, router, sp, basePath, showRatingFilter]);
 
-  const funnel = useMemo(() => R.funnel(updateSearch, { minQuietPeriodMs: 500 }), [updateSearch]);
+  const debouncedUpdate = useMemo(
+    () => R.funnel(updateSearch, { minQuietPeriodMs: 500 }),
+    [updateSearch],
+  );
 
   useEffect(() => {
-    funnel.call();
-  }, [funnel, query, postNeeds, minRating, sortBy, sortOrder]);
+    debouncedUpdate.call();
+  }, [debouncedUpdate, query, minRating, sortBy, sortOrder]);
 
   return (
     <div className="bg-muted mb-8 rounded-xl p-4">
@@ -105,24 +104,26 @@ export default function SearchBar() {
             className="bg-background mt-1 block w-full rounded-md border border-input p-2 text-foreground placeholder:text-muted-foreground"
           />
         </div>
-        <div>
-          <label htmlFor="minRating" className="block text-sm font-medium text-foreground">
-            Minimum Rating
-          </label>
-          <select
-            id="minRating"
-            value={minRating}
-            onChange={e => setMinRating(e.target.value)}
-            className="bg-background mt-1 block w-full rounded-md border border-input p-2 text-foreground"
-          >
-            <option value="">Any Rating</option>
-            <option value="1">1 Star & up</option>
-            <option value="2">2 Stars & up</option>
-            <option value="3">3 Stars & up</option>
-            <option value="4">4 Stars & up</option>
-            <option value="5">5 Stars</option>
-          </select>
-        </div>
+        {showRatingFilter && (
+          <div>
+            <label htmlFor="minRating" className="block text-sm font-medium text-foreground">
+              Minimum Rating
+            </label>
+            <select
+              id="minRating"
+              value={minRating}
+              onChange={e => setMinRating(e.target.value)}
+              className="bg-background mt-1 block w-full rounded-md border border-input p-2 text-foreground"
+            >
+              <option value="">Any Rating</option>
+              <option value="1">1 Star & up</option>
+              <option value="2">2 Stars & up</option>
+              <option value="3">3 Stars & up</option>
+              <option value="4">4 Stars & up</option>
+              <option value="5">5 Stars</option>
+            </select>
+          </div>
+        )}
         <div>
           <label htmlFor="sortBy" className="block text-sm font-medium text-foreground">
             Sort By
@@ -137,7 +138,7 @@ export default function SearchBar() {
             <option value="lastModifiedDate">Last Updated Date</option>
           </select>
         </div>
-        <div className="sm:col-span-2 lg:col-span-1">
+        <div className={`${!showRatingFilter ? "sm:col-span-2" : ""} lg:col-span-1`}>
           <label htmlFor="sortOrder" className="block text-sm font-medium text-foreground">
             Sort Order
           </label>
