@@ -7,7 +7,7 @@ import SearchBar from "~/components/posts/search-posts";
 import { Container } from "~/components/ui/container";
 import { Header } from "~/components/ui/header";
 import { H1 } from "~/components/ui/heading";
-import { getPosts } from "~/features/posts/post.queries";
+import { getAllPosts } from "~/features/posts/post.queries";
 import { withAuth } from "~/security/protected";
 
 export const dynamic = "force-dynamic";
@@ -26,23 +26,21 @@ async function Page({ searchParams, userId }: PageProps) {
     page = "1",
     limit = "8",
     query: rawQuery = "",
-    postNeeds: rawPostNeeds = "",
     minRating: rawMinRating = "",
     sortBy: rawSortBy = "createdDate",
     sortOrder: rawSortOrder = "desc",
   } = await searchParams;
 
   const query = Array.isArray(rawQuery) ? rawQuery[0] : rawQuery;
-  const postNeeds = Array.isArray(rawPostNeeds) ? rawPostNeeds[0] : rawPostNeeds;
   const minRating = Array.isArray(rawMinRating) ? rawMinRating[0] : rawMinRating;
   const sortBy = Array.isArray(rawSortBy) ? rawSortBy[0] : rawSortBy;
   const sortOrder = Array.isArray(rawSortOrder) ? rawSortOrder[0] : rawSortOrder;
 
-  const { posts, totalCount } = await getPosts(
+  const { posts, totalCount } = await getAllPosts(
     Number(page),
     Number(limit),
     userId,
-    { query, postNeeds, minRating, sortBy, sortOrder },
+    { query, minRating, sortBy, sortOrder },
   );
 
   return (
