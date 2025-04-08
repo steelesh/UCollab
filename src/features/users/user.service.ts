@@ -2,12 +2,13 @@ import type { Account, User } from "@prisma/client";
 
 import { lorelei } from "@dicebear/collection";
 import { createAvatar } from "@dicebear/core";
-import { AvatarSource, Prisma } from "@prisma/client";
+import { AvatarSource, NotificationType, Prisma } from "@prisma/client";
 import { notFound } from "next/navigation";
 import { Buffer } from "node:buffer";
 
 import type { CompleteOnboardingData, UpdateUserInput } from "~/features/users/user.schema";
 
+import { NotificationService } from "~/features/notifications/notification.service";
 import { onboardingSchema, userSelect } from "~/features/users/user.schema";
 import { blobStorage } from "~/lib/blob-storage";
 import { prisma } from "~/lib/prisma";
@@ -258,19 +259,17 @@ export const UserService = {
           },
         });
 
-        // TODO: Queue a notification if you want to alert the target user.
-        //        if (targetUser.id !== userId) {
-        //          await NotificationService.queueBatchNotifications({
-        //            userIds: [targetUser.id],
-        //            type: "FOLLOW",
-        //            message: `${connection.follower.username} is now connected with you`,
-        //            triggeredById: userId,
-        //          });
-        //        }
+        if (targetUser.id !== userId) {
+          await NotificationService.queueNotification({
+            userId: targetUser.id,
+            type: NotificationType.FOLLOW,
+            message: `${connection.follower.username} is now connected with you`,
+            triggeredById: userId,
+          });
+        }
 
         return connection;
       } catch (error) {
-        // If the connection already exists, this error code (P2002) might be raised.
         if (
           error instanceof Prisma.PrismaClientKnownRequestError
           && error.code === "P2002"
