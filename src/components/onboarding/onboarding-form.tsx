@@ -40,7 +40,7 @@ function GraduationYearControl({ field, currentYear }: { readonly field: any; re
       <div onMouseLeave={() => setFocused(null)} className="flex items-center" role="button" tabIndex={0}>
         {years.map((year, index) => (
           <div key={year} className="flex items-center">
-            <Button
+            <button
               type="button"
               onMouseEnter={() => setFocused(year)}
               onFocus={() => setFocused(year)}
@@ -54,13 +54,13 @@ function GraduationYearControl({ field, currentYear }: { readonly field: any; re
                   field.onChange(String(year));
                 }
               }}
-              className="relative cursor-pointer border-none bg-transparent px-2 py-1 focus:outline-none"
+              className="relative cursor-pointer border-none px-2 py-1 focus:outline-none"
             >
-              <span className="relative z-10 text-xs text-foreground">{year}</span>
+              <span className="relative z-10 text-xs text-foreground font-semibold">{year}</span>
               {focused === year && (
                 <motion.div
                   transition={{ layout: { duration: 0.2, ease: "easeOut" } }}
-                  className="bg-muted absolute right-0 bottom-[-2px] left-[-10px] z-0 h-[100%] w-[140%] rounded-md"
+                  className="bg-muted absolute right-0 bottom-[-1px] left-[-5px] -z-10 h-[90%] w-[120%] rounded-md"
                   layoutId="highlight"
                 />
               )}
@@ -70,8 +70,8 @@ function GraduationYearControl({ field, currentYear }: { readonly field: any; re
                   layoutId="underline"
                 />
               )}
-            </Button>
-            {index < years.length - 1 && <span className="mx-2 text-xs text-muted-foreground">|</span>}
+            </button>
+            {index < years.length - 1 && <span className="mx-2 text-xs text-muted-foreground cursor-default">|</span>}
           </div>
         ))}
       </div>
@@ -197,7 +197,7 @@ export function OnboardingForm() {
       </div>
       <Button
         type="submit"
-        className="w-full cursor-pointer bg-green-600 hover:bg-green-600/80"
+        className="w-full cursor-pointer bg-green-600 hover:bg-green-600/80 text-white"
         disabled={isSubmitting}
       >
         {isSubmitting ? "Saving..." : "Submit"}
