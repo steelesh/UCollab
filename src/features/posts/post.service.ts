@@ -944,7 +944,7 @@ export const PostService = {
   ): Promise<ExplorePageData> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        const { query, minRating } = filters;
+        const { query, minRating, sortBy = "createdDate", sortOrder = "desc" } = filters;
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -971,6 +971,7 @@ export const PostService = {
             id: true,
             title: true,
             createdDate: true,
+            lastModifiedDate: true,
             description: true,
             githubRepo: true,
             rating: true,
@@ -1017,7 +1018,7 @@ export const PostService = {
           },
         });
 
-        const scoredPosts = posts
+        const trendingPosts = posts
           .map((post) => {
             const nonOwnerWatchers = post.watchers.filter(w => w.userId !== post.createdById);
             const trendingScore = calculateTrendingScore(post);
@@ -1028,14 +1029,27 @@ export const PostService = {
               watchers: nonOwnerWatchers,
               trendingScore,
             };
-          });
+          })
+          .filter(post => post.isTrending);
 
-        const trendingPosts = scoredPosts
-          .filter(post => post.isTrending)
-          .sort((a, b) => b.trendingScore - a.trendingScore);
+        const sortedPosts = [...trendingPosts];
+
+        if (sortBy === "lastModifiedDate") {
+          sortedPosts.sort((a, b) => {
+            const dateA = new Date(a.lastModifiedDate).getTime();
+            const dateB = new Date(b.lastModifiedDate).getTime();
+            return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+          });
+        } else {
+          sortedPosts.sort((a, b) => {
+            const dateA = new Date(a.createdDate).getTime();
+            const dateB = new Date(b.createdDate).getTime();
+            return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+          });
+        }
 
         const totalCount = trendingPosts.length;
-        const paginatedPosts = trendingPosts.slice((page - 1) * limit, page * limit);
+        const paginatedPosts = sortedPosts.slice((page - 1) * limit, page * limit);
 
         return {
           posts: paginatedPosts satisfies ExplorePost[],
