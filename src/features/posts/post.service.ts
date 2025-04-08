@@ -1023,25 +1023,22 @@ export const PostService = {
             const trendingScore = calculateTrendingScore(post);
 
             return {
-              post: {
-                ...post,
-                isTrending: trendingScore > TRENDING_THRESHOLD,
-                watchers: nonOwnerWatchers,
-              },
+              ...post,
+              isTrending: trendingScore > TRENDING_THRESHOLD,
+              watchers: nonOwnerWatchers,
               trendingScore,
             };
           })
-          .sort((a, b) => b.trendingScore - a.trendingScore)
-          .slice((page - 1) * limit, page * limit)
-          .map(item => item.post);
+          .sort((a, b) => b.trendingScore - a.trendingScore);
 
-        const totalFilteredCount = postsWithScores.length;
+        const totalCount = postsWithScores.length;
+        const paginatedPosts = postsWithScores.slice((page - 1) * limit, page * limit);
 
         return {
-          posts: postsWithScores satisfies ExplorePost[],
-          totalCount: totalFilteredCount,
+          posts: paginatedPosts satisfies ExplorePost[],
+          totalCount,
           currentPage: page,
-          totalPages: Math.ceil(posts.length / limit),
+          totalPages: Math.ceil(totalCount / limit),
           limit,
           filters,
         };
