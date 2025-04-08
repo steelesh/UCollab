@@ -317,15 +317,15 @@ export const PostService = {
       }
     });
   },
-  async getPaginatedPosts(
+  async getAllPosts(
     requestUserId: User["id"],
-    filters: { query?: string; postNeeds?: string; minRating?: string; sortBy?: string; sortOrder?: string },
+    filters: { query?: string; minRating?: string; sortBy?: string; sortOrder?: string; needType?: string },
     page = 1,
     limit = 12,
   ): Promise<{ posts: ExplorePost[]; totalCount: number }> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
-        const { query, postNeeds, minRating, sortBy = "createdDate", sortOrder = "desc" } = filters;
+        const { query, minRating, needType, sortBy = "createdDate", sortOrder = "desc" } = filters;
         const where: any = {};
 
         if (query) {
@@ -335,14 +335,14 @@ export const PostService = {
           ];
         }
 
-        if (postNeeds) {
-          where.postNeeds = {
-            some: { needType: postNeeds },
-          };
-        }
-
         if (minRating) {
           where.rating = { gte: Number(minRating) };
+        }
+
+        if (needType) {
+          where.postNeeds = {
+            some: { needType },
+          };
         }
 
         const orderBy = { [sortBy]: sortOrder };
@@ -936,18 +936,37 @@ export const PostService = {
     });
   },
 
-  async getTrendingPosts(requestUserId: User["id"], page = 1, limit = 12): Promise<ExplorePageData> {
+  async getTrendingPosts(
+    requestUserId: User["id"],
+    filters: { query?: string; minRating?: string; sortBy?: string; sortOrder?: string },
+    page = 1,
+    limit = 12,
+  ): Promise<ExplorePageData> {
     return withServiceAuth(requestUserId, null, async () => {
       try {
+        const { query, minRating } = filters;
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-        const posts = await prisma.post.findMany({
-          where: {
-            createdDate: {
-              gte: thirtyDaysAgo,
-            },
+        const where: any = {
+          createdDate: {
+            gte: thirtyDaysAgo,
           },
+        };
+
+        if (query) {
+          where.OR = [
+            { title: { search: query } },
+            { description: { search: query } },
+          ];
+        }
+
+        if (minRating) {
+          where.rating = { gte: Number(minRating) };
+        }
+
+        const posts = await prisma.post.findMany({
+          where,
           select: {
             id: true,
             title: true,
@@ -1024,6 +1043,7 @@ export const PostService = {
           currentPage: page,
           totalPages: Math.ceil(posts.length / limit),
           limit,
+          filters,
         };
       } catch (error) {
         if (error instanceof Utils)
