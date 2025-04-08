@@ -260,8 +260,8 @@ export const UserService = {
         });
 
         if (targetUser.id !== userId) {
-          await NotificationService.queueBatchNotifications({
-            userIds: [targetUser.id],
+          await NotificationService.queueNotification({
+            userId: targetUser.id,
             type: NotificationType.FOLLOW,
             message: `${connection.follower.username} is now connected with you`,
             triggeredById: userId,
