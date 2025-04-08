@@ -228,6 +228,7 @@ enum NotificationType {
   POST_UPDATE
   SYSTEM
   RATING
+  FOLLOW
 }
 
 enum OnboardingStep {
